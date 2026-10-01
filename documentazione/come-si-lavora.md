@@ -136,6 +136,24 @@ dopo.
 
 Il backend ha i suoi: `cd backend && npm run prova`, e `npm run postman` per le rotte.
 
+## La roadmap si aggiorna a ogni push, di chiunque
+
+Regola di Carlo del 02/10/2026: **«aggiorna costantemente la roadmap al push di
+chiunque»**. La roadmap del cantiere è [`roadmap.md`](roadmap.md) — quella che dice a che
+punto siamo — e non può restare indietro di nemmeno un push, perché la si legge per
+decidere cosa fare adesso.
+
+- Ogni push porta con sé l'aggiornamento di `roadmap.md`, nello stesso commit della task:
+  la data in cima, la tappa toccata, lo stato del punto d'accordo con
+  `implementazioni/README.md`.
+- Vale anche per i push degli altri. Dopo il `git fetch` di inizio lavoro si guarda cos'è
+  arrivato: se un push di Carletto, di Alessio o un merge in `main` ha spostato una tappa e
+  in `roadmap.md` non c'è, lo si segna nel primo commit che si fa, controllato sul repo.
+
+Il dettaglio di cosa si scrive sta in testa a [`roadmap.md`](roadmap.md).
+
+---
+
 ## Il giro di fine task
 
 Committata la task, **prima di pushare** si fa un giro di controllo con i due agenti che lo

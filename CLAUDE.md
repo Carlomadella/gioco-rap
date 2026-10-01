@@ -13,6 +13,8 @@ qui, cambiala anche lì.
 1. **Mai lavorare su `main`.** Un branch per ogni lavoro, `task/qualcosa`, creato *prima*
    di aprire il primo file — non dopo, quando le modifiche sono già in giro.
 2. `git fetch` e guarda cos'è arrivato: Carletto pusha mentre lavori, ed è normale.
+   **La roadmap si aggiorna al push di chiunque**: se è arrivato qualcosa che sposta una
+   tappa e `documentazione/roadmap.md` non lo dice, lo segni tu nel tuo primo commit.
 3. Fai girare `cd frontend && npm run verifica` **sulla base pulita**. `main` può essere
    rosso: se lo scopri alla fine, cerchi dentro al tuo lavoro una rottura che non è tua.
 
@@ -43,7 +45,8 @@ qui, cambiala anche lì.
 1. `cd frontend && npm run verifica` — **non basta `npm run prova`**: la verifica fa girare
    anche `audit-regressioni.js`, che è quello che si accorge se hai tolto qualcosa. Se una
    cosa è stata tolta apposta, togli anche il suo controllo, nello stesso commit.
-2. Committa citando il testo del punto.
+2. Aggiorna `documentazione/roadmap.md` (data in cima, tappa toccata) e committa citando
+   il testo del punto: ogni push porta con sé la roadmap aggiornata.
 3. **Il giro di fine task**, prima del push: lancia insieme gli agenti `segnala-problemi` e
    `backend-allineato` (quest'ultimo conta davvero se la task ha toccato `backend/`).
    Quello che trovano si sistema adesso, non dopo il push. Dopo il commit un hook te lo

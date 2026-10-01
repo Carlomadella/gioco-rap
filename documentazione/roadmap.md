@@ -18,7 +18,17 @@ punto siamo, e cosa conviene fare adesso».
 
 ---
 
-## La regola: questo file si aggiorna a ogni task
+## La regola: questo file si aggiorna a ogni push, di chiunque
+
+Chiesto da Carlo il 02/10/2026: **la roadmap si aggiorna costantemente, a ogni push di
+chiunque** — non solo ai propri. Vuol dire due cose:
+
+- **i push tuoi** portano dentro l'aggiornamento di questo file, nello stesso commit della
+  task (i tre passi qui sotto);
+- **i push degli altri** (Carletto, Alessio, i merge in `main`): quando `git fetch` mostra
+  roba arrivata che sposta una tappa e qui non è stata segnata, la si segna tu nel primo
+  commit che fai — controllata sul repo, come il resto. Una roadmap che resta indietro di
+  un push è già una roadmap che mente.
 
 **Prima del push, insieme al commit della task**, si aggiorna qui:
 
