@@ -55,6 +55,7 @@ const skip = leggi("js/game/skip.js");
 const transfers = leggi("js/game/trasferte.js");
 const time = leggi("js/game/tempo.js");
 const timeControls = leggi("js/game/tempo-controlli.js");
+const luoghiFoto = leggi("js/game/luoghi-foto.js");
 /* Punto 27: le pagine sono tre. «index» qui è la pagina del gioco, che è
    quella che tiene tutta l'impalcatura di cui parlano queste prove; la landing
    e la porta d'ingresso hanno le loro, più sotto. */
@@ -2738,7 +2739,7 @@ test("il creator offre Avaturn e MakeHuman, con Avaturn consigliato, e il ponte 
   })());
 
 console.log("\nLe pagine dei posti sulla loro foto — Casa, Palestra, Live Club, stacca la spina");
-const luoghiFoto = leggi("js/game/luoghi-foto.js");
+/* luoghiFoto è già caricato all’inizio dell’audit. */
 const luoghiFotoCss = leggi("css/luoghi-foto.css");
 test("luoghi-foto.js e il suo CSS si caricano dopo lo Studio, di cui riusano i pannelli",
   index.indexOf('<script src="js/game/luoghi-foto.js') > index.indexOf('<script src="js/game/studio-elementi.js') &&
