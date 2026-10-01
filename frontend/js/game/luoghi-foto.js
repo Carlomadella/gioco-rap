@@ -111,6 +111,23 @@ function apriLuogo(id, opz){
   $("luogo").classList.add("on");
   renderLuogo();
 }
+/* La fascia in alto non ha un'altezza fissa: sotto i 480 punti il nome, le
+   risorse e l'orologio del tempo (tempo-controlli.js, montato dentro alla
+   fascia) vanno su tre righe, e la fascia supera `--stAlta`. La si misura e
+   la pagina parte lì sotto (`--lfAlta`, luoghi-foto.css); se la fascia
+   cambia — l'orologio che si monta dopo, il telefono girato — si rimisura. */
+function lfMisuraFascia(){
+  const root = $("luogo");
+  const head = root && root.querySelector(".lfbarra");
+  if(!head) return;
+  const h = Math.ceil(head.getBoundingClientRect().height);
+  if(h > 0) root.style.setProperty("--lfAlta", h + "px");
+}
+if(typeof ResizeObserver === "function" && typeof $ === "function" && $("luogo")){
+  const barra = $("luogo").querySelector(".lfbarra");
+  if(barra) new ResizeObserver(lfMisuraFascia).observe(barra);
+}
+
 /* Si esce dal bottone globale «Torna alla mappa» (menu-sistema.js la chiama)
    e da «Continua» quando la pagina è arrivata da una mossa. */
 function chiudiLuogo(){

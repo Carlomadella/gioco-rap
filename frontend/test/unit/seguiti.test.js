@@ -110,14 +110,14 @@ describe("la discografia decide, lo Studio fa", () => {
     expect(p.run("seguitoAscolti(G.songs[0])")).toBe(0);
   });
 
-  it("la remastered si prenota, apre il Mix a banco vuoto e la mossa esiste solo finche' e' prenotata", () => {
+  it("la remastered si prenota e la mossa esiste solo finche' e' prenotata", () => {
     expect(p.run('ACTIONS.find(a => a.id === "remaster").avail()')).toBe(false);
-    expect(p.run('studioSezAperta(STUDIO_SEZIONI.find(x => x.id === "banco"))')).toBe(false);
     expect(p.run("discoPrenotaRemaster(222)")).toBe(false);     // nove settimane: ancora no
     expect(p.run("discoPrenotaRemaster(111)")).toBe(true);
     expect(p.run('ACTIONS.find(a => a.id === "remaster").avail()')).toBe(true);
+    /* dal 21/09 sera le linguette sono aperte sempre: il Mix c'e' comunque */
     expect(p.run('studioSezAperta(STUDIO_SEZIONI.find(x => x.id === "banco"))')).toBe(true);
-    expect(p.run('studioSezAperta(STUDIO_SEZIONI.find(x => x.id === "fuori"))')).toBe(false);
+    expect(p.run('studioSezAperta(STUDIO_SEZIONI.find(x => x.id === "fuori"))')).toBe(true);
     expect(p.run("remasterPannello()")).toContain('data-az="remaster"');
     expect(p.run("discoSeguitiRiga(G.songs[0])")).toContain("remastered prenotata");
   });

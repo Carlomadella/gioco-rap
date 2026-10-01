@@ -53,6 +53,7 @@ const TRANSIZIONI_SCENE = {
     "media/video/Transizioni di scena/fabbrica_02_spogliatoio.webp",
     "media/video/Transizioni di scena/fabbrica_03_timbratura.webp"
   ],
+  /* Arrivo al turno: strada -> spogliatoio -> ingresso in cucina. */
   pizzeria: [
     "media/video/Transizioni di scena/pizzeria_01_arrivo.webp",
     "media/video/Transizioni di scena/pizzeria_02_spogliatoio.webp",
@@ -193,7 +194,7 @@ function transizioneScene(id, poi){
   try{ box.focus({preventScroll:true}); }catch(e){}
 
   /* Se uno degli asset manca non lasciamo mai il giocatore davanti al nero:
-     si entra normalmente in Fabbrica, come per un mp4 che non parte. */
+     si entra normalmente nel posto, come per un mp4 che non parte. */
   attesa = setTimeout(fine, TRANSIZIONE_ATTESA);
   Promise.all(slides.map(carica)).then(() => {
     if(chiuso) return;

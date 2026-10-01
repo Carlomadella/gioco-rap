@@ -16,12 +16,13 @@
   "related_task_ids": [],
   "intake_note": "",
   "current_state": [
-    "Le aree della mappa usano sagome e poligoni in frontend/js/game/hub.js.",
-    "frontend/css/hub.css implementa angoli corti, ombra, stato hover e comportamento touch."
+    "HUB_SAGOME e hubSagoma() in frontend/js/game/hub.js definiscono e trasformano in poligoni SVG le sagome cliccabili dei luoghi.",
+    "frontend/css/hub.css mostra gli angoli della sagoma e distingue hover mouse; frontend/css/tocco.css mantiene i bersagli touch e le regole senza hover."
   ],
   "systems": [
     "frontend/js/game/hub.js",
     "frontend/css/hub.css",
+    "frontend/css/tocco.css",
     "frontend/strumenti/audit-regressioni.js"
   ],
   "watch_paths": [
@@ -37,7 +38,8 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/game/hub.js: HUB_SAGOME definisce i poligoni delle aree e il rendering usa la sagoma."
+        "frontend/js/game/hub.js: HUB_SAGOME, hubSagoma() e renderHub() usano le sagome SVG come aree cliccabili.",
+        "frontend/strumenti/audit-regressioni.js: controlla che i luoghi abbiano poligoni validi e che il clic sia limitato alla sagoma."
       ]
     },
     {
@@ -46,7 +48,8 @@
       "verification": "playtest",
       "status": "needs_validation",
       "evidence": [
-        "manual: implementazioni/01-mappa-e-citta.md, sezione 'I bordi delle aree cliccabili sulla mappa', riporta prove Chrome ma richiede controllo visuale futuro."
+        "frontend/css/hub.css e frontend/css/tocco.css: regole per angoli visivi e input touch; non attestano da sole la resa su dispositivo reale.",
+        "manual: implementazioni/01-mappa-e-citta.md, sezione 'I bordi delle aree cliccabili sulla mappa', documenta la prova Chrome desktop e lascia da verificare la resa touch."
       ]
     }
   ],

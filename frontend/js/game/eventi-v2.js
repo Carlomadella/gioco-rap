@@ -342,9 +342,9 @@ function cooldownOk(e){
 }
 function eligible(e, opts){
   opts=opts||{};
-  /* ARC106 è il vecchio arco "promozione": oggi distribuisce somme una tantum
-     senza cambiare paga o mansione. Lo teniamo fuori dal pool finché, nel
-     passaggio eventi dedicato, verrà riscritto sui nuovi effetti reali. */
+  /* ARC106 è il vecchio arco "promozione": distribuisce somme una tantum
+     senza cambiare paga o mansione. Resta escluso perché la carriera lavoro è
+     ora gestita da lavoro-eventi.js con paga/ruolo persistenti reali. */
   if(e && e.arc_id==="ARC106") return false;
   if(!e || !cityOk(e) || !phaseOk(e) || !requirementsOk(e) || !cooldownOk(e)) return false;
   if(e.tier==="high" && !opts.ignoreHigh && !highDue()) return false;
@@ -1792,7 +1792,7 @@ function adfSocialMakePost(scene, opts){
   const post={
     adfSocial:true,
     sid:"SOC"+(++st().runtime.socialPostSeq),
-    n:author,t:caption,w:"adesso",like:likes,comments:comments,mia:false,
+    n:author,t:caption,w:"adesso",tw:totalWeeks(),like:likes,comments:comments,mia:false,
     media:{scene:scene}
   };
   adfSocialEnsureActions(post);
@@ -2053,7 +2053,7 @@ function mirrorDelivery(e, meta){
   if(e.delivery==="lafamegram"){
     G.lafamegramEventi=G.lafamegramEventi||[];
     G.lafamegramEventi.unshift({
-      n:"La Voce del Giro",t:e.title+" — "+e.description,w:"adesso",
+      n:"La Voce del Giro",t:e.title+" — "+e.description,w:"adesso",tw:totalWeeks(),
       like:Math.max(5,Math.round(12+G.hype*.8)),mia:false
     });
     if(G.lafamegramEventi.length>20) G.lafamegramEventi.length=20;
@@ -2227,7 +2227,14 @@ function adfWorkOvertimeAfterShift(){
 
   const offerta=lavoroTentaRichiestaStraordinario(luogo,Math.random());
   if(!offerta) return false;
-  if(!claimAutoEvent("work-overtime:"+luogo)) return false;
+  if(!claimAutoEvent("work-overtime:"+luogo)){
+    if(typeof lavoroAnnullaRichiestaStraordinario==="function")
+      lavoroAnnullaRichiestaStraordinario(luogo);
+    return false;
+  }
+
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime==="function")
+    ADF_WORK_EVENTS.onOvertime(luogo,"offered",offerta);
 
   s.lastHookEventDay=absDay();
   const giorno=offerta.targetLabel||"domani";
@@ -2296,6 +2303,8 @@ function adfFactoryStreetAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
     return false;
   if(typeof stradaTentaPropostaFabbrica!=="function") return false;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.crimeLeadActive==="function" &&
+     ADF_WORK_EVENTS.crimeLeadActive()) return false;
 
   const s=st();
   if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
@@ -2771,28 +2780,81 @@ saltaGiorni=function(n){
 };
 
 /* -------------------- action hooks -------------------- */
+function adfCompletaHookAzione(a,jobBefore,endedAt){
+  const shiftPayload = a.id==="turno" && jobBefore ? {
+    action_id:"turno",
+    job_id:jobBefore.id,
+    workplace:jobBefore.place,
+    job_name:jobBefore.n,
+    started_at:jobBefore.from,
+    ended_at:Number.isFinite(Number(endedAt))
+      ? Number(endedAt)
+      : ((typeof GAME_TIME!=="undefined" && GAME_TIME.now)
+        ? Number(GAME_TIME.now()) : Number(G.timeMinutes||0))
+  } : null;
+
+  const overtimeShown = a.id==="turno" ? adfWorkOvertimeAfterShift() : false;
+  const streetShown = a.id==="turno" && !overtimeShown
+    ? adfFactoryStreetAfterShift()
+    : false;
+  const workFamilyShown = a.id==="turno" && !overtimeShown && !streetShown &&
+    window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.afterShift==="function"
+      ? ADF_WORK_EVENTS.afterShift(shiftPayload)
+      : false;
+  const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
+    ? adfWorkContactAfterShift()
+    : false;
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+    emitHook("after_action",{action_id:a.id});
+  if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+    emitHook("after_job_shift",shiftPayload || {
+      action_id:"turno",
+      job_id:G.job.id,
+      workplace:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null)
+    });
+}
+
 for(const a of ACTIONS){
   if(a.__adfWrapped) continue;
   const old=a.run;
   a.run=function(){
-    const jobBefore=G.job&&G.job.id;
+    const jobBefore=G.job ? {
+      id:G.job.id,
+      place:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null),
+      n:G.job.n,
+      from:(typeof GAME_TIME!=="undefined" && GAME_TIME.now)
+        ? Number(GAME_TIME.now()) : Number(G.timeMinutes||0)
+    } : null;
     const out=old.apply(this,arguments);
     setTimeout(()=>{
-      const overtimeShown = a.id==="turno" ? adfWorkOvertimeAfterShift() : false;
-      const streetShown = a.id==="turno" && !overtimeShown
-        ? adfFactoryStreetAfterShift()
-        : false;
-      const contactShown = a.id==="turno" && !overtimeShown && !streetShown
-        ? adfWorkContactAfterShift()
-        : false;
-      if(!overtimeShown && !streetShown && !contactShown)
-        emitHook("after_action",{action_id:a.id});
-      if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !contactShown)
-        emitHook("after_job_shift",{
-          action_id:"turno",
-          job_id:G.job.id,
-          workplace:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null)
-        });
+      /* Un evento ALTO può spezzare un turno lungo a metà. In quel caso
+         straordinari, contatti, carriera e conflitti "dopo turno" devono
+         aspettare il resume reale del clock: altrimenti scatterebbero mentre
+         il turno è ancora sospeso. */
+      const suspended = a.id==="turno" && typeof GAME_TIME!=="undefined" &&
+        GAME_TIME.suspended && GAME_TIME.suspended();
+      if(suspended && suspended.id==="turno"){
+        const onResume=ev=>{
+          const d=(ev&&ev.detail)||{};
+          if(d.id!=="turno") return;
+          window.removeEventListener("game-time:action-resumed",onResume);
+          window.removeEventListener("jail-ui:opened",onAbort);
+          adfCompletaHookAzione(a,jobBefore,d.to);
+        };
+        const onAbort=()=>{
+          window.removeEventListener("game-time:action-resumed",onResume);
+          window.removeEventListener("jail-ui:opened",onAbort);
+        };
+        window.addEventListener("game-time:action-resumed",onResume);
+        window.addEventListener("jail-ui:opened",onAbort);
+        return;
+      }
+      adfCompletaHookAzione(
+        a,
+        jobBefore,
+        (typeof GAME_TIME!=="undefined" && GAME_TIME.now)
+          ? Number(GAME_TIME.now()) : Number(G.timeMinutes||0)
+      );
     },0);
     return out;
   };

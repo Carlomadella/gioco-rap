@@ -16,7 +16,8 @@
   "related_task_ids": [],
   "intake_note": "",
   "current_state": [
-    "La schermata di avvio gestisce tre slot distinti; slotKey mantiene la compatibilita' dello slot 1 e aggiunge -s2/-s3."
+    "N_SLOT = 3 e slotKey() mantengono la compatibilita' delle chiavi dello slot 1 e isolano gli slot 2 e 3 con suffissi dedicati.",
+    "avvio.js crea, carica ed elimina artista e partita per slot; save() scrive nella chiave associata allo slot attivo."
   ],
   "systems": [
     "frontend/js/avvio.js",
@@ -35,11 +36,11 @@
     {
       "id": "AC1",
       "description": "Esistono al massimo tre slot separati per artista e partita.",
-      "verification": "automatic",
+      "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/impostazioni.js: N_SLOT = 3 e slotKey distingue le chiavi dello slot 1 dagli slot successivi.",
-        "frontend/js/avvio.js: slots() costruisce tre slot e infoSlot legge artista e partita per ciascuno."
+        "frontend/js/impostazioni.js: N_SLOT = 3; slotKey() conserva le chiavi storiche del primo slot e aggiunge -s2/-s3.",
+        "frontend/js/avvio.js: slots()/infoSlot() leggono separatamente artista e partita per ciascuno dei tre slot."
       ]
     },
     {
@@ -48,8 +49,9 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/avvio.js: htmlMenu/htmlCarica e i gestori data-avvio distinguono continua, nuova, carica, elimina e sostituzione.",
-        "frontend/js/menu-sistema.js: scriviCheckpoint salva artista, partita e slot attivo."
+        "frontend/js/avvio.js: preparaNuovoSlot() rifiuta slot occupati; entraSlot(), eliminaSlot() e chiavi per-slot distinguono caricamento, cancellazione e nuovi salvataggi.",
+        "frontend/js/game/state.js: CHIAVE_PARTITA() e save() scrivono la partita nello slot scelto.",
+        "frontend/js/menu-sistema.js: scriviCheckpoint() salva artista, partita e slot attivo."
       ]
     }
   ],

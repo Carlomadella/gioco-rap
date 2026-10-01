@@ -1,0 +1,38 @@
+{
+  "schema_version": 5,
+  "id": "ADF-LEG-A62AD5A6816D",
+  "origin": "legacy",
+  "title": "Avaturn e il camerino MakeHuman, tutti e due",
+  "category": "03-artista-e-avatar",
+  "source": {
+    "point": "—",
+    "text": "Avaturn e il camerino MakeHuman, tutti e due",
+    "file": "implementazioni/03-artista-e-avatar.md",
+    "source_status": "fatto",
+    "source_status_raw": "fatto"
+  },
+  "audit_state": "not_audited",
+  "verified_status": null,
+  "intake_state": "canonical",
+  "related_task_ids": [],
+  "intake_note": "",
+  "roadmap_scope": "none",
+  "roadmap_impact": "none",
+  "roadmap_note": "",
+  "plan": {
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
+    "gaps": [],
+    "notes": []
+  },
+  "current_state": [],
+  "systems": [],
+  "watch_paths": [],
+  "acceptance_criteria": [],
+  "risks": [],
+  "notes": [
+    "Importata automaticamente dal lavoro già presente in implementazioni/README.md. Nessun contenuto storico è stato riscritto."
+  ]
+}

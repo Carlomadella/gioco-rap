@@ -113,7 +113,8 @@ Farmare contatti è gameplay, non un menu.
    si conosce la gente. Ruolo, carattere, fama, e i sei gradini del rapporto; quello che puoi chiedere
    dipende da dove sei arrivato, e con un rapper si può anche rompere — e quello diventa un rivale in
    classifica. Restano: i contatti che si presentano fra loro, le scene vere delle sessioni in studio,
-   e i ruoli di Milano (manager, promoter, A&R).
+   e i ruoli propri di Milano (manager e A&R; i promoter non popolano casualmente il Circolo in provincia,
+   ma possono essere conosciuti lì come eccezione attraverso alcuni lavori).
 3. Studi come luoghi con una qualità, dentro il calcolo del pezzo; via ogni residuo di studio proprio.
 4. Milano: soglie di sblocco, luoghi nuovi, prezzi e qualità più alti.
 5. Los Angeles: soglie, luoghi di lusso e di rischio, tetto della carriera. Da lì non ci si trasferisce in

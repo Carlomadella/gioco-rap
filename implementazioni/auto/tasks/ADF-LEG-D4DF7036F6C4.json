@@ -12,124 +12,77 @@
     "source_status_raw": "da fare"
   },
   "audit_state": "audited",
-  "verified_status": "in_progress",
+  "verified_status": "blocked",
   "intake_state": "overlap",
   "related_task_ids": [
     "ADF-LEG-043B012E6E3B"
   ],
-  "intake_note": "La task canonica copre i cinque lavori tecnici per gli store; questa richiesta mantiene il delta storico su README e schema database, gia' presente, oltre alla direzione di distribuzione.",
+  "intake_note": "overlap con ADF-LEG-043B012E6E3B: build, persistenza e integrazione tecnica degli store sono coperti dalla task canonica; la documentazione distingue correttamente build e demo, mentre l'esistenza dello schema e' verificata ma la richiesta storica di non pusharlo contrasta con backend/database/README.md.",
   "current_state": [
-    "frontend/strumenti/build.js e frontend/package.json producono un build per la distribuzione e una demo separata.",
-    "backend/database/ e backend/README.md documentano database, migrazioni e schema; implementazioni/08-uscita-sugli-store.md registra i README e backend/database/schema.md come fatti.",
-    "frontend/js/game/state.js salva ancora nel localStorage e la fonte segnala come mancanti il percorso dispositivo/cloud completo e la validazione dei canali pubblicati."
+    "frontend/README.md distingue npm run build (cartella per Electron/Capacitor) da npm run demo (file monolitico per prova); ROADMAP.md conferma che il monofile non e' il formato di uscita.",
+    "README.md e backend/database/README.md rimandano a backend/database/schema.md; il README del database descrive schema e migrazioni correnti e dichiara che il file e' in git.",
+    "La persistenza client e i canali pubblicati restano lavoro tecnico non concluso, coperto dalla task ADF-LEG-043B012E6E3B.",
+    "La richiesta storica che schema.md non fosse pushato contrasta con backend/database/README.md, che dichiara il file in git; il testo storico resta invariato."
   ],
   "systems": [
     "frontend/strumenti/build.js",
     "frontend/package.json",
-    "frontend/strumenti/prova.js",
     "backend/database/",
     "backend/README.md",
-    "frontend/js/game/state.js"
+    "backend/database/README.md",
+    "backend/database/schema.md",
+    "README.md",
+    "frontend/README.md",
+    "ROADMAP.md"
   ],
   "watch_paths": [
     "frontend/strumenti/build.js",
     "frontend/package.json",
-    "frontend/strumenti/prova.js",
     "backend/database/",
     "backend/README.md",
-    "frontend/js/game/state.js",
-    "frontend/js/net/online.js",
-    "backend/accessi.js"
+    "backend/database/README.md",
+    "backend/database/schema.md",
+    "README.md",
+    "frontend/README.md",
+    "ROADMAP.md"
   ],
   "acceptance_criteria": [
     {
       "id": "AC1",
-      "description": "La direzione store non dipende da un artifact monofile e la documentazione descrive build e schema database reali.",
+      "description": "La documentazione distingue il build di distribuzione dalla demo monofile e descrive i README separati e lo schema database corrente.",
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "frontend/strumenti/build.js: build e demo sono percorsi distinti.",
-        "backend/database/schema.md e backend/README.md: schema e destinazione store documentati."
+        "frontend/package.json e frontend/strumenti/build.js: npm run build produce dist per la distribuzione, mentre npm run demo genera separatamente il file monolitico.",
+        "frontend/README.md e ROADMAP.md: descrivono il build per Electron/Capacitor e qualificano il monofile come demo.",
+        "README.md, backend/database/README.md e backend/database/schema.md: collegano e documentano struttura, migrazioni e schema corrente."
       ]
     },
     {
       "id": "AC2",
-      "description": "La carriera viene salvata sul dispositivo e sincronizzata con il cloud dell'account senza dipendere soltanto dal localStorage.",
+      "description": "Il file di schema database resta escluso da git, come richiesto nel testo originale.",
       "verification": "code_audit",
-      "status": "needs_validation",
+      "status": "blocked",
       "evidence": [
-        "frontend/js/game/state.js: save() usa ancora localStorage.",
-        "frontend/js/net/online.js e backend/server.js: il ponte cloud esiste ma non sostituisce ancora il percorso di save()."
-      ]
-    },
-    {
-      "id": "AC3",
-      "description": "I canali Steam, Apple e Google sono collegati al client del prodotto pubblicato e permettono il recupero della carriera.",
-      "verification": "playtest",
-      "status": "needs_validation",
-      "evidence": [
-        "backend/accessi.js: verifica dei token quando configurata; la configurazione delle app pubblicate e il flusso client end-to-end non sono dimostrati dal repository."
+        "implementazioni/08-uscita-sugli-store.md, punto 32: richiede che schema.md non venga pushato.",
+        "backend/database/README.md: dichiara che backend/database/schema.md e' in git dal 13/09/2026.",
+        ".gitignore: esclude backend/database/dati/ ma non backend/database/schema.md."
       ]
     }
   ],
   "risks": [
-    "Il cloud puo' sovrascrivere la carriera sbagliata se il conflitto non resta esplicito.",
-    "Le credenziali e il test sugli store richiedono ambienti reali."
+    "La documentazione storica diceva che lo schema non andava pushato, ma backend/database/README.md dichiara ora backend/database/schema.md in git: il testo storico non e' stato riscritto."
   ],
   "notes": [],
   "plan": {
-    "mode": "auto",
-    "status": "ready",
-    "summary": "Conservare build e documentazione gia' presenti, poi chiudere persistenza cross-device e integrazione store.",
-    "steps": [
-      {
-        "id": "V1",
-        "title": "Persistenza installabile",
-        "objective": "Collegare il salvataggio del gioco a uno storage dispositivo e al cloud mantenendo offline e conflitti espliciti.",
-        "depends_on": [],
-        "systems": [
-          "frontend/js/game/state.js",
-          "frontend/js/net/online.js",
-          "backend/server.js"
-        ],
-        "watch_paths": [
-          "frontend/js/game/state.js",
-          "frontend/js/net/online.js",
-          "backend/server.js",
-          "backend/database/"
-        ],
-        "acceptance_criteria": [
-          "AC2"
-        ],
-        "status": "planned"
-      },
-      {
-        "id": "V2",
-        "title": "Canali pubblicati",
-        "objective": "Collegare client, autenticazione e recupero carriera agli adapter Steam, Apple e Google e provarli nei gusci pubblicati.",
-        "depends_on": [
-          "V1"
-        ],
-        "systems": [
-          "backend/accessi.js",
-          "backend/server.js",
-          "frontend/js/net/online.js",
-          "frontend/strumenti/build.js"
-        ],
-        "watch_paths": [
-          "backend/accessi.js",
-          "backend/server.js",
-          "frontend/js/net/online.js",
-          "frontend/strumenti/build.js"
-        ],
-        "acceptance_criteria": [
-          "AC3"
-        ],
-        "status": "planned"
-      }
-    ],
+    "mode": "none",
+    "status": "not_applicable",
+    "summary": "",
+    "steps": [],
     "gaps": [],
-    "notes": []
+    "notes": [
+      "La distinzione build/demo e i README sono documentati; la richiesta di esclusione dello schema da git e' in conflitto con la documentazione attuale. Il lavoro tecnico sugli store resta nella task collegata ADF-LEG-043B012E6E3B."
+    ]
   },
   "roadmap_scope": "none",
   "roadmap_impact": "none",

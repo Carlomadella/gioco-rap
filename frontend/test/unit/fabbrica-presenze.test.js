@@ -617,17 +617,28 @@ describe("cartellino presenze Fabbrica", () => {
   it("contratto e UI espongono richiami e blocco di riassunzione", () => {
     const hub = leggi("js/game/hub.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
+    const lavoro = helperLavoro();
+    const fabbrica = lavoro.slice(lavoro.indexOf("const ADF_FABBRICA_CARRIERA"),
+      lavoro.indexOf("const ADF_PIZZERIA_CARRIERA"));
 
-    expect(hub).toContain("da 3 in su scatta un richiamo formale");
-    expect(hub).toContain("8 settimane senza riassunzione");
-    expect(hub).toContain('lavoroBloccoRiassunzione("fabbrica")');
-    expect(luoghi).toContain("'Richiami <b>' + Number(cart.richiami || 0) + '/2</b>'");
+    /* Dalla Pizzeria (PR #11) il contratto è uno solo per tutti i luoghi: i
+       numeri (3 assenze, 8 settimane, 2 richiami) li legge dalla disciplina
+       della Fabbrica invece di averli scritti nel testo. */
+    expect(fabbrica).toContain("assenzeRichiamoMin:3");
+    expect(fabbrica).toContain("bloccoRiassunzioneSettimane:8");
+    expect(fabbrica).toContain("richiamiPrimaLicenziamento:2");
+    expect(hub).toContain('"da " + richiamoMin + " in su scatta un richiamo formale.');
+    expect(hub).toContain('" settimane senza riassunzione"');
+    expect(hub).toContain("lavoroBloccoRiassunzione(luogoContratto)");
+    expect(luoghi).toContain("Richiami <b>' + Number(cart.richiami || 0) + '/' + maxRichiami + '</b>");
+    expect(luoghi).toContain("Number(carrieraCfg.disciplina.richiamiPrimaLicenziamento || 2)");
     expect(luoghi).toContain('"Riassunzione bloccata · " + bloccoRiassunzione.weeksRemaining');
   });
 
   it("il motore eventi non può aggirare il blocco Fabbrica", () => {
     const eventi = leggi("js/game/eventi-v2.js");
-    expect(eventi).toContain('lavoroBloccoRiassunzione("fabbrica").active');
+    expect(eventi).toContain("lavoroBloccoRiassunzione(luogoContratto)");
+    expect(eventi).toContain("!G.job && !blocco.active");
     expect(eventi).toContain('G._lastJobLossReason||"missed_shifts"');
     expect(eventi).toContain('delete G._lastJobLossReason');
   });
@@ -959,10 +970,12 @@ describe("cartellino presenze Fabbrica", () => {
     const luoghi = leggi("js/game/luoghi-foto.js");
     const css = leggi("css/luoghi-foto.css");
 
-    expect(luoghi).toContain("const domenica = giorno === 6;");
+    /* il cartellino è generico dalla Pizzeria: il riposo viene dal contratto,
+       e la classe «domenica» resta solo alla Fabbrica */
+    expect(luoghi).toContain("const giornoRiposo = riposo === numeroGiorno;");
     expect(luoghi).toContain("const settimanaConclusa = settimana < (cart.settimana - 1);");
-    expect(luoghi).toContain("const nonLavorato = settimanaConclusa && !domenica && n === 0;");
-    expect(luoghi).toContain('(domenica ? " domenica" : "")');
+    expect(luoghi).toContain("const nonLavorato = settimanaConclusa && giornoOrdinario && !giornoRiposo && n === 0;");
+    expect(luoghi).toContain('(luogo === "fabbrica" && numeroGiorno === 7 ? " domenica" : "")');
     expect(luoghi).toContain('(nonLavorato ? " non-lavorato" : "")');
 
     expect(css).toContain(".lfpres-day.domenica{");
@@ -975,7 +988,7 @@ describe("cartellino presenze Fabbrica", () => {
     expect(luoghi).toContain('data-dimissioni="fabbrica"');
     expect(luoghi).toContain('t:"Dare le dimissioni?"');
     expect(luoghi).toContain('n:"Dai le dimissioni"');
-    expect(luoghi).toContain('lavoroTerminaContratto("fabbrica", "dimissioni")');
+    expect(luoghi).toContain('lavoroTerminaContratto(luogo, "dimissioni")');
   });
 
   it("il turno usa il luogo e la UI Fabbrica non dipende dall'id operaio", () => {

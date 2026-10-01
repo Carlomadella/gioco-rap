@@ -1115,7 +1115,8 @@ console.log("\nlo Studio: la gente della Sala conta");
                        i suoi pannelli (schede dei beat, take, cursori del banco,
                        il quando di Fuori) e senza di lui le sezioni non
                        disegnano */
-                    "js/game/studio-elementi.js", "js/game/writer.js",
+                    "js/game/studio-elementi.js", "js/game/studio-automatico.js",
+                    "js/game/writer.js",
                     "js/game/beatplay.js",
                     /* la promo sta sul telefono (LaFamegram) dal 14/09/2026:
                        qui si carica per provare che «Che post fai?» legga le
@@ -1225,6 +1226,44 @@ console.log("\nlo Studio: la gente della Sala conta");
       }catch(e){ rotte.push(s + " — " + e.message); }
     }
     controlla("tutte le sezioni si disegnano", rotte.length === 0, rotte);
+
+    /* «Beat, Testo e Cabina a mano, il resto in automatico coi malus»
+       (studio-automatico.js): un pezzo appena inciso, sul banco. La riga c'è in
+       Cabina; il tocco lo mixa della casa (+3), lo mette in coda per venerdì
+       senza l'hype dell'attesa, non costa energia e libera il banco. */
+    dentro(`
+      G.songs.push({t:"Prova auto", q:50, mixed:false, released:false, week:0, streams:0, last:0,
+        seed:777, parti:{beat:50, testo:50, fonico:0, feat:0, take:0}});
+      studioMettiSulBanco(777); STUDIO_SEZ = "cabina"; renderStudio();
+    `);
+    controlla("in Cabina, col pezzo inciso sul banco, c'è «chiudi tu il resto»",
+      dipinto().indexOf('data-auto="1"') >= 0, dipinto().slice(0, 200));
+    const energiaAuto = dentro("G.energy");
+    nodi.studio.scatena("click", {
+      target: { closest: selettore => selettore === "[data-auto]" ? { dataset:{ auto:"1" } } : null }
+    });
+    const auto = dentro("G.songs.find(s => s.seed === 777)");
+    controlla("il gioco lo mixa della casa (+3) e lo mette in coda per venerdì, senza energia",
+      auto.q === 53 && auto.mixed && auto.car === "della casa" && auto.parti.mix === 3 &&
+      auto.esce != null && auto.esceAuto === true && dentro("G.energy") === energiaAuto &&
+      dentro("G.studio.banco") === 777 && dentro("STUDIO_SEZ") === "beat",
+      JSON.stringify(auto));
+    /* tornandoci, Mix e Uscita restano aperte (Carlo, 28/09), e ripremere
+       «Mandalo fuori» sull'Uscita non ridà l'hype del venerdì */
+    const aperte = dentro("STUDIO_SEZIONI.filter(x => x.dopo).every(x => studioSezAperta(x))");
+    dentro("STUDIO_SEZ = 'fuori'; renderStudio(); studioMandaFuori()");
+    controlla("dopo il resto in automatico Mix e Uscita restano aperte, e l'Uscita non ridà l'hype",
+      aperte && dentro("studioQuando()") === "venerdi" &&
+      dentro("G.songs.find(s => s.seed === 777).esceAuto") === true,
+      JSON.stringify({aperte, quando:dentro("studioQuando()")}));
+    const hypeAutoPrima = dentro("G.hype = 0; G.hype");
+    dentro("G.day = 5; G.songs.find(s => s.seed === 777).esce = studioOggiAssoluto(); studioUscitePronte()");
+    const uscito = dentro("G.songs.find(s => s.seed === 777)");
+    const hypeAuto = dentro("G.hype") - hypeAutoPrima;
+    controlla("esce venerdì, ma senza l'hype dell'attesa",
+      uscito.released && !uscito.esceAuto && dentro("G.studio.banco") == null &&
+      Math.abs(hypeAuto - (6 + uscito.q * 0.12)) < 0.01,
+      "hype +" + hypeAuto.toFixed(2));
 
     /* le quattro foto senza interfaccia sono attaccate alle stanze giuste, e
        stanno davvero sul disco: un fondale che non c'è non dà errore, lascia
@@ -1485,21 +1524,28 @@ console.log("\nlo Studio: la gente della Sala conta");
       dentro("coverResa({seed:41, img:'data:x'})") === 1.08 &&
       dentro("coverResa(null)") === 1);
 
-    /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Le
-       altre linguette restano chiuse finche' non c'e' il primo pezzo. */
+    /* Punto 10 dello Studio: prima Beat, Testo e Cabina, poi il resto. Dal
+       14 al 21/09 Mix e Uscita restavano chiuse finche' non c'era il primo
+       pezzo; dal 21/09 sera sono sempre aperte (Carlo: «lascia sbloccate le
+       fasi dello studio bloccate») e a banco vuoto dicono da dove si comincia. */
     dentro("G.songs = []; STUDIO_SEZ = 'fuori'; renderStudio();");
     const linguette = () => nodi["st-tabs"].innerHTML || "";
-    controlla("senza pezzi Mix e Uscita sono chiuse, e Beat/Testo/Cabina no",
-      ["banco", "fuori"].every(id =>
-        new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
-      ["beat", "testo", "cabina"].every(id =>
+    controlla("senza pezzi nessuna linguetta e' chiusa, nemmeno Mix e Uscita",
+      linguette().indexOf("chiusa") < 0 &&
+      ["beat", "testo", "cabina", "banco", "fuori"].every(id =>
         new RegExp('class="sttab( on)?" data-sez="' + id + '"').test(linguette())),
       linguette().slice(0, 300));
-    controlla("e arrivando a una sezione chiusa si torna al Beat",
-      dentro("STUDIO_SEZ") === "beat");
+    controlla("e nell'Uscita a banco vuoto ci si resta, e dice da dove si comincia",
+      dentro("STUDIO_SEZ") === "fuori" &&
+      dipinto().indexOf("niente sul banco") >= 0 &&
+      dipinto().indexOf("Si comincia dal <b>Beat</b>") >= 0);
+    dentro("STUDIO_SEZ = 'banco'; renderStudio();");
+    controlla("e il Mix a banco vuoto manda in Cabina",
+      dipinto().indexOf("il banco è spento") >= 0 &&
+      dipinto().indexOf("dalla Cabina") >= 0);
     dentro("G.songs = [{t:'Primo', q:50, mixed:false, released:false, seed:61}]; studioMettiSulBanco(61); renderStudio();");
-    controlla("col pezzo appena inciso sul banco si apre tutto",
-      linguette().indexOf("chiusa") < 0);
+    controlla("col pezzo appena inciso sul banco il Mix lo mixa",
+      linguette().indexOf("chiusa") < 0 && dipinto().indexOf('data-az="mixa"') >= 0);
     /* «ad ogni pezzo» (F2): quando esce, il banco si svuota e Mix e Uscita
        si richiudono; un altro pezzo inciso prima si rimette sul banco da
        una riga, ed e' la stessa riga in Cabina, Mix e Uscita. */
@@ -1514,15 +1560,30 @@ console.log("\nlo Studio: la gente della Sala conta");
       dipinto().indexOf('data-banco="62"') >= 0 &&
       dentro("daPubblicare().t") === "Primo");
     dentro("ACTIONS.find(a => a.id === 'pubblica').run(); renderStudio();");
-    controlla("uscito il pezzo, il banco si svuota, Mix e Uscita si richiudono e si torna in Cabina",
+    controlla("uscito il pezzo, il banco si svuota, l'Uscita resta aperta e da li' si fa sapere su LaFamegram",
       dentro("G.studio.banco") === null &&
-      ["banco", "fuori"].every(id =>
-        new RegExp('sttab[^"]*chiusa" data-sez="' + id + '"').test(linguette())) &&
-      dentro("STUDIO_SEZ") === "cabina" &&
+      linguette().indexOf("chiusa") < 0 &&
+      dentro("STUDIO_SEZ") === "fuori" &&
       dipinto().indexOf("data-lafamegram") >= 0,
       linguette().slice(0, 300));
-    controlla("e in Cabina c'e' la riga per rimettere sul banco il pezzo inciso prima",
+    controlla("e c'e' la riga per rimettere sul banco il pezzo inciso prima",
       dipinto().indexOf('data-banco="62"') >= 0);
+    /* voce 82 (01/10/2026): a banco vuoto, con un pezzo inciso pronto, Uscita e
+       Mix dicono di rimetterlo sul banco, non di ricominciare dal Beat */
+    controlla("e a banco vuoto l'Uscita dice di rimettere sul banco il pezzo inciso, non di ripartire dal Beat",
+      dipinto().indexOf("rimetti uno sul banco") >= 0 &&
+      dipinto().indexOf("Si comincia dal <b>Beat</b>") < 0);
+    dentro("STUDIO_SEZ = 'banco'; renderStudio();");
+    controlla("e il Mix lo stesso",
+      dipinto().indexOf("rimetti uno sul banco") >= 0);
+    /* un salvataggio coi cursori ancora in `banco`: i cursori vanno in
+       `cursori` e sul banco torna l'ultimo pezzo inciso, come senza banco */
+    controlla("un salvataggio coi cursori in banco li sposta e ritrova il pezzo sul banco",
+      dentro(`(() => {
+        const prima = G.studio; G.studio = {banco:{voce:3, bassi:1, aria:2}};
+        const d = studioDati(); const ok = d.cursori.voce === 3 && d.banco === 62;
+        G.studio = prima; return ok;
+      })()`) === true);
     dentro("studioMettiSulBanco(62); STUDIO_SEZ = 'banco'; renderStudio();");
     controlla("rimesso sul banco un pezzo gia' mixato, il Mix lo dice e manda all'Uscita",
       linguette().indexOf("chiusa") < 0 &&
@@ -1530,15 +1591,26 @@ console.log("\nlo Studio: la gente della Sala conta");
       dipinto().indexOf('data-az="mixa"') < 0 &&
       dentro("daMixare() == null") &&
       dentro("daPubblicare().t") === "Secondo");
+    /* i cursori del Mix con un pezzo sul banco: dal 15/09 al 21/09 stavano
+       nella stessa casella del seed (G.studio.banco) e muoverne uno dava
+       «Cannot use 'in' operator»; adesso stanno in G.studio.cursori */
+    controlla("con un pezzo sul banco i cursori del Mix si muovono e il carattere li legge",
+      (() => {
+        try{ dentro("studioBancoMuovi('voce', 4); studioBancoMuovi('bassi', 0);"); }catch(e){ return false; }
+        return dentro("G.studio.cursori.voce") === 4 && dentro("G.studio.banco") === 62 &&
+          dentro("studioBancoCarattere().n") !== "PULITO";
+      })());
+    dentro("studioBancoMuovi('voce', 2); studioBancoMuovi('bassi', 2);");
     /* la cassaforte svuota il banco, e ritirare il pezzo lo rimette sopra */
     dentro("G.studio.quando = 'cassetto'; studioMandaFuori();");
     controlla("in cassaforte il pezzo lascia il banco vuoto",
       dentro("G.songs[1].tenuto") === true && dentro("G.studio.banco") === null &&
-      dentro("studioSbloccato()") === false);
+      dentro("studioSulBanco()") === null,
+      JSON.stringify({tenuto: dentro("G.songs[1].tenuto"), banco: dentro("G.studio.banco"), sbl: dentro("studioSulBanco()"), quando: dentro("G.studio.quando"), pezzi: dentro("G.songs.map(x=>x.t+\":\"+x.released+\":\"+x.seed).join(\",\")")}));
     dentro("studioRiprendi(62);");
     controlla("e ritirato dalla cassaforte torna sul banco",
       dentro("G.songs[1].tenuto") === undefined && dentro("G.studio.banco") === 62 &&
-      dentro("studioSbloccato()") === true);
+      dentro("studioSulBanco() != null"));
 
     /* Punto 8 dello Studio: un pezzo non ancora uscito non si spinge — al
        massimo se ne fa uscire un'anteprima, che all'uscita diventa spinta. */

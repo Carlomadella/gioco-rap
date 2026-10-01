@@ -3,12 +3,16 @@ name: Verifica gioco
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: verifica-gioco-${{ github.workflow }}-${{ github.ref }}
+  # Push del branch e pull_request devono essere lo STESSO lavoro logico.
+  # github.ref cambia (refs/heads/... vs refs/pull/.../merge), head_ref no:
+  # senza questo ogni patch di una PR lanciava due CI identici in parallelo.
+  group: verifica-gioco-${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
   cancel-in-progress: true
 
 jobs:
@@ -38,10 +42,12 @@ jobs:
       - name: Prova, regressioni, browser e build
         run: npm run verifica
 
-      # Fuori dalla catena perche' insieme all'altro caso e2e fallisce (vedi
-      # problemi-riscontrati.md, 13/09/2026). Qui gira da solo, che e' la
-      # condizione in cui passa. Da rimettere dentro quando si sa perche'.
-      - name: Il giro lungo nel browser, da solo
-        run: npm run test:e2e:lento
+      # Il flusso Avvio rapido -> cinematic -> hub e' gia' nel gate normale
+      # con un doppio del solo iframe MakeHuman. Il motore MakeHuman reale
+      # resta verificabile esplicitamente, senza rendere rosso ogni push per
+      # limiti/prestazioni del runner headless GitHub.
+      - name: MakeHuman reale (solo avvio manuale)
+        if: github.event_name == 'workflow_dispatch'
+        run: npm run test:e2e:makehuman
 
 

@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 29/09/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 01/10/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -134,9 +134,12 @@ non resta niente.
   — **Il Circolo**: la Sala e il Live Club sono un posto solo, sulla mappa dov'era la Sala,
   con la pagina identica al riferimento `il_circolo.png` senza la barra di sotto; dentro
   c'è anche la serata giocata a momenti (tre pezzi, la gente da 0 a 100 che pesa sul live)
-  — `frontend/js/game/circolo.js`. Restano lo Shop e la Strada senza foto, il fondale
-  pulito del Circolo (oggi è ritagliato dal riferimento) e le quattro schermate dei
-  cartelli arrivate il 29/09 (bancone, sala, open mic, backstage).
+  — `frontend/js/game/circolo.js`. **FATTO (01/10/2026)** — le quattro schermate dei
+  cartelli: Bancone, Sala, Palco (solo il live, coi momenti) e Backstage (con l'artista della
+  serata e i tuoi fan) sono pagine loro sui riferimenti, i riquadri di sotto non ci sono più e
+  gli orari si aprono col mouse sopra («Il Circolo a stanze: Bancone, Sala, Palco,
+  Backstage» in `implementazioni/02-interfaccia-e-telefono.md`). Restano lo Shop e la Strada
+  senza foto e il fondale pulito del Circolo (oggi è ritagliato dal riferimento).
 - **FATTO (19/09/2026)** — il primo minuto di chi prova il gioco: l'avvio rapido non è più
   nove secondi di nero ma la schermata «Preparo il tuo artista», con le fasi vere del
   camerino MakeHuman e tre tasti se si rompe (`frontend/js/preparo.js`). I «due minuti»

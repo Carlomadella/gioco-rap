@@ -6,6 +6,64 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:747e7b7 -->
+## 01/10/26, 13:58 â€” task/circolo-orari-e-pagine â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `747e7b7`
+
+### Cosa Ã¨ entrato
+
+- `7332eb4` â€” Il Circolo a stanze: i titoli dritti, via il pennarello corsivo â€” **Carlomadella**
+- `c48b66b` â€” Merge remote-tracking branch 'origin/main' into task/circolo-orari-e-pagine â€” **Carlomadella**
+- `c511470` â€” Il Circolo a stanze: le voci 85–89 del giro di fine task â€” **Carlomadella**
+- `ab18a4f` â€” Il Circolo a stanze: Bancone, Sala, Palco, Backstage â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/circolo-stanze.css`
+- **Modificato:** `frontend/css/circolo.css`
+- **Modificato:** `frontend/css/luoghi-foto.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Rimosso:** `frontend/media/photo/circolo/palco.jpg`
+- **Rimosso:** `frontend/media/photo/circolo/serata.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/backstage.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/bancone.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/palco.jpg`
+- **Rimosso:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png`
+
+**File interessati in questa categoria:** 10
+
+---
+
+<!-- merge:2c67b9c -->
+## 01/10/26, 12:43 â€” task/studio-cursori-e-linguette â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `2c67b9c`
+
+### Cosa Ã¨ entrato
+
+- `0dd90b6` â€” Il giro di fine task dopo il merge della Pizzeria: i numeri ?v= dei file cambiati â€” **Carlomadella**
+- `d627a5b` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `f3b42b4` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `a810c7f` â€” Merge remote-tracking branch 'origin/main' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `6e63f12` â€” Studio, linguette sempre aperte: le due voci del giro di fine task â€” **Carlomadella**
+- `9f6bca3` â€” Studio: le linguette sempre aperte e i cursori del Mix in G.studio.cursori â€” **Carlomadella**
+- `afbb42f` â€” Il giro di fine task su «Su LaFamegram non posta nessuno» e «Beat, Testo e Cabina a mano, il resto in automatico coi malus» â€” **Carlomadella**
+- `211769e` â€” Dopo il resto in automatico, Mix e Uscita restano aperte â€” **Carlomadella**
+- `fdd7002` â€” Beat, Testo e Cabina a mano, il resto in automatico coi malus â€” **Carlomadella**
+- `9b896a8` â€” Su LaFamegram posta anche la gente: i post degli incontri si datano quando nascono â€” **Carlomadella**
+- `0e9af7f` â€” Su LaFamegram posta anche la gente â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/studio.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:18c56d3 -->
 ## 01/10/26, 10:58 â€” feature/pizzeria-lavoro-strutturato â†’ main
 

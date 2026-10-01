@@ -349,6 +349,27 @@ il telefono deve sembrare un vero e proprio telefono : Quindi come un iphone esa
 
 ---
 
+## Su LaFamegram posta anche la gente
+
+sull'app lafamegram non posta nessuno
+
+   **FATTO (28/09/2026)** — adesso postano gli altri, una volta a settimana
+   (`js/game/telefono-feed-gente.js`, attaccato a `vitaRivali`):
+   - **i rivali della classifica**, con le stesse cose che finiscono nel diario: il
+     pezzo nuovo («Fuori «Ore Piccole». Link in bio»), la firma con l'etichetta, il primo
+     post quando spuntano dal niente, e la frecciata quando ti nominano in un pezzo. Nelle
+     settimane senza niente di grosso uno di loro posta comunque qualcosa del giro. I like
+     seguono i loro ascolti.
+   - **la gente della Sala che conosci** (rel ≥ 1), uno o due a settimana, col suo
+     mestiere: il beatmaker il beat, il fonico il mix, il giornalista il pezzo, il
+     videomaker il set. Chi ti vuole bene (rel ≥ 3) ogni tanto rilancia un tuo pezzo
+     uscito. La stessa persona non ripete la frase dei suoi ultimi post.
+
+   Stanno in `G.lafamegramGente` (le ultime quaranta), e `telPost()` le mescola con i
+   post degli incontri dal più nuovo; i tuoi restano in cima. Chi posta e cosa l'ho
+   deciso io (la voce diceva «prima si decide»): se Carlo vuole altro — gli opps più
+   cattivi, i beat da ascoltare nel post — si cambia nei testi in cima al file.
+
 ---
 
 ## Responsività di tutto il gioco — **cominciata, da finire domani**
@@ -2776,3 +2797,120 @@ si sceglie fra i meno usati e resta suo (`p.volto`). Anche «Chi c'è stasera» 
 di chi non conosci (prima era una sagoma): il nome resta «???». Due controlli nuovi in
 `audit-regressioni.js`. Il resto del gioco (Studio, classifica) disegna ancora le facce di
 `rivals.js`.
+
+## Il Circolo a stanze: Bancone, Sala, Palco, Backstage
+
+CARLO, 01/10/2026: «concentriamoci sul circolo, la barra di destra con gli orari, deve aprirsi
+quando ci si passa sopra col cursore, poi togliamo la barra in basso con la gente, il palco, la
+serata di oggi e i momenti durante il live e quei punti devono essere spostati nelle pagine che
+si aprono quando si clicca sul pulsante bancone, palco sala e backstage». Alle domande: pagine
+complete, come i riferimenti `bancone.png`, `sala.png`, `open_mic.png` e `backstage.png`;
+«sul palco deve esserci solo il live, e i momenti giocati»; nel backstage «si possano anche
+incontrare i fan per parlarci e dirti cosa gli è piaciuto e cosa no»; sul telefono gli orari
+si aprono col tocco.
+
+**FATTO (01/10/2026)** — branch `task/circolo-orari-e-pagine`, due file nuovi:
+`frontend/js/game/circolo-stanze.js` (le quattro pagine) e
+`frontend/js/game/circolo-incontri.js` (le mosse che prima non c'erano), col foglio
+`frontend/css/circolo-stanze.css`.
+
+- **La pagina del Circolo** è la foto coi quattro cartelli, intera (non più ritagliata: a
+  1536 × 864 tagliava Bancone e Backstage), coi bordi riempiti dalla stessa foto sfocata. La
+  colonna degli orari è una linguetta sul bordo destro (orologio, «Orari», pallino
+  aperto/chiuso) che si apre col mouse sopra e col tocco. I quattro riquadri di sotto non ci
+  sono più. Sotto i 900 punti le stanze sono anche quattro tasti grandi sotto alla foto;
+  sotto i 620 i cartelli sulla foto vanno via (sarebbero francobolli).
+- **Bancone** — la gente presente, chi non conosci in cima, con l'umore che le si legge in
+  faccia; l'**atmosfera del locale** (da tranquilla a locale pieno: la fascia dell'ora e il
+  fine settimana), che sposta di ±0,2 la riuscita delle mosse; quattro mosse: *Attacca
+  bottone* (il dialogo della Sala), *Offri da bere* (6 €, 15 min: un pezzo di rapporto,
+  secondo il carattere), *Ascolta la conversazione* (20 min: ne scopri il carattere),
+  *Presentati* (10 min, solo con chi non conosci: col locale pieno anche +1 hype).
+- **Sala** — tutta la gente presente con filtro (tutti, conosciuti, da conoscere), la scheda
+  grande col ritratto, una frase sua, il livello di rapporto in barra, le mosse di `posto.js`
+  con a destra cosa serve; «Chi c'è stasera» e «Opportunità dalla sala», che si sbloccano
+  davvero coi rapporti. Uno sconosciuto non ha nome nemmeno sotto alle mosse.
+- **Palco** — solo il live: *Live* (il live vero di `actions.js`) e *Open Mic* (per chi un
+  pezzo fuori non ce l'ha ancora); i tre momenti (Intro, Prima barra, Chiusura) con la
+  reazione del pubblico a sedici tacche, l'ordine della serata, le statistiche live
+  (Carisma, Rap, Scrittura, Energia) e le ricompense possibili calcolate sulle formule vere.
+  Il freestyle resta in Piazza; Showcase e Opening Act sono passati fra le cose da
+  sbloccare del backstage.
+- **Backstage** — apre con la serata (21:00–03:00). L'**artista della serata** (uno di cinque,
+  uno a sera): presentarsi, fare networking, chiedere un contatto (ti presenta un fonico, un
+  videomaker o un beatmaker che diventa un tuo contatto), proporre una collaborazione (una
+  ogni quattro settimane, con un pezzo fuori: se dice di sì hype e fan, se dice di no −2
+  hype), osservare l'ambiente. Con la gente del giro: networking, un pezzo di rapporto. **I
+  tuoi fan** (da uno a tre, quando hai un pezzo fuori): ognuno dice cosa gli è piaciuto e cosa
+  no dei tuoi pezzi veri (il mix piatto, il video che manca, il ritornello, pochi pezzi) e
+  scegli la foto (hype e qualche fan) o la critica (+0,4 all'abilità che serve). Occasioni
+  della serata, possibili sblocchi, rischio e prestigio.
+
+Ogni mossa vale una volta per sera (`G.circolo.oggi`, che si svuota col giorno) e costa
+tempo vero; l'hype non passa il tetto della fase e la pagina scrive solo quello che è
+entrato. Chi apriva un riquadro di prima (l'agenda: «passa dalla Sala») apre la stanza
+giusta. Nel giro è uscito anche un guasto di tutte le pagine dei luoghi sul telefono: sotto
+i 480 punti l'orologio del tempo va su una terza riga della fascia, che arriva a 143 punti,
+mentre la pagina partiva a 80 — le prime righe finivano sotto. Adesso la fascia si misura
+(`--lfAlta`, `luoghi-foto.js`). Le foto delle stanze sono ritagli dei riferimenti in
+`media/photo/circolo/stanze/`; `circolo/palco.jpg`, `circolo/serata.jpg` e `live_club.png`,
+che non usava più nessuno, sono uscite. Provato nel browser a 1536 × 864, 1280 × 720 e
+390 × 844: un live giocato fino all'esito, le mosse del bancone e del backstage, un fan;
+console pulita. Undici prove in `test/unit/circolo-stanze.test.js`, l'audit del Circolo
+riscritto sulle stanze.
+
+**Da decidere:** le meccaniche nuove sono piccole apposta (un pezzo di rapporto, un punto di
+hype, qualche fan) e il bot del simulatore di bilanciamento non le gioca — gioca le mosse di
+`actions.js`. Se servono nei conti dell'anno, il bot va insegnato a entrare al Circolo.
+
+## Il resto in automatico
+
+CARLO, «Studio (16/09/2026)»: «l'utente deve poter fare solo le sezioni Beat, Testo, e
+Cabina, poi il resto in automatico, però questo porta dei malus».
+
+**FATTO (28/09/2026)** — branch `task/studio-resto-automatico`, file nuovo
+`frontend/js/game/studio-automatico.js`, caricato dopo `studio-elementi.js`.
+
+Col pezzo appena inciso sul banco, sotto al pannello della **Cabina** (e sotto ai cursori
+del **Mix**) c'è una riga che dice il prezzo prima del tocco — «il mix della casa dà +3 (il
+tuo +6), «Sottopasso» esce venerdì ma senza l'hype dell'attesa. Niente energia, niente
+mossa.» — e il tasto «chiudi tu il resto: mix e uscita». Il tocco:
+
+- mixa il pezzo **della casa**: +3 fisso (`STUDIO_AUTO_MIX`) invece del mix vero, che è
+  6 + flow più il fonico e i cursori (di solito +7…+15), e niente flow guadagnato; nel
+  riquadro dei numeri di Fuori la voce si legge «Mix della casa»;
+- lo mette in coda per **venerdì** con la stessa strada del «venerdì» di Fuori, ma segnato
+  (`esceAuto`): quando esce, `studioUscitePronte()` non dà i +4 di hype dell'attesa;
+- non costa energia né la mossa del giorno (il mix a mano ne costa 24), lascia la
+  copertina che il pezzo ha già e riporta al **Beat** per il pezzo dopo.
+
+Il pezzo **resta sul banco**, quindi Mix e Uscita non si richiudono: tornandoci il Mix dice
+«già mixato» e l'Uscita è su «venerdì», senza «+hype» accanto e senza la voce «Venerdì» nel
+riquadro dei numeri (Carlo, 28/09: «non devono essere lockate quando ci ritorno dentro»).
+Ripremere «Mandalo fuori» lì non ridà l'hype: il segno si toglie solo se il venerdì lo
+scegli tu per un pezzo che non era già in coda. Il banco passa al pezzo nuovo quando lo
+incidi, e si svuota quando esce.
+
+Un pezzo già mixato a mano perde solo il venerdì secco (il tasto dice «fai uscire tu
+venerdì»). Rimettere il pezzo sul banco, o sceglierne il venerdì a mano, toglie il segno e
+l'hype torna. Provato nel browser a 1440 × 900 e 390 × 844: la riga c'è, il tasto è alto
+44, «Sottopasso» q48 → 51, in coda per venerdì, energia invariata, console pulita. Tre
+prove nuove in `strumenti/prova.js` (la riga, il mix della casa senza energia, l'uscita
+senza hype) e un controllo nell'audit.
+
+## Le linguette dello Studio sempre aperte, e i cursori del Mix
+
+CARLO, 21/09/2026 sera: «lascia sbloccate le fasi dello studio bloccate».
+
+**FATTO (01/10/2026)** — branch `task/studio-cursori-e-linguette`. Era fatto il 21/09 nel
+branch `task/studio-il-resto-in-automatico`, che non è mai entrato in `main` perché il resto
+in automatico è stato rifatto il 28/09 in un altro modo; da lì sono state portate le due cose
+che non dipendevano dall'automatico. **Le linguette**: `studioSezAperta()` dice sempre di
+sì, Mix e Uscita si aprono anche a banco vuoto e dicono che non c'è niente e da dove si
+comincia; uscito un pezzo si resta nell'Uscita, da dove si fa sapere su LaFamegram. **I
+cursori del Mix** (voce, bassi, aria) stavano in `G.studio.banco`, che dal 15/09 è anche il
+seed del pezzo sul banco: con un pezzo sopra leggevano un numero, il carattere restava
+sempre PULITO e muoverne uno dava «Cannot use 'in' operator». Adesso stanno in
+`G.studio.cursori`, e un salvataggio vecchio con l'oggetto in `banco` lo sposta lì. Le prove
+in `strumenti/prova.js` (le linguette a banco vuoto, i cursori con un pezzo sopra), due
+controlli nell'audit, il test della remastered in `seguiti.test.js` aggiornato.

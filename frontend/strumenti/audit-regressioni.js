@@ -113,18 +113,21 @@ test("CI usa npm ci con Node 22 e cache del lockfile frontend",
   ciWorkflow.includes("node-version: 22") &&
   ciWorkflow.includes("run: npm ci") &&
   ciWorkflow.includes("frontend/package-lock.json"));
-/* Il giro lungo sta DENTRO alla catena, e ci deve restare: e' il percorso
-   dove il bug si era nascosto. Era stato messo fuori il 13/09 credendolo
-   instabile; non lo era — a farlo fallire era il watcher del server di
-   sviluppo, che ricaricava la pagina in mezzo alla partita (vedi il commento
-   in strumenti/dev.js). Se qualcuno lo rimette fuori, questo controllo lo
-   dice, e la domanda da farsi e' se il motivo e' vero o e' un'altra diagnosi
-   sbagliata. */
-test("il giro lungo nel browser gira almeno in CI, da solo",
+/* Il gate CI verifica il flusso Avvio rapido fino all'hub senza affidare
+   l'esito alle prestazioni di targets.bin sul runner headless. La prova
+   MakeHuman completa non sparisce: resta esplicita e manuale. */
+test("CI separa il flusso Avvio rapido dal MakeHuman reale senza togliere copertura",
   pkg.scripts && pkg.scripts["test:e2e"] &&
-  ciWorkflow.includes("run: npm run test:e2e:lento") &&
-  pkg.scripts["test:e2e:lento"] &&
-  pkg.scripts["test:e2e:lento"].includes("--grep @lento"));
+  pkg.scripts["test:e2e"].includes("--grep-invert @makehuman") &&
+  pkg.scripts["test:e2e:makehuman"] &&
+  pkg.scripts["test:e2e:makehuman"].includes("--grep @makehuman") &&
+  leggi("test/e2e/gameplay.spec.js").includes("avvio rapido conclude la cinematic ed entra nell'hub") &&
+  leggi("test/e2e/gameplay.spec.js").includes('page.route("**/media/makehuman-camerino-v1/index.html"') &&
+  leggi("test/e2e/gameplay.spec.js").includes("@makehuman") &&
+  ciWorkflow.includes("workflow_dispatch:") &&
+  ciWorkflow.includes("if: github.event_name == 'workflow_dispatch'") &&
+  ciWorkflow.includes("run: npm run test:e2e:makehuman"));
+
 /* Il watcher non deve tornare a guardare le cartelle dei dati: e' la causa
    vera di quei rossi, e senza questo controllo ci si ricasca al primo che
    "semplifica" quella riga. */
@@ -230,7 +233,7 @@ test("FAMEpedia usa UI dedicata coerente e responsive",
   famepediaCss.includes("var(--c1)") &&
   famepediaCss.includes("@media (max-width:820px)") &&
   landing.includes('css/famepedia.css?v=4') &&
-  landing.includes('js/famepedia.js?v=3'));
+  landing.includes('js/famepedia.js?v=4'));
 test("FAMEpedia V2 mantiene indice voci persistente a sinistra",
   landing.includes('id="fp-nav-list"') &&
   famepediaJs.includes('host=$fp("fp-nav-list")') &&
@@ -698,6 +701,13 @@ test("gli elementi dello Studio stanno in un file loro, caricato dopo studio.js"
   index.indexOf('js/game/studio-elementi.js') > index.indexOf('js/game/studio.js') &&
   index.includes('css/studio-elementi.css'));
 
+/* «Beat, Testo e Cabina a mano, il resto in automatico coi malus» */
+test("il resto in automatico sta in un file suo, dopo studio-elementi.js, e porta i due malus",
+  index.indexOf("js/game/studio-automatico.js") > index.indexOf("js/game/studio-elementi.js") &&
+  leggi("js/game/studio-automatico.js").includes("const STUDIO_AUTO_MIX = 3;") &&
+  studioEl.includes("(auto ? 0 : STUDIO_VENERDI_HYPE)") &&
+  studioEl.includes("delete s.esceAuto;"));
+
 test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
   /* la cabina si apre vuota e ogni take, la prima compresa, e' quel dado */
   studioEl.includes("d.take = {k, l:[], s:0}") &&
@@ -725,7 +735,10 @@ test("tenere una take non costa energia: la sessione la paga la prima take (25 d
   studio.includes(`stPrimo(' data-ancora="1"', "Registra la take · " + costo + " energia"`));
 
 test("i cursori del banco partono al centro e al centro valgono zero",
-  studioEl.includes("d.banco = {voce:2, bassi:2, aria:2}") &&
+  /* dal 01/10/2026 stanno in `cursori`: `banco` e' il seed del pezzo sul banco (F2) */
+  studioEl.includes("d.cursori = {voce:2, bassi:2, aria:2}") && !studioEl.includes("d.banco = {voce") &&
+  /* la migrazione sta in studioDati, prima del recupero del pezzo sul banco */
+  /if\(d\.banco && typeof d\.banco === "object"\)\{\r?\n\s*if\(!d\.cursori\) d\.cursori = d\.banco;\r?\n\s*delete d\.banco;\r?\n\s*\}\r?\n[\s\S]{0,800}?if\(d\.banco === undefined\)/.test(studio) &&
   /* il carattere di ripiego, quello dei cursori fermi in mezzo, non da' punti */
   /PULITO",\s*q:0/.test(studioEl) &&
   actions.includes("+ studioBonus() + bancoBonus()"));
@@ -804,6 +817,18 @@ test("il Marketing sta sul telefono: «Che post fai?» in LaFamegram, e Fuori ci
   studio.includes("function studioFalloSapere()") &&
   studio.includes('data-lafamegram="1"') &&
   !studio.includes("function studioSezMarketing()"));
+/* «sull'app lafamegram non posta nessuno» (28/09/2026): rivali e gente della
+   Sala postano per conto loro, una volta a settimana, attaccati a vitaRivali. */
+test("su LaFamegram posta anche la gente: rivali e Sala, mescolati nel feed",
+  fs.existsSync(path.join(ROOT, "js/game/telefono-feed-gente.js")) &&
+  index.indexOf("js/game/telefono-feed-gente.js") > index.indexOf("js/game/telefono.js") &&
+  leggi("js/game/telefono-feed-gente.js").includes("vitaRivali = function") &&
+  leggi("js/game/telefono-feed-gente.js").includes("function feedGenteSala()") &&
+  tel.includes("G.lafamegramGente || []") &&
+  /* i post degli incontri si datano quando nascono, non quando apri l'app */
+  leggi("js/game/strada.js").includes('w:"in giro", tw:totalWeeks()') &&
+  ev.split('w:"adesso",tw:totalWeeks()').length >= 3 &&
+  !tel.includes("p.tw = ora"));
 test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classifica a pagamento e con rifiuto",
   studio.includes("function studioCabinaConChi(ft)") &&
   studio.includes("function studioChiamaRivale(nome)") &&
@@ -861,9 +886,11 @@ test("il riquadro dei numeri divide qualita' e ascolti, con le parti scritte all
   actions.indexOf("const conFeat = featBonus()") < actions.indexOf("studioConsumaFeat() : null") &&
   actions.includes("parti:{beat:bt.q, testo:b.q, fonico:conFonico, feat:conFeat, take:presa}") &&
   actions.includes("if(s.parti) s.parti.mix = mixGain();"));
-test("il pezzo sul banco (F2): Mix e Uscita si aprono su di lui e si chiudono quando esce o va in cassaforte",
+/* dal 01/10/2026 Mix e Uscita non si chiudono piu' (le linguette sono aperte
+   sempre): il banco si riempie e si svuota lo stesso, e studioSbloccato non c'e' piu' */
+test("il pezzo sul banco (F2): Mix e Uscita lavorano su di lui, e il banco si svuota quando esce o va in cassaforte",
   studio.includes("function studioSulBanco()") &&
-  studio.includes("return !!studioSulBanco();") &&
+  !studio.includes("function studioSbloccato()") &&
   actions.includes('if(typeof studioMettiSulBanco === "function") studioMettiSulBanco(seed);') &&
   actions.includes('if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);') &&
   studioEl.includes("studioSvuotaBanco(s);                    /* il banco si svuota") &&
@@ -1015,7 +1042,7 @@ test("la stima degli stream tiene conto del tetto della fase, come fa sim.js il 
 test("l'uscita di venerdi' costa la lucidita' come quella mandata fuori a mano",
   (() => {
     const a = studioEl.indexOf("function studioUscitePronte()");
-    const corpo = a >= 0 ? studioEl.slice(a, a + 1400) : "";
+    const corpo = a >= 0 ? studioEl.slice(a, a + 1900) : "";
     return corpo.includes('if(typeof addLuc === "function") addLuc(-1);');
   })());
 
@@ -2015,10 +2042,15 @@ test("quando la parte 2 esce (a mano o di venerdi') il primo torna a girare, e l
   sim.includes('const curve = typeof curvaPezzo === "function" ? curvaPezzo(s, age)') &&
   sim.includes('const seguitoPull = typeof seguitoAscolti === "function" ? seguitoAscolti(s) : 0;') &&
   sim.includes("let out = (fanPull + scoperta + featPull + seguitoPull) * curve * rnd(0.8, 1.25);"));
-test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, apre il Mix a banco vuoto, costa come un mix piu' la sala, una volta sola per pezzo",
+test("le linguette dello Studio sono aperte sempre (21/09/2026 sera, «lascia sbloccate le fasi dello studio bloccate»): studioSezAperta non guarda piu' il banco",
+  /function studioSezAperta\(x\)\{\r?\n  return !!x;\r?\n\}/.test(studio) &&
+  !studio.includes("if(!x.dopo || studioSbloccato()) return true;") &&
+  /* e il lucchetto non c'e' piu': niente classe chiusa, niente toast, niente ritorno al Beat */
+  !studio.includes('" chiusa"') && !studio.includes("rimettici un pezzo") &&
+  !leggi("css/studio.css").includes(".sttab.chiusa"));
+test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, costa come un mix piu' la sala, una volta sola per pezzo",
   actions.includes('{id:"remaster", n:"Remastered", e:24, luc:2,') &&
   actions.includes('avail:() => typeof remasterPrenotato === "function" && !!remasterPrenotato(),') &&
-  studio.includes('return x.id === "banco" && typeof remasterPrenotato === "function" && !!remasterPrenotato();') &&
   studio.includes('const remaster = typeof remasterPannello === "function" ? remasterPannello() : "";') &&
   seguiti.includes("if(!s || s.remaster){ d.remaster = null; return null; }") &&
   seguiti.includes("function remasterBase(){") && !seguiti.includes("? mixGain()") &&
@@ -2643,9 +2675,11 @@ test("gioco.html carica transizioni-video.js prima di hub.js, e il suo CSS",
   })());
 test("il cartello dello Studio passa dal video prima di aprire la stanza",
   /id:"studio"[\s\S]{0,600}?transizioneVideo\("studio",[\s\S]{0,80}?apriStudio\(/.test(hub));
-test("la Pizzeria usa la cinematica a tre scene prima di aprire la cucina",
+test("la Pizzeria usa tre immagini di arrivo prima di aprire la cucina",
   /pizzeria:\s*\[[\s\S]{0,500}?pizzeria_01_arrivo\.webp[\s\S]{0,500}?pizzeria_02_spogliatoio\.webp[\s\S]{0,500}?pizzeria_03_cucina\.webp/.test(tvid) &&
-  /id:"pizzeria"[\s\S]{0,300}?transizioneVideo\("pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub));
+  ["pizzeria_01_arrivo.webp","pizzeria_02_spogliatoio.webp","pizzeria_03_cucina.webp"].every(f =>
+    fs.existsSync(path.join(ROOT, "media/video/Transizioni di scena/" + f))) &&
+  /id:"pizzeria"[\s\S]{0,180}?transizioneVideo\("pizzeria",\s*\(\) => apriLuogo\("pizzeria"\)\)/.test(hub));
 /* Gli altri quattro (20/09/2026): due cartelli, una mossa, una take. La
    Sala e Casa come lo Studio; «stacca la spina» nel punto dove l'esito di
    quella mossa va sulla sua foto (l'incarto di mostraScena in luoghi-foto.js),
@@ -2763,7 +2797,7 @@ test("Casa, Palestra e il Circolo sulla mappa aprono la pagina, non piu' la fine
   /id:"vita",[\s\S]{0,240}?apriLuogo\("casa"\)/.test(hub) &&
   /id:"palestra",[\s\S]{0,80}?apriLuogo\("palestra"\)/.test(hub) &&
   /id:"fabbrica",[\s\S]{0,80}?apriLuogo\("fabbrica"\)/.test(hub) &&
-  /id:"pizzeria",[\s\S]{0,80}?apriLuogo\("pizzeria"\)/.test(hub) &&
+  /id:"pizzeria",[\s\S]{0,180}?transizioneVideo\("pizzeria",\s*\(\) => apriLuogo\("pizzeria"\)\)/.test(hub) &&
   !hub.includes('{id:"concerti"') && hub.includes("circoloEntra()"));
 test("la Fabbrica usa la foto e i comandi HTML dopo la sua transizione",
   luoghiFoto.includes('fabbrica: {f:"schermate_luoghi_con_elementi_HTML/fabbrica.webp"') &&
@@ -2821,10 +2855,13 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
 {
   const circolo = leggi("js/game/circolo.js");
   const circoloCss = leggi("css/circolo.css");
-  test("circolo.js e circolo.css si caricano dopo luoghi-foto, col pennarello dei titoli",
+  /* 01/10/2026, CARLO: via il corsivo a pennarello dei titoli (es. «ORARI») */
+  test("circolo.js e circolo.css si caricano dopo luoghi-foto, e i titoli sono dritti, senza il pennarello",
     index.indexOf('<script src="js/game/circolo.js') > index.indexOf('<script src="js/game/luoghi-foto.js') &&
     index.indexOf('href="css/circolo.css') > index.indexOf('href="css/luoghi-foto.css') &&
-    index.includes("family=Permanent+Marker") && circoloCss.includes('"Permanent Marker"'));
+    !index.includes("Permanent+Marker") && !circoloCss.includes("Permanent Marker") &&
+    circoloCss.includes('--ccTitoli:"Archivo Black"') &&
+    !/var\(--ccTitoli\)[^}]*font-style:italic/.test(circoloCss + leggi("css/circolo-stanze.css")));
   test("la pagina della Sala non c'è più: né l'HTML, né il foglio, né la testata nelle liste",
     !index.includes('id="posto"') && !index.includes("css/posto.css") &&
     !fs.existsSync(path.join(ROOT, "css/posto.css")) &&
@@ -2839,18 +2876,59 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     hours.includes('live:{open:"21:00", close:"03:00"}') &&
     hours.includes("if(ACTION_HOURS[id]) return ACTION_HOURS[id];") &&
     /\{id:"serata",\s*da:"21:00", a:"00:00"/.test(circolo));
-  test("le quattro targhette sulla foto e i quattro riquadri del riferimento",
+  /* 01/10/2026, CARLO: «togliamo la barra in basso con la gente, il palco,
+     la serata di oggi e i momenti durante il live, e quei punti devono
+     essere spostati nelle pagine che si aprono quando si clicca sul pulsante
+     bancone, palco, sala e backstage» */
+  const stanze = leggi("js/game/circolo-stanze.js");
+  const incontri = leggi("js/game/circolo-incontri.js");
+  test("le quattro targhette sulla foto aprono ognuna la sua stanza, e i quattro riquadri di sotto non ci sono più",
     ["bancone", "palco", "sala", "backstage"].every(id => circolo.includes('cart("' + id + '"')) &&
-    ["gente", "palco", "serata", "momenti"].every(id => circolo.includes('ccPannello("' + id + '"')) &&
+    ["bancone", "sala", "palco", "backstage"].every(id => stanze.includes(id + ':') && stanze.includes('ccBriciole("' + id + '")')) &&
+    circolo.includes('CIRCOLO.stanza = dove;') && !circolo.includes("function ccPannello(") &&
+    !circolo.includes('class="cc-giu"') && !leggi("css/circolo.css").includes(".cc-giu{") &&
     !circolo.includes("Statistiche") && !circolo.includes("Inventario"));
-  test("le foto della pagina ci sono: il fondale, il palco e la serata",
+  test("le stanze si caricano dopo circolo.js, col loro foglio",
+    index.indexOf('<script src="js/game/circolo-incontri.js') > index.indexOf('<script src="js/game/circolo.js') &&
+    index.indexOf('<script src="js/game/circolo-stanze.js') > index.indexOf('<script src="js/game/circolo.js') &&
+    index.indexOf('href="css/circolo-stanze.css') > index.indexOf('href="css/circolo.css'));
+  test("chi chiedeva un riquadro di prima (l'agenda: «passa dalla Sala») finisce nella stanza giusta",
+    circolo.includes('const CC_STANZA_DI = {gente:"sala", palco:"palco", momenti:"palco", serata:"backstage",') &&
+    leggi("js/game/posto.js").includes('apriLuogo("circolo", {pannello:"gente"})'));
+  test("le foto ci sono: il fondale e le tre stanze ritagliate dai riferimenti",
     ["media/photo/schermate_luoghi/schermate luoghi_senza_HTML/il_circolo.png",
-     "media/photo/circolo/palco.jpg", "media/photo/circolo/serata.jpg",
-     "media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png"]
-      .every(f => fs.existsSync(path.join(ROOT, f))));
-  test("la serata giocata a momenti pesa sul live di actions.js, e fuori dal Circolo vale 1",
+     "media/photo/circolo/stanze/bancone.jpg", "media/photo/circolo/stanze/palco.jpg",
+     "media/photo/circolo/stanze/backstage.jpg"]
+      .every(f => fs.existsSync(path.join(ROOT, f))) &&
+    /* un url() dentro a una variabile CSS Chrome lo risolve rispetto al foglio */
+    !stanze.includes("--cc-fondo") && stanze.includes("function ccSfondo(url){"));
+  test("la colonna degli orari è una linguetta che si apre col mouse sopra, e col tocco",
+    circolo.includes('data-cc-orari="1"') && circolo.includes("CIRCOLO.orari = !CIRCOLO.orari") &&
+    /@media \(hover:hover\)\{[\s\S]*?\.cc-info:hover,\.cc-info:focus-within\{transform:none/.test(circoloCss) &&
+    circoloCss.includes(".cc-info.aperta{transform:none"));
+  test("sul palco c'è solo il live: Live e Open Mic, coi momenti; il freestyle sta in Piazza",
+    circolo.includes('if(id !== "live" && id !== "openmic") return;') &&
+    !circolo.includes('avviaAzioneDiretta("free")') && !stanze.includes('sali("free"') &&
+    circolo.includes('const CC_PASSI = ["Intro", "Prima barra", "Chiusura"];'));
+  test("al bancone e nel backstage ogni mossa vale una volta per sera, e costa tempo",
+    incontri.includes("if(!c.oggi || c.oggi.key !== key)") &&
+    incontri.includes('(oggi.bevuto[p.id] ? "Stasera gliel’hai già offerto" : null)') &&
+    incontri.includes("if(!fan || oggi.fan[fid] || !circoloQui()) return false;") &&
+    /const CC_TEMPO = Object\.freeze\(\{bevi:15,/.test(incontri));
+  test("l'artista della serata ti presenta qualcuno una volta sola, e la gente della Sala resta sotto al tetto",
+    incontri.includes("c.presentati[o.n] = 1;") &&
+    incontri.includes("genteDellaSala().filter(x => !x.via).length >= POSTO_MAX"));
+  test("nel backstage i fan dicono cosa gli è piaciuto e cosa no, dei pezzi veri",
+    incontri.includes("function circoloFan(){") && incontri.includes("const critiche = [];") &&
+    stanze.includes("Cosa funziona:") && stanze.includes("Cosa no:"));
+  test("l'hype delle stanze non passa il tetto né i due punti a sera, e la pagina scrive quello che è entrato davvero",
+    incontri.includes("G.hype = Math.max(prima, Math.min(tetto, prima + su));") &&
+    incontri.includes("const CC_HYPE_SERA = 2;") &&
+    !/\+1 hype\./.test(incontri));
+  test("la serata giocata a momenti pesa sul live; un lead lavoro si moltiplica senza saltare la resa",
     actions.includes('const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;') &&
-    actions.includes("const molt = (giaOggi ? 0.45 : 1) * peso * resa;") &&
+    actions.includes('const moltLavoro = leadLavoro ? Math.max(1, Number(leadLavoro.multiplier || 1)) : 1;') &&
+    actions.includes("const molt = (giaOggi ? 0.45 : 1) * peso * resa * moltLavoro;") &&
     circolo.includes("function circoloResaSerata(){ const r = CIRCOLO_RESA; CIRCOLO_RESA = 1; return r; }"));
   test("il dopo-serata si somma prima del tetto «già visto oggi»",
     (() => {
@@ -2870,15 +2948,21 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
   test("sul palco si sale solo stando al Circolo, e col Circolo aperto gli eventi aspettano",
     circolo.includes('if(!circoloQui()) return {ok:false, perche:"Sei lontano: raggiungi il Circolo dalla mappa"};') &&
     leggi("js/game/eventi-v2.js").includes('if(typeof circoloOccupato==="function" && circoloOccupato()) return true;'));
-  test("sugli schermi stretti il Circolo si impila, e i :hover stanno dietro a (hover:hover)",
-    leggi("css/stretto.css").includes(".cc-giu{grid-template-columns:minmax(0,1fr);") &&
-    leggi("css/stretto.css").includes(".cc-su{grid-template-columns:minmax(0,1fr)}") &&
-    circoloCss.includes("@media (hover:hover){"));
+  test("sugli schermi stretti le stanze sono tasti grandi sotto alla foto, le colonne si impilano, e i :hover stanno dietro a (hover:hover)",
+    /@media \(max-width:900px\)\{[\s\S]*?\.cc-porte\{display:flex/.test(circoloCss) &&
+    circolo.includes("function ccPorte(f){") &&
+    /@media \(max-width:1180px\)\{[\s\S]*?\.cc-bancone\{grid-template-columns:minmax\(0,1fr\)\}/.test(leggi("css/circolo-stanze.css")) &&
+    circoloCss.includes("@media (hover:hover){") && leggi("css/circolo-stanze.css").includes("@media (hover:hover){"));
+  test("la pagina dei luoghi parte dove finisce la fascia, anche quando sul telefono l'orologio va a capo",
+    leggi("css/luoghi-foto.css").includes(".lfwrap{position:absolute;left:0;right:0;top:var(--lfAlta,var(--stAlta));") &&
+    leggi("js/game/luoghi-foto.js").includes('root.style.setProperty("--lfAlta", h + "px");') &&
+    leggi("js/game/luoghi-foto.js").includes("new ResizeObserver(lfMisuraFascia).observe(barra);"));
   /* 30/09/2026, CARLO: la pagina non scorre, sta tutta nella viewport; e i
      volti sono gli otto ritratti di `concept/simil_avatar.png` */
-  test("sopra i 1180 il Circolo sta tutto nello schermo e non scorre",
-    /@media \(min-width:1181px\)\{\s*\.lfwrap\.lfcircolo\{overflow:hidden\}/.test(circoloCss) &&
-    circoloCss.includes(".cc-scena{aspect-ratio:auto;height:100%;max-height:none;min-height:0}"));
+  test("sopra i 1180 il Circolo e le sue stanze stanno nello schermo: la foto intera, le liste che scorrono dentro",
+    circoloCss.includes(".cc-casa{position:relative;height:100%;min-height:0}") &&
+    circoloCss.includes("width:min(100cqw, calc(100cqh * 1250 / 526))") &&
+    leggi("css/circolo-stanze.css").includes(".cc-in{height:100%;min-height:0;position:relative}"));
   test("le facce del Circolo sono gli otto ritratti, non il disegno di rivals.js",
     [1, 2, 3, 4, 5, 6, 7, 8].every(n => circolo.includes('"volto-' + n + '.jpg"') &&
       fs.existsSync(path.join(ROOT, "media/photo/circolo/volti/volto-" + n + ".jpg"))) &&
@@ -3028,7 +3112,7 @@ console.log("\nLe tre del Marketing (20/09/2026)");
   test("il bot del simulatore di bilanciamento trova ancora finestre, colpi e azioni per nome", altro.length === 0, altro.join(", "));
 })();
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/studio-automatico.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/lavoro-eventi.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }

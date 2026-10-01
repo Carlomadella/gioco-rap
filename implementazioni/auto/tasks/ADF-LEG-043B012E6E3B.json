@@ -12,7 +12,7 @@
     "source_status_raw": "in parte"
   },
   "audit_state": "audited",
-  "verified_status": "needs_validation",
+  "verified_status": "blocked",
   "intake_state": "canonical",
   "related_task_ids": [],
   "intake_note": "Task canonica che raggruppa i cinque prerequisiti tecnici di uscita.",
@@ -20,63 +20,99 @@
   "roadmap_impact": "none",
   "roadmap_note": "",
   "current_state": [
-    "Il build è presente in frontend/strumenti/build.js ed è esposto da frontend/package.json come npm run build.",
-    "Il backend espone account, sessioni, cloud e database SQLite/PostgreSQL tramite backend/accessi.js e backend/database/.",
-    "La responsività mobile ha regole in frontend/css/tocco.css, ma la fonte storica segnala ancora hover, telefono reale e parte del negozio da validare.",
-    "La migrazione a PostgreSQL multi-server e il collegamento dei salvataggi locali al cloud/store non risultano chiusi dalla fonte né dimostrati come percorso end-to-end."
+    "frontend/strumenti/build.js e frontend/package.json producono una cartella dist con bundle minificati e hash; la demo monofile è un comando distinto.",
+    "backend/server.js espone account, sessioni e API delle carriere; backend/database/db.js seleziona SQLite o PostgreSQL e applica migrazioni.",
+    "Il client salva ancora la partita in localStorage (frontend/js/game/state.js: save()); frontend/js/net/online.js offre API cloud separate, senza aggancio dimostrato al save().",
+    "PostgreSQL e' supportato da backend/database/db.js con ADF_PG, ma backend/database/copia.js dichiara la copia SQLite-only; per PostgreSQL non e' dimostrato un backup/ripristino operativo.",
+    "frontend/css/tocco.css porta i controlli touch a 44 px; il repository e la fonte storica non attestano una verifica completa su telefono reale, negozio e gusci pubblicati."
   ],
   "systems": [
     "frontend/strumenti/build.js",
+    "frontend/strumenti/verifica-build.js",
     "frontend/package.json",
+    "frontend/css/hub.css",
+    "frontend/css/stretto.css",
     "frontend/css/tocco.css",
+    "frontend/js/game/state.js",
     "frontend/js/net/online.js",
     "backend/accessi.js",
-    "backend/database/"
+    "backend/server.js",
+    "backend/database/",
+    "frontend/test/"
   ],
   "watch_paths": [
     "frontend/strumenti/build.js",
+    "frontend/strumenti/verifica-build.js",
     "frontend/package.json",
+    "frontend/css/hub.css",
+    "frontend/css/stretto.css",
     "frontend/css/tocco.css",
+    "frontend/js/game/state.js",
     "frontend/js/net/online.js",
     "backend/accessi.js",
-    "backend/database/"
+    "backend/server.js",
+    "backend/database/",
+    "frontend/test/"
   ],
   "acceptance_criteria": [
     {
       "id": "AC1",
-      "description": "Il gioco produce un pacchetto installabile con asset e codice referenziati senza dipendere dalla lista di script sorgente.",
+      "description": "Il build produce una cartella installabile con bundle minificati e hash; il file monolitico resta una demo separata.",
       "verification": "automatic",
       "status": "satisfied",
       "evidence": [
-        "frontend/package.json: script build -> node strumenti/build.js.",
-        "frontend/strumenti/build.js: genera bundle di codice e stile con impronta."
+        "frontend/package.json: npm run build richiama strumenti/build.js.",
+        "frontend/strumenti/build.js: build dist separato da demo, genera bundle CSS/JS con impronta e conserva i percorsi relativi.",
+        "frontend/strumenti/verifica-build.js: verifica bundle con hash, riferimenti agli asset e separazione tra dist e demo."
       ]
     },
     {
       "id": "AC2",
-      "description": "Account, sessioni, salvataggi cloud e database persistente hanno percorsi server reali e separati.",
+      "description": "Account, sessioni, API di salvataggio cloud e motori SQLite/PostgreSQL hanno percorsi server reali e separati.",
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "backend/accessi.js: verifica dei canali di accesso e gestione delle sessioni.",
-        "backend/database/db.js: selezione e migrazione dei motori SQLite/PostgreSQL.",
-        "backend/database/README.md: archivio unico e migrazioni per entrambi i motori."
+        "backend/server.js: rotte account/sessione e GET/PUT /api/carriera/:slot; PUT delega a archivio.salvaCarriera().",
+        "backend/accessi.js: funzioni steam(), apple() e google() verificano le credenziali esterne quando configurate.",
+        "backend/database/db.js: scegliMotore() e migra() selezionano SQLite/PostgreSQL e applicano migrazioni numerate."
       ]
     },
     {
       "id": "AC3",
-      "description": "L'interfaccia mobile, il negozio e il collegamento del salvataggio locale al cloud sono pronti per una prova di prodotto sugli store.",
+      "description": "Il salvataggio del client collega la carriera locale al file del dispositivo, a Steam Cloud e al cloud account, mantenendo offline e conflitti espliciti.",
+      "verification": "code_audit",
+      "status": "blocked",
+      "evidence": [
+        "frontend/js/game/state.js: save() persiste ancora con localStorage.",
+        "frontend/js/net/online.js: salvaCarriera(), carriera() e carriere() sono esposti separatamente e non sono chiamati da save()."
+      ]
+    },
+    {
+      "id": "AC4",
+      "description": "I client pubblicati per Steam, iOS e Android completano autenticazione, recupero carriera e cancellazione account; il backend di rilascio usa PostgreSQL con backup e ripristino verificati.",
+      "verification": "playtest",
+      "status": "blocked",
+      "evidence": [
+        "backend/accessi.js e backend/server.js: i canali store dipendono da configurazione e un canale non configurato risponde 501.",
+        "backend/database/copia.js: la copia usa SQLite; backend/database/README.md dichiara che con PostgreSQL la copia si ritira.",
+        "manual: implementazioni/08-uscita-sugli-store.md, punti 34-37, registra come residui i canali pubblicati, il file sul dispositivo, Steam Cloud e la validazione del prodotto."
+      ]
+    },
+    {
+      "id": "AC5",
+      "description": "L'interfaccia mobile e il negozio sono leggibili e utilizzabili con touch e senza hover sui dispositivi target.",
       "verification": "playtest",
       "status": "needs_validation",
       "evidence": [
-        "frontend/css/tocco.css: regole per pointer coarse e bersagli minimi.",
-        "implementazioni/08-uscita-sugli-store.md: la fonte dichiara il lavoro mobile e il negozio ancora parziali."
+        "frontend/css/tocco.css: regole per pointer:coarse e bersagli minimi da 44 px.",
+        "manual: implementazioni/08-uscita-sugli-store.md, punto 36, richiede ancora la prova su un telefono vero."
       ]
     }
   ],
   "risks": [
-    "Un build valido non dimostra da solo la compatibilità con wrapper Steam, iOS e Android.",
-    "Il passaggio a PostgreSQL e il cloud richiedono migrazioni e gestione dei conflitti senza perdere carriere."
+    "Un build valido non dimostra da solo la compatibilità con gusci Electron/Capacitor, Steam Cloud o procedure di pubblicazione.",
+    "Il salvataggio cloud deve mantenere account, slot e conflitti coerenti senza sovrascrivere carriere.",
+    "Il backup attuale e' limitato a SQLite; servono backup e ripristino verificati anche per il PostgreSQL di rilascio."
   ],
   "notes": [
     "La fonte storica in parte è preservata: l'audit separa ciò che il codice dimostra dai punti ancora da validare."
@@ -84,71 +120,84 @@
   "plan": {
     "mode": "auto",
     "status": "ready",
-    "summary": "Conservare il build e il backend già presenti, quindi chiudere in ordine persistenza cross-device, packaging store e validazione mobile.",
+    "summary": "Conservare build e servizi server già presenti, poi collegare la persistenza del client, completare i gusci e i canali degli store e validare il gioco sui dispositivi target.",
     "steps": [
       {
         "id": "V1",
-        "title": "Build e persistenza installabile",
-        "objective": "Stabilizzare bundle, salvataggio locale, cloud e conflitti per una carriera che sopravvive al cambio dispositivo.",
+        "title": "Collegamento della persistenza del client",
+        "objective": "Collegare il salvataggio al file nello spazio privato del dispositivo e ai servizi cloud/Steam Cloud, mantenendo offline e conflitti espliciti.",
         "depends_on": [],
         "systems": [
-          "frontend/strumenti/build.js",
+          "frontend/js/game/state.js",
           "frontend/js/net/online.js",
           "backend/database/"
         ],
         "watch_paths": [
-          "frontend/strumenti/build.js",
+          "frontend/js/game/state.js",
           "frontend/js/net/online.js",
           "backend/database/"
         ],
         "acceptance_criteria": [
-          "AC1",
-          "AC2"
+          "AC3"
         ],
-        "status": "needs_validation"
+        "status": "planned"
       },
       {
         "id": "V2",
-        "title": "Integrazione account e store",
-        "objective": "Collegare autenticazione, cancellazione account e packaging ai canali Steam, Apple e Google senza fallback non verificati.",
+        "title": "Gusci, servizi e canali degli store",
+        "objective": "Collegare i bundle ai gusci Steam/Electron e Capacitor, configurare i canali Steam/Apple/Google e preparare PostgreSQL con backup e ripristino verificati.",
         "depends_on": [
           "V1"
         ],
         "systems": [
           "backend/accessi.js",
-          "frontend/js/net/online.js"
+          "backend/server.js",
+          "backend/database/",
+          "frontend/js/net/online.js",
+          "frontend/strumenti/build.js",
+          "frontend/package.json"
         ],
         "watch_paths": [
           "backend/accessi.js",
-          "frontend/js/net/online.js"
+          "backend/server.js",
+          "backend/database/",
+          "frontend/js/net/online.js",
+          "frontend/strumenti/build.js",
+          "frontend/package.json"
         ],
         "acceptance_criteria": [
-          "AC2"
+          "AC4"
         ],
-        "status": "needs_validation"
+        "status": "planned"
       },
       {
         "id": "V3",
-        "title": "Prova mobile e negozio",
-        "objective": "Validare layout, touch, hover e shop sui dispositivi target e registrare i gap residui.",
+        "title": "Validazione mobile e prodotto",
+        "objective": "Verificare layout, touch, hover e negozio su dispositivi reali e chiudere il percorso prodotto sugli store.",
         "depends_on": [
           "V1",
           "V2"
         ],
         "systems": [
+          "frontend/css/hub.css",
+          "frontend/css/stretto.css",
           "frontend/css/tocco.css",
+          "frontend/css/negozio.css",
           "frontend/js/game/negozio.js",
           "frontend/js/game/telefono.js"
         ],
         "watch_paths": [
+          "frontend/css/hub.css",
+          "frontend/css/stretto.css",
           "frontend/css/tocco.css",
+          "frontend/css/negozio.css",
           "frontend/js/game/negozio.js",
           "frontend/js/game/telefono.js"
         ],
         "acceptance_criteria": [
-          "AC3"
+          "AC5"
         ],
-        "status": "needs_validation"
+        "status": "planned"
       }
     ],
     "gaps": [],

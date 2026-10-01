@@ -16,13 +16,15 @@
   "related_task_ids": [],
   "intake_note": "",
   "current_state": [
-    "Il progetto separa frontend, backend e backend/database con README dedicati.",
-    "Il backend espone il proprio strato dati tramite backend/database/archivio.js."
+    "README.md collega frontend/README.md, backend/README.md e backend/database/README.md per le rispettive aree.",
+    "backend/server.js importa backend/database/archivio.js; il server delega allo strato dati, che usa il motore selezionato da backend/database/db.js.",
+    "backend/database/README.md descrive schema.md come file in git; backend.md resta invece un dossier locale escluso da git secondo la documentazione."
   ],
   "systems": [
     "frontend/",
     "backend/",
     "backend/database/",
+    "backend/database/README.md",
     "frontend/strumenti/audit-regressioni.js"
   ],
   "watch_paths": [
@@ -36,11 +38,11 @@
     {
       "id": "AC1",
       "description": "Frontend, backend e database hanno cartelle e README distinti.",
-      "verification": "automatic",
+      "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "README.md: collega frontend/README.md, backend/README.md e backend/database/README.md.",
-        "frontend/strumenti/audit-regressioni.js: verifica cartelle e README della separazione."
+        "README.md: collega le tre guide distinte di frontend, backend e database.",
+        "frontend/README.md, backend/README.md e backend/database/README.md: documentazione dedicata ai rispettivi sistemi."
       ]
     },
     {
@@ -49,9 +51,9 @@
       "verification": "code_audit",
       "status": "satisfied",
       "evidence": [
-        "backend/server.js: importa il modulo dati.",
-        "backend/database/archivio.js: concentra l'accesso al database.",
-        "backend/README.md: documenta la separazione server/database."
+        "backend/server.js: importa ./database/archivio.js.",
+        "backend/database/archivio.js: concentra l'accesso ai dati; backend/database/db.js seleziona motore e migrazioni.",
+        "backend/README.md: documenta che il server parla con archivio.js e non direttamente col motore."
       ]
     }
   ],

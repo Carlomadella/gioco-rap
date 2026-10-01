@@ -14,8 +14,9 @@
    persona nello stesso giorno vale meno (`p.ult`).
 
    In provincia c'è poca gente e pochi ruoli, di proposito: il giornalista si
-   affaccia solo quando qualcuno comincia a sapere chi sei, e manager, promoter e
-   uffici stampa non ci sono proprio. Quelli sono Milano.
+   affaccia solo quando qualcuno comincia a sapere chi sei. Manager e uffici stampa
+   restano roba da Milano; un promoter non occupa mai un posto casuale al Circolo,
+   ma può diventare un contatto eccezionale se lo incontri davvero lavorando.
 
    Dal 29/09/2026 la Sala non ha più una pagina sua: con il Live Club è
    diventata **Il Circolo** (js/game/circolo.js), e la gente si incontra nel
@@ -140,7 +141,7 @@ const POSTO_RUOLI = {
   videomaker: {n:"Videomaker", k:"#22D3EE",
     d:"Gira i video. Decide come ti si vede, prima ancora di come suoni.",
     da:g => (g.songs || []).some(x => x.released)},
-  /* Questi due ruoli possono nascere dal lavoro ma non occupano posti casuali
+  /* Questi ruoli possono nascere dal lavoro ma non occupano posti casuali
      al Circolo: sono contatti persistenti della vita fuori dalla Sala. */
   promoter: {n:"Promoter", k:"#FB7185",
     d:"Lavora con serate e locali. Può farti arrivare occasioni che al Circolo non passano."},

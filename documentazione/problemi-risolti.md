@@ -6490,3 +6490,277 @@ lanciato.
 - **quanto pesa** — da sistemare con calma.
 
 **RISOLTO (30/09/2026)** — stesso branch: niente più tre righe nella scheda (la scheda scorre, con la barretta sottile), le mosse chiuse del Palco vanno a capo invece dei puntini e la loro colonna ha la barretta, le facce di «Chi c'è stasera» scendono fino a 46 punti.
+
+## Giro del 29/09/2026 (segnala-problemi, giro stretto sul commit 2b1f650, branch `task/lafamegram-posta-la-gente`) — la chiusa
+
+### I post della strada e della Voce del Giro prendono la data di quando li guardi, non di quando nascono
+- **dove** — `frontend/js/game/telefono.js:215` (la riga che dà la settimana ai post degli
+  incontri), con i post che nascono in `frontend/js/game/strada.js:124` e
+  `frontend/js/game/eventi-v2.js:2012`
+- **cosa succede** — i post degli incontri non hanno una settimana e la prendono la prima
+  volta che apri LaFamegram. Il commento dice che «il popup che li annuncia apre LaFamegram»,
+  ma questo vale solo per i post con la foto (quelli del popup social): quelli degli incontri
+  per strada (il fan, «La Voce del Giro» sul litigio, ecc.) e le notizie della Voce del Giro
+  nascono senza nessun popup che apra l'app. Se non apri LaFamegram per qualche settimana,
+  quando lo apri quei post vecchi finiscono in cima, sopra i post della gente di questa
+  settimana, e sotto la scritta «in giro» / «adesso». Lo stesso succede alla prima apertura
+  con un salvataggio di prima di oggi: tutti i post vecchi degli incontri diventano «di
+  questa settimana».
+- **come si vede** — fai un incontro per strada che finisce su LaFamegram, non aprire il
+  telefono, fai passare tre o quattro settimane, poi apri LaFamegram: il post della strada
+  sta sopra i post dei rivali usciti nel frattempo.
+- **quanto pesa** — da sistemare con calma (l'ordine del feed è un po' sbagliato, non si
+  perde niente).
+- **RISOLTO (29/09/2026)** — branch `task/lafamegram-posta-la-gente`: i post si timbrano
+  `tw:totalWeeks()` quando nascono (`strada.js` e i due posti di `eventi-v2.js`), `telPost`
+  non timbra più niente e quelli dei salvataggi vecchi senza settimana vanno in fondo.
+  Controllo in `audit-regressioni.js`.
+
+## Giro del 01/10/2026 (segnala-problemi, `task/studio-resto-automatico`) — la chiusa
+
+### 79. Nota: due cose fuori posto in `fatte.md` per i punti chiusi oggi
+- **dove** — `implementazioni/fatte.md:28` (la riga «28/09/2026 | 1» della tabella) e
+  `:202` («### Beat, Testo e Cabina a mano, il resto in automatico», sotto «## 21/09/2026»
+  di `:193`); la nota tolta stava in `implementazioni/implementazioni.md` sotto «9.
+  sull'app lafamegram non posta nessuno» (CARLO, «Da discutere»)
+- **cosa succede** — il punto dello Studio è chiuso il 28/09 ma è finito sotto al titolo
+  del 21/09, e nella tabella c'è un 28/09 che non ha un titolo suo. Il punto di LaFamegram
+  è stato tolto dalla lista insieme alla sua nota «Stato (15/09/2026)», che non è stata
+  copiata né in `fatte.md` né in `02-interfaccia-e-telefono.md:352` (lì c'è solo la
+  richiesta e il FATTO): la regola di `fatte.md` è tenere le note com'erano. E nella lista
+  CARLO «Da discutere» adesso si salta dall'8 al 10. Il gioco non ne risente.
+- **come si vede** — apri `fatte.md` e cerca «Il resto in automatico»: sta in mezzo ai
+  punti del 21/09.
+- **quanto pesa** — da sistemare con calma.
+
+## Giro sul telefono del 01/10/2026 (prova-sul-telefono, branch `task/studio-resto-automatico` con dentro `task/lafamegram-posta-la-gente`, commit `d9425894`)
+
+**Misure:** 390 × 844 in verticale, 844 × 390 di traverso, 360 × 640 (il piccolo) e
+1366 × 768 (computer). L'estensione Chrome non era collegata: giro fatto con Playwright
+(Chromium, `isMobile` e `hasTouch` accesi sulle misure da telefono, i tasti premuti con
+`tap()`), su un server mio (`node strumenti/dev.js --porta 8137`), non sulla 8000. Il pezzo
+sul banco l'ho messo a mano da console (`G.songs.push(...)` + `studioMettiSulBanco`), non
+passando dalla Cabina vera: quello che si vede in Cabina *sopra* la riga («manca la strofa»)
+è quindi quello di un banco senza strofe e beat in cartella. Il feed di LaFamegram l'ho
+riempito facendo girare `vitaRivali` per sei settimane. **Console pulita**: nessun errore
+né avviso su nessuna misura.
+
+**Quello che funziona.** La riga «Il resto lo può chiudere il gioco…» e il tasto «chiudi tu
+il resto: mix e uscita» si leggono a tutte le misure: il testo va a capo dentro al pannello,
+il tasto è alto 44 e largo 231, non esce (a 360 il riquadro è largo 306 e il tasto finisce a
+258). **Nessuna pagina scorre di lato.** Il tocco funziona; dopo il tocco compare il toast
+«… esce venerdì, chiuso dal gioco» (sopra la barra delle notizie, leggibile anche di
+traverso), lo Studio torna al Beat, e **Mix e Uscita restano aperte** a tutte le misure: il
+Mix dice «è già mixato — della casa», l'Uscita ha «venerdì · fra 4 g» acceso e la riga della
+qualità scrive «Mix della casa +3». Su LaFamegram i post della gente sono card semplici,
+senza tasti (né rotti né vuoti), larghe quanto lo schermo del telefono, niente testo che
+esce con i testi veri; il feed scorre dentro al telefono e la testata «LAFAMEGRAM» col tasto
+indietro resta ferma.
+
+Di traverso la riga sta sotto la piega: nella Cabina e nel Mix la colonna che scorre è alta
+222 punti su 390, e la riga si trova solo scorrendo. Non è di questa task: è la fascia della
+**voce 9** e del giro del 20/09 («Di traverso la fascia si prende 144 punti su 390»).
+![Cabina di traverso: la riga è sotto, si scorre](prove-telefono/2026-10-01/studio-auto-cabina-844x390.png)
+
+Le figure di quello che va: ![Mix a 390, la riga in vista](prove-telefono/2026-10-01/studio-auto-mix-390x844.png)
+![Mix a 360](prove-telefono/2026-10-01/studio-auto-mix-360x640.png)
+![Mix al computer](prove-telefono/2026-10-01/studio-auto-mix-1366x768.png)
+![Uscita riaperta dopo il tocco, al computer](prove-telefono/2026-10-01/studio-auto-uscita-riaperta-1366x768.png)
+![LaFamegram, i post della gente a 390](prove-telefono/2026-10-01/lafamegram-gente-390x844.png)
+![LaFamegram di traverso](prove-telefono/2026-10-01/lafamegram-844x390.png)
+- **RISOLTO (01/10/2026)** — stesso branch: in `fatte.md` c'è «## 28/09/2026» coi due punti,
+  la nota «Stato (15/09/2026)» di LaFamegram è tornata sotto al suo punto, la tabella dice 2.
+  Il salto dall'8 al 10 nella lista CARLO è voluto: i numeri non si rifanno.
+
+## Giro del 01/10/2026 (segnala-problemi, giro stretto sul commit `b091b2b0`, branch `task/studio-cursori-e-linguette`)
+
+Guardato: chi legge `G.studio.banco` e chi legge i cursori (studio.js, studio-elementi.js,
+actions.js con `mixGain`/`bancoBonus`, studio-automatico.js, seguiti.js, posto.js, il
+simulatore `strumenti/bilanciamento/bot.js`, prova.js e seguiti.test.js); Mix e Uscita a banco
+vuoto, con la remastered prenotata e col tasto «chiudi tu il resto»; i salvataggi vecchi con
+`banco` oggetto, numero, `null` o mancante. `npm run prova` e l'audit li aveva già fatti girare
+chi ha lanciato il giro (i 6 falliti dell'audit sono di `main`, non di questo commit).
+
+**A posto.** Fuori da studio.js nessuno legge `G.studio.banco`: tutti gli altri passano da
+`studioSulBanco()`. I cursori li legge solo studio-elementi.js (`studioBanco()`), e da fuori ci
+si arriva da `mixGain()` → `bancoBonus()` → `studioBancoGuadagno()`: un giro solo, e adesso
+legge la casella giusta. Il simulatore non tocca i cursori: stanno al centro e valgono zero,
+come prima. Lo spostamento del salvataggio regge tutti i casi: con l'oggetto dei cursori in
+`banco` lo sposta in `cursori` e svuota il banco; con un numero (anche il seed 0) o con `null`
+non fa niente; con `banco` mancante ci pensa `studioDati()` come prima. La remastered prenotata
+continua a passare avanti nel Mix (`studioSezBanco`, riga 1171), e «chiudi tu il resto» a banco
+vuoto non compare, perché `studioAutoRiga()` senza pezzo non scrive niente.
+
+### 82. Mix e Uscita a banco vuoto dicono «comincia dal Beat» anche quando hai pezzi incisi pronti
+- **dove** — `frontend/js/game/studio.js:1195` (il Mix: «niente, il banco è spento · Prima si
+  registra. Il provino arriva dalla Cabina») e `frontend/js/game/studio.js:1405` (l'Uscita:
+  «Si comincia dal Beat, poi il Testo, poi la Cabina»).
+- **cosa succede** — adesso che Mix e Uscita si aprono sempre, ci arrivi anche quando sul banco
+  non c'è niente ma i pezzi incisi ce li hai: per esempio ne avevi due, uno è uscito, e il banco
+  si è svuotato. Il centro ti dice di ripartire dal Beat, mentre il pezzo che ti serve sta già
+  nella colonna di destra e basta toccarlo. Prima questa differenza la faceva il messaggio che
+  compariva toccando la linguetta chiusa («Niente sul banco: rimettici un pezzo»), che adesso
+  non compare più (voce 83). Ci finisce dritto anche chi riapre un salvataggio di prima del
+  15/09: lo spostamento dei cursori lascia il banco vuoto, e il recupero «sul banco ci va
+  l'ultimo pezzo inciso» di `studioDati()` (riga 171) non parte più, perché scatta solo quando
+  il banco manca del tutto, non quando è vuoto.
+- **come si vede** — incidi due pezzi, mandane fuori uno, apri il Mix o l'Uscita.
+- **quanto pesa** — si vede ma si gira intorno (il pezzo è lì a destra, ma la frase ti manda
+  altrove).
+- **RISOLTO (01/10/2026)** — stesso branch: a banco vuoto, se ci sono pezzi incisi, Mix e Uscita
+  dicono «ne rimetti uno sul banco, qui a destra»; la migrazione dei cursori sta in `studioDati()`
+  prima del recupero, così un salvataggio vecchio ritrova sul banco l'ultimo pezzo inciso. Tre prove
+  nuove in `strumenti/prova.js`.
+
+### 83. Il lucchetto delle linguette dello Studio è rimasto nel codice, e i commenti dicono che c'è
+- **dove** — `frontend/js/game/studio.js:1498-1505` (in `renderStudio`, il ritorno al Beat o alla
+  Cabina «se la sezione è chiusa»), `studio.js:1509-1510` (la classe `chiusa` e
+  `aria-disabled`), `studio.js:1582-1588` (il messaggio quando tocchi una linguetta chiusa),
+  `frontend/css/studio.css:339-343` (`.sttab.chiusa`, il lucchetto); `studioSbloccato()`
+  (`studio.js:107`) nel gioco non la chiama più nessuno, solo `strumenti/prova.js:1592`.
+  I commenti che raccontano ancora il contrario: `studio.js:106` («Il resto si apre quando c'è
+  un pezzo sul banco»), `studio.js:122-124` («Mix e Uscita si aprono su di lui… e si
+  richiudono»), `studio.js:1396` («Con F2 qui non si arriva: senza un pezzo sul banco l'Uscita
+  è chiusa»).
+- **cosa succede** — `studioSezAperta()` adesso dice sempre di sì, quindi questi pezzi non
+  scattano mai: non fanno danni, ma chi legge il codice crede che le linguette si chiudano
+  ancora. È una scelta del commit tenere `studioSezAperta()` «se una sezione dovesse
+  richiudersi»; il resto però va o tolto o scritto che è fermo.
+- **come si vede** — non si vede giocando; si vede aprendo `studio.js`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — stesso branch: via il ritorno al Beat, la classe `chiusa` con
+  `aria-disabled`, il toast, `.sttab.chiusa` e `studioSbloccato()`; i tre commenti riscritti.
+  L'audit controlla che il lucchetto non torni.
+
+### 84. Sei file cambiati e il loro numero nella pagina del gioco è rimasto lo stesso
+- **dove** — `frontend/pagine/gioco.html`: `css/studio.css?v=12` (riga 42),
+  `js/game/state.js?v=14` (678), `js/game/studio.js?v=15` (701), `js/game/strada.js?v=12`
+  (712), `js/game/eventi-v2.js?v=1227` (734), `js/game/tempo-controlli.js?v=18` (749). Sono
+  gli stessi numeri di `origin/main`, ma il contenuto dei sei file in questo branch è diverso.
+- **cosa succede** — quel numero serve a dire al browser «il file è nuovo, non usare la copia
+  vecchia». Qui non si è alzato, e chi gioca dal browser e ha già aperto il gioco può tenersi
+  le copie vecchie insieme a quelle nuove degli altri file. Non si rompe niente (ho guardato i
+  miscugli possibili), ma per lui il fix di oggi del widget del tempo non arriva (continua a
+  ridisegnarsi a ogni fotogramma e scalda il telefono), e lo Studio ha ancora le linguette col
+  lucchetto. Il pacchetto per gli store mette tutto in un file solo, quindi lì non succede.
+- **come si vede** — apri il gioco dal browser su `main` di adesso, poi aggiorna dopo il
+  merge di questo branch senza svuotare la cache: Mix e Uscita restano col lucchetto a banco
+  vuoto.
+- **quanto pesa** — da sistemare con calma (ma è un minuto: alzare di uno i sei numeri).
+- **RISOLTO (01/10/2026)** — stesso branch, prima del push: `studio.css?v=13`, `state.js?v=15`,
+  `studio.js?v=16`, `strada.js?v=13`, `eventi-v2.js?v=1228`; `tempo-controlli.js?v=19` è arrivato
+  col fix del widget, da `task/test-fabbrica-dopo-pizzeria`.
+
+## Giro del 01/10/2026 (segnala-problemi, fine task `task/circolo-orari-e-pagine`, commit `ab18a4f7`)
+
+Come chiesto non ho fatto girare né la verifica né i test (la verifica completa era già verde):
+ho letto il codice cambiato rispetto a `origin/main` e chi lo chiama. Guardato e **a posto**:
+
+- **Le funzioni e le foto tolte.** Nessun file del gioco chiama più `ccGente`, `ccPalco`,
+  `ccSerata`, `ccMomenti`, `ccPannello`, `ccScheda`, `ccNessuno` o un `data-pan`;
+  `circoloDopoDisegno` c'è ancora (ora fa solo pulizia), e `luoghi-foto.js:176` la trova.
+  `palco.jpg`, `serata.jpg` e `live_club.png` non li cita più nessun file del gioco (solo i
+  fogli di `implementazioni/` e `registro-modifiche/`, che sono storia). Le classi del vecchio
+  disegno non le cerca più nessuno, né i test né l'audit (l'audit controlla anzi che
+  `cc-giu` *non* ci sia). I due file nuovi non danno a niente lo stesso nome di una cosa
+  che c'è già in un altro file: all'avvio non si rompe niente. I numeri `?v=` dei file
+  cambiati sono stati tutti alzati.
+- **Il live partito da fuori.** La card o l'agenda aprono la pagina (`apriLuogo` con
+  `da:"mossa"`), poi arriva l'esito, e `circoloParti` (`circolo.js:246`) porta sul Palco, che
+  lo mostra con «Continua»; «Continua» chiude la pagina, come prima. Il live non ha un
+  filmato suo, quindi l'esito c'è già quando la serata a momenti ci aggiunge «La gente: …/100».
+- **La serata a metà.** Mentre sei sul palco «Il Circolo» in alto è spento, ma ci sono sempre
+  le tre risposte e la serata si chiude da sola alla terza. «Torna alla mappa» del menu
+  funziona lo stesso (`menu-sistema.js:405` chiude la pagina e basta): non si resta mai
+  chiusi dentro. Rientrando la stessa sera si torna sul palco a metà; se nel frattempo sei
+  andato altrove la serata è finita lì (è la scelta già scritta per «La serata lasciata a metà»).
+- **I salvataggi vecchi.** Senza `G.circolo.oggi`: `circoloOggi()` lo crea vuoto alla prima
+  lettura, e quando cambia il giorno lo rifà da capo. Senza `p.visto`: vale «no», come prima.
+  Una serata salvata a metà ha la stessa forma di prima (il freestyle una serata non la apriva).
+- **Il discorso di posto.js e il cambio di stanza.** Da una stanza all'altra si passa solo da
+  «Il Circolo», che chiude il discorso a metà: al ritorno non c'è una risposta che punta a una
+  persona sparita.
+- **L'inglese.** `js/lingua.js` traduce solo il menu e i pannelli fissi; nessuna pagina dei
+  posti (Casa, Palestra, Studio) ci passa, quindi le stanze in italiano sono come le altre.
+- **La misura della fascia.** Con la pagina chiusa la fascia misura zero e il gioco non
+  scrive niente (`luoghi-foto.js:125`); quando la pagina si riapre la misura riparte da
+  sola. Su computer la fascia è alta come prima (58), quindi Casa, Palestra, Fabbrica e
+  Pizzeria non si spostano. Non può girare all'infinito: cambia la pagina sotto, non la fascia.
+- **Il telefono, sulla carta.** Il passaggio del mouse sugli orari e sui tasti sta tutto sotto
+  «solo dove c'è un mouse»; col dito la linguetta si apre e si chiude toccandola. La striscia
+  degli orari non copre il cartello Backstage: la foto si ferma prima. Non l'ho provato su
+  uno schermo vero: quello è il lavoro di `prova-sul-telefono`.
+
+### 85. Il contatto dell'artista nel backstage si può avere ogni sera, e la gente non smette di crescere
+- **dove** — `frontend/js/game/circolo-incontri.js:319` (con `posto.js:27` e `posto.js:559`)
+- **cosa succede** — «Chiedi un contatto» crea ogni volta una persona nuova, già «contatto».
+  Il «una volta per sera» si azzera col giorno, e il «ti ha notato» pure: ogni sera ti
+  presenti, ti nota, e hai una persona nuova in 20 minuti. Il gioco dice che in provincia
+  girano al massimo 8 persone, ma questa strada il tetto non lo guarda: dopo un mese sono
+  una trentina. E siccome sono già oltre il tetto, il gioco smette di far arrivare
+  sconosciuti nuovi al bancone; in più chi ha un rapporto più alto si vede prima, e queste
+  persone nuove spingono fuori dalla sala quelle di prima. L'artista è sempre uno dei cinque,
+  quindi «te l'ha presentato Raiz» si ripete ogni cinque giorni.
+- **come si vede** — una sera di fila dopo l'altra: backstage, Presentati finché ti nota,
+  Chiedi un contatto; guarda la Sala dopo qualche settimana.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (01/10/2026)** — stesso branch, prima del push: ogni artista ti presenta qualcuno
+  una volta sola (`G.circolo.presentati`), e con la Sala già a `POSTO_MAX` non nasce nessuno:
+  l'artista parla bene di te a uno che conosci (due pezzi di rapporto). Due prove in
+  `circolo-stanze.test.js`, un controllo nell'audit.
+
+### 86. Il tasto dei fan nel backstage funziona per caso
+- **dove** — `frontend/js/game/circolo-stanze.js:404-405`, `frontend/js/game/luoghi-foto.js:841`
+- **cosa succede** — i due tasti del fan («Ringrazia e fate una foto», «Chiedi cosa
+  cambierebbe») dicono cosa sono con lo stesso nome (`data-scelta`) che la pagina dei posti
+  usa per Pesi/Cardio della palestra. Al tocco quella risponde per prima, ridisegna tutto e si
+  ferma; solo dopo il Circolo guarda lo stesso tocco e fa la mossa. Oggi funziona, ma si
+  sente due volte il clic e la pagina si ridisegna due volte; basta che una delle due cambi
+  l'ordine o aggiunga un controllo e il tasto non fa più niente, senza errori.
+- **come si vede** — backstage di sera con un pezzo fuori, tocca un fan e poi la foto:
+  due clic.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — i tasti dei fan usano `data-fan`, non più `data-scelta`: il clic
+  lo legge solo il Circolo.
+
+### 87. Le mosse nuove danno ogni sera hype e abilità, e «+0,4» scritto non è quello che entra (da decidere)
+- **dove** — `frontend/js/game/circolo-incontri.js:432-440` (i fan), `:293-309` (l'artista)
+- **cosa succede** — **è soprattutto una scelta di bilanciamento, non un errore.** I numeri
+  rispettano il tetto dell'hype e le soglie dei rapporti. Ma ogni sera, solo spendendo tempo:
+  fino a 3 fan con la foto (+1 hype e 2–6 fan l'uno) o con la critica (+0,4 a un'abilità
+  l'uno), più +1 dall'artista se ti nota e +1 dal networking con lui. Fanno circa 5 punti di
+  hype a sera, ripetibili, quando un pezzo che esce ne dà 6–15: va con la voce 65 («l'hype sta
+  al tetto») e la 61 (abilità al tetto in un anno). L'errore piccolo è il testo: la critica
+  scrive «Rap +0,4», ma l'abilità sale meno quanto più è alta (`sim.js:58`), quindi il numero
+  scritto è più grande di quello vero.
+- **come si vede** — backstage di sera con un pezzo fuori: tre fan, tre critiche, e guarda
+  quanto sale Rap nel profilo.
+- **quanto pesa** — da sistemare con calma (i numeri: da decidere).
+- **RISOLTO (01/10/2026)** — deciso col tetto: tutte le stanze insieme danno al massimo due
+  punti di hype a sera (`CC_HYPE_SERA`; la collaborazione con l'artista, una ogni quattro
+  settimane, ne resta fuori), e la critica dei fan non scrive più «+0,4» ma «ci guadagna il
+  Rap». Una prova in `circolo-stanze.test.js`.
+
+### 88. Nella Sala una faccia di «Chi c'è stasera» apre la scheda di un altro
+- **dove** — `frontend/js/game/circolo-stanze.js:176` e `:212`, `frontend/js/game/circolo.js:610-619`
+- **cosa succede** — la colonna «Chi c'è stasera» fa vedere 8 facce, ma nella sala in quel
+  momento ce ne sono 3 (di pomeriggio) o 5 (la sera). Toccando una di quelle che non sono
+  ancora arrivate esce «Arriva più tardi», e la scheda in mezzo si apre sul primo della lista,
+  non su quello toccato; il commento nel codice dice invece che chi non è ancora arrivato
+  «si guarda dalla Sala». Era già così nel riquadro di prima: non l'ha rotto questo lavoro.
+- **come si vede** — Sala alle 15:00, tocca la sesta faccia a destra.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — la scheda si apre su chi hai toccato anche se arriva più tardi,
+  e al posto delle mosse dice che adesso non è in sala.
+
+### 89. «Ascolta la conversazione» fa sapere il nome di uno sconosciuto
+- **dove** — `frontend/js/game/circolo-incontri.js:179-182` (con `circolo.js:136`)
+- **cosa succede** — uno che non conosci si vede come «???». Ascoltandolo, se va bene ne
+  capisci il carattere, e il gioco per questo lo considera già conosciuto: il nome compare
+  subito, nella frase e nella lista. Il commento in `circolo.js` dice che il nome si scopre
+  offrendo da bere o presentandosi, e la frase ha pure il ramo «che tipo è quello lì», che
+  così non esce mai. Se ascoltare deve bastare, è da scrivere; se no è un errore.
+- **come si vede** — al bancone scegli un «???», Ascolta la conversazione.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — `circoloSconosciuto` non guarda più `p.scoperto`: ascoltando ne
+  capisci il carattere, il nome resta «???» finché non ci parli o ti presenti.

@@ -6,6 +6,146 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:747e7b7 -->
+## 01/10/26, 13:58 â€” task/circolo-orari-e-pagine â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `747e7b7`
+
+### Cosa Ã¨ entrato
+
+- `7332eb4` â€” Il Circolo a stanze: i titoli dritti, via il pennarello corsivo â€” **Carlomadella**
+- `c48b66b` â€” Merge remote-tracking branch 'origin/main' into task/circolo-orari-e-pagine â€” **Carlomadella**
+- `c511470` â€” Il Circolo a stanze: le voci 85–89 del giro di fine task â€” **Carlomadella**
+- `ab18a4f` â€” Il Circolo a stanze: Bancone, Sala, Palco, Backstage â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Aggiunto:** `frontend/css/circolo-stanze.css`
+- **Modificato:** `frontend/css/circolo.css`
+- **Modificato:** `frontend/css/luoghi-foto.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Aggiunto:** `frontend/js/game/circolo-incontri.js`
+- **Aggiunto:** `frontend/js/game/circolo-stanze.js`
+- **Modificato:** `frontend/js/game/circolo.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Rimosso:** `frontend/media/photo/circolo/palco.jpg`
+- **Rimosso:** `frontend/media/photo/circolo/serata.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/backstage.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/bancone.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/palco.jpg`
+- **Rimosso:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/circolo-stanze.test.js`
+
+**File interessati in questa categoria:** 19
+
+---
+
+<!-- merge:dc26a32 -->
+## 01/10/26, 13:34 â€” feature/eventi-lavoro-famiglie-rebased â†’ main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `dc26a32`
+
+### Cosa Ã¨ entrato
+
+- `85cf559` â€” test: riallinea dritta Fabbrica al testo corrente â€” **mycolbraga**
+- `70a302e` â€” fix: chiudi regressioni CI punto 10 â€” **mycolbraga**
+- `ce9fc63` â€” chore: riallinea punto 10 con main e risolvi conflitti â€” **mycolbraga**
+- `4541d4f` â€” chore: sync main before point 10 merge â€” **mycolbraga**
+- `be367d2` â€” docs(roadmap): align promoter geography with work contacts â€” **mycolbraga**
+- `7be1556` â€” docs(contacts): clarify work-only promoter exception in Provincia â€” **mycolbraga**
+- `d27fa4d` â€” test(work-events): follow refreshed event engine asset â€” **mycolbraga**
+- `b959cd2` â€” chore(work-events): refresh persistent conflict engine cache â€” **mycolbraga**
+- `69e291b` â€” test(work-events): keep pending conflicts persistent until shift commit â€” **mycolbraga**
+- `39aa1f6` â€” fix(work-events): persist pending work-music conflicts across reloads â€” **mycolbraga**
+- `58ada6d` â€” chore(gameplay): refresh reviewed work-event caches â€” **mycolbraga**
+- `86c1985` â€” test(work-review): cover clock resume and structured re-entry â€” **mycolbraga**
+- `a2bad73` â€” fix(work-events): wait for resumed shift before post-shift hooks â€” **mycolbraga**
+- `2cd000b` â€” fix(work): generalize structured contract re-entry state â€” **mycolbraga**
+- `3afec04` â€” fix(agenda): read numeric game time correctly â€” **mycolbraga**
+- `d245203` â€” docs(events): mark legacy promotion arc as superseded â€” **mycolbraga**
+- `dbdd985` â€” docs(work): point structured careers at real event engine â€” **mycolbraga**
+- `cb9c6fa` â€” test(work-events): cover work families on latest structured jobs â€” **mycolbraga**
+- `4581e71` â€” test(audit): align work-event checks with latest main â€” **mycolbraga**
+- `588e750` â€” chore(work-events): load work event engine on latest gameplay â€” **mycolbraga**
+- `2eba74b` â€” docs(famepedia): add work event families to structured jobs â€” **mycolbraga**
+- `e60798f` â€” feat(work-events): arbitrate structured work events after committed shifts â€” **mycolbraga**
+- `56c4c49` â€” feat(work-events): connect structured jobs to persistent event effects â€” **mycolbraga**
+- `54f273d` â€” feat(work-events): carry landing.html integration onto latest main â€” **mycolbraga**
+- `d6f10dd` â€” feat(work-events): carry strada-crimine.js integration onto latest main â€” **mycolbraga**
+- `aef21f6` â€” feat(work-events): carry ui.js integration onto latest main â€” **mycolbraga**
+- `c215384` â€” feat(work-events): carry agenda.js integration onto latest main â€” **mycolbraga**
+- `3b222e9` â€” feat(work-events): add persistent work event families on structured jobs â€” **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Aggiunto:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Aggiunto:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 12
+
+---
+
+<!-- merge:2c67b9c -->
+## 01/10/26, 12:43 â€” task/studio-cursori-e-linguette â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `2c67b9c`
+
+### Cosa Ã¨ entrato
+
+- `0dd90b6` â€” Il giro di fine task dopo il merge della Pizzeria: i numeri ?v= dei file cambiati â€” **Carlomadella**
+- `d627a5b` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `f3b42b4` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `a810c7f` â€” Merge remote-tracking branch 'origin/main' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `6e63f12` â€” Studio, linguette sempre aperte: le due voci del giro di fine task â€” **Carlomadella**
+- `9f6bca3` â€” Studio: le linguette sempre aperte e i cursori del Mix in G.studio.cursori â€” **Carlomadella**
+- `afbb42f` â€” Il giro di fine task su «Su LaFamegram non posta nessuno» e «Beat, Testo e Cabina a mano, il resto in automatico coi malus» â€” **Carlomadella**
+- `211769e` â€” Dopo il resto in automatico, Mix e Uscita restano aperte â€” **Carlomadella**
+- `fdd7002` â€” Beat, Testo e Cabina a mano, il resto in automatico coi malus â€” **Carlomadella**
+- `9b896a8` â€” Su LaFamegram posta anche la gente: i post degli incontri si datano quando nascono â€” **Carlomadella**
+- `0e9af7f` â€” Su LaFamegram posta anche la gente â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/lafamegram-feed-server-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/lafamegram-gente-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/studio-auto-dopo-tocco-beat-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/studio-auto-mix-riaperto-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/studio-auto-uscita-riaperta-390x844.png`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada.js`
+- **Aggiunto:** `frontend/js/game/studio-automatico.js`
+- **Modificato:** `frontend/js/game/studio-elementi.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Aggiunto:** `frontend/js/game/telefono-feed-gente.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/seguiti.test.js`
+
+**File interessati in questa categoria:** 18
+
+---
+
 <!-- merge:18c56d3 -->
 ## 01/10/26, 10:58 â€” feature/pizzeria-lavoro-strutturato â†’ main
 

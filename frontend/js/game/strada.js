@@ -121,7 +121,7 @@ function strScenaFan(comportamenti, storicoKey){
    incontro finisce su LaFamegram davvero, non solo nel diario. */
 function postaEvento(nome, testo, like){
   if(!G.lafamegramEventi) G.lafamegramEventi = [];
-  G.lafamegramEventi.unshift({n:nome, t:testo, w:"in giro", like:Math.max(0, Math.round(like || 0)), mia:false});
+  G.lafamegramEventi.unshift({n:nome, t:testo, w:"in giro", tw:totalWeeks(), like:Math.max(0, Math.round(like || 0)), mia:false});
   if(G.lafamegramEventi.length > 20) G.lafamegramEventi.length = 20;
 }
 

@@ -19,7 +19,8 @@
   "roadmap_impact": "none",
   "roadmap_note": "",
   "current_state": [
-    "La mappa espone Pizzeria e Fabbrica come luoghi reali e i rispettivi turni sono vincolati al luogo corretto."
+    "HUB_LUOGHI e HUB_SAGOME in frontend/js/game/hub.js espongono Pizzeria e Fabbrica come luoghi cliccabili; ciascuna apre la propria schermata fotografica.",
+    "JOBS associa Lavapiatti a pizzeria e Operaio a fabbrica; gli orari del luogo e del lavoro sono distinti e il turno richiede il posto di lavoro corretto."
   ],
   "systems": [
     "frontend/js/game/hub.js",
@@ -42,8 +43,8 @@
       "verification": "automatic",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/game/hub.js: definisce le voci pizzeria e fabbrica, coordinate, colore e ambientazione.",
-        "frontend/strumenti/audit-regressioni.js: verifica gli edifici con id pizzeria e fabbrica."
+        "frontend/js/game/hub.js: HUB_LUOGHI include pizzeria/fabbrica, HUB_SAGOME ne definisce i poligoni e renderHub() genera gli hotspot.",
+        "frontend/strumenti/audit-regressioni.js: verifica le pagine fotografiche e i due luoghi selezionabili."
       ]
     },
     {
@@ -52,9 +53,9 @@
       "verification": "automatic",
       "status": "satisfied",
       "evidence": [
-        "frontend/js/game/spostamenti.js: associa lavapiatti a pizzeria e operaio a fabbrica.",
-        "frontend/js/game/orari.js: definisce gli orari di pizzeria, fabbrica, lavapiatti e operaio.",
-        "frontend/strumenti/audit-regressioni.js: prova il vincolo di luogo del turno lavapiatti."
+        "frontend/js/game/actions.js: JOBS associa Lavapiatti a pizzeria (100 €, 18 energia) e Operaio a fabbrica (220 €, 40 energia).",
+        "frontend/js/game/spostamenti.js: JOB_PLACE associa i turni alle sedi; frontend/js/game/orari.js: PLACE_JOB e JOB_HOURS definiscono sedi e fasce orarie.",
+        "frontend/strumenti/audit-regressioni.js: controllo runtime 'il turno lavapiatti richiede la Pizzeria' e test dei luoghi delle mansioni."
       ]
     }
   ],
