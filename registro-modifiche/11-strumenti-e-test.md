@@ -6,6 +6,53 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:2c67b9c -->
+## 01/10/26, 12:43 â€” task/studio-cursori-e-linguette â†’ main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `2c67b9c`
+
+### Cosa Ã¨ entrato
+
+- `0dd90b6` â€” Il giro di fine task dopo il merge della Pizzeria: i numeri ?v= dei file cambiati â€” **Carlomadella**
+- `d627a5b` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `f3b42b4` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `a810c7f` â€” Merge remote-tracking branch 'origin/main' into task/studio-cursori-e-linguette â€” **Carlomadella**
+- `6e63f12` â€” Studio, linguette sempre aperte: le due voci del giro di fine task â€” **Carlomadella**
+- `9f6bca3` â€” Studio: le linguette sempre aperte e i cursori del Mix in G.studio.cursori â€” **Carlomadella**
+- `afbb42f` â€” Il giro di fine task su «Su LaFamegram non posta nessuno» e «Beat, Testo e Cabina a mano, il resto in automatico coi malus» â€” **Carlomadella**
+- `211769e` â€” Dopo il resto in automatico, Mix e Uscita restano aperte â€” **Carlomadella**
+- `fdd7002` â€” Beat, Testo e Cabina a mano, il resto in automatico coi malus â€” **Carlomadella**
+- `9b896a8` â€” Su LaFamegram posta anche la gente: i post degli incontri si datano quando nascono â€” **Carlomadella**
+- `0e9af7f` â€” Su LaFamegram posta anche la gente â€” **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/lafamegram-feed-server-360x640.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/lafamegram-gente-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/studio-auto-dopo-tocco-beat-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/studio-auto-mix-riaperto-390x844.png`
+- **Aggiunto:** `documentazione/prove-telefono/2026-10-01/studio-auto-uscita-riaperta-390x844.png`
+- **Modificato:** `frontend/css/studio.css`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada.js`
+- **Aggiunto:** `frontend/js/game/studio-automatico.js`
+- **Modificato:** `frontend/js/game/studio-elementi.js`
+- **Modificato:** `frontend/js/game/studio.js`
+- **Aggiunto:** `frontend/js/game/telefono-feed-gente.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/strumenti/prova.js`
+- **Modificato:** `frontend/test/unit/seguiti.test.js`
+
+**File interessati in questa categoria:** 20
+
+---
+
 <!-- merge:18c56d3 -->
 ## 01/10/26, 10:58 â€” feature/pizzeria-lavoro-strutturato â†’ main
 
