@@ -413,13 +413,12 @@ function lavoroFirmaContratto(luogo, job){
     roleAtSign:job && job.id || null
   };
 
-  if(luogo === "fabbrica"){
+  const cfgCarriera = lavoroCarrieraDef(luogo);
+  if(cfgCarriera){
     const carriera = lavoroCarriera(luogo);
     if(carriera){
-      /* Le dimissioni non cancellano i richiami: altrimenti basterebbe
-         licenziarsi e rifirmare per azzerare la disciplina. Dopo un vero
-         licenziamento, invece, le 8 settimane di blocco fanno da sanzione e
-         il nuovo contratto riparte senza richiami attivi. */
+      /* Le dimissioni non cancellano i richiami. Dopo un vero licenziamento,
+         invece, il rientro a blocco scaduto riparte senza richiami attivi. */
       const storico = Array.isArray(sede.contractHistory) ? sede.contractHistory : [];
       const ultimaChiusura = storico.length ? storico[storico.length - 1] : null;
       if(ultimaChiusura && ultimaChiusura.endReason === "licenziamento" &&
@@ -429,8 +428,11 @@ function lavoroFirmaContratto(luogo, job){
       carriera.cyclesInRole = 0;
       carriera.perfectCyclesInRole = 0;
       carriera.perfectStreak = 0;
-      carriera.roleId = job && job.id || "operaio";
-      const idx = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === carriera.roleId);
+      carriera.roleId = job && job.id ||
+        (Array.isArray(cfgCarriera.ruoli) && cfgCarriera.ruoli[0] ? cfgCarriera.ruoli[0].id : null);
+      const idx = Array.isArray(cfgCarriera.ruoli)
+        ? cfgCarriera.ruoli.findIndex(r => r.id === carriera.roleId)
+        : -1;
       carriera.roleLevel = idx >= 0 ? idx : 0;
     }
   }
