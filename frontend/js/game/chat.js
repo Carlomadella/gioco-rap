@@ -786,15 +786,19 @@ function chatContattoSala(p){
   const fonico = p.ruolo === "fonico";
   const video = p.ruolo === "videomaker";
   const r = (typeof POSTO_RUOLI === "object" && POSTO_RUOLI[p.ruolo]) || {k:"#94A3B8", n:"Contatto"};
+  const origine = p.origineLuogo === "fabbrica" ? " · collega di Fabbrica" : "";
   return {
+    /* Manteniamo il prefisso storico "sala:" per compatibilità con i
+       salvataggi/chat esistenti: l'origine visibile è invece quella reale. */
     id: "sala:" + p.id,
     n: p.n,
-    sotto: r.n,
+    sotto: r.n + origine,
     ic: video ? "mirino" : (fonico ? "cursori" : "manopole"),
     k: r.k,
     sempre: true,
     spesso: .3,
-    dallaSala: true,
+    dallaSala: !p.origineLuogo,
+    dalLavoro: p.origineLuogo || null,
     persona: p,
     spunti: video ? chatSpuntiVideomaker(p) : (fonico ? chatSpuntiFonico(p) : chatSpuntiBeatmaker(p)),
     tu: chatTuSala(p, fonico)
@@ -802,6 +806,8 @@ function chatContattoSala(p){
 }
 
 /* chi ti ha dato il numero ed è ancora in giro.
+   Può essere una persona conosciuta alla Sala oppure sul lavoro: in entrambi
+   i casi è la stessa persona persistente in G.gente, non un contatto finto.
 
    Il mestiere si controlla **qui** e non solo sul bottone che lo chiede: sono
    due punti diversi, e se un domani il numero lo si potesse chiedere anche a
@@ -824,12 +830,14 @@ function chatPresentazione(p){
      de La Sala sono un misto (Sara, Gigi, Andre, Nico...), e «quello del mixer»
      su Sara suona sbagliato — non e' un dettaglio da niente, e' il primo
      messaggio che leggi di quella persona. */
+  const daFabbrica = p.origineLuogo === "fabbrica";
+  const intro = daFabbrica ? "Sono " + p.n + ", ci siamo conosciuti in Fabbrica. " : "Sono " + p.n + ". ";
   chatBolla(t, "loro",
     p.ruolo === "fonico"
-      ? "Sono " + p.n + ". Sto dietro al mixer: quando hai qualcosa da sistemare, scrivimi."
+      ? intro + "Fuori dal turno sto dietro al mixer: quando hai qualcosa da sistemare, scrivimi."
     : p.ruolo === "videomaker"
-      ? "Sono " + p.n + ", quello con la camera. Quando c'è da girare qualcosa, scrivimi prima di chiunque altro."
-      : "Sono " + p.n + ". Se ti serve roba nuova scrivimi, non aspettare di passare in sala.");
+      ? intro + "Fuori dal turno giro roba: quando c'è da fare un video, scrivimi."
+      : intro + "Fuori dal turno faccio beat. Se ti serve roba nuova, scrivimi.");
   t.nonLetti = (t.nonLetti || 0) + 1;
 }
 
