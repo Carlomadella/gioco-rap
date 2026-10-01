@@ -352,6 +352,8 @@ describe("famiglie eventi lavoro", () => {
       .toBeLessThan(eventi.indexOf("ADF_WORK_EVENTS.afterShift(shiftPayload)"));
     expect(strada).toContain("ADF_WORK_EVENTS.crimeLeadActive()");
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
+    expect(strada).toContain('"Dritta " + lead.sourceLabel');
+    expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
     expect(html).toContain('js/game/lavoro-eventi.js?v=1');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
