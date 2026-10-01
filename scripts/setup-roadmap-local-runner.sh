@@ -6,14 +6,26 @@ RUNNER_DIR="${ADF_RUNNER_DIR:-$HOME/actions-runner-anni-di-fame}"
 RUNNER_NAME="${ADF_RUNNER_NAME:-anni-di-fame-local-$(hostname)}"
 RUNNER_LABEL="${ADF_RUNNER_LABEL:-anni-di-fame-local}"
 
-for cmd in gh curl tar python3; do
+for cmd in curl tar python3; do
   command -v "$cmd" >/dev/null 2>&1 || {
     echo "Manca '$cmd' nel WSL." >&2
     exit 1
   }
 done
 
-gh auth status >/dev/null
+if command -v gh >/dev/null 2>&1; then
+  GH=(gh)
+elif command -v gh.exe >/dev/null 2>&1; then
+  GH=(gh.exe)
+elif [ -x "/mnt/c/Program Files/GitHub CLI/gh.exe" ]; then
+  GH=("/mnt/c/Program Files/GitHub CLI/gh.exe")
+else
+  echo "GitHub CLI non trovato né in WSL né su Windows." >&2
+  echo "Apri PowerShell e verifica che 'gh auth status' funzioni, poi rilancia." >&2
+  exit 1
+fi
+
+"${GH[@]}" auth status >/dev/null
 
 detect_ollama() {
   local candidates=()
@@ -45,15 +57,15 @@ if [ -z "$OLLAMA_URL" ]; then
 fi
 
 echo "Ollama rilevato: $OLLAMA_URL"
-gh variable set ADF_LOCAL_AI_BASE_URL --repo "$REPO" --body "$OLLAMA_URL"
-gh variable set ADF_LOCAL_AI_MODEL --repo "$REPO" --body "${ADF_LOCAL_AI_MODEL:-gpt-oss:20b}"
+"${GH[@]}" variable set ADF_LOCAL_AI_BASE_URL --repo "$REPO" --body "$OLLAMA_URL"
+"${GH[@]}" variable set ADF_LOCAL_AI_MODEL --repo "$REPO" --body "${ADF_LOCAL_AI_MODEL:-gpt-oss:20b}"
 
 mkdir -p "$RUNNER_DIR"
 cd "$RUNNER_DIR"
 
 if [ ! -f ./run.sh ]; then
   DOWNLOAD_URL="$(
-    gh api "repos/$REPO/actions/runners/downloads" |
+    "${GH[@]}" api "repos/$REPO/actions/runners/downloads" |
       python3 -c 'import json,sys; rows=json.load(sys.stdin); xs=[r["download_url"] for r in rows if r.get("os")=="linux" and r.get("architecture")=="x64"]; print(xs[0] if xs else "")'
   )"
   if [ -z "$DOWNLOAD_URL" ]; then
@@ -68,7 +80,7 @@ if [ ! -f ./run.sh ]; then
 fi
 
 if [ ! -f .runner ]; then
-  TOKEN="$(gh api -X POST "repos/$REPO/actions/runners/registration-token" --jq .token)"
+  TOKEN="$("${GH[@]}" api -X POST "repos/$REPO/actions/runners/registration-token" --jq .token)"
   echo "Registro il runner '$RUNNER_NAME' su $REPO con label '$RUNNER_LABEL'..."
   ./config.sh --unattended \
     --url "https://github.com/$REPO" \
