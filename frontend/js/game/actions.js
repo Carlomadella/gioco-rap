@@ -309,10 +309,41 @@ function lavoroNomeLuogo(luogo){
    lavoro. */
 const ADF_LAVORO_RETE = Object.freeze({
   fabbrica:Object.freeze({
-    chanceIncontro:0.18, cooldownGiorni:7, minTurni:3, maxContatti:4,
-    ruoli:Object.freeze(["collega","collega","collega","beatmaker","fonico"]),
-    dettaglio:"collega di Fabbrica",
-    storia:"Vi siete conosciuti lavorando in Fabbrica."
+    chanceIncontro:0.16, cooldownGiorni:7, minTurni:3, maxContatti:4,
+    ruoli:Object.freeze(["collega","collega","collega","collega","beatmaker"]),
+    dettaglio:"collega di reparto in Fabbrica",
+    storia:"Vi siete conosciuti lavorando nello stesso reparto in Fabbrica.",
+    /* La promozione allarga gradualmente la rete invece di regalare contatti
+       migliori. Crescono esposizione e capienza; il pool resta soprattutto
+       fatto di colleghi, con beatmaker/fonici che esistono perché sono persone
+       che fanno musica fuori dal turno, non perché il ruolo manageriale li
+       materializzi. */
+    perRuolo:Object.freeze({
+      operaio:Object.freeze({
+        chanceIncontro:0.16, cooldownGiorni:7, minTurni:3, maxContatti:4,
+        ruoli:Object.freeze(["collega","collega","collega","collega","beatmaker"]),
+        dettaglio:"collega di reparto in Fabbrica",
+        storia:"Vi siete conosciuti lavorando nello stesso reparto in Fabbrica."
+      }),
+      operaio_esperto:Object.freeze({
+        chanceIncontro:0.18, cooldownGiorni:6, minTurni:2, maxContatti:5,
+        ruoli:Object.freeze(["collega","collega","collega","beatmaker","fonico"]),
+        dettaglio:"persona conosciuta sulla linea in Fabbrica",
+        storia:"Vi siete conosciuti mentre seguivi la linea come operaio esperto."
+      }),
+      capolinea:Object.freeze({
+        chanceIncontro:0.20, cooldownGiorni:5, minTurni:2, maxContatti:6,
+        ruoli:Object.freeze(["collega","collega","collega","beatmaker","fonico","fonico"]),
+        dettaglio:"persona conosciuta coordinando la linea",
+        storia:"Vi siete conosciuti mentre coordinavi persone e problemi della linea."
+      }),
+      capoturno:Object.freeze({
+        chanceIncontro:0.22, cooldownGiorni:4, minTurni:1, maxContatti:7,
+        ruoli:Object.freeze(["collega","collega","collega","beatmaker","beatmaker","fonico","fonico"]),
+        dettaglio:"persona conosciuta gestendo il turno",
+        storia:"Vi siete conosciuti mentre gestivi il turno e i reparti della Fabbrica."
+      })
+    })
   }),
   pizzeria:Object.freeze({
     chanceIncontro:0.24, cooldownGiorni:4, minTurni:1, maxContatti:6,
@@ -372,7 +403,15 @@ function lavoroReteChiave(job){
 function lavoroReteDef(job){
   if(!job) return null;
   const chiave = lavoroReteChiave(job);
-  return ADF_LAVORO_RETE[job.id] || ADF_LAVORO_RETE[chiave] || null;
+  const base = ADF_LAVORO_RETE[job.id] || ADF_LAVORO_RETE[chiave] || null;
+  if(!base) return null;
+
+  /* I luoghi con carriera interna possono cambiare profilo rete senza cambiare
+     la chiave persistente della sede. I contatti vecchi quindi restano, ma il
+     ruolo corrente decide da ora in poi ritmo, cap e persone che puoi incontrare. */
+  const profilo = base.perRuolo && base.perRuolo[job.id];
+  if(!profilo) return base;
+  return Object.assign({},base,profilo,{perRuolo:base.perRuolo,roleId:job.id});
 }
 
 function lavoroReteRuoli(job, cfg){
@@ -1360,6 +1399,7 @@ function lavoroReteStato(luogo){
   const s = sede.network;
   s.encounters = Math.max(0, Number(s.encounters || 0));
   s.turniVisti = Math.max(0, Number(s.turniVisti || 0));
+  if(!s.turniPerRuolo || typeof s.turniPerRuolo!=="object") s.turniPerRuolo={};
   if(!Array.isArray(s.history)) s.history = [];
   return s;
 }
@@ -1381,13 +1421,13 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
   if(Number(stato.lastCheckAbsoluteDay) === oggi) return null;
   stato.lastCheckAbsoluteDay = oggi;
   stato.turniVisti += 1;
+  const ruoloId=String(corrente.id||luogo||"lavoro");
+  stato.turniPerRuolo[ruoloId]=Math.max(0,Number(stato.turniPerRuolo[ruoloId]||0))+1;
 
-  let esposizione = stato.turniVisti;
-  if(luogo === "fabbrica"){
-    const cart = lavoroCartellino(luogo);
-    if(!cart) return null;
-    esposizione = cart.totale;
-  }
+  /* L'esposizione per sbloccare nuovi incontri riparte quando cambia mansione.
+     Non azzera la rete: impedisce soltanto che una promozione sfrutti i turni
+     accumulati da Operaio per generare subito un contatto da Capolinea. */
+  const esposizione = stato.turniPerRuolo[ruoloId];
   if(esposizione < Number(cfg.minTurni || 0)) return null;
 
   if(stato.lastEncounterAbsoluteDay != null &&
@@ -1414,6 +1454,8 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
     ruoli,
     {
       jobId:corrente.id || null,
+      workRoleId:corrente.id || null,
+      workRoleName:corrente.n || null,
       dettaglio:cfg.dettaglio || "contatto conosciuto al lavoro",
       storia:cfg.storia || "Vi siete conosciuti sul lavoro."
     }
@@ -1427,6 +1469,7 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
     personId:persona.id,
     role:persona.ruolo,
     jobId:corrente.id || null,
+    workRoleId:corrente.id || null,
     type:persona.numero ? "known_contact" : "encounter"
   });
   if(stato.history.length > 24) stato.history.shift();
