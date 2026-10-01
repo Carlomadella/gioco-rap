@@ -11,6 +11,7 @@ on:
       - scripts/roadmap-audit-guard.js
       - scripts/test-roadmap-audit-guard.js
       - scripts/roadmap-local-agent.js
+      - scripts/roadmap-local-manual.js
       - scripts/setup-roadmap-local-runner.sh
       - .github/workflows/roadmap-auto.yml
   workflow_run:
@@ -79,6 +80,7 @@ jobs:
           node scripts/test-roadmap-auto.js
           node scripts/test-roadmap-audit-guard.js
           node --check scripts/roadmap-local-agent.js
+          node --check scripts/roadmap-local-manual.js
           node scripts/roadmap-local-agent.js self-test
           bash -n scripts/setup-roadmap-local-runner.sh
 
