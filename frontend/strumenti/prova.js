@@ -1568,6 +1568,22 @@ console.log("\nlo Studio: la gente della Sala conta");
       linguette().slice(0, 300));
     controlla("e c'e' la riga per rimettere sul banco il pezzo inciso prima",
       dipinto().indexOf('data-banco="62"') >= 0);
+    /* voce 82 (01/10/2026): a banco vuoto, con un pezzo inciso pronto, Uscita e
+       Mix dicono di rimetterlo sul banco, non di ricominciare dal Beat */
+    controlla("e a banco vuoto l'Uscita dice di rimettere sul banco il pezzo inciso, non di ripartire dal Beat",
+      dipinto().indexOf("rimetti uno sul banco") >= 0 &&
+      dipinto().indexOf("Si comincia dal <b>Beat</b>") < 0);
+    dentro("STUDIO_SEZ = 'banco'; renderStudio();");
+    controlla("e il Mix lo stesso",
+      dipinto().indexOf("rimetti uno sul banco") >= 0);
+    /* un salvataggio coi cursori ancora in `banco`: i cursori vanno in
+       `cursori` e sul banco torna l'ultimo pezzo inciso, come senza banco */
+    controlla("un salvataggio coi cursori in banco li sposta e ritrova il pezzo sul banco",
+      dentro(`(() => {
+        const prima = G.studio; G.studio = {banco:{voce:3, bassi:1, aria:2}};
+        const d = studioDati(); const ok = d.cursori.voce === 3 && d.banco === 62;
+        G.studio = prima; return ok;
+      })()`) === true);
     dentro("studioMettiSulBanco(62); STUDIO_SEZ = 'banco'; renderStudio();");
     controlla("rimesso sul banco un pezzo gia' mixato, il Mix lo dice e manda all'Uscita",
       linguette().indexOf("chiusa") < 0 &&
@@ -1589,12 +1605,12 @@ console.log("\nlo Studio: la gente della Sala conta");
     dentro("G.studio.quando = 'cassetto'; studioMandaFuori();");
     controlla("in cassaforte il pezzo lascia il banco vuoto",
       dentro("G.songs[1].tenuto") === true && dentro("G.studio.banco") === null &&
-      dentro("studioSbloccato()") === false,
-      JSON.stringify({tenuto: dentro("G.songs[1].tenuto"), banco: dentro("G.studio.banco"), sbl: dentro("studioSbloccato()"), quando: dentro("G.studio.quando"), pezzi: dentro("G.songs.map(x=>x.t+\":\"+x.released+\":\"+x.seed).join(\",\")")}));
+      dentro("studioSulBanco()") === null,
+      JSON.stringify({tenuto: dentro("G.songs[1].tenuto"), banco: dentro("G.studio.banco"), sbl: dentro("studioSulBanco()"), quando: dentro("G.studio.quando"), pezzi: dentro("G.songs.map(x=>x.t+\":\"+x.released+\":\"+x.seed).join(\",\")")}));
     dentro("studioRiprendi(62);");
     controlla("e ritirato dalla cassaforte torna sul banco",
       dentro("G.songs[1].tenuto") === undefined && dentro("G.studio.banco") === 62 &&
-      dentro("studioSbloccato()") === true);
+      dentro("studioSulBanco() != null"));
 
     /* Punto 8 dello Studio: un pezzo non ancora uscito non si spinge — al
        massimo se ne fa uscire un'anteprima, che all'uscita diventa spinta. */

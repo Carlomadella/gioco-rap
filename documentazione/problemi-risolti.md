@@ -6571,3 +6571,63 @@ Le figure di quello che va: ![Mix a 390, la riga in vista](prove-telefono/2026-1
 - **RISOLTO (01/10/2026)** — stesso branch: in `fatte.md` c'è «## 28/09/2026» coi due punti,
   la nota «Stato (15/09/2026)» di LaFamegram è tornata sotto al suo punto, la tabella dice 2.
   Il salto dall'8 al 10 nella lista CARLO è voluto: i numeri non si rifanno.
+
+## Giro del 01/10/2026 (segnala-problemi, giro stretto sul commit `b091b2b0`, branch `task/studio-cursori-e-linguette`)
+
+Guardato: chi legge `G.studio.banco` e chi legge i cursori (studio.js, studio-elementi.js,
+actions.js con `mixGain`/`bancoBonus`, studio-automatico.js, seguiti.js, posto.js, il
+simulatore `strumenti/bilanciamento/bot.js`, prova.js e seguiti.test.js); Mix e Uscita a banco
+vuoto, con la remastered prenotata e col tasto «chiudi tu il resto»; i salvataggi vecchi con
+`banco` oggetto, numero, `null` o mancante. `npm run prova` e l'audit li aveva già fatti girare
+chi ha lanciato il giro (i 6 falliti dell'audit sono di `main`, non di questo commit).
+
+**A posto.** Fuori da studio.js nessuno legge `G.studio.banco`: tutti gli altri passano da
+`studioSulBanco()`. I cursori li legge solo studio-elementi.js (`studioBanco()`), e da fuori ci
+si arriva da `mixGain()` → `bancoBonus()` → `studioBancoGuadagno()`: un giro solo, e adesso
+legge la casella giusta. Il simulatore non tocca i cursori: stanno al centro e valgono zero,
+come prima. Lo spostamento del salvataggio regge tutti i casi: con l'oggetto dei cursori in
+`banco` lo sposta in `cursori` e svuota il banco; con un numero (anche il seed 0) o con `null`
+non fa niente; con `banco` mancante ci pensa `studioDati()` come prima. La remastered prenotata
+continua a passare avanti nel Mix (`studioSezBanco`, riga 1171), e «chiudi tu il resto» a banco
+vuoto non compare, perché `studioAutoRiga()` senza pezzo non scrive niente.
+
+### 82. Mix e Uscita a banco vuoto dicono «comincia dal Beat» anche quando hai pezzi incisi pronti
+- **dove** — `frontend/js/game/studio.js:1195` (il Mix: «niente, il banco è spento · Prima si
+  registra. Il provino arriva dalla Cabina») e `frontend/js/game/studio.js:1405` (l'Uscita:
+  «Si comincia dal Beat, poi il Testo, poi la Cabina»).
+- **cosa succede** — adesso che Mix e Uscita si aprono sempre, ci arrivi anche quando sul banco
+  non c'è niente ma i pezzi incisi ce li hai: per esempio ne avevi due, uno è uscito, e il banco
+  si è svuotato. Il centro ti dice di ripartire dal Beat, mentre il pezzo che ti serve sta già
+  nella colonna di destra e basta toccarlo. Prima questa differenza la faceva il messaggio che
+  compariva toccando la linguetta chiusa («Niente sul banco: rimettici un pezzo»), che adesso
+  non compare più (voce 83). Ci finisce dritto anche chi riapre un salvataggio di prima del
+  15/09: lo spostamento dei cursori lascia il banco vuoto, e il recupero «sul banco ci va
+  l'ultimo pezzo inciso» di `studioDati()` (riga 171) non parte più, perché scatta solo quando
+  il banco manca del tutto, non quando è vuoto.
+- **come si vede** — incidi due pezzi, mandane fuori uno, apri il Mix o l'Uscita.
+- **quanto pesa** — si vede ma si gira intorno (il pezzo è lì a destra, ma la frase ti manda
+  altrove).
+- **RISOLTO (01/10/2026)** — stesso branch: a banco vuoto, se ci sono pezzi incisi, Mix e Uscita
+  dicono «ne rimetti uno sul banco, qui a destra»; la migrazione dei cursori sta in `studioDati()`
+  prima del recupero, così un salvataggio vecchio ritrova sul banco l'ultimo pezzo inciso. Tre prove
+  nuove in `strumenti/prova.js`.
+
+### 83. Il lucchetto delle linguette dello Studio è rimasto nel codice, e i commenti dicono che c'è
+- **dove** — `frontend/js/game/studio.js:1498-1505` (in `renderStudio`, il ritorno al Beat o alla
+  Cabina «se la sezione è chiusa»), `studio.js:1509-1510` (la classe `chiusa` e
+  `aria-disabled`), `studio.js:1582-1588` (il messaggio quando tocchi una linguetta chiusa),
+  `frontend/css/studio.css:339-343` (`.sttab.chiusa`, il lucchetto); `studioSbloccato()`
+  (`studio.js:107`) nel gioco non la chiama più nessuno, solo `strumenti/prova.js:1592`.
+  I commenti che raccontano ancora il contrario: `studio.js:106` («Il resto si apre quando c'è
+  un pezzo sul banco»), `studio.js:122-124` («Mix e Uscita si aprono su di lui… e si
+  richiudono»), `studio.js:1396` («Con F2 qui non si arriva: senza un pezzo sul banco l'Uscita
+  è chiusa»).
+- **cosa succede** — `studioSezAperta()` adesso dice sempre di sì, quindi questi pezzi non
+  scattano mai: non fanno danni, ma chi legge il codice crede che le linguette si chiudano
+  ancora. È una scelta del commit tenere `studioSezAperta()` «se una sezione dovesse
+  richiudersi»; il resto però va o tolto o scritto che è fermo.
+- **come si vede** — non si vede giocando; si vede aprendo `studio.js`.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (01/10/2026)** — stesso branch: via il ritorno al Beat, la classe `chiusa` con
+  `aria-disabled`, il toast, `.sttab.chiusa` e `studioSbloccato()`; i tre commenti riscritti.
+  L'audit controlla che il lucchetto non torni.

@@ -103,16 +103,13 @@ const STUDIO_SEZIONI = [
 
 let STUDIO_SEZ = "beat";
 
-/* Il resto si apre quando c'e' un pezzo sul banco (punto 10, «ad ogni pezzo»). */
-function studioSbloccato(){
-  return !!studioSulBanco();
-}
 /* Tutte le linguette sono aperte, sempre (Carlo, 21/09/2026 sera: «lascia
    sbloccate le fasi dello studio bloccate»; portato il 01/10). Prima Mix e
    Uscita si aprivano solo con un pezzo sul banco — o, il Mix, con una
    remastered prenotata (seguiti.js). A banco vuoto dicono che non c'e' niente
-   e da dove si comincia. La funzione resta: e' lei che le linguette e
-   renderStudio interrogano, e se una sezione dovesse richiudersi si fa qui. */
+   e cosa fare: rimettere sul banco un pezzo inciso, o cominciare dal Beat. Il
+   lucchetto (la classe `chiusa`, il ritorno al Beat, il toast) e' stato tolto
+   il 01/10: se un giorno una sezione dovesse richiudersi, va rifatto da qui. */
 function studioSezAperta(x){
   return !!x;
 }
@@ -120,8 +117,8 @@ function studioSezAperta(x){
 /* ==================== IL PEZZO SUL BANCO (F2) ====================
    Lo Studio lavora **un** pezzo alla volta: `G.studio.banco` e' il suo seed.
    Beat, Testo e Cabina lo fanno nascere; appena inciso e' lui sul banco, Mix
-   e Uscita si aprono su di lui, e quando esce (o va in cassaforte) il banco
-   si svuota e si richiudono. I pezzi incisi prima, o ritirati dalla
+   e Uscita lavorano su di lui, e quando esce (o va in cassaforte) il banco
+   si svuota e lo dicono. I pezzi incisi prima, o ritirati dalla
    cassaforte, si rimettono sul banco da una riga — la stessa in Cabina, Mix
    e Uscita. Era l'obiezione del 14/09 («mixare il pezzo di ieri mentre
    scrivi quello di oggi»): si fa scegliendo cosa c'e' sul banco, uno alla
@@ -164,6 +161,14 @@ function studioGente(ruolo){
 function studioDati(){
   if(!G.studio) G.studio = {};
   const d = G.studio;
+  /* Fino al 01/10/2026 i cursori del Mix stavano in `banco`, che dal 15/09 e'
+     il seed del pezzo: un salvataggio con l'oggetto dei cursori li' li sposta
+     in `cursori` e lascia `banco` da ritrovare qui sotto, come un salvataggio
+     senza banco. */
+  if(d.banco && typeof d.banco === "object"){
+    if(!d.cursori) d.cursori = d.banco;
+    delete d.banco;
+  }
   /* Un salvataggio di prima del banco (14/09/2026) ha due caselle, `mixa` ed
      `esce`: la prima che punta ancora a un pezzo diventa il banco; se
      nessuna, sul banco ci va l'ultimo pezzo inciso e non uscito, cosi' chi
@@ -1193,7 +1198,9 @@ function studioSezBanco(){
   } else {
     mid = stPan("",
       stCapo("Mixi", "niente, il banco è spento", "") +
-      '<p class="stnota">Prima si registra. Il provino arriva <b>dalla Cabina</b>.</p>');
+      '<p class="stnota">' + (studioListaBanco().length
+        ? 'Hai dei pezzi incisi: ne <b>rimetti uno sul banco</b>, qui a destra.'
+        : 'Prima si registra. Il provino arriva <b>dalla Cabina</b>.') + '</p>');
   }
 
   const dx = stPan("", studioSulBancoRighe(g), "cartella");
@@ -1393,13 +1400,15 @@ function studioSezFuori(){
          telefono, e da qui ci si arriva con una riga */
       (ultimo ? studioFalloSapereRiga(ultimo, da) : ""));
   } else {
-    /* Con F2 qui non si arriva: senza un pezzo sul banco l'Uscita e' chiusa
-       e `renderStudio()` porta in Cabina, dove sta anche la strada per
-       «fallo sapere». Il ripiego resta per un disegno chiamato a mano. */
+    /* Banco vuoto: l'Uscita e' aperta lo stesso (01/10/2026) e dice cosa
+       fare — rimettere sul banco un pezzo inciso, ritirarne uno dalla
+       cassaforte, o cominciare dal Beat — e da qui si fa sapere l'ultimo uscito. */
     mid = stPan("",
-      stCapo("Fuori", tenuti.length ? "tutto in cassaforte" : "niente sul banco", "") +
+      stCapo("Fuori", tenuti.length && !studioListaBanco().length ? "tutto in cassaforte" : "niente sul banco", "") +
       '<p class="stnota">' +
-        (tenuti.length
+        (studioListaBanco().length
+          ? 'Hai dei pezzi incisi: ne <b>rimetti uno sul banco</b>, qui a destra.'
+          : tenuti.length
           ? 'Quello che hai lo stai tenendo da parte. Ne <b>ritiri uno</b> dalla cassaforte, ' +
             'qui a destra, e torna sul banco.'
           : 'Si comincia dal <b>Beat</b>, poi il <b>Testo</b>, poi la <b>Cabina</b>.') +
@@ -1494,20 +1503,11 @@ function renderStudio(){
   if(!root || !root.classList.contains("on")) return;
 
   studioCoverPulisci();
-  let sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
-  /* una sezione chiusa non si disegna nemmeno arrivandoci da fuori (un
-     cartello della mappa, un salvataggio): si torna al Beat — o in Cabina,
-     se un pezzo e' gia' uscito: e' il banco che si e' svuotato, e la Cabina
-     e' dove lo si riempie (e da dove si va a farlo sapere) */
-  if(!studioSezAperta(sez)){
-    sez = STUDIO_SEZIONI.find(x => x.id === (studioFuori().length ? "cabina" : "beat")) || STUDIO_SEZIONI[0];
-    STUDIO_SEZ = sez.id;
-  }
+  const sez = STUDIO_SEZIONI.find(x => x.id === STUDIO_SEZ) || STUDIO_SEZIONI[0];
 
   const tabs = $("st-tabs");
   tabs.innerHTML = STUDIO_SEZIONI.map(x =>
-    '<button class="sttab' + (x.id === sez.id ? " on" : "") + (studioSezAperta(x) ? "" : " chiusa") +
-    '" data-sez="' + x.id + '"' + (studioSezAperta(x) ? "" : ' aria-disabled="true"') + '>' +
+    '<button class="sttab' + (x.id === sez.id ? " on" : "") + '" data-sez="' + x.id + '">' +
     x.n + '</button>').join("");
   /* Cinque linguette a 390px ci stanno; sotto, o con una lingua piu' lunga,
      la striscia scorre. Due cose, se no le ultime sezioni sono una caccia al
@@ -1578,15 +1578,6 @@ if($("studio")){
   $("studio").addEventListener("click", e => {
     const t = e.target.closest("[data-sez]");
     if(t){
-      const x = STUDIO_SEZIONI.find(y => y.id === t.dataset.sez);
-      /* punto 10: chiusa finche' non c'e' un pezzo sul banco — lo dice, non tace */
-      if(x && !studioSezAperta(x)){
-        SFX.fail();
-        toast(studioListaBanco().length
-          ? "Niente sul banco: <b>rimettici un pezzo</b>, dalla Cabina."
-          : "Prima il pezzo: <b>Beat, Testo, Cabina</b>. Poi il resto.", "bad", "!", ["#3A3F49", "#22262E"]);
-        return;
-      }
       STUDIO_SEZ = t.dataset.sez; STUDIO_DIARIO = 0; SFX.tap(); renderStudio(); return;
     }
     const bm = e.target.closest("[data-bm]");

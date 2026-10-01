@@ -734,7 +734,8 @@ test("tenere una take non costa energia: la sessione la paga la prima take (25 d
 test("i cursori del banco partono al centro e al centro valgono zero",
   /* dal 01/10/2026 stanno in `cursori`: `banco` e' il seed del pezzo sul banco (F2) */
   studioEl.includes("d.cursori = {voce:2, bassi:2, aria:2}") && !studioEl.includes("d.banco = {voce") &&
-  studioEl.includes('if(d.banco && typeof d.banco === "object"){ d.cursori = d.banco; d.banco = null; }') &&
+  /* la migrazione sta in studioDati, prima del recupero del pezzo sul banco */
+  /if\(d\.banco && typeof d\.banco === "object"\)\{\r?\n\s*if\(!d\.cursori\) d\.cursori = d\.banco;\r?\n\s*delete d\.banco;\r?\n\s*\}\r?\n[\s\S]{0,800}?if\(d\.banco === undefined\)/.test(studio) &&
   /* il carattere di ripiego, quello dei cursori fermi in mezzo, non da' punti */
   /PULITO",\s*q:0/.test(studioEl) &&
   actions.includes("+ studioBonus() + bancoBonus()"));
@@ -882,9 +883,11 @@ test("il riquadro dei numeri divide qualita' e ascolti, con le parti scritte all
   actions.indexOf("const conFeat = featBonus()") < actions.indexOf("studioConsumaFeat() : null") &&
   actions.includes("parti:{beat:bt.q, testo:b.q, fonico:conFonico, feat:conFeat, take:presa}") &&
   actions.includes("if(s.parti) s.parti.mix = mixGain();"));
-test("il pezzo sul banco (F2): Mix e Uscita si aprono su di lui e si chiudono quando esce o va in cassaforte",
+/* dal 01/10/2026 Mix e Uscita non si chiudono piu' (le linguette sono aperte
+   sempre): il banco si riempie e si svuota lo stesso, e studioSbloccato non c'e' piu' */
+test("il pezzo sul banco (F2): Mix e Uscita lavorano su di lui, e il banco si svuota quando esce o va in cassaforte",
   studio.includes("function studioSulBanco()") &&
-  studio.includes("return !!studioSulBanco();") &&
+  !studio.includes("function studioSbloccato()") &&
   actions.includes('if(typeof studioMettiSulBanco === "function") studioMettiSulBanco(seed);') &&
   actions.includes('if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);') &&
   studioEl.includes("studioSvuotaBanco(s);                    /* il banco si svuota") &&
@@ -2038,7 +2041,10 @@ test("quando la parte 2 esce (a mano o di venerdi') il primo torna a girare, e l
   sim.includes("let out = (fanPull + scoperta + featPull + seguitoPull) * curve * rnd(0.8, 1.25);"));
 test("le linguette dello Studio sono aperte sempre (21/09/2026 sera, «lascia sbloccate le fasi dello studio bloccate»): studioSezAperta non guarda piu' il banco",
   /function studioSezAperta\(x\)\{\r?\n  return !!x;\r?\n\}/.test(studio) &&
-  !studio.includes("if(!x.dopo || studioSbloccato()) return true;"));
+  !studio.includes("if(!x.dopo || studioSbloccato()) return true;") &&
+  /* e il lucchetto non c'e' piu': niente classe chiusa, niente toast, niente ritorno al Beat */
+  !studio.includes('" chiusa"') && !studio.includes("rimettici un pezzo") &&
+  !leggi("css/studio.css").includes(".sttab.chiusa"));
 test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, costa come un mix piu' la sala, una volta sola per pezzo",
   actions.includes('{id:"remaster", n:"Remastered", e:24, luc:2,') &&
   actions.includes('avail:() => typeof remasterPrenotato === "function" && !!remasterPrenotato(),') &&

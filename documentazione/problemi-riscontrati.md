@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 82. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 84. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -81,6 +81,9 @@ non torna in cima: va deciso insieme alla risposta del Marketing in cima (la 10)
 
 **81.** Nota: nel feed di LaFamegram le date sono scritte in due modi («A1 S04» e «Settimana
 12»): con la 78.
+
+Dal giro del 01/10 su `task/studio-cursori-e-linguette`: le voci 82–83 sono chiuse lo stesso
+giorno nel branch e stanno in `problemi-risolti.md`.
 
 ---
 

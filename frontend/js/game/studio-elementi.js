@@ -538,10 +538,10 @@ const STUDIO_CARATTERI = [
    un pezzo sopra i cursori leggevano un numero — undefined alle tacche,
    carattere sempre PULITO, e muoverne uno dava «Cannot use 'in' operator».
    Trovato il 21/09 in un branch mai unito, portato qui il 01/10/2026. Un
-   salvataggio con l'oggetto dei cursori ancora in `banco` lo sposta qui. */
+   salvataggio con l'oggetto dei cursori ancora in `banco` lo sposta
+   `studioDati()` (studio.js), prima di ritrovare il pezzo sul banco. */
 function studioBanco(){
   const d = studioDati();
-  if(d.banco && typeof d.banco === "object"){ d.cursori = d.banco; d.banco = null; }
   if(!d.cursori) d.cursori = {voce:2, bassi:2, aria:2};
   return d.cursori;
 }
