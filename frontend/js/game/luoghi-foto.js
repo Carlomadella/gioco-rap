@@ -386,12 +386,17 @@ function lfFabbricaCartellino(){
     html += '</div>';
   }
 
+  const blocco = cart.bloccoRiassunzione || {active:false,weeksRemaining:0};
   html += '<div class="lfpres-foot">' +
     '<span>Turni <b>' + cart.totale + '</b></span>' +
     (cart.turniSettimanaliRichiesti
       ? '<span>Questa settimana <b>' + cart.giorniLavoratiSettimana + '/' + cart.turniSettimanaliRichiesti + '</b></span>'
       : '') +
     '<span>Affidabilità <b>' + Math.round(cart.affidabilita == null ? 50 : cart.affidabilita) + '</b></span>' +
+    '<span>Richiami <b>' + Number(cart.richiami || 0) + '/2</b></span>' +
+    (blocco.active
+      ? '<span>Riassunzione <b>' + blocco.weeksRemaining + ' sett.</b></span>'
+      : '') +
     '<span>Ciclo <b>' + cart.settimana + '/4</b></span>' +
     '</div></div>';
   return html;
@@ -461,7 +466,14 @@ function lfFabbrica(){
         orario += " · ingresso fino alle " + GAME_TIME.format(st.closeAt - (st.duration != null ? st.duration : GAME_HOURS.jobDuration(baseDef.id)));
     }
   }catch(e){}
+  const bloccoRiassunzione = !mio && !altro && typeof lavoroBloccoRiassunzione === "function"
+    ? lavoroBloccoRiassunzione("fabbrica")
+    : {active:false,weeksRemaining:0};
+
   if(altro) stato = {ok:false, perche:"Lavori gia' come " + altro.n.toLowerCase()};
+  else if(bloccoRiassunzione.active)
+    stato = {ok:false, perche:"Riassunzione bloccata · " + bloccoRiassunzione.weeksRemaining +
+      (bloccoRiassunzione.weeksRemaining === 1 ? " settimana" : " settimane")};
   else if(stato.ok && G.energy < def.e) stato = {ok:false, perche:"Serve energia"};
 
   const sx = lfPan("Il posto",
@@ -490,7 +502,11 @@ function lfFabbrica(){
     v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + def.e + " energia") : stato.perche,
     vCls:stato.ok ? "" : "calmo"
   });
-  const testo = mio ? "Fai il turno" : "Leggi e firma il contratto";
+  const testo = mio
+    ? "Fai il turno"
+    : bloccoRiassunzione.active
+      ? "Riassunzione bloccata"
+      : "Leggi e firma il contratto";
   const azioneLavoro = mio ? ' data-vai="turno"' : ' data-lavoro="' + baseDef.id + '"';
   const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
     '<p class="stnota">' +
@@ -498,7 +514,9 @@ function lfFabbrica(){
         ? (pagaTurno.percentuale
             ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> questo turno ha una maggiorazione del ' + pagaTurno.percentuale + '%.'
             : 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica.')
-        : 'Prima di iniziare firmi un contratto: ' + (quota || 5) + ' giorni a settimana, lunedì–sabato. La domenica è riposo salvo straordinario richiesto dall’azienda.') +
+        : (bloccoRiassunzione.active
+            ? 'Dopo il licenziamento la Fabbrica non ti riassume subito. Il blocco dura 8 settimane.'
+            : 'Prima di iniziare firmi un contratto: ' + (quota || 5) + ' giorni a settimana, lunedì–sabato. La domenica è riposo salvo straordinario richiesto dall’azienda.')) +
     '</p>' +
     riga +
     '<div class="stazioni"><button type="button" class="stprimo"' + azioneLavoro +
