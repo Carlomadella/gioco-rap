@@ -7,15 +7,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:2c5c304 -->
-## 29/09/26, 21:14 â€” task/problemi-risolti â†’ main
+## 29/09/26, 21:14 — task/problemi-risolti → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `2c5c304`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `058144e` â€” I problemi chiusi in problemi-risolti.md: le voci del giro di fine task â€” **Carlomadella**
-- `81104f5` â€” I problemi chiusi in problemi-risolti.md, e il foglio dei punti nuovi solo con quelli aperti â€” **Carlomadella**
+- `058144e` — I problemi chiusi in problemi-risolti.md: le voci del giro di fine task — **Carlomadella**
+- `81104f5` — I problemi chiusi in problemi-risolti.md, e il foglio dei punti nuovi solo con quelli aperti — **Carlomadella**
 
 ### File di questa categoria
 
@@ -31,14 +31,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:f06f0ea -->
-## 27/09/26, 16:53 â€” task/rapporto-voci-57-64 â†’ main
+## 27/09/26, 16:53 — task/rapporto-voci-57-64 → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `f06f0ea`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `e995438` â€” Rapporto: le voci 57–64 chiuse, la regressione della PR #2 e il giro di fine task â€” **Carlomadella**
+- `e995438` — Rapporto: le voci 57–64 chiuse, la regressione della PR #2 e il giro di fine task — **Carlomadella**
 
 ### File di questa categoria
 
@@ -49,14 +49,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:70a2bd0 -->
-## 27/09/26, 16:23 â€” task/e2e-tetto-60-secondi â†’ main
+## 27/09/26, 16:23 — task/e2e-tetto-60-secondi → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `70a2bd0`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `e807452` â€” Prove e2e: il tetto passa da 30 a 60 secondi â€” **Carlomadella**
+- `e807452` — Prove e2e: il tetto passa da 30 a 60 secondi — **Carlomadella**
 
 ### File di questa categoria
 
@@ -67,16 +67,16 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:74011d1 -->
-## 27/09/26, 15:13 â€” task/giro-controllo-un-anno â†’ main
+## 27/09/26, 15:13 — task/giro-controllo-un-anno → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `74011d1`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `6c95d32` â€” Rapporto del giro di un anno: le voci 52–56 chiuse, e i giri di fine task â€” **Carlomadella**
-- `72f31b0` â€” Giro di controllo di un anno: le sei correzioni del giro stretto â€” **Carlomadella**
-- `6bd1c06` â€” Giro di controllo su tutto il repository, con un anno di gioco simulato â€” **Carlomadella**
+- `6c95d32` — Rapporto del giro di un anno: le voci 52–56 chiuse, e i giri di fine task — **Carlomadella**
+- `72f31b0` — Giro di controllo di un anno: le sei correzioni del giro stretto — **Carlomadella**
+- `6bd1c06` — Giro di controllo su tutto il repository, con un anno di gioco simulato — **Carlomadella**
 
 ### File di questa categoria
 
@@ -87,14 +87,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:a2eb870 -->
-## 20/09/26, 23:23 â€” task/ordine-nel-foglio-dei-punti â†’ main
+## 20/09/26, 23:23 — task/ordine-nel-foglio-dei-punti → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `a2eb870`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `f11c682` â€” docs(implementazioni): ordine nel foglio dei punti — le chiuse fuori dall'ordine, i punti dello Studio del 16/09 dentro, le regole di Carlo in come-si-lavora â€” **Carlomadella**
+- `f11c682` — docs(implementazioni): ordine nel foglio dei punti — le chiuse fuori dall'ordine, i punti dello Studio del 16/09 dentro, le regole di Carlo in come-si-lavora — **Carlomadella**
 
 ### File di questa categoria
 
@@ -105,15 +105,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:668d98c -->
-## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
+## 19/09/26, 14:00 — task/pagine-luoghi-foto → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `668d98c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `2cf77fc` â€” fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse â€” **Carlomadella**
-- `18141cf` â€” feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» â€” **Carlomadella**
+- `2cf77fc` — fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse — **Carlomadella**
+- `18141cf` — feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -125,15 +125,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:c0c45c2 -->
-## 16/09/26, 17:20 â€” task/salvare-i-punti-da-main â†’ main
+## 16/09/26, 17:20 — task/salvare-i-punti-da-main → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `c0c45c2`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `5926f75` â€” fix(git): il giro di chiusura del gate dei fogli — cinque cose del controllo, tutte chiuse â€” **Carlomadella**
-- `c922653` â€” feat(git): i fogli dei punti si salvano da main — «fai in modo che io possa salvare le implementazioni nuove» â€” **Carlomadella**
+- `5926f75` — fix(git): il giro di chiusura del gate dei fogli — cinque cose del controllo, tutte chiuse — **Carlomadella**
+- `c922653` — feat(git): i fogli dei punti si salvano da main — «fai in modo che io possa salvare le implementazioni nuove» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -145,14 +145,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:684a1af -->
-## 16/09/26, 14:36 â€” task/prima-transizione-video â†’ main
+## 16/09/26, 14:36 — task/prima-transizione-video → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `684a1af`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `f0f730f` â€” feat(transizioni): il primo video, lo Studio — «implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata» â€” **Carlomadella**
+- `f0f730f` — feat(transizioni): il primo video, lo Studio — «implementa le transizioni dentro al progetto, che partano cliccando sulla scheda collegata» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -163,15 +163,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:ae547dc -->
-## 15/09/26, 16:18 â€” task/sistema-il-foglio-dei-punti-nuovi â†’ main
+## 15/09/26, 16:18 — task/sistema-il-foglio-dei-punti-nuovi → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `ae547dc`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `086a638` â€” fix(documenti): il giro di chiusura del foglio dei punti — l'hover era già chiuso, i due elenchi nello stesso ordine â€” **Carlomadella**
-- `167e22d` â€” docs(implementazioni): sistema il foglio dei punti nuovi — l'ordine copre tutti gli aperti â€” **Carlomadella**
+- `086a638` — fix(documenti): il giro di chiusura del foglio dei punti — l'hover era già chiuso, i due elenchi nello stesso ordine — **Carlomadella**
+- `167e22d` — docs(implementazioni): sistema il foglio dei punti nuovi — l'ordine copre tutti gli aperti — **Carlomadella**
 
 ### File di questa categoria
 
@@ -182,14 +182,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:c7f1b9b -->
-## 14/09/26, 07:53 â€” task/brainstorming-studio-sezioni â†’ main
+## 14/09/26, 07:53 — task/brainstorming-studio-sezioni → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `c7f1b9b`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `9261edd` â€” docs(studio): brainstorming per togliere Cover, Feat e Marketing, e il punto 10 «ad ogni pezzo» â€” **Carlomadella**
+- `9261edd` — docs(studio): brainstorming per togliere Cover, Feat e Marketing, e il punto 10 «ad ogni pezzo» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -201,15 +201,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:bc14d1d -->
-## 13/09/26, 19:55 â€” task/tasto-compralo-fuori-schermo â†’ main
+## 13/09/26, 19:55 — task/tasto-compralo-fuori-schermo → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `bc14d1d`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `4a67409` â€” Merge branch 'main' into task/tasto-compralo-fuori-schermo â€” **Carlomadella**
-- `5f91dc2` â€” fix(studio): il tasto «Compralo» non finisce piu' fuori dallo schermo â€” **Carlomadella**
+- `4a67409` — Merge branch 'main' into task/tasto-compralo-fuori-schermo — **Carlomadella**
+- `5f91dc2` — fix(studio): il tasto «Compralo» non finisce piu' fuori dallo schermo — **Carlomadella**
 
 ### File di questa categoria
 
@@ -220,14 +220,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:48dc367 -->
-## 12/09/26, 17:55 â€” origin/feat/stato-account-landing-v2-20260912-175446 â†’ main
+## 12/09/26, 17:55 — origin/feat/stato-account-landing-v2-20260912-175446 → main
 
 **Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
 **Merge commit:** `48dc367`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `13864e6` â€” feat(account): mostra stato connessione nella landing â€” **Mycol**
+- `13864e6` — feat(account): mostra stato connessione nella landing — **Mycol**
 
 ### File di questa categoria
 
@@ -238,14 +238,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:5f88dac -->
-## 12/09/26, 16:46 â€” task/avvio-rapido-paesi-province-v4 â†’ main
+## 12/09/26, 16:46 — task/avvio-rapido-paesi-province-v4 → main
 
 **Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
 **Merge commit:** `5f88dac`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `1580cbe` â€” feat(avvio-rapido): amplia il pool di provenienza â€” **Mycol**
+- `1580cbe` — feat(avvio-rapido): amplia il pool di provenienza — **Mycol**
 
 ### File di questa categoria
 
@@ -256,14 +256,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:7979f69 -->
-## 12/09/26, 13:21 â€” origin/fix/anti-regressione-git-gate-v2 â†’ main
+## 12/09/26, 13:21 — origin/fix/anti-regressione-git-gate-v2 → main
 
 **Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
 **Merge commit:** `7979f69`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `66c8d70` â€” fix(git): impedisce regressioni da main e branch obsoleti â€” **Mycol**
+- `66c8d70` — fix(git): impedisce regressioni da main e branch obsoleti — **Mycol**
 
 ### File di questa categoria
 
@@ -274,14 +274,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:dc0d94e -->
-## 06/09/26, 10:09 â€” task/pagine-per-ogni-azione â†’ main
+## 06/09/26, 10:09 — task/pagine-per-ogni-azione → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `dc0d94e`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `180960c` â€” docs: una pagina per ogni azione? l'analisi e il progetto (punto 2) â€” **Carlomadella**
+- `180960c` — docs: una pagina per ogni azione? l'analisi e il progetto (punto 2) — **Carlomadella**
 
 ### File di questa categoria
 
@@ -294,14 +294,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:b42c3ca -->
-## 05/09/26, 23:53 â€” task/26-landing-login-gioco-pagine-separate â†’ main
+## 05/09/26, 23:53 — task/26-landing-login-gioco-pagine-separate → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `b42c3ca`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `e3634c6` â€” feat: la landing, l'accesso e il gioco diventano tre pagine (punto 27) â€” **Carlomadella**
+- `e3634c6` — feat: la landing, l'accesso e il gioco diventano tre pagine (punto 27) — **Carlomadella**
 
 ### File di questa categoria
 
