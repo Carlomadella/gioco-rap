@@ -261,7 +261,16 @@ function lavoroFirmaContratto(luogo, job){
   if(luogo === "fabbrica"){
     const carriera = lavoroCarriera(luogo);
     if(carriera){
-      carriera.warnings = 0;
+      /* Le dimissioni non cancellano i richiami: altrimenti basterebbe
+         licenziarsi e rifirmare per azzerare la disciplina. Dopo un vero
+         licenziamento, invece, le 8 settimane di blocco fanno da sanzione e
+         il nuovo contratto riparte senza richiami attivi. */
+      const storico = Array.isArray(sede.contractHistory) ? sede.contractHistory : [];
+      const ultimaChiusura = storico.length ? storico[storico.length - 1] : null;
+      if(ultimaChiusura && ultimaChiusura.endReason === "licenziamento" &&
+         !(lavoroBloccoRiassunzione(luogo).active)){
+        carriera.warnings = 0;
+      }
       carriera.cyclesInRole = 0;
       carriera.perfectCyclesInRole = 0;
       carriera.perfectStreak = 0;
