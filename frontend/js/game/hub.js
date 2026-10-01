@@ -432,31 +432,56 @@ function contrattoPostoLavoro(def){
   const recupero = Math.max(1, Number(disciplina.recuperoRichiamoCicliPerfetti || 1));
   const bonusExtra = Math.max(0, Number(cfg.bonusSestoGiornoPct || 0));
 
-  const rigaExtra = luogo === "pizzeria"
-    ? "<b>Turni extra:</b> dal " + (turni + 1) + "° giorno distinto della settimana la paga sale del +" + bonusExtra + "%.<br>"
-    : "<b>Domenica:</b> riposo. Si lavora solo con una richiesta straordinaria dell'azienda.<br>";
+  const tipoContratto = luogo === "pizzeria"
+    ? "Ristorazione · contratto a turni"
+    : "Stabilimento industriale · contratto a turni";
+  const extraTitolo = luogo === "pizzeria" ? "Turni extra" : "Straordinari";
+  const extraTesto = luogo === "pizzeria"
+    ? "Dal " + (turni + 1) + "° giorno distinto della settimana la paga sale del +" + bonusExtra + "%."
+    : "La domenica è riposo. Si lavora solo con una richiesta straordinaria dell'azienda.";
+  const assenzeTesto = "Le assenze vengono valutate a fine settimana. " +
+    (lieveMax > 0 ? "Fino a " + lieveMax + (lieveMax === 1 ? " assenza riduce" : " assenze riducono") +
+      " l'affidabilità; " : "") +
+    "da " + richiamoMin + " in su scatta un richiamo formale.";
+  const disciplinaTesto = "Dopo " + richiamiMax +
+    " richiami, un'altra settimana grave porta al licenziamento" +
+    (blocco ? " e a " + blocco + " settimane senza riassunzione" : "") + ".";
+  const recuperoTesto = recupero +
+    (recupero === 1 ? " ciclo perfetto cancella" : " cicli perfetti consecutivi cancellano") +
+    " un richiamo.";
 
   showEvent({
     k:nome,
     t:"Contratto di lavoro",
-    d:"<b>Mansione iniziale:</b> " + def.n + "<br>" +
-      "<b>Paga:</b> " + def.pay + " € a turno<br>" +
-      "<b>Durata:</b> " + durata + "<br>" +
-      "<b>Presenze richieste:</b> " + turni + " giorni a settimana<br>" +
-      "<b>Giorni ordinari:</b> " + giorni + "<br>" +
-      "<b>Riposo contrattuale:</b> " + riposo + ".<br>" +
-      rigaExtra +
-      "<b>Assenze:</b> vengono valutate a fine settimana. " +
-        (lieveMax > 0 ? "Fino a " + lieveMax + (lieveMax === 1 ? " assenza riduce" : " assenze riducono") +
-          " l'affidabilità; " : "") +
-        "da " + richiamoMin + " in su scatta un richiamo formale.<br>" +
-      "<b>Disciplina:</b> dopo " + richiamiMax +
-        " richiami, un'altra settimana grave porta al licenziamento" +
-        (blocco ? " e a " + blocco + " settimane senza riassunzione" : "") + ".<br>" +
-      "<b>Recupero:</b> " + recupero +
-        (recupero === 1 ? " ciclo perfetto cancella" : " cicli perfetti consecutivi cancellano") +
-        " un richiamo.<br><br>" +
-      "Presenze e carriera restano legate alla " + nome + " anche se cambi mansione.",
+    variant:"work-contract",
+    workplace:luogo,
+    d:
+      '<span class="wc-doc">' +
+        '<span class="wc-head">' +
+          '<span class="wc-company">' + nome + '</span>' +
+          '<span class="wc-type">CONTRATTO DI LAVORO</span>' +
+          '<span class="wc-sub">' + tipoContratto + '</span>' +
+        '</span>' +
+        '<span class="wc-rule"></span>' +
+        '<span class="wc-grid">' +
+          '<span class="wc-field"><small>Mansione iniziale</small><strong>' + def.n + '</strong></span>' +
+          '<span class="wc-field"><small>Paga</small><strong>' + def.pay + ' € / turno</strong></span>' +
+          '<span class="wc-field"><small>Durata turno</small><strong>' + durata + '</strong></span>' +
+          '<span class="wc-field"><small>Presenze richieste</small><strong>' + turni + ' giorni / settimana</strong></span>' +
+          '<span class="wc-field"><small>Giorni ordinari</small><strong>' + giorni + '</strong></span>' +
+          '<span class="wc-field"><small>Riposo</small><strong>' + riposo + '</strong></span>' +
+        '</span>' +
+        '<span class="wc-clause"><b>' + extraTitolo + '</b><span>' + extraTesto + '</span></span>' +
+        '<span class="wc-clause"><b>Assenze e disciplina</b><span>' + assenzeTesto + ' ' + disciplinaTesto + '</span></span>' +
+        '<span class="wc-clause"><b>Recupero del richiamo</b><span>' + recuperoTesto + '</span></span>' +
+        '<span class="wc-clause wc-career"><b>Carriera interna</b><span>Presenze, anzianità e storico restano legati alla ' +
+          nome + ' anche se cambi mansione.</span></span>' +
+        '<span class="wc-signatures">' +
+          '<span><small>Datore di lavoro</small><strong>' + nome + '</strong></span>' +
+          '<span><small>Firma del lavoratore</small><i>________________________</i></span>' +
+        '</span>' +
+        '<span class="wc-fineprint">La firma rende attivo il rapporto di lavoro alle condizioni sopra indicate.</span>' +
+      '</span>',
     annulla(){},
     opts:[
       {n:"Firma il contratto", d:"Accetti le condizioni e diventi dipendente della " + nome, run(){

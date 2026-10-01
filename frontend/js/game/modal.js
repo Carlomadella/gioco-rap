@@ -46,7 +46,15 @@ function modaleViaggio(travel){
     $("travel-duration").textContent = travel.duration;
   }
 }
-function modaleSenzaViaggio(){ modaleViaggio(null); }
+function modaleAspetto(e){
+  const modal=$("modal");
+  const contratto=!!(e && e.variant==="work-contract");
+  const luogo=contratto ? String(e.workplace||"") : "";
+  modal.classList.toggle("work-contract",contratto);
+  modal.classList.toggle("contract-fabbrica",contratto && luogo==="fabbrica");
+  modal.classList.toggle("contract-pizzeria",contratto && luogo==="pizzeria");
+}
+function modaleSenzaViaggio(){ modaleViaggio(null); modaleAspetto(null); }
 
 function showEvent(e){
   if(modaleObbligata()){
@@ -54,6 +62,7 @@ function showEvent(e){
     return;
   }
   const obbligata = typeof e.annulla !== "function";
+  modaleAspetto(e);
   $("m-k").textContent = e.k;
   $("m-t").textContent = e.t;
   $("m-d").innerHTML = e.d;
