@@ -2272,6 +2272,77 @@ function adfFactoryOvertimeAfterShift(){
   return true;
 }
 
+/* Conoscenze nate in Fabbrica.
+   Sono persone vere di G.gente: se scambi il numero entrano nella chat e
+   possono produrre gli stessi beat/mix/video dei contatti conosciuti altrove.
+   Non tocchiamo ancora proposte criminali: quello è il punto successivo. */
+function adfFactoryContactAfterShift(){
+  if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
+    return false;
+  if(typeof lavoroTentaIncontroContatto!=="function") return false;
+
+  const s=st();
+  if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const p=lavoroTentaIncontroContatto("fabbrica",Math.random());
+  if(!p) return false;
+  if(!claimAutoEvent("factory-contact")) return false;
+
+  s.lastHookEventDay=absDay();
+
+  const ruolo=(typeof POSTO_RUOLI==="object" && POSTO_RUOLI[p.ruolo])
+    ? POSTO_RUOLI[p.ruolo].n
+    : "Contatto";
+  const giaVisto=!!p.workEncountered;
+  p.workEncountered=true;
+
+  let dettaglio="";
+  if(p.ruolo==="fonico")
+    dettaglio="Ti racconta che fuori dal turno lavora anche dietro a un mixer.";
+  else if(p.ruolo==="videomaker")
+    dettaglio="Ti fa vedere due clip sul telefono: fuori dal turno gira video.";
+  else
+    dettaglio="Ti dice che la sera produce beat sul portatile.";
+
+  afterClear(()=>showEvent({
+    k:"Fabbrica · Colleghi",
+    t:giaVisto ? p.n+" torna a parlarti di musica" : "Un collega parla di musica",
+    d:"Durante il turno finisci a parlare con <b>"+p.n+"</b>. " +
+      dettaglio+"<br><br><b>"+ruolo+"</b> · collega di Fabbrica. " +
+      "Se nasce un contatto, resta una persona vera della tua rete e può ricomparire anche dopo.",
+    annulla(){
+      /* Chiudere il popup non cancella la persona: ormai vi siete conosciuti. */
+    },
+    opts:[
+      {n:"Scambiatevi il numero", d:"Diventa un contatto persistente nelle chat", run(){
+        const x=typeof postoScambiaNumeroLavoro==="function"
+          ? postoScambiaNumeroLavoro(p) : null;
+        if(!x) return {t:"Non siete riusciti a scambiarvi il numero.",c:""};
+        if(typeof gain==="function") gain("rete",0.5);
+        return {
+          t:"<b>"+p.n+"</b> è adesso nella tua rete. Lo trovi nelle chat come "+
+            ruolo.toLowerCase()+" · collega di Fabbrica.",
+          c:"good"
+        };
+      }},
+      {n:"Parlate un po'", d:"Costruisci il rapporto senza scambiarvi ancora il numero", run(){
+        if(typeof postoAvvicinaContattoLavoro==="function")
+          postoAvvicinaContattoLavoro(p,2);
+        if(typeof gain==="function") gain("rete",0.2);
+        return {
+          t:"Con <b>"+p.n+"</b> non è rimasta solo una chiacchiera da turno. Potrà ricapitare.",
+          c:""
+        };
+      }},
+      {n:"Resta sul lavoro", d:"Niente contatto per ora", run(){
+        return {t:"Vi conoscete di vista, ma per ora resta un collega della Fabbrica.",c:""};
+      }}
+    ]
+  }),80);
+
+  return true;
+}
+
 function hookMatches(e, kind, payload){
   payload=payload||{};
   const h=e.repo_hook||{};
@@ -2618,9 +2689,12 @@ for(const a of ACTIONS){
     const out=old.apply(this,arguments);
     setTimeout(()=>{
       const overtimeShown = a.id==="turno" ? adfFactoryOvertimeAfterShift() : false;
-      if(!overtimeShown)
+      const contactShown = a.id==="turno" && !overtimeShown
+        ? adfFactoryContactAfterShift()
+        : false;
+      if(!overtimeShown && !contactShown)
         emitHook("after_action",{action_id:a.id});
-      if(a.id==="turno" && G.job && !overtimeShown)
+      if(a.id==="turno" && G.job && !overtimeShown && !contactShown)
         emitHook("after_job_shift",{
           action_id:"turno",
           job_id:G.job.id,
