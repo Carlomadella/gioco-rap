@@ -58,7 +58,6 @@ const FAMILIES = Object.freeze({
 const MUSIC_AGENDA_IDS = new Set(["live","free","sala","promo"]);
 const CRIME_JOBS = new Set(["buttafuori","fattorino"]);
 let bypassConflict = null;
-let pendingConflictMiss = null;
 
 function nclamp(v,min,max){
   v=Number(v)||0;
@@ -230,7 +229,8 @@ function guardAction(id){
         /* Non togliamo ancora la voce: il secondo avvio può comunque essere
            respinto da luogo/orario. La perdita viene committata solo dopo che
            il clock certifica che il turno ha davvero attraversato l'evento. */
-        pendingConflictMiss={voice:v,key,day:absDay(),jobId:G.job&&G.job.id};
+        s.pendingConflictMiss={voice:v,key,day:absDay(),jobId:G.job&&G.job.id};
+        try{ if(typeof save==="function") save(); }catch(_){}
         bypassConflict={key,day:absDay()};
         setTimeout(()=>{
           if(typeof avviaAzioneDiretta==="function") avviaAzioneDiretta("turno");
@@ -238,7 +238,7 @@ function guardAction(id){
         return null;
       }},
       {n:"Tieni l'appuntamento",d:"Non fai il turno: niente paga e il lavoro resta scoperto",run(){
-        pendingConflictMiss=null;
+        delete s.pendingConflictMiss;
         record(s,"conflict",{
           choice:"music",
           jobId:G.job&&G.job.id,
@@ -689,11 +689,14 @@ function onCycle(luogo,evaluation){
    siamo dopo il commit del clock e possiamo verificare che l'intervallo del
    turno abbia davvero attraversato l'appuntamento. */
 function commitConflictMiss(payload,job,s){
-  if(!pendingConflictMiss) return null;
-  const p=pendingConflictMiss;
-  pendingConflictMiss=null;
+  const p=s && s.pendingConflictMiss;
+  if(!p) return null;
+  delete s.pendingConflictMiss;
 
-  if(p.day!==absDay() || !p.voice) return null;
+  if(p.day!==absDay() || !p.voice){
+    try{ if(typeof save==="function") save(); }catch(_){}
+    return null;
+  }
   const from=Number(payload&&payload.started_at);
   const to=Number(payload&&payload.ended_at);
   const at=Number(p.voice.minuti);
