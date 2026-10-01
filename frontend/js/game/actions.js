@@ -204,6 +204,12 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
     affidabilitaCompletato:2,
     affidabilitaSaltato:-5
   }),
+  rete:Object.freeze({
+    chanceIncontro:0.18,
+    cooldownGiorni:7,
+    minTurniCiclo:3,
+    maxContatti:4
+  }),
   ruoli:Object.freeze([
     Object.freeze({id:"operaio", n:"Operaio"}),
     Object.freeze({id:"operaio_esperto", n:"Operaio esperto"}),
@@ -962,6 +968,75 @@ function lavoroAggiornaStraordinariTempo(){
         offerta.targetLabel + ". Affidabilità " + (delta >= 0 ? "+" : "") + delta + ".", "bad");
     }
   }
+}
+
+function lavoroReteStato(luogo){
+  const sede = lavoroSede(luogo);
+  if(!sede) return null;
+  if(!sede.network || typeof sede.network !== "object"){
+    sede.network = {
+      lastCheckAbsoluteDay:null,
+      lastEncounterAbsoluteDay:null,
+      encounters:0,
+      history:[]
+    };
+  }
+  const s = sede.network;
+  s.encounters = Math.max(0, Number(s.encounters || 0));
+  if(!Array.isArray(s.history)) s.history = [];
+  return s;
+}
+
+/* La Fabbrica può generare conoscenze vere, ma senza trasformarsi in una
+   lotteria di contatti: almeno tre turni fatti nel ciclo, massimo quattro
+   persone nate da questo luogo e almeno una settimana fra due incontri. */
+function lavoroTentaIncontroContatto(luogo, roll){
+  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return null;
+  if(typeof postoContattoLavoroCandidato !== "function") return null;
+
+  const stato = lavoroReteStato(luogo);
+  const cart = lavoroCartellino(luogo);
+  const cfg = ADF_FABBRICA_CARRIERA.rete;
+  if(!stato || !cart) return null;
+
+  const oggi = lavoroGiornoAssoluto();
+  if(Number(stato.lastCheckAbsoluteDay) === oggi) return null;
+  stato.lastCheckAbsoluteDay = oggi;
+
+  if(cart.totale < Number(cfg.minTurniCiclo || 0)) return null;
+
+  if(stato.lastEncounterAbsoluteDay != null &&
+     oggi - Number(stato.lastEncounterAbsoluteDay) < Number(cfg.cooldownGiorni || 0))
+    return null;
+
+  const esistenti = (G.gente || []).filter(p =>
+    p && !p.via && p.origineLuogo === luogo
+  );
+  const daRiprendere = esistenti.filter(p => !p.numero);
+  if(!daRiprendere.length && esistenti.length >= Number(cfg.maxContatti || 0))
+    return null;
+
+  const r = roll == null ? Math.random() : Number(roll);
+  if(!Number.isFinite(r) || r >= Number(cfg.chanceIncontro || 0)) return null;
+
+  const persona = postoContattoLavoroCandidato(
+    luogo,
+    daRiprendere,
+    Number(cfg.maxContatti || 0)
+  );
+  if(!persona) return null;
+
+  stato.lastEncounterAbsoluteDay = oggi;
+  stato.encounters += 1;
+  stato.history.push({
+    absoluteDay:oggi,
+    personId:persona.id,
+    role:persona.ruolo,
+    type:persona.numero ? "known_contact" : "encounter"
+  });
+  if(stato.history.length > 24) stato.history.shift();
+
+  return persona;
 }
 
 function lavoroTurnoConsentitoOggi(luogo){
