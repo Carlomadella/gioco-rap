@@ -30,34 +30,13 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
-  preflight-static:
+  prepara:
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    steps:
-      - name: Scarica repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'push' && github.ref_name || 'main' }}
-          fetch-depth: 1
-      - name: Configura Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Verifica motore e agente locale
-        run: |
-          node scripts/test-roadmap-auto.js
-          node scripts/test-roadmap-audit-guard.js
-          node --check scripts/roadmap-local-agent.js
-          node scripts/roadmap-local-agent.js self-test
-          bash -n scripts/setup-roadmap-local-runner.sh
-
-  aggiorna:
-    needs: preflight-static
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
-    runs-on: [self-hosted, Linux, X64, anni-di-fame-local]
-    env:
-      ADF_LOCAL_AI_MODEL: ${{ vars.ADF_LOCAL_AI_MODEL || 'gpt-oss:20b' }}
-      ADF_LOCAL_AI_BASE_URL: ${{ vars.ADF_LOCAL_AI_BASE_URL || 'http://127.0.0.1:11434/v1' }}
+    outputs:
+      branch: ${{ steps.branch.outputs.name }}
+      checkout_sha: ${{ steps.contesto.outputs.checkout_sha }}
+      serve_ai: ${{ steps.piano.outputs.serve_ai }}
 
     steps:
       - name: Scegli branch
@@ -85,31 +64,23 @@ jobs:
         id: contesto
         shell: bash
         run: |
+          echo "checkout_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           if [ "${{ github.event_name }}" = "workflow_run" ]; then
             TARGET="${{ github.event.workflow_run.head_sha }}"
           else
             TARGET="$(git rev-parse HEAD)"
           fi
-          echo "sha=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "target_sha=$TARGET" >> "$GITHUB_OUTPUT"
           git diff --name-only "$TARGET^1" "$TARGET" > "$RUNNER_TEMP/changed-files.txt" 2>/dev/null || :
           git log -1 --format=%s "$TARGET" > "$RUNNER_TEMP/commit-subject.txt"
 
-      - name: Verifica Ollama locale
-        shell: bash
+      - name: Test motore roadmap e agente locale
         run: |
-          node - <<'NODE'
-          const base = String(process.env.ADF_LOCAL_AI_BASE_URL || '').replace(/\/+$/, '');
-          const model = process.env.ADF_LOCAL_AI_MODEL || 'gpt-oss:20b';
-          if (!base) throw new Error('ADF_LOCAL_AI_BASE_URL non configurato');
-          const response = await fetch(base + '/models');
-          if (!response.ok) throw new Error('Ollama non raggiungibile: HTTP ' + response.status);
-          const data = await response.json();
-          const ids = (data.data || []).map(x => x.id || x.model || x.name).filter(Boolean);
-          if (!ids.some(id => id === model || id.startsWith(model + ':'))) {
-            throw new Error('Modello locale non trovato: ' + model + '. Disponibili: ' + ids.join(', '));
-          }
-          console.log('Ollama OK:', base, 'modello:', model);
-          NODE
+          node scripts/test-roadmap-auto.js
+          node scripts/test-roadmap-audit-guard.js
+          node --check scripts/roadmap-local-agent.js
+          node scripts/roadmap-local-agent.js self-test
+          bash -n scripts/setup-roadmap-local-runner.sh
 
       - name: Importa tutto lo storico senza riscriverlo
         run: node scripts/roadmap-auto.js bootstrap
@@ -132,22 +103,85 @@ jobs:
           else
             echo "serve_ai=false" >> "$GITHUB_OUTPUT"
           fi
-          cp -a implementazioni/auto/tasks "$RUNNER_TEMP/tasks-prima-ai"
 
-      - name: Espandi richieste e verifica criteri
-        id: ai
-        if: steps.piano.outputs.serve_ai == 'true'
+          mkdir -p .roadmap-ci/input
+          cp -a implementazioni/auto/tasks .roadmap-ci/input/tasks
+          cp "$RUNNER_TEMP/roadmap-prompt.txt" .roadmap-ci/input/roadmap-prompt.txt
+          cp "$RUNNER_TEMP/audit-ids.txt" .roadmap-ci/input/audit-ids.txt
+
+      - name: Salva input per il solo passaggio AI
+        uses: actions/upload-artifact@v4
+        with:
+          name: roadmap-ai-input-${{ github.run_id }}
+          path: .roadmap-ci/input
+          if-no-files-found: error
+          retention-days: 1
+
+  ai_locale:
+    needs: prepara
+    if: ${{ needs.prepara.result == 'success' && needs.prepara.outputs.serve_ai == 'true' }}
+    runs-on: [self-hosted, Linux, X64, anni-di-fame-local]
+    timeout-minutes: 45
+    env:
+      ADF_LOCAL_AI_MODEL: ${{ vars.ADF_LOCAL_AI_MODEL || 'gpt-oss:20b' }}
+      ADF_LOCAL_AI_BASE_URL: ${{ vars.ADF_LOCAL_AI_BASE_URL || 'http://127.0.0.1:11434/v1' }}
+
+    steps:
+      - name: Scarica lo snapshot esatto preparato da GitHub
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepara.outputs.checkout_sha }}
+          fetch-depth: 0
+
+      - name: Configura Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Recupera input audit
+        uses: actions/download-artifact@v4
+        with:
+          name: roadmap-ai-input-${{ github.run_id }}
+          path: .roadmap-ci/input
+
+      - name: Ripristina le task preparate deterministicamente
         shell: bash
         run: |
+          rm -rf implementazioni/auto/tasks
+          cp -a .roadmap-ci/input/tasks implementazioni/auto/tasks
+
+      - name: Verifica Ollama locale
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const base = String(process.env.ADF_LOCAL_AI_BASE_URL || '').replace(/\/+$/, '');
+          const model = process.env.ADF_LOCAL_AI_MODEL || 'gpt-oss:20b';
+          if (!base) throw new Error('ADF_LOCAL_AI_BASE_URL non configurato');
+          const response = await fetch(base + '/models');
+          if (!response.ok) throw new Error('Ollama non raggiungibile: HTTP ' + response.status);
+          const data = await response.json();
+          const ids = (data.data || []).map(x => x.id || x.model || x.name).filter(Boolean);
+          if (!ids.some(id => id === model || id.startsWith(model + ':'))) {
+            throw new Error('Modello locale non trovato: ' + model + '. Disponibili: ' + ids.join(', '));
+          }
+          console.log('Ollama OK:', base, 'modello:', model);
+          NODE
+
+      - name: Audit AI locale
+        id: ai
+        shell: bash
+        run: |
+          cp -a implementazioni/auto/tasks "$RUNNER_TEMP/tasks-prima-ai"
           set +e
+
           node scripts/roadmap-local-agent.js audit \
-            --prompt-file "$RUNNER_TEMP/roadmap-prompt.txt" \
-            --ids-file "$RUNNER_TEMP/audit-ids.txt"
+            --prompt-file ".roadmap-ci/input/roadmap-prompt.txt" \
+            --ids-file ".roadmap-ci/input/audit-ids.txt"
           AI_CODE=$?
           CODE=$AI_CODE
 
           if [ "$AI_CODE" -eq 0 ]; then
-            node scripts/roadmap-audit-guard.js validate-batch "$RUNNER_TEMP/audit-ids.txt" \
+            node scripts/roadmap-audit-guard.js validate-batch ".roadmap-ci/input/audit-ids.txt" \
               > "$RUNNER_TEMP/audit-validation.log" 2>&1
             CODE=$?
           fi
@@ -155,14 +189,14 @@ jobs:
           if [ "$AI_CODE" -eq 0 ] && [ "$CODE" -ne 0 ]; then
             echo "::warning::JSON AI locali non conformi: avvio un solo passaggio automatico di riparazione."
             node scripts/roadmap-local-agent.js repair \
-              --prompt-file "$RUNNER_TEMP/roadmap-prompt.txt" \
-              --ids-file "$RUNNER_TEMP/audit-ids.txt" \
+              --prompt-file ".roadmap-ci/input/roadmap-prompt.txt" \
+              --ids-file ".roadmap-ci/input/audit-ids.txt" \
               --validation-file "$RUNNER_TEMP/audit-validation.log"
             REPAIR_CODE=$?
             CODE=$REPAIR_CODE
 
             if [ "$REPAIR_CODE" -eq 0 ]; then
-              node scripts/roadmap-audit-guard.js validate-batch "$RUNNER_TEMP/audit-ids.txt" \
+              node scripts/roadmap-audit-guard.js validate-batch ".roadmap-ci/input/audit-ids.txt" \
                 > "$RUNNER_TEMP/audit-validation.log" 2>&1
               CODE=$?
             fi
@@ -174,30 +208,12 @@ jobs:
             cat "$RUNNER_TEMP/audit-validation.log" 2>/dev/null || true
             rm -rf implementazioni/auto/tasks
             cp -a "$RUNNER_TEMP/tasks-prima-ai" implementazioni/auto/tasks
-            echo "ok=false" >> "$GITHUB_OUTPUT"
             exit "$CODE"
           fi
 
           cat "$RUNNER_TEMP/audit-validation.log" 2>/dev/null || true
-          echo "ok=true" >> "$GITHUB_OUTPUT"
 
-      - name: Blocca scritture fuori dal perimetro automatico
-        shell: bash
-        run: |
-          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/.*|implementazioni/implementazioni\.md)$' || true)
-          if [ -n "$FUORI" ]; then
-            echo "::error::L'agente ha modificato file non consentiti:"
-            echo "$FUORI"
-            exit 1
-          fi
-
-      - name: Rigenera cruscotto e valida
-        run: |
-          node scripts/roadmap-auto.js finalize
-          node scripts/roadmap-auto.js check
-          git diff --check
-
-      - name: Prepara eventuale manutenzione della roadmap ufficiale
+      - name: Prepara eventuale manutenzione AI della roadmap ufficiale
         id: roadmap
         shell: bash
         run: |
@@ -223,17 +239,16 @@ jobs:
 
           REGOLE RIGIDE
           - Sei già nel branch/worktree corretto predisposto dal workflow: NON creare/cambiare branch e NON fare commit/pull/push.
-          - Le regole generiche del repository su branch e commit sono già soddisfatte dal workflow esterno.
           - Prima leggi ROADMAP.md, le task indicate e il codice collegato.
           - Puoi modificare SOLO ROADMAP.md.
           - Non cancellare macro-fasi, città, principi permanenti o decisioni già approvate.
           - Non cambiare la direzione del gioco per "migliorarla".
           - Puoi aggiungere o chiarire solo evoluzione reale del gioco: prerequisiti di macro-fasi, nuovi sistemi di gameplay, progressione del mondo/città o capacità strutturali visibili al giocatore.
           - NON aggiungere bugfix, patch, regressioni, fix CSS/UI locali, refactor interni, migrazioni tecniche, test, tooling o manutenzione.
-          - NON copiare nella roadmap ufficiale i singoli step V1...Vn di un piano tecnico: il piano può restare nelle implementazioni.
+          - NON copiare nella roadmap ufficiale i singoli step V1...Vn di un piano tecnico.
           - Non duplicare contenuti già presenti.
           - Se il buco è già coperto, non modificare niente.
-          - Se scopri che servirebbe cambiare una decisione strutturale, NON farlo: quello è impatto major e richiede revisione umana.
+          - Se servirebbe cambiare una decisione strutturale, NON farlo: quello è impatto major e richiede revisione umana.
           - Non segnare "fatto" qualcosa solo perché una task lo dice: verifica il repo.
           - Mantieni tono, struttura e lingua italiana già usati in ROADMAP.md.
           - Preferisci una modifica piccola e precisa a una riscrittura estesa.
@@ -249,7 +264,7 @@ jobs:
             echo "serve_ai=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Migliora la roadmap ufficiale dove mancano passaggi reali
+      - name: Manutenzione AI locale della roadmap ufficiale
         if: steps.roadmap.outputs.serve_ai == 'true'
         shell: bash
         run: |
@@ -260,12 +275,11 @@ jobs:
           set -e
 
           if [ "$CODE" -ne 0 ]; then
-            echo "::warning::Manutenzione roadmap locale non completata: ripristino ROADMAP.md senza inventare modifiche."
+            echo "::warning::Manutenzione roadmap locale non completata: ripristino ROADMAP.md."
             cp "$RUNNER_TEMP/ROADMAP.before.md" ROADMAP.md
           fi
 
       - name: Proteggi la direzione ufficiale da riscritture automatiche
-        if: steps.roadmap.outputs.serve_ai == 'true'
         shell: bash
         run: |
           node - <<'NODE'
@@ -287,7 +301,7 @@ jobs:
           }
 
           const permanent = [
-            'Tutto dev\'essere interattivo',
+            "Tutto dev'essere interattivo",
             'Tutto personalizzabile',
             'Si sblocca un mondo, non un menu',
             'Niente studio personale'
@@ -299,14 +313,131 @@ jobs:
           }
           NODE
 
-          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/.*|implementazioni/implementazioni\.md|ROADMAP\.md)$' || true)
+          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/.*|ROADMAP\.md)$' || true)
           if [ -n "$FUORI" ]; then
-            echo "::error::Modifica roadmap fuori perimetro:"
+            echo "::error::L'agente locale ha modificato file non consentiti:"
             echo "$FUORI"
             exit 1
           fi
 
-          git diff --check -- ROADMAP.md
+          git diff --check -- implementazioni/auto ROADMAP.md
+
+      - name: Prepara output del solo passaggio AI
+        shell: bash
+        run: |
+          rm -rf .roadmap-ci/output
+          mkdir -p .roadmap-ci/output
+          cp -a implementazioni/auto/tasks .roadmap-ci/output/tasks
+          cp ROADMAP.md .roadmap-ci/output/ROADMAP.md
+
+      - name: Restituisci output AI a GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: roadmap-ai-output-${{ github.run_id }}
+          path: .roadmap-ci/output
+          if-no-files-found: error
+          retention-days: 1
+
+  finalizza:
+    needs:
+      - prepara
+      - ai_locale
+    if: ${{ always() && needs.prepara.result == 'success' && (needs.ai_locale.result == 'success' || needs.ai_locale.result == 'skipped') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Scarica lo snapshot esatto
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepara.outputs.checkout_sha }}
+          fetch-depth: 0
+
+      - name: Configura Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Recupera input deterministico
+        uses: actions/download-artifact@v4
+        with:
+          name: roadmap-ai-input-${{ github.run_id }}
+          path: .roadmap-ci/input
+
+      - name: Ripristina stato preparato
+        shell: bash
+        run: |
+          rm -rf implementazioni/auto/tasks
+          cp -a .roadmap-ci/input/tasks implementazioni/auto/tasks
+          cp ROADMAP.md "$RUNNER_TEMP/ROADMAP.before-ai.md"
+
+      - name: Recupera risultato AI locale
+        if: needs.prepara.outputs.serve_ai == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: roadmap-ai-output-${{ github.run_id }}
+          path: .roadmap-ci/output
+
+      - name: Applica risultato AI locale
+        if: needs.prepara.outputs.serve_ai == 'true'
+        shell: bash
+        run: |
+          rm -rf implementazioni/auto/tasks
+          cp -a .roadmap-ci/output/tasks implementazioni/auto/tasks
+          cp .roadmap-ci/output/ROADMAP.md ROADMAP.md
+
+      - name: Rivalida deterministicamente il batch AI
+        if: needs.prepara.outputs.serve_ai == 'true'
+        run: node scripts/roadmap-audit-guard.js validate-batch ".roadmap-ci/input/audit-ids.txt"
+
+      - name: Proteggi nuovamente la roadmap sul runner GitHub
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          const before = fs.readFileSync(process.env.RUNNER_TEMP + '/ROADMAP.before-ai.md', 'utf8');
+          const after = fs.readFileSync('ROADMAP.md', 'utf8');
+
+          const headings = before.match(/^##\s+.+$/gm) || [];
+          const missing = headings.filter(h => !after.includes(h));
+          if (missing.length) {
+            console.error('BLOCCO: la manutenzione ha rimosso sezioni ufficiali:');
+            console.error(missing.join('\n'));
+            process.exit(1);
+          }
+
+          if (after.length < before.length * 0.95) {
+            console.error('BLOCCO: ROADMAP.md si è accorciata troppo; possibile riscrittura distruttiva.');
+            process.exit(1);
+          }
+
+          const permanent = [
+            "Tutto dev'essere interattivo",
+            'Tutto personalizzabile',
+            'Si sblocca un mondo, non un menu',
+            'Niente studio personale'
+          ];
+          const lost = permanent.filter(fragment => before.includes(fragment) && !after.includes(fragment));
+          if (lost.length) {
+            console.error('BLOCCO: sono state rimosse regole permanenti: ' + lost.join(' | '));
+            process.exit(1);
+          }
+          NODE
+
+      - name: Rigenera cruscotto e valida
+        run: |
+          node scripts/roadmap-auto.js finalize
+          node scripts/roadmap-auto.js check
+          git diff --check
+
+      - name: Blocca scritture fuori dal perimetro automatico
+        shell: bash
+        run: |
+          FUORI=$(git diff --name-only | grep -Ev '^(implementazioni/auto/.*|implementazioni/implementazioni\.md|ROADMAP\.md)$' || true)
+          if [ -n "$FUORI" ]; then
+            echo "::error::Modifica fuori perimetro automatico:"
+            echo "$FUORI"
+            exit 1
+          fi
 
       - name: Salva stato automatico e manutenzione roadmap
         shell: bash
@@ -321,5 +452,5 @@ jobs:
           fi
 
           git commit -m "docs: aggiorna implementazioni e roadmap ufficiale"
-          git pull --rebase origin "${{ steps.branch.outputs.name }}"
-          git push origin "HEAD:${{ steps.branch.outputs.name }}"
+          git pull --rebase origin "${{ needs.prepara.outputs.branch }}"
+          git push origin "HEAD:${{ needs.prepara.outputs.branch }}"
