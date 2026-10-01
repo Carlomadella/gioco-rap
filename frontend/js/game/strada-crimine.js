@@ -88,6 +88,15 @@ const STRADA_PROT = [
 const STRADA_UOMO_COSTO = 500, STRADA_UOMO_UPKEEP = 140, STRADA_UOMO_MAX = 5;
 const STRADA_FERRO_COSTO = 900, STRADA_AVVOCATO_COSTO = 320;
 
+/* Proposte nate FUORI dalla Fabbrica: non aprono il giro criminale a chi è
+   pulito. Premiano invece chi ha già una storia nella Strada con una singola
+   opportunità più remunerativa ma un po' più rumorosa. */
+const STRADA_FABBRICA_LEAD = Object.freeze({
+  chance:.12,
+  cooldownGiorni:14,
+  durataGiorni:7
+});
+
 /* ==================== LA SCENA IN CORSO ====================
    Come modal.js, ma tutta dentro alla schermata: showEvent (z-index 60) finirebbe
    sotto ai pannelli come questo (z-index 93, stessa famiglia di posto/negozio),
@@ -168,6 +177,166 @@ function stradaGiroAvviato(){
   return s.giroAvviato;
 }
 
+function stradaAbsDay(){
+  return Math.max(1,
+    ((Number(G.year || 1) - 1) * 52 + (Number(G.week || 1) - 1)) * 7 +
+    Math.max(1, Math.min(7, Number(G.day || 1)))
+  );
+}
+
+function stradaFabbricaLeadStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.fabbricaLead || typeof s.fabbricaLead!=="object"){
+    s.fabbricaLead={
+      lastCheckAbsoluteDay:null,
+      lastOfferAbsoluteDay:null,
+      pending:null,
+      active:null,
+      history:[]
+    };
+  }
+  const st=s.fabbricaLead;
+  if(!Array.isArray(st.history)) st.history=[];
+  return st;
+}
+
+function stradaAggiornaPropostaFabbrica(silent){
+  const st=stradaFabbricaLeadStato();
+  if(!st.active) return null;
+
+  const oggi=stradaAbsDay();
+  if(Number(st.active.expiresAbsoluteDay)>=oggi) return st.active;
+
+  const scaduta=Object.assign({},st.active,{status:"expired",expiredAbsoluteDay:oggi});
+  st.history.push(scaduta);
+  if(st.history.length>20) st.history.shift();
+  st.active=null;
+
+  if(!silent && typeof pushLog==="function"){
+    pushLog("<b>La proposta fuori dalla Fabbrica è scaduta.</b> La dritta non è più valida.", "");
+  }
+  return null;
+}
+
+function stradaFabbricaLeadAttivo(colpoId){
+  const st=stradaFabbricaLeadStato();
+  stradaAggiornaPropostaFabbrica(true);
+  if(!st.active) return null;
+  if(colpoId && st.active.colpoId!==colpoId) return null;
+  return st.active;
+}
+
+function stradaFabbricaLeadVariante(roll){
+  const rep=Math.max(0,Number((G.strada&&G.strada.rep)||0));
+  let pool;
+  if(rep>=45){
+    pool=[
+      {colpoId:"scotta",bonusPct:25,extraHeat:3,label:"Roba che scotta"},
+      {colpoId:"cassa",bonusPct:30,extraHeat:4,label:"La cassa del bar"}
+    ];
+  }else if(rep>=18){
+    pool=[
+      {colpoId:"consegne",bonusPct:20,extraHeat:2,label:"Consegne che non chiedi"},
+      {colpoId:"scotta",bonusPct:25,extraHeat:3,label:"Roba che scotta"}
+    ];
+  }else{
+    pool=[{colpoId:"consegne",bonusPct:20,extraHeat:2,label:"Consegne che non chiedi"}];
+  }
+
+  const r=Number.isFinite(Number(roll)) ? Math.max(0,Math.min(.999999,Number(roll))) : Math.random();
+  return Object.assign({},pool[Math.floor(r*pool.length)]);
+}
+
+function stradaTentaPropostaFabbrica(roll,variantRoll){
+  if(!G.job) return null;
+  const luogo=typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null);
+  if(luogo!=="fabbrica") return null;
+  if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
+
+  const st=stradaFabbricaLeadStato();
+  stradaAggiornaPropostaFabbrica(true);
+  if(st.active || st.pending) return null;
+
+  const oggi=stradaAbsDay();
+  if(Number(st.lastCheckAbsoluteDay)===oggi) return null;
+  st.lastCheckAbsoluteDay=oggi;
+
+  if(st.lastOfferAbsoluteDay!=null &&
+     oggi-Number(st.lastOfferAbsoluteDay)<STRADA_FABBRICA_LEAD.cooldownGiorni)
+    return null;
+
+  const r=roll==null ? Math.random() : Number(roll);
+  if(!Number.isFinite(r) || r>=STRADA_FABBRICA_LEAD.chance) return null;
+
+  const variante=stradaFabbricaLeadVariante(variantRoll);
+  st.lastOfferAbsoluteDay=oggi;
+  st.pending=Object.assign({
+    source:"fabbrica",
+    status:"offered",
+    offeredAbsoluteDay:oggi,
+    durataGiorni:STRADA_FABBRICA_LEAD.durataGiorni
+  },variante);
+  return Object.assign({},st.pending);
+}
+
+function stradaAccettaPropostaFabbrica(){
+  const st=stradaFabbricaLeadStato();
+  if(!st.pending) return null;
+  const oggi=stradaAbsDay();
+  const lead=Object.assign({},st.pending,{
+    status:"active",
+    acceptedAbsoluteDay:oggi,
+    expiresAbsoluteDay:oggi+Math.max(1,Number(st.pending.durataGiorni||STRADA_FABBRICA_LEAD.durataGiorni))
+  });
+  st.pending=null;
+  st.active=lead;
+  st.history.push({
+    type:"accepted",
+    absoluteDay:oggi,
+    colpoId:lead.colpoId,
+    bonusPct:lead.bonusPct,
+    expiresAbsoluteDay:lead.expiresAbsoluteDay
+  });
+  if(st.history.length>20) st.history.shift();
+  return Object.assign({},lead);
+}
+
+function stradaRifiutaPropostaFabbrica(){
+  const st=stradaFabbricaLeadStato();
+  if(!st.pending) return null;
+  const proposta=Object.assign({},st.pending,{status:"declined",declinedAbsoluteDay:stradaAbsDay()});
+  st.pending=null;
+  st.history.push({
+    type:"declined",
+    absoluteDay:stradaAbsDay(),
+    colpoId:proposta.colpoId,
+    bonusPct:proposta.bonusPct
+  });
+  if(st.history.length>20) st.history.shift();
+  return proposta;
+}
+
+function stradaConsumaPropostaFabbrica(colpoId,successo){
+  const st=stradaFabbricaLeadStato();
+  const lead=stradaFabbricaLeadAttivo(colpoId);
+  if(!lead) return null;
+  const usata=Object.assign({},lead,{
+    status:"consumed",
+    consumedAbsoluteDay:stradaAbsDay(),
+    success:!!successo
+  });
+  st.active=null;
+  st.history.push({
+    type:"consumed",
+    absoluteDay:usata.consumedAbsoluteDay,
+    colpoId:usata.colpoId,
+    bonusPct:usata.bonusPct,
+    success:usata.success
+  });
+  if(st.history.length>20) st.history.shift();
+  return usata;
+}
+
 function stradaChance(colpo, approccio){
   const s = G.strada;
   let p = .62 - colpo.difficolta * .34;
@@ -199,8 +368,12 @@ function stradaTenta(colpoId, approccioId){
 
   s.giroAvviato=true;
   G.energy -= colpo.energia;
+  const leadFabbrica = stradaFabbricaLeadAttivo(colpoId);
   const successo = Math.random() < stradaChance(colpo, approccio);
+  const leadUsato = leadFabbrica ? stradaConsumaPropostaFabbrica(colpoId, successo) : null;
+  const moltiplicatoreLead = leadUsato ? (1 + Number(leadUsato.bonusPct || 0) / 100) : 1;
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
+  const rumoreLead = leadUsato ? Math.max(0, Number(leadUsato.extraHeat || 0)) : 0;
   /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
      il suo peso — è il più rischioso dei sei eventi della settimana, e
      deve rendere in proporzione quando capita davvero quel giorno lì.
@@ -210,21 +383,28 @@ function stradaTenta(colpoId, approccioId){
     ? AGENDA.consumaPeso("colpo") : 1;
 
   if(successo){
-    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso;
+    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso * moltiplicatoreLead;
     const pulito = Math.round(grezzo * .4), sporco = Math.round(grezzo * .6);
     G.money += pulito; s.sporchi += sporco;
     s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
-    s.heat = clamp(s.heat + rumore * .6, 0, 100);
+    s.heat = clamp(s.heat + rumore * .6 + rumoreLead, 0, 100);
     diarioBordo().colpi++;
+    const notaLead = leadUsato
+      ? " <b>Dritta fuori dalla Fabbrica: +" + Number(leadUsato.bonusPct || 0) +
+        "% sul guadagno, +" + rumoreLead + " attenzione.</b>"
+      : "";
     STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
-        fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne.",
+        fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne." + notaLead,
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
-    s.heat = clamp(s.heat + rumore, 0, 100);
+    s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
+    const notaLeadFallita = leadUsato
+      ? " La dritta arrivata fuori dalla Fabbrica è bruciata."
+      : "";
     if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
       s.uomini--;
       STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. Uno dei tuoi ci è rimasto sotto: " +
-          "tu sei rientrato pulito, lui no. Un uomo in meno.",
+          "tu sei rientrato pulito, lui no. Un uomo in meno." + notaLeadFallita,
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
       const primaVolta = s.precedenti === 0 && approccio.id !== "ferro" && colpo.difficolta <= .3;
@@ -232,7 +412,7 @@ function stradaTenta(colpoId, approccioId){
         const multa = Math.round(colpo.min * .8);
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
-            fmt(multa) + " € di multa. Stavolta è andata.",
+            fmt(multa) + " € di multa. Stavolta è andata." + notaLeadFallita,
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
@@ -241,7 +421,7 @@ function stradaTenta(colpoId, approccioId){
         s.arresto = {settimane:settimane, colpo:colpo.n};
         STRADA_SCENA = {k:"Com'è andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
-            ". Niente musica, niente strada: solo il tempo che passa.",
+            ". Niente musica, niente strada: solo il tempo che passa." + notaLeadFallita,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
       }
     }
@@ -1039,14 +1219,23 @@ function renderStColpi(){
   }
 
   centro.classList.remove("locked");
+  const leadFabbrica = stradaFabbricaLeadAttivo();
   griglia.innerHTML = STRADA_COLPI.map((c, i) => {
     const senzaEnergia = G.energy < c.energia;
+    const lead = leadFabbrica && leadFabbrica.colpoId === c.id ? leadFabbrica : null;
+    const giorniLead = lead
+      ? Math.max(0, Math.ceil((Number(lead.expiresAbsoluteDay) - stradaAbsDay()) / 1))
+      : 0;
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
       '<div class="stchips">' +
         '<span class="stchip money">' + fmt(c.min) + '–' + fmt(c.max) + ' €</span>' +
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
+        (lead
+          ? '<span class="stchip money">Dritta Fabbrica +' + Number(lead.bonusPct || 0) +
+            '% · ' + giorniLead + (giorniLead === 1 ? ' giorno' : ' giorni') + '</span>'
+          : '') +
       '</div><span class="go">→</span></button>';
   }).join("");
 }
