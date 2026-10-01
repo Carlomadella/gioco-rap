@@ -2840,9 +2840,10 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
      "media/photo/circolo/palco.jpg", "media/photo/circolo/serata.jpg",
      "media/photo/schermate_luoghi/schermate luoghi_senza_HTML/live_club.png"]
       .every(f => fs.existsSync(path.join(ROOT, f))));
-  test("la serata giocata a momenti pesa sul live di actions.js, e fuori dal Circolo vale 1",
+  test("la serata giocata a momenti pesa sul live; un lead lavoro si moltiplica senza saltare la resa",
     actions.includes('const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;') &&
-    actions.includes("const molt = (giaOggi ? 0.45 : 1) * peso * resa;") &&
+    actions.includes('const moltLavoro = leadLavoro ? Math.max(1, Number(leadLavoro.multiplier || 1)) : 1;') &&
+    actions.includes("const molt = (giaOggi ? 0.45 : 1) * peso * resa * moltLavoro;") &&
     circolo.includes("function circoloResaSerata(){ const r = CIRCOLO_RESA; CIRCOLO_RESA = 1; return r; }"));
   test("il dopo-serata si somma prima del tetto «già visto oggi»",
     (() => {
