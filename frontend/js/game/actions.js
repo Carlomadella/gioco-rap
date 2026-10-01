@@ -165,6 +165,8 @@ const ADF_LAVORO_CONTRATTI = Object.freeze({
     turniSettimanali:5,
     giorniConsentiti:Object.freeze([1,2,3,4,5,6]),
     domenicaRiposo:true,
+    bonusSestoGiornoPct:30,
+    bonusDomenicaPct:75,
     cicloSettimane:4
   })
 });
@@ -450,10 +452,16 @@ function lavoroCartellino(luogo){
   const posOggi = lavoroPosizioneOggi();
   const settimana = Math.floor(posOggi / 7) + 1;
   const inizio = (settimana - 1) * 7;
-  const giorniLavoratiSettimana = new Set(
-    stato.turni.filter(n => n >= inizio && n < inizio + 7)
-  ).size;
   const contratto = lavoroContrattoDef(luogo);
+  const giorniConsentiti = contratto && Array.isArray(contratto.giorniConsentiti)
+    ? contratto.giorniConsentiti
+    : [1,2,3,4,5,6,7];
+  const giorniLavoratiSettimana = new Set(
+    stato.turni.filter(n => {
+      if(n < inizio || n >= inizio + 7) return false;
+      return giorniConsentiti.includes((n - inizio) + 1);
+    })
+  ).size;
   const carriera = lavoroCarriera(luogo);
   return {
     luogo:luogo,
@@ -483,6 +491,47 @@ function lavoroRegistraPresenza(luogo){
     totale:stato.turni.length,
     oggi:stato.turni.filter(n => n === pos).length,
     ciclo:cartellino.ciclo
+  };
+}
+
+/* Maggiorazioni Fabbrica.
+   - il 6° GIORNO ordinario distinto della settimana paga +30%;
+   - una domenica autorizzata dall'azienda paga +75%;
+   - un secondo turno nello stesso sesto giorno non riapplica il +30%.
+   La domenica resta fuori dal conteggio 5/5 contrattuale. */
+function lavoroPagaTurno(luogo, pagaBase){
+  const base = Math.max(0, Math.round(Number(pagaBase) || 0));
+  const def = lavoroContrattoDef(luogo);
+  if(!def) return {base:base, totale:base, bonus:0, percentuale:0, tipo:null, etichetta:""};
+
+  const giorno = Math.max(1, Math.min(7, Number(G.day || 1)));
+  const cart = lavoroCartellino(luogo);
+  let percentuale = 0;
+  let tipo = null;
+  let etichetta = "";
+
+  if(giorno === 7 && lavoroDomenicaAutorizzata(luogo)){
+    percentuale = Math.max(0, Number(def.bonusDomenicaPct || 0));
+    tipo = "domenica";
+    etichetta = "Domenica straordinaria";
+  }else if(Array.isArray(def.giorniConsentiti) && def.giorniConsentiti.includes(giorno) && cart){
+    const giaLavoratoOggi = Number(cart.conteggi[cart.posOggi] || 0) > 0;
+    const richiesti = Math.max(0, Number(def.turniSettimanali || 0));
+    if(!giaLavoratoOggi && richiesti > 0 && cart.giorniLavoratiSettimana >= richiesti){
+      percentuale = Math.max(0, Number(def.bonusSestoGiornoPct || 0));
+      tipo = "sesto-giorno";
+      etichetta = "6° giorno";
+    }
+  }
+
+  const totale = Math.round(base * (1 + percentuale / 100));
+  return {
+    base:base,
+    totale:totale,
+    bonus:Math.max(0, totale - base),
+    percentuale:percentuale,
+    tipo:tipo,
+    etichetta:etichetta
   };
 }
 
@@ -985,7 +1034,15 @@ const ACTIONS = [
    d:"Nessuna musica, ma i soldi entrano.",
    avail:() => !!G.job,
    dyn:() => G.job ? G.job.e : 18,
-   give:() => G.job ? "+" + G.job.pay + " € · −4 benessere" : "",
+   give:() => {
+     if(!G.job) return "";
+     const luogo = lavoroLuogo(G.job);
+     const paga = luogo ? lavoroPagaTurno(luogo, G.job.pay) :
+       {totale:G.job.pay, percentuale:0};
+     return "+" + paga.totale + " €" +
+       (paga.percentuale ? " · bonus +" + paga.percentuale + "%" : "") +
+       " · −4 benessere";
+   },
    run(){
      const j = G.job;
      const luogoLavoroAttuale = lavoroLuogo(j);
@@ -993,7 +1050,10 @@ const ACTIONS = [
        const gate = lavoroTurnoConsentitoOggi(luogoLavoroAttuale);
        if(!gate.ok) return gate.reason + ".";
      }
-     G.money += j.pay; G.wellbeing -= 4; G.shifts = (G.shifts||0) + 1;
+     const paga = luogoLavoroAttuale
+       ? lavoroPagaTurno(luogoLavoroAttuale, j.pay)
+       : {base:j.pay, totale:j.pay, bonus:0, percentuale:0, tipo:null, etichetta:""};
+     G.money += paga.totale; G.wellbeing -= 4; G.shifts = (G.shifts||0) + 1;
      /* La presenza appartiene al luogo di lavoro: se in futuro passi da
         Operaio a Capolinea/Capoturno in Fabbrica, il cartellino continua. */
      const luogoLavoro = lavoroLuogo(j);
@@ -1001,7 +1061,12 @@ const ACTIONS = [
      const def = JOBS.find(x => x.id === j.id);
      let extra = "";
      if(def && def.extra) extra = def.extra();
-     return "Turno da " + j.n.toLowerCase() + ": +" + j.pay + " €." + extra;
+     let msg = "Turno da " + j.n.toLowerCase() + ": paga " + paga.totale + " €.";
+     if(paga.bonus > 0){
+       msg += " <b>" + paga.etichetta + ": bonus +" + paga.percentuale +
+         "% (+" + paga.bonus + " €).</b>";
+     }
+     return msg + extra;
    }},
 
   {id:"cercalavoro", n:"Cerca lavoro", e:10, luc:-1,
