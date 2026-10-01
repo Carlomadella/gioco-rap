@@ -746,8 +746,82 @@ function chatSpuntiVideomaker(p){
   ];
 }
 
+/* Contatti di lavoro che non hanno una funzione produttiva diretta (rapper,
+   promoter e conoscenze della Strada) hanno comunque chat vere: il rapporto
+   cresce e modifica rete/lucidità/benessere, senza fingere che un promoter
+   venda beat o che una conoscenza della Strada sia un fonico. */
+function chatSpuntiLavoroGenerici(p){
+  if(p.ruolo === "promoter") return [
+    {id:"serate", peso:3,
+     testo:() => "Sto chiudendo due serate per il weekend. In provincia gira poca roba, ma se ti fai vedere la gente si ricorda.",
+     opts:[
+       {n:"Tienimi presente", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Ti tengo in lista. Prima fammi vedere che continui a muoverti."; }},
+       {n:"Per ora penso ai pezzi", d:"+lucidità", run(){ addLuc(3); return "Giusto. Una serata senza roba pronta serve a poco."; }}
+     ]},
+    {id:"locale", peso:2,
+     testo:() => "Il locale dove giro io sta cercando facce nuove. Non ti prometto niente, ma sapere chi chiamare conta.",
+     opts:[
+       {n:"Ci sentiamo quando ho qualcosa fuori", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Quello è il momento giusto."; }},
+       {n:"Mandami almeno il nome del posto", d:"+rete", run(){ chRete(1); return "Te lo mando. Poi muoviti tu."; }}
+     ]}
+  ];
+  if(p.ruolo === "strada") return [
+    {id:"giro", peso:3,
+     testo:() => "Ti ho visto in giro. Non confondere chi conosci col poterti fidare di chiunque.",
+     opts:[
+       {n:"Tengo gli occhi aperti", d:"+lucidità", run(){ addLuc(3); chatAvvicina(p,1); return "Meglio. Le occasioni buone non hanno scritto sopra che lo sono."; }},
+       {n:"Io so con chi parlo", d:"+rete", run(){ chRete(1); return "Vedremo. Intanto hai il mio numero."; }}
+     ]},
+    {id:"calma", peso:2,
+     testo:() => "Quando lavori tutto il giorno e poi fai il resto di notte, prima o poi sbagli per stanchezza.",
+     opts:[
+       {n:"Hai ragione", d:"+benessere", run(){ chBene(3); chatAvvicina(p,1); return "Ogni tanto fermarsi è parte del gioco."; }},
+       {n:"Finché reggo, reggo", d:"+rete", run(){ chRete(1); return "Basta che sai quando smettere."; }}
+     ]}
+  ];
+  /* Rapper incontrato lavorando: resta un artista, ma il rapporto nasce fuori
+     dal Circolo e non gli attribuiamo servizi che non ha. */
+  return [
+    {id:"pezzi", peso:3,
+     testo:() => "Oh, ma quindi fai musica davvero? Prima o poi fammi sentire qualcosa.",
+     opts:[
+       {n:"Quando ho il pezzo giusto", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Perfetto. Meglio una cosa buona che dieci mezze."; }},
+       {n:"Ti mando qualcosa appena esce", d:"+lucidità", run(){ addLuc(3); return "Ci sta. Così lo sento finito."; }}
+     ]},
+    {id:"gavetta", peso:2,
+     testo:() => "È strano beccarsi al lavoro e poi scoprire che stiamo provando a fare la stessa cosa fuori.",
+     opts:[
+       {n:"Almeno ci capiamo", d:"+benessere", run(){ chBene(3); chatAvvicina(p,1); return "Esatto. Non devi spiegare perché sei stanco."; }},
+       {n:"Vediamo chi arriva prima", d:"+rete", run(){ chRete(1); return "Ah, quindi la metti così. Va bene."; }}
+     ]}
+  ];
+}
+
 /* Le aperture: quello che puoi scrivere tu per primo. */
+function chatTuLavoroGenerico(p){
+  if(p.ruolo === "promoter") return [
+    {n:"Che gira nei locali?", d:"+rete",
+     run(){ chRete(1); chatAvvicina(p,1); return "Poche serate, ma le persone giuste si vedono sempre. Ti aggiorno se cambia qualcosa."; }},
+    {n:"Quando conviene farsi vedere?", d:"+lucidità",
+     run(){ addLuc(3); return "Quando hai qualcosa da far ricordare, non solo per esserci."; }}
+  ];
+  if(p.ruolo === "strada") return [
+    {n:"Com'è il giro?", d:"+lucidità",
+     run(){ addLuc(3); chatAvvicina(p,1); return "Sempre uguale finché non cambia all'improvviso. Non correre dietro a ogni voce."; }},
+    {n:"Ci sentiamo se serve", d:"+rete",
+     run(){ chRete(1); return "Va bene. Ma niente messaggi inutili."; }}
+  ];
+  return [
+    {n:"Che stai ascoltando?", d:"+rete",
+     run(){ chRete(1); chatAvvicina(p,1); return "Un po' di tutto. Mandami qualcosa di tuo quando ce l'hai."; }},
+    {n:"Come concili lavoro e musica?", d:"+benessere",
+     run(){ chBene(3); return "Male, come tutti. Però almeno sappiamo perché lo facciamo."; }}
+  ];
+}
+
 function chatTuSala(p, fonico){
+  if(["rapper","promoter","strada"].includes(p.ruolo))
+    return chatTuLavoroGenerico(p);
   if(p.ruolo === "videomaker") return [
     {n:"Quando giriamo?",
      run:() => "Quando vuoi. Dimmi solo che pezzo e dove ti immagini.",
@@ -785,8 +859,11 @@ function chatTuSala(p, fonico){
 function chatContattoSala(p){
   const fonico = p.ruolo === "fonico";
   const video = p.ruolo === "videomaker";
+  const generico = ["rapper","promoter","strada"].includes(p.ruolo);
   const r = (typeof POSTO_RUOLI === "object" && POSTO_RUOLI[p.ruolo]) || {k:"#94A3B8", n:"Contatto"};
-  const origine = p.origineLuogo === "fabbrica" ? " · collega di Fabbrica" : "";
+  const origine = p.origineLuogo
+    ? " · " + (p.origineDettaglio || "conosciuto al lavoro")
+    : "";
   return {
     /* Manteniamo il prefisso storico "sala:" per compatibilità con i
        salvataggi/chat esistenti: l'origine visibile è invece quella reale. */
@@ -800,20 +877,17 @@ function chatContattoSala(p){
     dallaSala: !p.origineLuogo,
     dalLavoro: p.origineLuogo || null,
     persona: p,
-    spunti: video ? chatSpuntiVideomaker(p) : (fonico ? chatSpuntiFonico(p) : chatSpuntiBeatmaker(p)),
+    spunti: generico
+      ? chatSpuntiLavoroGenerici(p)
+      : (video ? chatSpuntiVideomaker(p) : (fonico ? chatSpuntiFonico(p) : chatSpuntiBeatmaker(p))),
     tu: chatTuSala(p, fonico)
   };
 }
 
 /* chi ti ha dato il numero ed è ancora in giro.
    Può essere una persona conosciuta alla Sala oppure sul lavoro: in entrambi
-   i casi è la stessa persona persistente in G.gente, non un contatto finto.
-
-   Il mestiere si controlla **qui** e non solo sul bottone che lo chiede: sono
-   due punti diversi, e se un domani il numero lo si potesse chiedere anche a
-   un rapper, questo si ritroverebbe in chat con le battute di un beatmaker.
-   Il filtro sta dove stanno i dati, non dove sta il bottone. */
-const CHAT_MESTIERI = ["beatmaker", "fonico", "videomaker"];
+   i casi è la stessa persona persistente in G.gente, non un contatto finto. */
+const CHAT_MESTIERI = ["beatmaker","fonico","videomaker","rapper","promoter","strada"];
 function chatDaSala(){
   return (G.gente || [])
     .filter(x => x.numero && !x.via && CHAT_MESTIERI.indexOf(x.ruolo) >= 0)
@@ -826,18 +900,22 @@ function chatPresentazione(p){
   const c = chatContattoSala(p);
   const t = chatTraccia(c.id);
   if(t.msgs.length) return;
-  /* Come si presentano: senza aggettivi che diano un genere a chi parla. I nomi
-     de La Sala sono un misto (Sara, Gigi, Andre, Nico...), e «quello del mixer»
-     su Sara suona sbagliato — non e' un dettaglio da niente, e' il primo
-     messaggio che leggi di quella persona. */
-  const daFabbrica = p.origineLuogo === "fabbrica";
-  const intro = daFabbrica ? "Sono " + p.n + ", ci siamo conosciuti in Fabbrica. " : "Sono " + p.n + ". ";
-  chatBolla(t, "loro",
-    p.ruolo === "fonico"
-      ? intro + "Fuori dal turno sto dietro al mixer: quando hai qualcosa da sistemare, scrivimi."
+  const origine = p.origineDettaglio
+    ? "Ci siamo conosciuti: " + p.origineDettaglio + ". "
+    : "";
+  const intro = "Sono " + p.n + ". " + origine;
+  const testo = p.ruolo === "fonico"
+    ? intro + "Sto dietro al mixer: quando hai qualcosa da sistemare, scrivimi."
     : p.ruolo === "videomaker"
-      ? intro + "Fuori dal turno giro roba: quando c'è da fare un video, scrivimi."
-      : intro + "Fuori dal turno faccio beat. Se ti serve roba nuova, scrivimi.");
+      ? intro + "Giro roba: quando c'è da fare un video, scrivimi."
+      : p.ruolo === "beatmaker"
+        ? intro + "Faccio beat. Se ti serve roba nuova, scrivimi."
+        : p.ruolo === "promoter"
+          ? intro + "Giro tra locali e serate. Se passa qualcosa di sensato, ti scrivo."
+          : p.ruolo === "strada"
+            ? intro + "Hai il mio numero. Usalo solo quando serve."
+            : intro + "Anche io faccio musica. Quando hai qualcosa fuori, mandamela.";
+  chatBolla(t, "loro", testo);
   t.nonLetti = (t.nonLetti || 0) + 1;
 }
 
