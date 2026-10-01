@@ -137,7 +137,7 @@ const TEL_GRIGLIA = ["obiettivi", "notizie", "classifiche", "statistiche",
    Notifiche di eventi-v2, o Sputa di sputa.js) tiene il disegno vettoriale
    di prima. */
 const TEL_FOTO = new Set(TEL_GRIGLIA.concat(TEL_DOCK));
-const TEL_RUOLI = {beatmaker:"Beatmaker", rapper:"Rapper", fonico:"Fonico", giornalista:"Giornalista"};
+const TEL_RUOLI = {beatmaker:"Beatmaker", rapper:"Rapper", fonico:"Fonico", giornalista:"Giornalista", videomaker:"Videomaker", promoter:"Promoter", strada:"Conoscenza della Strada"};
 
 /* ================= LAFAMEGRAM — IL FEED (punti 52, 53) =================
    Il vero motore è sul server (`GET /api/feed`, backend/database/archivio.js
