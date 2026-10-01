@@ -586,6 +586,38 @@ describe("cartellino presenze Fabbrica", () => {
     expect(sim).toContain("due sistemi disciplinari in conflitto");
   });
 
+  it("le dimissioni non azzerano i richiami, il rientro dopo licenziamento sì", () => {
+    const ctx = {
+      G:{
+        year:1,week:6,day:1,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            career:{
+              reliability:55,cyclesCompleted:1,perfectCycles:0,perfectStreak:0,
+              cyclesInRole:1,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
+              raisesByRole:{},payHistory:[],roleHistory:[],warnings:2,warningHistory:[],
+              dismissals:0,blockedUntilWeek:null,evaluations:[]
+            }
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext('lavoroTerminaContratto("fabbrica","dimissioni"); G.job={id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}; lavoroFirmaContratto("fabbrica",G.job);', ctx);
+    expect(vm.runInContext('lavoroCarriera("fabbrica").warnings', ctx)).toBe(2);
+
+    vm.runInContext('lavoroTerminaContratto("fabbrica","licenziamento"); lavoroCarriera("fabbrica").blockedUntilWeek=5;', ctx);
+    ctx.G.week = 6;
+    vm.runInContext('G.job={id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}; lavoroFirmaContratto("fabbrica",G.job);', ctx);
+    expect(vm.runInContext('lavoroCarriera("fabbrica").warnings', ctx)).toBe(0);
+  });
+
   it("contratto e UI espongono richiami e blocco di riassunzione", () => {
     const hub = leggi("js/game/hub.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
