@@ -2780,6 +2780,40 @@ saltaGiorni=function(n){
 };
 
 /* -------------------- action hooks -------------------- */
+function adfCompletaHookAzione(a,jobBefore,endedAt){
+  const shiftPayload = a.id==="turno" && jobBefore ? {
+    action_id:"turno",
+    job_id:jobBefore.id,
+    workplace:jobBefore.place,
+    job_name:jobBefore.n,
+    started_at:jobBefore.from,
+    ended_at:Number.isFinite(Number(endedAt))
+      ? Number(endedAt)
+      : ((typeof GAME_TIME!=="undefined" && GAME_TIME.now)
+        ? Number(GAME_TIME.now()) : Number(G.timeMinutes||0))
+  } : null;
+
+  const overtimeShown = a.id==="turno" ? adfWorkOvertimeAfterShift() : false;
+  const streetShown = a.id==="turno" && !overtimeShown
+    ? adfFactoryStreetAfterShift()
+    : false;
+  const workFamilyShown = a.id==="turno" && !overtimeShown && !streetShown &&
+    window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.afterShift==="function"
+      ? ADF_WORK_EVENTS.afterShift(shiftPayload)
+      : false;
+  const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
+    ? adfWorkContactAfterShift()
+    : false;
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+    emitHook("after_action",{action_id:a.id});
+  if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+    emitHook("after_job_shift",shiftPayload || {
+      action_id:"turno",
+      job_id:G.job.id,
+      workplace:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null)
+    });
+}
+
 for(const a of ACTIONS){
   if(a.__adfWrapped) continue;
   const old=a.run;
@@ -2793,35 +2827,34 @@ for(const a of ACTIONS){
     } : null;
     const out=old.apply(this,arguments);
     setTimeout(()=>{
-      const shiftPayload = a.id==="turno" && jobBefore ? {
-        action_id:"turno",
-        job_id:jobBefore.id,
-        workplace:jobBefore.place,
-        job_name:jobBefore.n,
-        started_at:jobBefore.from,
-        ended_at:(typeof GAME_TIME!=="undefined" && GAME_TIME.now)
+      /* Un evento ALTO può spezzare un turno lungo a metà. In quel caso
+         straordinari, contatti, carriera e conflitti "dopo turno" devono
+         aspettare il resume reale del clock: altrimenti scatterebbero mentre
+         il turno è ancora sospeso. */
+      const suspended = a.id==="turno" && typeof GAME_TIME!=="undefined" &&
+        GAME_TIME.suspended && GAME_TIME.suspended();
+      if(suspended && suspended.id==="turno"){
+        const onResume=ev=>{
+          const d=(ev&&ev.detail)||{};
+          if(d.id!=="turno") return;
+          window.removeEventListener("game-time:action-resumed",onResume);
+          window.removeEventListener("jail-ui:opened",onAbort);
+          adfCompletaHookAzione(a,jobBefore,d.to);
+        };
+        const onAbort=()=>{
+          window.removeEventListener("game-time:action-resumed",onResume);
+          window.removeEventListener("jail-ui:opened",onAbort);
+        };
+        window.addEventListener("game-time:action-resumed",onResume);
+        window.addEventListener("jail-ui:opened",onAbort);
+        return;
+      }
+      adfCompletaHookAzione(
+        a,
+        jobBefore,
+        (typeof GAME_TIME!=="undefined" && GAME_TIME.now)
           ? Number(GAME_TIME.now()) : Number(G.timeMinutes||0)
-      } : null;
-
-      const overtimeShown = a.id==="turno" ? adfWorkOvertimeAfterShift() : false;
-      const streetShown = a.id==="turno" && !overtimeShown
-        ? adfFactoryStreetAfterShift()
-        : false;
-      const workFamilyShown = a.id==="turno" && !overtimeShown && !streetShown &&
-        window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.afterShift==="function"
-          ? ADF_WORK_EVENTS.afterShift(shiftPayload)
-          : false;
-      const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
-        ? adfWorkContactAfterShift()
-        : false;
-      if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown)
-        emitHook("after_action",{action_id:a.id});
-      if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
-        emitHook("after_job_shift",shiftPayload || {
-          action_id:"turno",
-          job_id:G.job.id,
-          workplace:typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null)
-        });
+      );
     },0);
     return out;
   };
