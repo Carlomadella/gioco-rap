@@ -38,6 +38,36 @@
    il secondo, e cambiare l'ordine vuol dire cambiare la pagina. */
 
 /* ==========================================================
+   CONTRATTO TOUCH MOBILE
+   ========================================================== */
+/* Un solo gioco, ma il telefono ha un layer di interazione proprio.
+   I contenitori che scorrono devono lasciare al browser la gesture nativa:
+   nessun drag JavaScript per imitare lo scroll e nessun blocco del dito.
+   Questo vale anche su device touch che non dichiarano una viewport piccola. */
+@media (pointer:coarse), (max-width:900px){
+  .stwrap,
+  .lfwrap,
+  .pannello,
+  .sheet2,
+  .trascard,
+  .setts,
+  .adf-system-panel,
+  .land-avvio{
+    touch-action:pan-y;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  /* La mappa deve poter essere trascinata in orizzontale senza impedire
+     lo scorrimento verticale della pagina quando il gesto va su/giu'. */
+  .pmappa,
+  .subnav,
+  .stabs{
+    touch-action:pan-x pan-y;
+    -webkit-overflow-scrolling:touch;
+  }
+}
+
+/* ==========================================================
    BASE
    ========================================================== */
 @media (max-width:820px){.grid{grid-template-columns:1fr}}
