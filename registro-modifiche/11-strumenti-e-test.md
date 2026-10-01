@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7fe740c -->
+## 01/10/26, 21:37 — task/widget-meteo-click-perimetro → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `7fe740c`
+
+### Cosa è entrato
+
+- `0603e5c` — chore(cache): invalida il widget tempo meteo — **mycolbraga**
+- `13a543e` — test(meteo): protegge la chiusura fuori perimetro — **mycolbraga**
+- `434d2ca` — feat(meteo): chiude il widget quando il mouse esce dal perimetro — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:14b1549 -->
 ## 01/10/26, 21:27 — fix/registro-unico-utf8 → main
 
