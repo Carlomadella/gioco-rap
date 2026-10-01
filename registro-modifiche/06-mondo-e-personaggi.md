@@ -7,17 +7,17 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:747e7b7 -->
-## 01/10/26, 13:58 â€” task/circolo-orari-e-pagine â†’ main
+## 01/10/26, 13:58 — task/circolo-orari-e-pagine → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `747e7b7`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `7332eb4` â€” Il Circolo a stanze: i titoli dritti, via il pennarello corsivo â€” **Carlomadella**
-- `c48b66b` â€” Merge remote-tracking branch 'origin/main' into task/circolo-orari-e-pagine â€” **Carlomadella**
-- `c511470` â€” Il Circolo a stanze: le voci 85–89 del giro di fine task â€” **Carlomadella**
-- `ab18a4f` â€” Il Circolo a stanze: Bancone, Sala, Palco, Backstage â€” **Carlomadella**
+- `7332eb4` — Il Circolo a stanze: i titoli dritti, via il pennarello corsivo — **Carlomadella**
+- `c48b66b` — Merge remote-tracking branch 'origin/main' into task/circolo-orari-e-pagine — **Carlomadella**
+- `c511470` — Il Circolo a stanze: le voci 85–89 del giro di fine task — **Carlomadella**
+- `ab18a4f` — Il Circolo a stanze: Bancone, Sala, Palco, Backstage — **Carlomadella**
 
 ### File di questa categoria
 
@@ -28,41 +28,41 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:dc26a32 -->
-## 01/10/26, 13:34 â€” feature/eventi-lavoro-famiglie-rebased â†’ main
+## 01/10/26, 13:34 — feature/eventi-lavoro-famiglie-rebased → main
 
 **Merge effettuato da:** GitHub (noreply@github.com)  
 **Merge commit:** `dc26a32`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `85cf559` â€” test: riallinea dritta Fabbrica al testo corrente â€” **mycolbraga**
-- `70a302e` â€” fix: chiudi regressioni CI punto 10 â€” **mycolbraga**
-- `ce9fc63` â€” chore: riallinea punto 10 con main e risolvi conflitti â€” **mycolbraga**
-- `4541d4f` â€” chore: sync main before point 10 merge â€” **mycolbraga**
-- `be367d2` â€” docs(roadmap): align promoter geography with work contacts â€” **mycolbraga**
-- `7be1556` â€” docs(contacts): clarify work-only promoter exception in Provincia â€” **mycolbraga**
-- `d27fa4d` â€” test(work-events): follow refreshed event engine asset â€” **mycolbraga**
-- `b959cd2` â€” chore(work-events): refresh persistent conflict engine cache â€” **mycolbraga**
-- `69e291b` â€” test(work-events): keep pending conflicts persistent until shift commit â€” **mycolbraga**
-- `39aa1f6` â€” fix(work-events): persist pending work-music conflicts across reloads â€” **mycolbraga**
-- `58ada6d` â€” chore(gameplay): refresh reviewed work-event caches â€” **mycolbraga**
-- `86c1985` â€” test(work-review): cover clock resume and structured re-entry â€” **mycolbraga**
-- `a2bad73` â€” fix(work-events): wait for resumed shift before post-shift hooks â€” **mycolbraga**
-- `2cd000b` â€” fix(work): generalize structured contract re-entry state â€” **mycolbraga**
-- `3afec04` â€” fix(agenda): read numeric game time correctly â€” **mycolbraga**
-- `d245203` â€” docs(events): mark legacy promotion arc as superseded â€” **mycolbraga**
-- `dbdd985` â€” docs(work): point structured careers at real event engine â€” **mycolbraga**
-- `cb9c6fa` â€” test(work-events): cover work families on latest structured jobs â€” **mycolbraga**
-- `4581e71` â€” test(audit): align work-event checks with latest main â€” **mycolbraga**
-- `588e750` â€” chore(work-events): load work event engine on latest gameplay â€” **mycolbraga**
-- `2eba74b` â€” docs(famepedia): add work event families to structured jobs â€” **mycolbraga**
-- `e60798f` â€” feat(work-events): arbitrate structured work events after committed shifts â€” **mycolbraga**
-- `56c4c49` â€” feat(work-events): connect structured jobs to persistent event effects â€” **mycolbraga**
-- `54f273d` â€” feat(work-events): carry landing.html integration onto latest main â€” **mycolbraga**
-- `d6f10dd` â€” feat(work-events): carry strada-crimine.js integration onto latest main â€” **mycolbraga**
-- `aef21f6` â€” feat(work-events): carry ui.js integration onto latest main â€” **mycolbraga**
-- `c215384` â€” feat(work-events): carry agenda.js integration onto latest main â€” **mycolbraga**
-- `3b222e9` â€” feat(work-events): add persistent work event families on structured jobs â€” **mycolbraga**
+- `85cf559` — test: riallinea dritta Fabbrica al testo corrente — **mycolbraga**
+- `70a302e` — fix: chiudi regressioni CI punto 10 — **mycolbraga**
+- `ce9fc63` — chore: riallinea punto 10 con main e risolvi conflitti — **mycolbraga**
+- `4541d4f` — chore: sync main before point 10 merge — **mycolbraga**
+- `be367d2` — docs(roadmap): align promoter geography with work contacts — **mycolbraga**
+- `7be1556` — docs(contacts): clarify work-only promoter exception in Provincia — **mycolbraga**
+- `d27fa4d` — test(work-events): follow refreshed event engine asset — **mycolbraga**
+- `b959cd2` — chore(work-events): refresh persistent conflict engine cache — **mycolbraga**
+- `69e291b` — test(work-events): keep pending conflicts persistent until shift commit — **mycolbraga**
+- `39aa1f6` — fix(work-events): persist pending work-music conflicts across reloads — **mycolbraga**
+- `58ada6d` — chore(gameplay): refresh reviewed work-event caches — **mycolbraga**
+- `86c1985` — test(work-review): cover clock resume and structured re-entry — **mycolbraga**
+- `a2bad73` — fix(work-events): wait for resumed shift before post-shift hooks — **mycolbraga**
+- `2cd000b` — fix(work): generalize structured contract re-entry state — **mycolbraga**
+- `3afec04` — fix(agenda): read numeric game time correctly — **mycolbraga**
+- `d245203` — docs(events): mark legacy promotion arc as superseded — **mycolbraga**
+- `dbdd985` — docs(work): point structured careers at real event engine — **mycolbraga**
+- `cb9c6fa` — test(work-events): cover work families on latest structured jobs — **mycolbraga**
+- `4581e71` — test(audit): align work-event checks with latest main — **mycolbraga**
+- `588e750` — chore(work-events): load work event engine on latest gameplay — **mycolbraga**
+- `2eba74b` — docs(famepedia): add work event families to structured jobs — **mycolbraga**
+- `e60798f` — feat(work-events): arbitrate structured work events after committed shifts — **mycolbraga**
+- `56c4c49` — feat(work-events): connect structured jobs to persistent event effects — **mycolbraga**
+- `54f273d` — feat(work-events): carry landing.html integration onto latest main — **mycolbraga**
+- `d6f10dd` — feat(work-events): carry strada-crimine.js integration onto latest main — **mycolbraga**
+- `aef21f6` — feat(work-events): carry ui.js integration onto latest main — **mycolbraga**
+- `c215384` — feat(work-events): carry agenda.js integration onto latest main — **mycolbraga**
+- `3b222e9` — feat(work-events): add persistent work event families on structured jobs — **mycolbraga**
 
 ### File di questa categoria
 
@@ -84,24 +84,24 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:2c67b9c -->
-## 01/10/26, 12:43 â€” task/studio-cursori-e-linguette â†’ main
+## 01/10/26, 12:43 — task/studio-cursori-e-linguette → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `2c67b9c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `0dd90b6` â€” Il giro di fine task dopo il merge della Pizzeria: i numeri ?v= dei file cambiati â€” **Carlomadella**
-- `d627a5b` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
-- `f3b42b4` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
-- `a810c7f` â€” Merge remote-tracking branch 'origin/main' into task/studio-cursori-e-linguette â€” **Carlomadella**
-- `6e63f12` â€” Studio, linguette sempre aperte: le due voci del giro di fine task â€” **Carlomadella**
-- `9f6bca3` â€” Studio: le linguette sempre aperte e i cursori del Mix in G.studio.cursori â€” **Carlomadella**
-- `afbb42f` â€” Il giro di fine task su «Su LaFamegram non posta nessuno» e «Beat, Testo e Cabina a mano, il resto in automatico coi malus» â€” **Carlomadella**
-- `211769e` â€” Dopo il resto in automatico, Mix e Uscita restano aperte â€” **Carlomadella**
-- `fdd7002` â€” Beat, Testo e Cabina a mano, il resto in automatico coi malus â€” **Carlomadella**
-- `9b896a8` â€” Su LaFamegram posta anche la gente: i post degli incontri si datano quando nascono â€” **Carlomadella**
-- `0e9af7f` â€” Su LaFamegram posta anche la gente â€” **Carlomadella**
+- `0dd90b6` — Il giro di fine task dopo il merge della Pizzeria: i numeri ?v= dei file cambiati — **Carlomadella**
+- `d627a5b` — Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette — **Carlomadella**
+- `f3b42b4` — Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette — **Carlomadella**
+- `a810c7f` — Merge remote-tracking branch 'origin/main' into task/studio-cursori-e-linguette — **Carlomadella**
+- `6e63f12` — Studio, linguette sempre aperte: le due voci del giro di fine task — **Carlomadella**
+- `9f6bca3` — Studio: le linguette sempre aperte e i cursori del Mix in G.studio.cursori — **Carlomadella**
+- `afbb42f` — Il giro di fine task su «Su LaFamegram non posta nessuno» e «Beat, Testo e Cabina a mano, il resto in automatico coi malus» — **Carlomadella**
+- `211769e` — Dopo il resto in automatico, Mix e Uscita restano aperte — **Carlomadella**
+- `fdd7002` — Beat, Testo e Cabina a mano, il resto in automatico coi malus — **Carlomadella**
+- `9b896a8` — Su LaFamegram posta anche la gente: i post degli incontri si datano quando nascono — **Carlomadella**
+- `0e9af7f` — Su LaFamegram posta anche la gente — **Carlomadella**
 
 ### File di questa categoria
 
@@ -129,28 +129,28 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:18c56d3 -->
-## 01/10/26, 10:58 â€” feature/pizzeria-lavoro-strutturato â†’ main
+## 01/10/26, 10:58 — feature/pizzeria-lavoro-strutturato → main
 
 **Merge effettuato da:** GitHub (noreply@github.com)  
 **Merge commit:** `18c56d3`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `a628512` â€” test(audit): follow generic workplace resignation flow â€” **mycolbraga**
-- `6e8df92` â€” chore(web): bust pizzeria workplace assets â€” **mycolbraga**
-- `b88496c` â€” test(audit): cover structured pizzeria page â€” **mycolbraga**
-- `33f3a2e` â€” test(pizzeria): cover structured workplace rules â€” **mycolbraga**
-- `b123133` â€” fix(work): avoid legacy discipline for pizzeria â€” **mycolbraga**
-- `086daf8` â€” fix(work): preserve factory sixth-day payout type â€” **mycolbraga**
-- `f76d9ee` â€” docs(famepedia): explain structured pizzeria work â€” **mycolbraga**
-- `7a27c6d` â€” feat(events): add pizzeria overtime flow â€” **mycolbraga**
-- `c57b8e6` â€” feat(hours): apply each workplace contract calendar â€” **mycolbraga**
-- `77f5ed5` â€” fix(travel): keep workplace location after job promotions â€” **mycolbraga**
-- `0c2334e` â€” feat(time): keep pizzeria shift duration across promotions â€” **mycolbraga**
-- `a34271c` â€” style(work): render workplace-specific rest days â€” **mycolbraga**
-- `b171937` â€” feat(pizzeria): add contract attendance and career UI â€” **mycolbraga**
-- `24c8030` â€” feat(work): support pizzeria contracts in hiring flow â€” **mycolbraga**
-- `61012fc` â€” feat(work): generalize workplace career for pizzeria â€” **mycolbraga**
+- `a628512` — test(audit): follow generic workplace resignation flow — **mycolbraga**
+- `6e8df92` — chore(web): bust pizzeria workplace assets — **mycolbraga**
+- `b88496c` — test(audit): cover structured pizzeria page — **mycolbraga**
+- `33f3a2e` — test(pizzeria): cover structured workplace rules — **mycolbraga**
+- `b123133` — fix(work): avoid legacy discipline for pizzeria — **mycolbraga**
+- `086daf8` — fix(work): preserve factory sixth-day payout type — **mycolbraga**
+- `f76d9ee` — docs(famepedia): explain structured pizzeria work — **mycolbraga**
+- `7a27c6d` — feat(events): add pizzeria overtime flow — **mycolbraga**
+- `c57b8e6` — feat(hours): apply each workplace contract calendar — **mycolbraga**
+- `77f5ed5` — fix(travel): keep workplace location after job promotions — **mycolbraga**
+- `0c2334e` — feat(time): keep pizzeria shift duration across promotions — **mycolbraga**
+- `a34271c` — style(work): render workplace-specific rest days — **mycolbraga**
+- `b171937` — feat(pizzeria): add contract attendance and career UI — **mycolbraga**
+- `24c8030` — feat(work): support pizzeria contracts in hiring flow — **mycolbraga**
+- `61012fc` — feat(work): generalize workplace career for pizzeria — **mycolbraga**
 
 ### File di questa categoria
 
@@ -161,15 +161,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:4a578e8 -->
-## 30/09/26, 00:35 â€” task/il-circolo â†’ main
+## 30/09/26, 00:35 — task/il-circolo → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `4a578e8`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `cf8f789` â€” Il Circolo: le voci del giro di fine task — il palco solo stando lì, la serata a metà, il telefono â€” **Carlomadella**
-- `07d14b9` â€” Il Circolo: la Sala e il Live Club diventano un posto solo, con la serata giocata a momenti â€” **Carlomadella**
+- `cf8f789` — Il Circolo: le voci del giro di fine task — il palco solo stando lì, la serata a metà, il telefono — **Carlomadella**
+- `07d14b9` — Il Circolo: la Sala e il Live Club diventano un posto solo, con la serata giocata a momenti — **Carlomadella**
 
 ### File di questa categoria
 
@@ -223,15 +223,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:7f02c3e -->
-## 28/09/26, 11:46 â€” task/diario-dal-telefono â†’ main
+## 28/09/26, 11:46 — task/diario-dal-telefono → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `7f02c3e`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `7da4f4f` â€” Esc sul Diario aperto dalle Notifiche chiude solo il Diario â€” **Carlomadella**
-- `b85ba42` â€” Il Diario si riapre col dito, e l'orologio non ci sta sopra â€” **Carlomadella**
+- `7da4f4f` — Esc sul Diario aperto dalle Notifiche chiude solo il Diario — **Carlomadella**
+- `b85ba42` — Il Diario si riapre col dito, e l'orologio non ci sta sopra — **Carlomadella**
 
 ### File di questa categoria
 
@@ -242,14 +242,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:c415886 -->
-## 27/09/26, 16:53 â€” task/ritocchi-telefono-27-09 â†’ main
+## 27/09/26, 16:53 — task/ritocchi-telefono-27-09 → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `c415886`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `0d0ce55` â€” Telefono: la conferma del viaggio non si apre già scorsa, e tre ritocchi â€” **Carlomadella**
+- `0d0ce55` — Telefono: la conferma del viaggio non si apre già scorsa, e tre ritocchi — **Carlomadella**
 
 ### File di questa categoria
 
@@ -260,14 +260,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:a202dde -->
-## 27/09/26, 16:52 â€” task/coda-menu-e-prova-ricaricata â†’ main
+## 27/09/26, 16:52 — task/coda-menu-e-prova-ricaricata → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `a202dde`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `665d85f` â€” La prova rimasta aperta torna anche dopo il carcere â€” **Carlomadella**
+- `665d85f` — La prova rimasta aperta torna anche dopo il carcere — **Carlomadella**
 
 ### File di questa categoria
 
@@ -279,14 +279,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:a0a4f23 -->
-## 27/09/26, 16:19 â€” task/carcere-spese-e-lavoro â†’ main
+## 27/09/26, 16:19 — task/carcere-spese-e-lavoro → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `a0a4f23`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `f28ccec` â€” In carcere il diario dice quanto costa stare dentro â€” **Carlomadella**
+- `f28ccec` — In carcere il diario dice quanto costa stare dentro — **Carlomadella**
 
 ### File di questa categoria
 
@@ -298,14 +298,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:3b85be1 -->
-## 27/09/26, 16:18 â€” task/diario-senza-giorno-saltato â†’ main
+## 27/09/26, 16:18 — task/diario-senza-giorno-saltato → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `3b85be1`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `29c22f1` â€” La fine giornata non scrive più «1 giorno saltato» nel diario â€” **Carlomadella**
+- `29c22f1` — La fine giornata non scrive più «1 giorno saltato» nel diario — **Carlomadella**
 
 ### File di questa categoria
 
@@ -316,14 +316,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:e1277e7 -->
-## 27/09/26, 16:18 â€” task/incontro-alto-senza-x â†’ main
+## 27/09/26, 16:18 — task/incontro-alto-senza-x → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `e1277e7`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `5bf23ba` â€” L'incontro ALTO per strada fermo in un salto non ha più la X â€” **Carlomadella**
+- `5bf23ba` — L'incontro ALTO per strada fermo in un salto non ha più la X — **Carlomadella**
 
 ### File di questa categoria
 
@@ -334,15 +334,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:8f632e1 -->
-## 27/09/26, 15:13 â€” task/orologio-sotto-le-finestre â†’ main
+## 27/09/26, 15:13 — task/orologio-sotto-le-finestre → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `8f632e1`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `bdb4aa7` â€” Orologio: «GIORNO» più grande anche sul telefono; via la presa della barretta â€” **Carlomadella**
-- `9ccf9d7` â€” Sul telefono l'orologio sta sotto le finestre, e quattro ritocchi dal giro â€” **Carlomadella**
+- `bdb4aa7` — Orologio: «GIORNO» più grande anche sul telefono; via la presa della barretta — **Carlomadella**
+- `9ccf9d7` — Sul telefono l'orologio sta sotto le finestre, e quattro ritocchi dal giro — **Carlomadella**
 
 ### File di questa categoria
 
@@ -353,15 +353,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:8053990 -->
-## 27/09/26, 15:13 â€” task/salvataggio-annidato-a-meta â†’ main
+## 27/09/26, 15:13 — task/salvataggio-annidato-a-meta → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `8053990`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `0776f9f` â€” Il completamento del salvataggio non rimette «pulita» una carriera criminale vecchia â€” **Carlomadella**
-- `24316c0` â€” Il salvataggio si completa anche dentro gli oggetti annidati â€” **Carlomadella**
+- `0776f9f` — Il completamento del salvataggio non rimette «pulita» una carriera criminale vecchia — **Carlomadella**
+- `24316c0` — Il salvataggio si completa anche dentro gli oggetti annidati — **Carlomadella**
 
 ### File di questa categoria
 
@@ -374,15 +374,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:f2ec9b9 -->
-## 27/09/26, 15:13 â€” task/alto-coperto-da-altra-finestra â†’ main
+## 27/09/26, 15:13 — task/alto-coperto-da-altra-finestra → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `f2ec9b9`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `d0f5485` â€” La coda della modale: si conta una volta, riparte anche dopo un errore â€” **Carlomadella**
-- `8e00cf1` â€” Un evento ALTO a schermo non si copre più con un'altra finestra â€” **Carlomadella**
+- `d0f5485` — La coda della modale: si conta una volta, riparte anche dopo un errore — **Carlomadella**
+- `8e00cf1` — Un evento ALTO a schermo non si copre più con un'altra finestra — **Carlomadella**
 
 ### File di questa categoria
 
@@ -399,16 +399,16 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:e7f618f -->
-## 27/09/26, 15:13 â€” task/salto-senza-finally â†’ main
+## 27/09/26, 15:13 — task/salto-senza-finally → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `e7f618f`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `bc515d0` â€” Il salto rilegge lo stato degli eventi dopo un giorno disfatto, e avvisa sempre â€” **Carlomadella**
-- `1030fee` â€” Il salto disfa il giorno rotto e manda l'errore alla schermata di servizio â€” **Carlomadella**
-- `f6b9262` â€” Il salto del tempo si spegne anche quando la chiusura va in errore â€” **Carlomadella**
+- `bc515d0` — Il salto rilegge lo stato degli eventi dopo un giorno disfatto, e avvisa sempre — **Carlomadella**
+- `1030fee` — Il salto disfa il giorno rotto e manda l'errore alla schermata di servizio — **Carlomadella**
+- `f6b9262` — Il salto del tempo si spegne anche quando la chiusura va in errore — **Carlomadella**
 
 ### File di questa categoria
 
@@ -422,14 +422,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:3a1b2e8 -->
-## 27/09/26, 15:13 â€” task/contratto-rescisso-in-carcere â†’ main
+## 27/09/26, 15:13 — task/contratto-rescisso-in-carcere → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `3a1b2e8`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `378537e` â€” Il contratto rescisso in carcere si porta via anche la consegna â€” **Carlomadella**
+- `378537e` — Il contratto rescisso in carcere si porta via anche la consegna — **Carlomadella**
 
 ### File di questa categoria
 
@@ -442,14 +442,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:241bcda -->
-## 26/09/26, 16:50 â€” task/giro-telefono-25-09-2026 â†’ main
+## 26/09/26, 16:50 — task/giro-telefono-25-09-2026 → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `241bcda`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `74ebb70` â€” Responsività: sistema Impostazioni e bersagli touch sotto i 44 punti â€” **Carlomadella**
+- `74ebb70` — Responsività: sistema Impostazioni e bersagli touch sotto i 44 punti — **Carlomadella**
 
 ### File di questa categoria
 
@@ -461,19 +461,19 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:5b1b476 -->
-## 21/09/26, 18:31 â€” task/studio-le-tre-code â†’ main
+## 21/09/26, 18:31 — task/studio-le-tre-code → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `5b1b476`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `21afb8d` â€” Studio, «Le tre code dello Studio a cinque linguette», dopo il secondo giro: il rivale-contatto uscito dalla classifica che diventa opp rinasce con la storia del feat, non «conosciuti alla Sala» â€” **Carlomadella**
-- `e8d8f32` â€” docs: la roadmap segna FATTO «Le tre code dello Studio a cinque linguette», e la nota di chiusura dice che il legame è solo rivaleId â€” **Carlomadella**
-- `b588eb3` â€” Studio, «Le tre code dello Studio a cinque linguette»: chi rompe con te alla Sala il posto lo occupa ancora — diventaOpp lega la persona al rivale solo con rivaleId, non con rivale:true che vuol dire «venuto dalla classifica» e la toglieva dal conto della Sala â€” **Carlomadella**
-- `6b84125` â€” Studio, dopo il giro di fine task: l'opp nato alla Sala resta legato al suo rivale (non torna in «Dalla classifica» a pagamento), le trasferte non pescano nomi della classifica, l'omonimo di un salvataggio vecchio che diventa opp si fonde col rivale â€” **Carlomadella**
-- `c8fc276` â€” Studio: il legame rivale ↔ contatto è un id stabile del rivale, non il seed (che è la copertina dell'ultimo pezzo e cambia a ogni uscita) â€” **Carlomadella**
-- `389beea` â€” Studio, «Le tre code dello Studio a cinque linguette»: l'omonimo della classifica si può chiamare (il legame è il seed), chi accetta non ruba un posto alla Sala; la copertina orfana era già chiusa dal 14/09 â€” **Carlomadella**
+- `21afb8d` — Studio, «Le tre code dello Studio a cinque linguette», dopo il secondo giro: il rivale-contatto uscito dalla classifica che diventa opp rinasce con la storia del feat, non «conosciuti alla Sala» — **Carlomadella**
+- `e8d8f32` — docs: la roadmap segna FATTO «Le tre code dello Studio a cinque linguette», e la nota di chiusura dice che il legame è solo rivaleId — **Carlomadella**
+- `b588eb3` — Studio, «Le tre code dello Studio a cinque linguette»: chi rompe con te alla Sala il posto lo occupa ancora — diventaOpp lega la persona al rivale solo con rivaleId, non con rivale:true che vuol dire «venuto dalla classifica» e la toglieva dal conto della Sala — **Carlomadella**
+- `6b84125` — Studio, dopo il giro di fine task: l'opp nato alla Sala resta legato al suo rivale (non torna in «Dalla classifica» a pagamento), le trasferte non pescano nomi della classifica, l'omonimo di un salvataggio vecchio che diventa opp si fonde col rivale — **Carlomadella**
+- `c8fc276` — Studio: il legame rivale ↔ contatto è un id stabile del rivale, non il seed (che è la copertina dell'ultimo pezzo e cambia a ogni uscita) — **Carlomadella**
+- `389beea` — Studio, «Le tre code dello Studio a cinque linguette»: l'omonimo della classifica si può chiamare (il legame è il seed), chi accetta non ruba un posto alla Sala; la copertina orfana era già chiusa dal 14/09 — **Carlomadella**
 
 ### File di questa categoria
 
@@ -490,15 +490,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:9995781 -->
-## 21/09/26, 13:53 â€” task/shop-rifiniture-dopo-il-giro â†’ main
+## 21/09/26, 13:53 — task/shop-rifiniture-dopo-il-giro → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `9995781`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `1e5426c` â€” Shop, il giro stretto sulle rifiniture: il render non salva mai (l'estrazione si segna e la salva l'apertura dello Shop), le prove col dado seminato e il ramo «solo usato» costruito, la barra piena fino al bordo â€” **Carlomadella**
-- `f4f7569` â€” Shop, le rifiniture dopo il giro di fine task: «1 capo scontati», la card bloccata più scura, l'estrazione pigra che salva, il diario col solo usato, tredici prove unitarie, la barra dei filtri con lo sfondo, README-API a Node 22.12 â€” **Carlomadella**
+- `1e5426c` — Shop, il giro stretto sulle rifiniture: il render non salva mai (l'estrazione si segna e la salva l'apertura dello Shop), le prove col dado seminato e il ramo «solo usato» costruito, la barra piena fino al bordo — **Carlomadella**
+- `f4f7569` — Shop, le rifiniture dopo il giro di fine task: «1 capo scontati», la card bloccata più scura, l'estrazione pigra che salva, il diario col solo usato, tredici prove unitarie, la barra dei filtri con lo sfondo, README-API a Node 22.12 — **Carlomadella**
 
 ### File di questa categoria
 
@@ -509,15 +509,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:c43384b -->
-## 21/09/26, 13:15 â€” task/shop-capi-sbloccati-e-offerte â†’ main
+## 21/09/26, 13:15 — task/shop-capi-sbloccati-e-offerte → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `c43384b`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `305f912` â€” docs: la lista «Da fare adesso» rinumerata dopo i due punti dello Shop usciti, e la voce dello Shop in provincia rimanda ai capi che si sbloccano â€” **Carlomadella**
-- `df4ee09` â€” Shop: «Capi che si sbloccano» e «Le offerte della settimana» — lo Shop cresce con la carriera â€” **Carlomadella**
+- `305f912` — docs: la lista «Da fare adesso» rinumerata dopo i due punti dello Shop usciti, e la voce dello Shop in provincia rimanda ai capi che si sbloccano — **Carlomadella**
+- `df4ee09` — Shop: «Capi che si sbloccano» e «Le offerte della settimana» — lo Shop cresce con la carriera — **Carlomadella**
 
 ### File di questa categoria
 
@@ -529,14 +529,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:1ff4f30 -->
-## 21/09/26, 08:27 â€” task/shop-solo-vestiti-con-filtri â†’ main
+## 21/09/26, 08:27 — task/shop-solo-vestiti-con-filtri → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `1ff4f30`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `022e7ad` â€” Shop: «i beat non devono stare nello shop … pulsanti tipo filtri … l'attrezzatura non serve se andiamo in studio a registrare» — solo vestiti, coi filtri per tipologia â€” **Carlomadella**
+- `022e7ad` — Shop: «i beat non devono stare nello shop … pulsanti tipo filtri … l'attrezzatura non serve se andiamo in studio a registrare» — solo vestiti, coi filtri per tipologia — **Carlomadella**
 
 ### File di questa categoria
 
@@ -549,14 +549,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:f83c4ad -->
-## 21/09/26, 08:07 â€” task/shop-lo-stile-che-conta â†’ main
+## 21/09/26, 08:07 — task/shop-lo-stile-che-conta → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `f83c4ad`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `08c5a0e` â€” Shop: «Lo stile che conta» — i capi addosso pesano su hype, presenza e promo â€” **Carlomadella**
+- `08c5a0e` — Shop: «Lo stile che conta» — i capi addosso pesano su hype, presenza e promo — **Carlomadella**
 
 ### File di questa categoria
 
@@ -567,14 +567,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:170da15 -->
-## 21/09/26, 07:51 â€” task/sala-gratis-e-take-a-25 â†’ main
+## 21/09/26, 07:51 — task/sala-gratis-e-take-a-25 → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `170da15`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `d08209e` â€” Sala: «non deve costare energia interagire con gli altri all'interno della sala» — tutto a zero; Studio: «Costa troppo una take in studio» — la prima a 25, le altre a 8 â€” **Carlomadella**
+- `d08209e` — Sala: «non deve costare energia interagire con gli altri all'interno della sala» — tutto a zero; Studio: «Costa troppo una take in studio» — la prima a 25, le altre a 8 — **Carlomadella**
 
 ### File di questa categoria
 
@@ -585,14 +585,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:219c73c -->
-## 20/09/26, 23:10 â€” task/shop-tre-reparti â†’ main
+## 20/09/26, 23:10 — task/shop-tre-reparti → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `219c73c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `0537ae2` â€” feat(shop): «Lo Shop promette tre reparti, ce ne sono due» — il reparto Vestiti: lo Shop sblocca, il camerino veste â€” **Carlomadella**
+- `0537ae2` — feat(shop): «Lo Shop promette tre reparti, ce ne sono due» — il reparto Vestiti: lo Shop sblocca, il camerino veste — **Carlomadella**
 
 ### File di questa categoria
 
@@ -603,17 +603,17 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:d17bd8f -->
-## 20/09/26, 11:49 â€” task/barra-plancia-980-1180 â†’ main
+## 20/09/26, 11:49 — task/barra-plancia-980-1180 → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `d17bd8f`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `8781762` â€” fix(plancia): il giro di chiusura della fascia — otto voci del 20/09 (35–42), tutte chiuse â€” **Carlomadella**
-- `a8f6cc3` â€” merge: main nel branch della fascia — la mano del rapper; le voci del giro rinumerate 35–40 â€” **Carlomadella**
-- `7b8c978` â€” docs(plancia): i due giri di fine task sulla fascia — segnala-problemi e prova-sul-telefono, sei e sette voci â€” **Carlomadella**
-- `c4d9f77` â€” feat(plancia): «Fra i 980 e i 1180 punti la barra della plancia trabocca» — la fascia per gradi, e la plancia a 1280 × 800 â€” **Carlomadella**
+- `8781762` — fix(plancia): il giro di chiusura della fascia — otto voci del 20/09 (35–42), tutte chiuse — **Carlomadella**
+- `a8f6cc3` — merge: main nel branch della fascia — la mano del rapper; le voci del giro rinumerate 35–40 — **Carlomadella**
+- `7b8c978` — docs(plancia): i due giri di fine task sulla fascia — segnala-problemi e prova-sul-telefono, sei e sette voci — **Carlomadella**
+- `c4d9f77` — feat(plancia): «Fra i 980 e i 1180 punti la barra della plancia trabocca» — la fascia per gradi, e la plancia a 1280 × 800 — **Carlomadella**
 
 ### File di questa categoria
 
@@ -626,15 +626,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:20153a1 -->
-## 20/09/26, 11:23 â€” task/mano-rapper-svg â†’ main
+## 20/09/26, 11:23 — task/mano-rapper-svg → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `20153a1`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `108ec42` â€” fix(piazza): il giro di chiusura della mano del rapper — l'audit dice perché, l'indice dice che è chiusa â€” **Carlomadella**
-- `309de1c` â€” fix(piazza): «La mano del braccio alzato del rapper è un tracciato SVG rotto» — la curva si chiude sul polso â€” **Carlomadella**
+- `108ec42` — fix(piazza): il giro di chiusura della mano del rapper — l'audit dice perché, l'indice dice che è chiusa — **Carlomadella**
+- `309de1c` — fix(piazza): «La mano del braccio alzato del rapper è un tracciato SVG rotto» — la curva si chiude sul polso — **Carlomadella**
 
 ### File di questa categoria
 
@@ -647,15 +647,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:67e3719 -->
-## 20/09/26, 01:09 â€” task/piccole-agenda-beat-parametri-licenziarsi â†’ main
+## 20/09/26, 01:09 — task/piccole-agenda-beat-parametri-licenziarsi → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `67e3719`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `adbe45d` â€” fix(agenda): il giro di chiusura delle quattro piccole — tre voci del 20/09, tutte chiuse â€” **Carlomadella**
-- `164e6be` â€” feat(gioco): le quattro piccole — agenda, prezzi dei beat, parametri a 1, licenziarsi â€” **Carlomadella**
+- `adbe45d` — fix(agenda): il giro di chiusura delle quattro piccole — tre voci del 20/09, tutte chiuse — **Carlomadella**
+- `164e6be` — feat(gioco): le quattro piccole — agenda, prezzi dei beat, parametri a 1, licenziarsi — **Carlomadella**
 
 ### File di questa categoria
 
@@ -669,34 +669,34 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:668d98c -->
-## 19/09/26, 14:00 â€” task/pagine-luoghi-foto â†’ main
+## 19/09/26, 14:00 — task/pagine-luoghi-foto → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `668d98c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `2cf77fc` â€” fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse â€” **Carlomadella**
-- `18141cf` â€” feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» â€” **Carlomadella**
+- `2cf77fc` — fix(luoghi): il giro di chiusura delle pagine sulla foto — sei voci del 19/09, tutte chiuse — **Carlomadella**
+- `18141cf` — feat(luoghi): Casa, Palestra, Live Club e stacca la spina sulla loro foto — «aggiungi le foto di background dei posti» — **Carlomadella**
 
 ### File di questa categoria
 
-- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (6).png` â†’ `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/piazza_freestyle.png`
+- **Rinominato:** `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/ChatGPT Image 6 set 2026, 19_43_34 (6).png` → `frontend/media/photo/schermate_luoghi/schermate luoghi_senza_HTML/piazza_freestyle.png`
 
 **File interessati in questa categoria:** 1
 
 ---
 
 <!-- merge:b9bd794 -->
-## 15/09/26, 14:28 â€” task/telefono-sul-telefono â†’ main
+## 15/09/26, 14:28 — task/telefono-sul-telefono → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `b9bd794`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `4d482f1` â€” fix(telefono): il giro di chiusura del telefono che si alza — nove voci su dieci â€” **Carlomadella**
-- `d97e8de` â€” feat(telefono): il telefono quando lo schermo è un telefono — sotto i 1180 si alza da un tasto â€” **Carlomadella**
+- `4d482f1` — fix(telefono): il giro di chiusura del telefono che si alza — nove voci su dieci — **Carlomadella**
+- `d97e8de` — feat(telefono): il telefono quando lo schermo è un telefono — sotto i 1180 si alza da un tasto — **Carlomadella**
 
 ### File di questa categoria
 
@@ -707,22 +707,22 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:975839c -->
-## 15/09/26, 00:32 â€” task/studio-cinque-linguette â†’ main
+## 15/09/26, 00:32 — task/studio-cinque-linguette → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `975839c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `c4aa9e6` â€” fix(studio): il feat entra nei numeri di Fuori, tutta la classifica in «Con chi», «all'8%» â€” **Carlomadella**
-- `43e7555` â€” docs(backend): README-API sa che POST /api/account promuove l'ospite a email â€” **Carlomadella**
-- `b4d6a40` â€” docs(studio): «Lo Studio a cinque linguette» — B + D3 + F2 + E chiuso nei documenti â€” **Carlomadella**
-- `ea4359e` â€” test(studio): la prova di «Con chi» segue la riga accorciata â€” **Carlomadella**
-- `e3ace64` â€” fix(studio): la promo anche nella LaFamegram di eventi-v2, righe del feat che non si troncano â€” **Carlomadella**
-- `14eeee1` â€” feat(studio): il pezzo sul banco (F2) — Mix e Uscita ad ogni pezzo â€” **Carlomadella**
-- `3df6539` â€” feat(studio): la Cover dentro all'Uscita, e qualita' e ascolti divisi (E) â€” **Carlomadella**
-- `35c04b6` â€” feat(studio): il Feat in Cabina accanto al fonico, con le due porte (D3) â€” **Carlomadella**
-- `98cc918` â€” feat(studio): il Marketing passa sul telefono, in LaFamegram («Che post fai?») â€” **Carlomadella**
+- `c4aa9e6` — fix(studio): il feat entra nei numeri di Fuori, tutta la classifica in «Con chi», «all'8%» — **Carlomadella**
+- `43e7555` — docs(backend): README-API sa che POST /api/account promuove l'ospite a email — **Carlomadella**
+- `b4d6a40` — docs(studio): «Lo Studio a cinque linguette» — B + D3 + F2 + E chiuso nei documenti — **Carlomadella**
+- `ea4359e` — test(studio): la prova di «Con chi» segue la riga accorciata — **Carlomadella**
+- `e3ace64` — fix(studio): la promo anche nella LaFamegram di eventi-v2, righe del feat che non si troncano — **Carlomadella**
+- `14eeee1` — feat(studio): il pezzo sul banco (F2) — Mix e Uscita ad ogni pezzo — **Carlomadella**
+- `3df6539` — feat(studio): la Cover dentro all'Uscita, e qualita' e ascolti divisi (E) — **Carlomadella**
+- `35c04b6` — feat(studio): il Feat in Cabina accanto al fonico, con le due porte (D3) — **Carlomadella**
+- `98cc918` — feat(studio): il Marketing passa sul telefono, in LaFamegram («Che post fai?») — **Carlomadella**
 
 ### File di questa categoria
 
@@ -747,14 +747,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:18824d8 -->
-## 13/09/26, 17:44 â€” task/beat-e-tasto-oro-riapplicato â†’ main
+## 13/09/26, 17:44 — task/beat-e-tasto-oro-riapplicato → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `18824d8`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `80108c7` â€” fix(studio): riapplica a mano tre delle quattro correzioni di beat-e-tasto-oro â€” **Carlomadella**
+- `80108c7` — fix(studio): riapplica a mano tre delle quattro correzioni di beat-e-tasto-oro — **Carlomadella**
 
 ### File di questa categoria
 
@@ -765,17 +765,17 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:f3c7c40 -->
-## 10/09/26, 16:55 â€” fix/durata-azioni-e-orari-fabbrica â†’ main
+## 10/09/26, 16:55 — fix/durata-azioni-e-orari-fabbrica → main
 
 **Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.58)  
 **Merge commit:** `f3c7c40`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `d9bd32a` â€” docs: registra il quinto giro (merge da main) e corregge un falso allarme â€” **Sadyco La Fame**
-- `1cccf23` â€” Merge branch 'main' into fix/durata-azioni-e-orari-fabbrica â€” **Sadyco La Fame**
-- `34a45f8` â€” fix: le azioni durano quanto dichiarano, e la Fabbrica rispetta l'orario â€” **Alessio (LaFame)**
-- `68f8e3c` â€” fix: chiudi l'azione a fine freestyle in piazza (e agenda in carcere) â€” **Alessio**
+- `d9bd32a` — docs: registra il quinto giro (merge da main) e corregge un falso allarme — **Sadyco La Fame**
+- `1cccf23` — Merge branch 'main' into fix/durata-azioni-e-orari-fabbrica — **Sadyco La Fame**
+- `34a45f8` — fix: le azioni durano quanto dichiarano, e la Fabbrica rispetta l'orario — **Alessio (LaFame)**
+- `68f8e3c` — fix: chiudi l'azione a fine freestyle in piazza (e agenda in carcere) — **Alessio**
 
 ### File di questa categoria
 
@@ -790,20 +790,20 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:91438dd -->
-## 08/09/26, 10:36 â€” branch non identificato â†’ main
+## 08/09/26, 10:36 — branch non identificato → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `91438dd`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `a36b5e8` â€” Merge branch 'main' into task/responsivita â€” **Carlomadella**
-- `b197884` â€” fix: le cinque cose trovate dal giro di fine task â€” **Carlomadella**
-- `4d688c8` â€” css: il gioco stretto in un foglio suo, css/stretto.css â€” **Carlomadella**
-- `1338348` â€” docs: i punti della responsività chiusi, spostati nel loro argomento â€” **Carlomadella**
-- `df41c78` â€” strada: si impila sul telefono, e il rapporto di settimana ci sta a 360 â€” **Carlomadella**
-- `ee4951c` â€” css: ogni :hover dentro a @media (hover:hover), su tutti i fogli â€” **Carlomadella**
-- `43623ca` â€” studio: l'orologio galleggiante non copre più lo Studio, e le take si confrontano â€” **Carlomadella**
+- `a36b5e8` — Merge branch 'main' into task/responsivita — **Carlomadella**
+- `b197884` — fix: le cinque cose trovate dal giro di fine task — **Carlomadella**
+- `4d688c8` — css: il gioco stretto in un foglio suo, css/stretto.css — **Carlomadella**
+- `1338348` — docs: i punti della responsività chiusi, spostati nel loro argomento — **Carlomadella**
+- `df41c78` — strada: si impila sul telefono, e il rapporto di settimana ci sta a 360 — **Carlomadella**
+- `ee4951c` — css: ogni :hover dentro a @media (hover:hover), su tutti i fogli — **Carlomadella**
+- `43623ca` — studio: l'orologio galleggiante non copre più lo Studio, e le take si confrontano — **Carlomadella**
 
 ### File di questa categoria
 
@@ -849,16 +849,16 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:5bbd9fb -->
-## 07/09/26, 20:26 â€” task/via-lo-zero-dipendenze â†’ main
+## 07/09/26, 20:26 — task/via-lo-zero-dipendenze → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `5bbd9fb`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `2c44f85` â€” docs(dipendenze): il registro, e i rimandi agganciati al testo invece che al numero â€” **Carlomadella**
-- `af8f0e0` â€” merge: main dentro al branch delle dipendenze â€” **Carlomadella**
-- `8b82f2f` â€” docs(punto 4): via il principio zero-dipendenze, al suo posto una regola â€” **Carlomadella**
+- `2c44f85` — docs(dipendenze): il registro, e i rimandi agganciati al testo invece che al numero — **Carlomadella**
+- `af8f0e0` — merge: main dentro al branch delle dipendenze — **Carlomadella**
+- `8b82f2f` — docs(punto 4): via il principio zero-dipendenze, al suo posto una regola — **Carlomadella**
 
 ### File di questa categoria
 
@@ -875,43 +875,43 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:328eb81 -->
-## 06/09/26, 21:22 â€” task/telefono-nuovo â†’ main
+## 06/09/26, 21:22 — task/telefono-nuovo → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `328eb81`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `1bbcd22` â€” feat(telefono): via l'app Messaggi, dock nuovo, sfondo a tutto schermo (punto 68) â€” **Carlomadella**
-- `f4f63a2` â€” assets: le schermate dei luoghi in una cartella loro â€” **Carlomadella**
-- `3b32ec8` â€” feat(telefono): la home è quella della foto (punto 3 «DA FARE» → punto 68) â€” **Carlomadella**
+- `1bbcd22` — feat(telefono): via l'app Messaggi, dock nuovo, sfondo a tutto schermo (punto 68) — **Carlomadella**
+- `f4f63a2` — assets: le schermate dei luoghi in una cartella loro — **Carlomadella**
+- `3b32ec8` — feat(telefono): la home è quella della foto (punto 3 «DA FARE» → punto 68) — **Carlomadella**
 
 ### File di questa categoria
 
-- **Rinominato:** `frontend/media/photo/freestyle_in_piazza.png` â†’ `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/freestyle_in_piazza.png`
+- **Rinominato:** `frontend/media/photo/freestyle_in_piazza.png` → `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/freestyle_in_piazza.png`
 
 **File interessati in questa categoria:** 1
 
 ---
 
 <!-- merge:e4ad390 -->
-## 06/09/26, 14:40 â€” origin/main â†’ main
+## 06/09/26, 14:40 — origin/main → main
 
 **Merge effettuato da:** Sadyco La Fame (sadycolafame@Mac.Home)  
 **Merge commit:** `e4ad390`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `b1a0d15` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
-- `06bcd36` â€” merge: intro finale carriera dinamica â€” **Mycol**
-- `9a6d8ed` â€” feat: rende dinamica intro finale carriera â€” **Mycol**
-- `90d6c1a` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
-- `7858816` â€” Merge branch 'task/foto-luoghi-e-azioni' â€” **Carlomadella**
-- `35f9227` â€” assets: le undici foto delle azioni e dei luoghi â€” **Carlomadella**
-- `0b7bc2d` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
-- `51b2c5e` â€” Merge branch 'task/agenda-blocca-skip' â€” **Carlomadella**
-- `efa2033` â€” feat(agenda): un appuntamento segnato ferma il salto del tempo (punto 1 DA FARE) â€” **Carlomadella**
-- `ddabac6` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `b1a0d15` — docs: aggiorna registro modifiche — **Anni di Fame Bot**
+- `06bcd36` — merge: intro finale carriera dinamica — **Mycol**
+- `9a6d8ed` — feat: rende dinamica intro finale carriera — **Mycol**
+- `90d6c1a` — docs: aggiorna registro modifiche — **Anni di Fame Bot**
+- `7858816` — Merge branch 'task/foto-luoghi-e-azioni' — **Carlomadella**
+- `35f9227` — assets: le undici foto delle azioni e dei luoghi — **Carlomadella**
+- `0b7bc2d` — docs: aggiorna registro modifiche — **Anni di Fame Bot**
+- `51b2c5e` — Merge branch 'task/agenda-blocca-skip' — **Carlomadella**
+- `efa2033` — feat(agenda): un appuntamento segnato ferma il salto del tempo (punto 1 DA FARE) — **Carlomadella**
+- `ddabac6` — docs: aggiorna registro modifiche — **Anni di Fame Bot**
 
 ### File di questa categoria
 
@@ -922,14 +922,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:7858816 -->
-## 06/09/26, 13:38 â€” task/foto-luoghi-e-azioni â†’ main
+## 06/09/26, 13:38 — task/foto-luoghi-e-azioni → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `7858816`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `35f9227` â€” assets: le undici foto delle azioni e dei luoghi â€” **Carlomadella**
+- `35f9227` — assets: le undici foto delle azioni e dei luoghi — **Carlomadella**
 
 ### File di questa categoria
 
@@ -940,15 +940,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:cdc13d5 -->
-## 06/09/26, 11:50 â€” task/6-7-hype-e-farming â†’ main
+## 06/09/26, 11:50 — task/6-7-hype-e-farming → main
 
 **Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
 **Merge commit:** `cdc13d5`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `a4073c3` â€” gioco: battle di freestyle esclusiva, peso degli eventi, tetto d'hype per fase (punti 6, 7) â€” **Sadyco La Fame**
-- `70adb5c` â€” fix(mappa): cartelli orari rifatti, non piu tagliati a meta â€” **Claude**
+- `a4073c3` — gioco: battle di freestyle esclusiva, peso degli eventi, tetto d'hype per fase (punti 6, 7) — **Sadyco La Fame**
+- `70adb5c` — fix(mappa): cartelli orari rifatti, non piu tagliati a meta — **Claude**
 
 ### File di questa categoria
 
@@ -973,14 +973,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:66b0f10 -->
-## 06/09/26, 09:48 â€” task/fix-render-e-agenti â†’ main
+## 06/09/26, 09:48 — task/fix-render-e-agenti → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `66b0f10`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `9bdef2e` â€” fix: renderNegozio non è mai esistita, e i tre agenti entrano in main â€” **Carlomadella**
+- `9bdef2e` — fix: renderNegozio non è mai esistita, e i tre agenti entrano in main — **Carlomadella**
 
 ### File di questa categoria
 
@@ -999,14 +999,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:e823d71 -->
-## 06/09/26, 09:34 â€” task/pagina-attivita-criminali â†’ main
+## 06/09/26, 09:34 — task/pagina-attivita-criminali → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `e823d71`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `1afca19` â€” fix: la pagina delle Attività criminali non taglia più i pezzi (punto 1 «DA FARE») â€” **Carlomadella**
+- `1afca19` — fix: la pagina delle Attività criminali non taglia più i pezzi (punto 1 «DA FARE») — **Carlomadella**
 
 ### File di questa categoria
 
@@ -1019,21 +1019,21 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:e673802 -->
-## 06/09/26, 01:44 â€” task/7-8-9-md-agenda-eventi â†’ main
+## 06/09/26, 01:44 — task/7-8-9-md-agenda-eventi → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `e673802`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `fcee5ec` â€” feat: l'agenda con le notifiche, e i file .md in cartelle (punti 7, 8, 9) â€” **Carlomadella**
+- `fcee5ec` — feat: l'agenda con le notifiche, e i file .md in cartelle (punti 7, 8, 9) — **Carlomadella**
 
 ### File di questa categoria
 
 - **Aggiunto:** `documentazione/README.md`
-- **Rinominato:** `comandidelterminale.md` â†’ `documentazione/comandidelterminale.md`
-- **Rinominato:** `problemi_riscontrati.md` â†’ `documentazione/problemi-riscontrati.md`
-- **Rinominato:** `stili interfaccia schermata di gioco.md` â†’ `documentazione/stili-interfaccia.md`
+- **Rinominato:** `comandidelterminale.md` → `documentazione/comandidelterminale.md`
+- **Rinominato:** `problemi_riscontrati.md` → `documentazione/problemi-riscontrati.md`
+- **Rinominato:** `stili interfaccia schermata di gioco.md` → `documentazione/stili-interfaccia.md`
 - **Modificato:** `frontend/README.md`
 - **Aggiunto:** `frontend/concept/interfaccia_telefono.png`
 - **Modificato:** `frontend/css/hub.css`
@@ -1044,24 +1044,24 @@ Non contiene idee, TODO o implementazioni future.
 - **Modificato:** `frontend/pagine/gioco.html`
 - **Aggiunto:** `prompt/README.md`
 - **Aggiunto:** `prompt/foto_da_creare.md`
-- **Rinominato:** `prompt-ambientazioni.md` â†’ `prompt/prompt-ambientazioni.md`
-- **Rinominato:** `prompt-app-telefono.md` â†’ `prompt/prompt-app-telefono.md`
+- **Rinominato:** `prompt-ambientazioni.md` → `prompt/prompt-ambientazioni.md`
+- **Rinominato:** `prompt-app-telefono.md` → `prompt/prompt-app-telefono.md`
 
 **File interessati in questa categoria:** 16
 
 ---
 
 <!-- merge:76cfda1 -->
-## 04/09/26, 22:48 â€” main â†’ main
+## 04/09/26, 22:48 — main → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `76cfda1`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `4c52f4f` â€” fix: lo Shop diventa uno shop, non un menù impostazioni (punto 4) â€” **Sadyco La Fame**
-- `5a66eb5` â€” fix: card della mappa uniformi come lo Studio, via i tastini che la scorrono (punti 2, 3) â€” **Sadyco La Fame**
-- `4e9168e` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
+- `4c52f4f` — fix: lo Shop diventa uno shop, non un menù impostazioni (punto 4) — **Sadyco La Fame**
+- `5a66eb5` — fix: card della mappa uniformi come lo Studio, via i tastini che la scorrono (punti 2, 3) — **Sadyco La Fame**
+- `4e9168e` — docs: aggiorna registro modifiche — **Anni di Fame Bot**
 
 ### File di questa categoria
 
@@ -1073,14 +1073,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:4284600 -->
-## 04/09/26, 20:41 â€” task/registro-e-media â†’ main
+## 04/09/26, 20:41 — task/registro-e-media → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `4284600`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `2a43296` â€” docs: registro allineato e due sfondi nuovi â€” **Carlomadella**
+- `2a43296` — docs: registro allineato e due sfondi nuovi — **Carlomadella**
 
 ### File di questa categoria
 
@@ -1092,15 +1092,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:60b46fe -->
-## 04/09/26, 12:12 â€” task/studio-prova â†’ main
+## 04/09/26, 12:12 — task/studio-prova → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `60b46fe`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `05d39fc` â€” fix: il logo non finisce piu' sopra a "Lo Studio" â€” **Carlomadella**
-- `ccaf2a1` â€” fix: lo Studio non manda piu' al Catalogo, e la promo non finge â€” **Carlomadella**
+- `05d39fc` — fix: il logo non finisce piu' sopra a "Lo Studio" — **Carlomadella**
+- `ccaf2a1` — fix: lo Studio non manda piu' al Catalogo, e la promo non finge — **Carlomadella**
 
 ### File di questa categoria
 
@@ -1112,14 +1112,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:d80b80a -->
-## 04/09/26, 11:23 â€” task/via-il-quaderno â†’ main
+## 04/09/26, 11:23 — task/via-il-quaderno → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `d80b80a`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `e8b1dda` â€” feat: via il quaderno, ogni scheda torna nel posto che gia' esisteva â€” **Carlomadella**
+- `e8b1dda` — feat: via il quaderno, ogni scheda torna nel posto che gia' esisteva — **Carlomadella**
 
 ### File di questa categoria
 
@@ -1144,22 +1144,22 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:3170d23 -->
-## 04/09/26, 10:08 â€” main â†’ main
+## 04/09/26, 10:08 — main → main
 
 **Merge effettuato da:** Sadyco La Fame (sadycolafame@192.168.1.53)  
 **Merge commit:** `3170d23`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `0287cef` â€” docs: aggiorna registro modifiche â€” **Anni di Fame Bot**
-- `994aa67` â€” Merge branch 'task/schermata-originale-nella-mappa' â€” **Carlomadella**
-- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
-- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
-- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+- `0287cef` — docs: aggiorna registro modifiche — **Anni di Fame Bot**
+- `994aa67` — Merge branch 'task/schermata-originale-nella-mappa' — **Carlomadella**
+- `276e8d1` — fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni — **Carlomadella**
+- `cee9ce0` — feat: via la vecchia schermata di gioco, le sue schede sopra la mappa — **Carlomadella**
+- `6dad126` — chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store — **Carlomadella**
 
 ### File di questa categoria
 
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` â†’ `frontend/concept/landing_b_negozio_angolo.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` → `frontend/concept/landing_b_negozio_angolo.jpg`
 - **Modificato:** `frontend/js/game/eventi-tempo.js`
 - **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-01.jpg"`
 - **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-02.jpg"`
@@ -1197,20 +1197,20 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:994aa67 -->
-## 04/09/26, 10:05 â€” task/schermata-originale-nella-mappa â†’ main
+## 04/09/26, 10:05 — task/schermata-originale-nella-mappa → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `994aa67`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `276e8d1` â€” fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni â€” **Carlomadella**
-- `cee9ce0` â€” feat: via la vecchia schermata di gioco, le sue schede sopra la mappa â€” **Carlomadella**
-- `6dad126` â€” chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store â€” **Carlomadella**
+- `276e8d1` — fix: via anche i quattro bottoni in fondo alla mappa, erano doppioni — **Carlomadella**
+- `cee9ce0` — feat: via la vecchia schermata di gioco, le sue schede sopra la mappa — **Carlomadella**
+- `6dad126` — chore: pulizia dei media, 35 MB fuori dal pacchetto per gli store — **Carlomadella**
 
 ### File di questa categoria
 
-- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` â†’ `frontend/concept/landing_b_negozio_angolo.jpg`
+- **Rinominato:** `frontend/media/photo/pagina di landing/landing_b_negozio_angolo.jpg` → `frontend/concept/landing_b_negozio_angolo.jpg`
 - **Modificato:** `frontend/js/game/eventi-tempo.js`
 - **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-01.jpg"`
 - **Rimosso:** `"frontend/media/photo/pagina attivit\303\240 criminali/pagina-attivita-02.jpg"`
@@ -1710,7 +1710,7 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- commit:7f6e454 -->
-## 02/09/26, 01:37 — fix(strada): finalize mojibake replacements including explicit Ãˆ/Ã¨ literals
+## 02/09/26, 01:37 — fix(strada): finalize mojibake replacements including explicit È/è literals
 
 **Tipo:** Commit diretto su main  
 **Autore:** Carlomadella (madella871@gmail.com)  

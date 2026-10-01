@@ -15,22 +15,11 @@ fi
 echo ""
 echo "=========================================="
 echo " MERGE RILEVATO SU MAIN"
-echo " Aggiornamento registro modifiche..."
+echo " Registro modifiche: aggiornamento affidato a GitHub Actions."
 echo "=========================================="
 echo ""
 
-node scripts/genera-registro-modifiche.js
-
-if [ $? -ne 0 ]; then
-    echo "ERRORE: impossibile aggiornare il registro."
-    exit 1
-fi
-
-if ! git diff --quiet -- registro-modifiche; then
-    git add registro-modifiche
-    git commit -m "docs: aggiorna registro modifiche"
-
-    echo ""
-    echo "✓ Registro committato automaticamente."
-    echo ""
-fi
+# Il registro viene generato e committato una sola volta dal workflow
+# .github/workflows/registro-merge.yml. Il client locale non scrive file
+# e non crea commit automatici dopo il merge.
+exit 0

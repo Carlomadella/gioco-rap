@@ -7,24 +7,24 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:2c67b9c -->
-## 01/10/26, 12:43 â€” task/studio-cursori-e-linguette â†’ main
+## 01/10/26, 12:43 — task/studio-cursori-e-linguette → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `2c67b9c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `0dd90b6` â€” Il giro di fine task dopo il merge della Pizzeria: i numeri ?v= dei file cambiati â€” **Carlomadella**
-- `d627a5b` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
-- `f3b42b4` â€” Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette â€” **Carlomadella**
-- `a810c7f` â€” Merge remote-tracking branch 'origin/main' into task/studio-cursori-e-linguette â€” **Carlomadella**
-- `6e63f12` â€” Studio, linguette sempre aperte: le due voci del giro di fine task â€” **Carlomadella**
-- `9f6bca3` â€” Studio: le linguette sempre aperte e i cursori del Mix in G.studio.cursori â€” **Carlomadella**
-- `afbb42f` â€” Il giro di fine task su «Su LaFamegram non posta nessuno» e «Beat, Testo e Cabina a mano, il resto in automatico coi malus» â€” **Carlomadella**
-- `211769e` â€” Dopo il resto in automatico, Mix e Uscita restano aperte â€” **Carlomadella**
-- `fdd7002` â€” Beat, Testo e Cabina a mano, il resto in automatico coi malus â€” **Carlomadella**
-- `9b896a8` â€” Su LaFamegram posta anche la gente: i post degli incontri si datano quando nascono â€” **Carlomadella**
-- `0e9af7f` â€” Su LaFamegram posta anche la gente â€” **Carlomadella**
+- `0dd90b6` — Il giro di fine task dopo il merge della Pizzeria: i numeri ?v= dei file cambiati — **Carlomadella**
+- `d627a5b` — Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette — **Carlomadella**
+- `f3b42b4` — Merge branch 'task/test-fabbrica-dopo-pizzeria' into task/studio-cursori-e-linguette — **Carlomadella**
+- `a810c7f` — Merge remote-tracking branch 'origin/main' into task/studio-cursori-e-linguette — **Carlomadella**
+- `6e63f12` — Studio, linguette sempre aperte: le due voci del giro di fine task — **Carlomadella**
+- `9f6bca3` — Studio: le linguette sempre aperte e i cursori del Mix in G.studio.cursori — **Carlomadella**
+- `afbb42f` — Il giro di fine task su «Su LaFamegram non posta nessuno» e «Beat, Testo e Cabina a mano, il resto in automatico coi malus» — **Carlomadella**
+- `211769e` — Dopo il resto in automatico, Mix e Uscita restano aperte — **Carlomadella**
+- `fdd7002` — Beat, Testo e Cabina a mano, il resto in automatico coi malus — **Carlomadella**
+- `9b896a8` — Su LaFamegram posta anche la gente: i post degli incontri si datano quando nascono — **Carlomadella**
+- `0e9af7f` — Su LaFamegram posta anche la gente — **Carlomadella**
 
 ### File di questa categoria
 
@@ -35,15 +35,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:2c5c304 -->
-## 29/09/26, 21:14 â€” task/problemi-risolti â†’ main
+## 29/09/26, 21:14 — task/problemi-risolti → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `2c5c304`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `058144e` â€” I problemi chiusi in problemi-risolti.md: le voci del giro di fine task â€” **Carlomadella**
-- `81104f5` â€” I problemi chiusi in problemi-risolti.md, e il foglio dei punti nuovi solo con quelli aperti â€” **Carlomadella**
+- `058144e` — I problemi chiusi in problemi-risolti.md: le voci del giro di fine task — **Carlomadella**
+- `81104f5` — I problemi chiusi in problemi-risolti.md, e il foglio dei punti nuovi solo con quelli aperti — **Carlomadella**
 
 ### File di questa categoria
 
@@ -54,15 +54,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:33a69bd -->
-## 27/09/26, 15:13 â€” task/backend-documento-salvataggi â†’ main
+## 27/09/26, 15:13 — task/backend-documento-salvataggi → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `33a69bd`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `8eb0941` â€” Backend: salvaCarriera aggiunge __adfCloud solo se c'è un artista â€” **Carlomadella**
-- `778b053` â€” Backend: due frasi della documentazione allineate a quello che fa il codice â€” **Carlomadella**
+- `8eb0941` — Backend: salvaCarriera aggiunge __adfCloud solo se c'è un artista — **Carlomadella**
+- `778b053` — Backend: due frasi della documentazione allineate a quello che fa il codice — **Carlomadella**
 
 ### File di questa categoria
 
@@ -75,15 +75,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:9995781 -->
-## 21/09/26, 13:53 â€” task/shop-rifiniture-dopo-il-giro â†’ main
+## 21/09/26, 13:53 — task/shop-rifiniture-dopo-il-giro → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `9995781`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `1e5426c` â€” Shop, il giro stretto sulle rifiniture: il render non salva mai (l'estrazione si segna e la salva l'apertura dello Shop), le prove col dado seminato e il ramo «solo usato» costruito, la barra piena fino al bordo â€” **Carlomadella**
-- `f4f7569` â€” Shop, le rifiniture dopo il giro di fine task: «1 capo scontati», la card bloccata più scura, l'estrazione pigra che salva, il diario col solo usato, tredici prove unitarie, la barra dei filtri con lo sfondo, README-API a Node 22.12 â€” **Carlomadella**
+- `1e5426c` — Shop, il giro stretto sulle rifiniture: il render non salva mai (l'estrazione si segna e la salva l'apertura dello Shop), le prove col dado seminato e il ramo «solo usato» costruito, la barra piena fino al bordo — **Carlomadella**
+- `f4f7569` — Shop, le rifiniture dopo il giro di fine task: «1 capo scontati», la card bloccata più scura, l'estrazione pigra che salva, il diario col solo usato, tredici prove unitarie, la barra dei filtri con lo sfondo, README-API a Node 22.12 — **Carlomadella**
 
 ### File di questa categoria
 
@@ -99,15 +99,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:6ba6de0 -->
-## 16/09/26, 17:47 â€” task/jose-e-zod-nel-backend â†’ main
+## 16/09/26, 17:47 — task/jose-e-zod-nel-backend → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `6ba6de0`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `18fae26` â€” fix(backend): il giro di chiusura di jose e zod — nove voci dei due controlli, tutte chiuse â€” **Carlomadella**
-- `d268a3d` â€” feat(backend): jose e zod usate — «jose va usata, e zod va deciso» â€” **Carlomadella**
+- `18fae26` — fix(backend): il giro di chiusura di jose e zod — nove voci dei due controlli, tutte chiuse — **Carlomadella**
+- `d268a3d` — feat(backend): jose e zod usate — «jose va usata, e zod va deciso» — **Carlomadella**
 
 ### File di questa categoria
 
@@ -128,15 +128,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:b39a7d2 -->
-## 15/09/26, 11:27 â€” task/documenti-backend-in-pari â†’ main
+## 15/09/26, 11:27 — task/documenti-backend-in-pari → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `b39a7d2`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `1a0d419` â€” docs(backend): la difficoltà si riscrive a ogni punteggio, e le roadmap contano tre dipendenze â€” **Carlomadella**
-- `1d59615` â€” docs(backend): README-API, README dei dati e README di radice rimessi in pari â€” **Carlomadella**
+- `1a0d419` — docs(backend): la difficoltà si riscrive a ogni punteggio, e le roadmap contano tre dipendenze — **Carlomadella**
+- `1d59615` — docs(backend): README-API, README dei dati e README di radice rimessi in pari — **Carlomadella**
 
 ### File di questa categoria
 
@@ -151,22 +151,22 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:975839c -->
-## 15/09/26, 00:32 â€” task/studio-cinque-linguette â†’ main
+## 15/09/26, 00:32 — task/studio-cinque-linguette → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `975839c`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `c4aa9e6` â€” fix(studio): il feat entra nei numeri di Fuori, tutta la classifica in «Con chi», «all'8%» â€” **Carlomadella**
-- `43e7555` â€” docs(backend): README-API sa che POST /api/account promuove l'ospite a email â€” **Carlomadella**
-- `b4d6a40` â€” docs(studio): «Lo Studio a cinque linguette» — B + D3 + F2 + E chiuso nei documenti â€” **Carlomadella**
-- `ea4359e` â€” test(studio): la prova di «Con chi» segue la riga accorciata â€” **Carlomadella**
-- `e3ace64` â€” fix(studio): la promo anche nella LaFamegram di eventi-v2, righe del feat che non si troncano â€” **Carlomadella**
-- `14eeee1` â€” feat(studio): il pezzo sul banco (F2) — Mix e Uscita ad ogni pezzo â€” **Carlomadella**
-- `3df6539` â€” feat(studio): la Cover dentro all'Uscita, e qualita' e ascolti divisi (E) â€” **Carlomadella**
-- `35c04b6` â€” feat(studio): il Feat in Cabina accanto al fonico, con le due porte (D3) â€” **Carlomadella**
-- `98cc918` â€” feat(studio): il Marketing passa sul telefono, in LaFamegram («Che post fai?») â€” **Carlomadella**
+- `c4aa9e6` — fix(studio): il feat entra nei numeri di Fuori, tutta la classifica in «Con chi», «all'8%» — **Carlomadella**
+- `43e7555` — docs(backend): README-API sa che POST /api/account promuove l'ospite a email — **Carlomadella**
+- `b4d6a40` — docs(studio): «Lo Studio a cinque linguette» — B + D3 + F2 + E chiuso nei documenti — **Carlomadella**
+- `ea4359e` — test(studio): la prova di «Con chi» segue la riga accorciata — **Carlomadella**
+- `e3ace64` — fix(studio): la promo anche nella LaFamegram di eventi-v2, righe del feat che non si troncano — **Carlomadella**
+- `14eeee1` — feat(studio): il pezzo sul banco (F2) — Mix e Uscita ad ogni pezzo — **Carlomadella**
+- `3df6539` — feat(studio): la Cover dentro all'Uscita, e qualita' e ascolti divisi (E) — **Carlomadella**
+- `35c04b6` — feat(studio): il Feat in Cabina accanto al fonico, con le due porte (D3) — **Carlomadella**
+- `98cc918` — feat(studio): il Marketing passa sul telefono, in LaFamegram («Che post fai?») — **Carlomadella**
 
 ### File di questa categoria
 
@@ -191,15 +191,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:d6a7c64 -->
-## 13/09/26, 16:02 â€” task/backend-schema-allineato â†’ main
+## 13/09/26, 16:02 — task/backend-schema-allineato → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `d6a7c64`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `cdd86d9` â€” docs(backend): schema.md entra in git, allineato alle migrazioni vere â€” **Carlomadella**
-- `7b8dfd0` â€” docs(backend): il README elenca tutte le manopole, e un controllo lo difende â€” **Carlomadella**
+- `cdd86d9` — docs(backend): schema.md entra in git, allineato alle migrazioni vere — **Carlomadella**
+- `7b8dfd0` — docs(backend): il README elenca tutte le manopole, e un controllo lo difende — **Carlomadella**
 
 ### File di questa categoria
 
@@ -212,21 +212,21 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:541eacc -->
-## 13/09/26, 15:18 â€” test/vitest-playwright-gate â†’ main
+## 13/09/26, 15:18 — test/vitest-playwright-gate → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `541eacc`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `fea873b` â€” docs: scrive la diagnosi del giro lungo, per chi ci ricasca â€” **Carlomadella**
-- `83a695f` â€” test: il controllo sulle navigazioni non prendeva l'errore piu' frequente â€” **Carlomadella**
-- `dad1c62` â€” test: il giro lungo nel browser esce dalla catena di ogni push â€” **Carlomadella**
-- `007de3d` â€” test: alza il tetto dell'attesa dell'avvio rapido a dieci minuti â€” **Carlomadella**
-- `8507075` â€” merge: porta il ramo del gate di prove sopra main â€” **Carlomadella**
-- `288fa6c` â€” docs: appunti nuovi in implementazioni â€” **Carlomadella**
-- `b4a6202` â€” docs(dipendenze): il registro dice quello che c'e' davvero, debito compreso â€” **Carlomadella**
-- `e78ed6d` â€” test: il gate di verifica fa girare prove vere, e trova l'avvio rapido rotto â€” **Carlomadella**
+- `fea873b` — docs: scrive la diagnosi del giro lungo, per chi ci ricasca — **Carlomadella**
+- `83a695f` — test: il controllo sulle navigazioni non prendeva l'errore piu' frequente — **Carlomadella**
+- `dad1c62` — test: il giro lungo nel browser esce dalla catena di ogni push — **Carlomadella**
+- `007de3d` — test: alza il tetto dell'attesa dell'avvio rapido a dieci minuti — **Carlomadella**
+- `8507075` — merge: porta il ramo del gate di prove sopra main — **Carlomadella**
+- `288fa6c` — docs: appunti nuovi in implementazioni — **Carlomadella**
+- `b4a6202` — docs(dipendenze): il registro dice quello che c'e' davvero, debito compreso — **Carlomadella**
+- `e78ed6d` — test: il gate di verifica fa girare prove vere, e trova l'avvio rapido rotto — **Carlomadella**
 
 ### File di questa categoria
 
@@ -237,14 +237,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:1595560 -->
-## 12/09/26, 17:24 â€” origin/fix/backend-online-player-default-20260912-172324 â†’ main
+## 12/09/26, 17:24 — origin/fix/backend-online-player-default-20260912-172324 → main
 
 **Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
 **Merge commit:** `1595560`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `cff0c0f` â€” fix(online): usa backend pubblico per i player â€” **Mycol**
+- `cff0c0f` — fix(online): usa backend pubblico per i player — **Mycol**
 
 ### File di questa categoria
 
@@ -258,14 +258,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:8dffa9f -->
-## 12/09/26, 12:54 â€” fix/account-artista-cloud-20260912-145418 â†’ main
+## 12/09/26, 12:54 — fix/account-artista-cloud-20260912-145418 → main
 
 **Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
 **Merge commit:** `8dffa9f`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `cb502a7` â€” fix(online): collega account artista e cloud â€” **Mycol**
+- `cb502a7` — fix(online): collega account artista e cloud — **Mycol**
 
 ### File di questa categoria
 
@@ -278,14 +278,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:813dae0 -->
-## 12/09/26, 12:03 â€” fix/postgres-bigint-cloud-20260912-140328 â†’ main
+## 12/09/26, 12:03 — fix/postgres-bigint-cloud-20260912-140328 → main
 
 **Merge effettuato da:** Mycol (mycolbraga@gmail.com)  
 **Merge commit:** `813dae0`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `2ef0aed` â€” fix(backend): normalizza bigint PostgreSQL â€” **Mycol**
+- `2ef0aed` — fix(backend): normalizza bigint PostgreSQL — **Mycol**
 
 ### File di questa categoria
 
@@ -296,16 +296,16 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:5bbd9fb -->
-## 07/09/26, 20:26 â€” task/via-lo-zero-dipendenze â†’ main
+## 07/09/26, 20:26 — task/via-lo-zero-dipendenze → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `5bbd9fb`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `2c44f85` â€” docs(dipendenze): il registro, e i rimandi agganciati al testo invece che al numero â€” **Carlomadella**
-- `af8f0e0` â€” merge: main dentro al branch delle dipendenze â€” **Carlomadella**
-- `8b82f2f` â€” docs(punto 4): via il principio zero-dipendenze, al suo posto una regola â€” **Carlomadella**
+- `2c44f85` — docs(dipendenze): il registro, e i rimandi agganciati al testo invece che al numero — **Carlomadella**
+- `af8f0e0` — merge: main dentro al branch delle dipendenze — **Carlomadella**
+- `8b82f2f` — docs(punto 4): via il principio zero-dipendenze, al suo posto una regola — **Carlomadella**
 
 ### File di questa categoria
 
@@ -318,15 +318,15 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:2914885 -->
-## 07/09/26, 10:49 â€” task/backend-al-passo-col-gioco â†’ main
+## 07/09/26, 10:49 — task/backend-al-passo-col-gioco → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `2914885`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `5fe714f` â€” feat(backend): i bot si diradano quando arriva gente vera, e il punto 30 si controlla da solo â€” **Carlomadella**
-- `128b7c9` â€” feat(backend): il server sta al passo col gioco — diario di bordo e bot credibili â€” **Carlomadella**
+- `5fe714f` — feat(backend): i bot si diradano quando arriva gente vera, e il punto 30 si controlla da solo — **Carlomadella**
+- `128b7c9` — feat(backend): il server sta al passo col gioco — diario di bordo e bot credibili — **Carlomadella**
 
 ### File di questa categoria
 
@@ -346,14 +346,14 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:66b0f10 -->
-## 06/09/26, 09:48 â€” task/fix-render-e-agenti â†’ main
+## 06/09/26, 09:48 — task/fix-render-e-agenti → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `66b0f10`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `9bdef2e` â€” fix: renderNegozio non è mai esistita, e i tre agenti entrano in main â€” **Carlomadella**
+- `9bdef2e` — fix: renderNegozio non è mai esistita, e i tre agenti entrano in main — **Carlomadella**
 
 ### File di questa categoria
 
@@ -364,16 +364,16 @@ Non contiene idee, TODO o implementazioni future.
 ---
 
 <!-- merge:bdb2c5f -->
-## 05/09/26, 16:17 â€” task/pagine-di-servizio â†’ main
+## 05/09/26, 16:17 — task/pagine-di-servizio → main
 
 **Merge effettuato da:** Carlomadella (madella871@gmail.com)  
 **Merge commit:** `bdb2c5f`
 
-### Cosa Ã¨ entrato
+### Cosa è entrato
 
-- `59c3988` â€” refactor(backend): le pagine di errore diventano middleware, e il 404 esce dal frontend â€” **Carlomadella**
-- `28af709` â€” feat: le pagine di servizio — avvio, rotto, salvataggio illeggibile, server giù, 404 â€” **Carlomadella**
-- `86ba2c2` â€” chore: i video in ordine, i concept fuori dal pacchetto, e un 404 a ogni avvio â€” **Carlomadella**
+- `59c3988` — refactor(backend): le pagine di errore diventano middleware, e il 404 esce dal frontend — **Carlomadella**
+- `28af709` — feat: le pagine di servizio — avvio, rotto, salvataggio illeggibile, server giù, 404 — **Carlomadella**
+- `86ba2c2` — chore: i video in ordine, i concept fuori dal pacchetto, e un 404 a ogni avvio — **Carlomadella**
 
 ### File di questa categoria
 
@@ -382,10 +382,10 @@ Non contiene idee, TODO o implementazioni future.
 - **Aggiunto:** `backend/risposte.js`
 - **Modificato:** `backend/server.js`
 - **Modificato:** `frontend/concept/README.md`
-- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/booth_registrazione_notturno.png` â†’ `frontend/concept/booth_registrazione_notturno.png`
-- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/control_room_notturna.png` â†’ `frontend/concept/control_room_notturna.png`
-- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_a colonne.png` â†’ `frontend/concept/skill_tree_a_colonne.png`
-- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_ramificato.png` â†’ `frontend/concept/skill_tree_ramificato.png`
+- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/booth_registrazione_notturno.png` → `frontend/concept/booth_registrazione_notturno.png`
+- **Rinominato:** `frontend/media/photo/immagini_background_personaggio/control_room_notturna.png` → `frontend/concept/control_room_notturna.png`
+- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_a colonne.png` → `frontend/concept/skill_tree_a_colonne.png`
+- **Rinominato:** `frontend/media/photo/pagina_skill_tree/interfaccia_skill_tree_ramificato.png` → `frontend/concept/skill_tree_ramificato.png`
 - **Aggiunto:** `frontend/css/servizio.css`
 - **Modificato:** `frontend/index.html`
 - **Modificato:** `frontend/js/game/state.js`
@@ -394,7 +394,7 @@ Non contiene idee, TODO o implementazioni future.
 - **Aggiunto:** `frontend/js/servizio.js`
 - **Rimosso:** `frontend/media/video/06_palestra_boxe_definitivo.mp4`
 - **Rimosso:** `frontend/media/video/08_ingresso_club_definitivo.mp4`
-- **Rinominato:** `frontend/media/video/07_partenza_milano_definitivo.mp4` â†’ `frontend/media/video/Transizioni di scena/07_partenza_milano_definitivo.mp4`
+- **Rinominato:** `frontend/media/video/07_partenza_milano_definitivo.mp4` → `frontend/media/video/Transizioni di scena/07_partenza_milano_definitivo.mp4`
 
 **File interessati in questa categoria:** 18
 
