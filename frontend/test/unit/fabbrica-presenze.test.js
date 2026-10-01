@@ -237,6 +237,42 @@ describe("cartellino presenze Fabbrica", () => {
     expect(week).toBeGreaterThan(close);
   });
 
+  it("le dimissioni chiudono il contratto ma conservano storico e carriera", () => {
+    const ctx = {
+      G:{
+        year:1,week:2,day:3,
+        job:{id:"operaio",place:"fabbrica"},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2]},
+            career:{reliability:70,cyclesCompleted:2,perfectCycles:1,perfectStreak:1,evaluations:[]}
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext('lavoroTerminaContratto("fabbrica", "dimissioni")', ctx);
+
+    expect(ctx.G.workplaces.fabbrica.contract).toBeNull();
+    expect(ctx.G.workplaces.fabbrica.contractHistory).toHaveLength(1);
+    expect(ctx.G.workplaces.fabbrica.contractHistory[0].endReason).toBe("dimissioni");
+    expect(ctx.G.workplaces.fabbrica.attendance.turni).toEqual([0,1,2]);
+    expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(70);
+  });
+
+  it("mostra il tasto dimissioni nel pannello Fabbrica con conferma", () => {
+    const luoghi = leggi("js/game/luoghi-foto.js");
+    expect(luoghi).toContain('data-dimissioni="fabbrica"');
+    expect(luoghi).toContain('t:"Dare le dimissioni?"');
+    expect(luoghi).toContain('n:"Dai le dimissioni"');
+    expect(luoghi).toContain('lavoroTerminaContratto("fabbrica", "dimissioni")');
+  });
+
   it("il turno usa il luogo e la UI Fabbrica non dipende dall'id operaio", () => {
     const actions = leggi("js/game/actions.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
