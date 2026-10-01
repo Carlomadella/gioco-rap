@@ -789,7 +789,6 @@ function lavoroCandidatoStraordinario(luogo){
   const assoluto = lavoroGiornoAssoluto();
   const settimana = lavoroSettimanaAssoluta();
 
-  if(stato.lastCheckAbsoluteDay === assoluto) return null;
   if(Number(stato.lastOfferWeek) === settimana) return null;
 
   /* La richiesta arriva solo quando il contratto è già coperto:
