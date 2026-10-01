@@ -2458,16 +2458,19 @@ test("la fascia si legge sulla card del beat, nello Studio",
   beatsJs.includes("const fasciaBeat = b =>"));
 test("si parte con tutti i parametri a 1",
   state.includes("skills:{scrittura:1, flow:1, presenza:1, rete:1}"));
-test("le dimissioni dalla Fabbrica chiudono il contratto senza perdere lo storico",
-  luoghiFoto.includes("function lfDimissioniFabbrica()") &&
+test("le dimissioni dai posti strutturati chiudono il contratto senza perdere lo storico",
+  luoghiFoto.includes("function lfDimissioniLavoro(luogo, nome)") &&
   luoghiFoto.includes('data-dimissioni="fabbrica"') &&
-  luoghiFoto.includes('lavoroTerminaContratto("fabbrica", "dimissioni")') &&
+  luoghiFoto.includes('data-dimissioni="pizzeria"') &&
+  luoghiFoto.includes('lavoroTerminaContratto(luogo, "dimissioni")') &&
+  luoghiFoto.includes('function lfDimissioniFabbrica(){ return lfDimissioniLavoro("fabbrica", "Fabbrica"); }') &&
   luoghiFoto.includes("G.job = null;") &&
   actions.includes("function lavoroTerminaContratto(luogo, motivo)") &&
   actions.includes("sede.contractHistory.push(Object.assign({}, contratto") &&
-  /function offerJobs\(\)\{[\s\S]{0,900}if\(G\.job\)\{/.test(actions) &&
+  /function offerJobs\(\)\{[\s\S]{0,1200}if\(G\.job\)\{/.test(actions) &&
   ev.includes('if(t==="no_job") return !G.job;') &&
-  ev.includes("if(j && !G.job && !fabbricaBloccata){") &&
+  ev.includes("const luogoContratto=j&&j.place&&typeof lavoroContrattoDef") &&
+  ev.includes("if(j && !G.job && !blocco.active){") &&
   ev.includes("G.job={id:j.id,place:j.place||null,n:j.n,pay:j.pay,e:j.e,missed:0};"));
 
 console.log("\nPunto 7 — i file .md in cartelle con nomi coerenti");
