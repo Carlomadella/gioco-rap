@@ -1603,14 +1603,58 @@ function lavoroPagaTurno(luogo, pagaBase){
 function fabbricaCartellino(){ return lavoroCartellino("fabbrica"); }
 function fabbricaRegistraPresenza(){ return lavoroRegistraPresenza("fabbrica"); }
 
+/* Carico di lavoro: il semplice fatto di avere un impiego non deve
+   abbassare automaticamente tutto il resto del gioco. Fino a cinque turni
+   settimanali il costo è già rappresentato da tempo, energia e dagli effetti
+   specifici della mansione. Il malus globale nasce dal sovraccarico (6°/7°
+   turno) e dalla fatica che si trascina tra più settimane pesanti. */
+function lavoroFaticaCorrente(){
+  return clamp(Number(G.workFatigue||0),0,100);
+}
+
+function lavoroDeltaFaticaSettimanale(turni){
+  const n=Math.max(0,Math.floor(Number(turni)||0));
+  if(n<=2) return -18;
+  if(n===3) return -12;
+  if(n===4) return -6;
+  if(n===5) return 4;
+  if(n===6) return 12;
+  return 22 + Math.max(0,n-7)*6;
+}
+
+function lavoroAggiornaFaticaSettimanale(turni){
+  const n=Math.max(0,Math.floor(Number(turni)||0));
+  const prima=lavoroFaticaCorrente();
+  const dopo=clamp(prima+lavoroDeltaFaticaSettimanale(n),0,100);
+  G.workFatigue=dopo;
+  return {turni:n,prima:prima,dopo:dopo,delta:dopo-prima};
+}
+
+function lavoroQualitaFattore(turni,fatica){
+  const n=Math.max(0,Math.floor(Number(turni==null?G.shifts:turni)||0));
+  const f=clamp(Number(fatica==null?lavoroFaticaCorrente():fatica)||0,0,100);
+  const acuto=n<=5 ? 1 : n===6 ? .94 : n===7 ? .86 : .80;
+  const cronico=1-Math.min(.15,Math.max(0,f-20)*.003);
+  return clamp(acuto*cronico,.78,1);
+}
+
+function lavoroLifestyleFattore(turni,fatica){
+  const n=Math.max(0,Math.floor(Number(turni==null?G.shifts:turni)||0));
+  const f=clamp(Number(fatica==null?lavoroFaticaCorrente():fatica)||0,0,100);
+  const acuto=n<=5 ? 1 : n===6 ? .85 : n===7 ? .68 : .55;
+  const cronico=1-Math.min(.30,Math.max(0,f-15)*.005);
+  return clamp(acuto*cronico,.45,1);
+}
+
 /* Cosa determina davvero la qualità di quello che fai:
-   benessere, dove vivi, quanto hai lavorato questa settimana, quanti pezzi hai già fatto. */
+   benessere, dove vivi, sovraccarico di lavoro attuale/accumulato e quanta
+   esperienza hai già costruito. */
 function qFactors(){
   const f = [];
   const ben = clamp(0.58 + G.wellbeing/135, 0.58, 1.14);           f.push(["benessere", ben]);
   const casa = 1 + (G.life && G.life.casa ? G.life.casa : 0)*0.04;  f.push(["dove vivi", casa]);
-  const stanco = 1 - Math.min(0.20, (G.shifts||0)*0.07);
-  if((G.shifts||0) > 0) f.push(["turni fatti", stanco]);
+  const stanco = lavoroQualitaFattore();
+  if(stanco < .999) f.push(["sovraccarico lavoro", stanco]);
   const lu = 0.65 + luc()*0.005;                                    f.push(["lucidità", lu]);
   const esp = 1 + Math.min(0.14, G.songs.length*0.012);             f.push(["esperienza", esp]);
   /* l'attrezzatura da casa non c'e' piu' (21/09/2026): si registra in Studio */
