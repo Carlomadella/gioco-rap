@@ -229,7 +229,7 @@ test("FAMEpedia usa UI dedicata coerente e responsive",
   famepediaCss.includes("var(--c1)") &&
   famepediaCss.includes("@media (max-width:820px)") &&
   landing.includes('css/famepedia.css?v=4') &&
-  landing.includes('js/famepedia.js?v=2'));
+  landing.includes('js/famepedia.js?v=3'));
 test("FAMEpedia V2 mantiene indice voci persistente a sinistra",
   landing.includes('id="fp-nav-list"') &&
   famepediaJs.includes('host=$fp("fp-nav-list")') &&
