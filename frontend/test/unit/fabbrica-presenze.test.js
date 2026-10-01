@@ -794,6 +794,98 @@ describe("cartellino presenze Fabbrica", () => {
     expect(luoghi).toContain("straordinarioAccettato.targetLabel");
   });
 
+  it("dopo almeno tre turni può nascere una conoscenza persistente di Fabbrica", () => {
+    const persona = {
+      id:"p-fab-1",
+      n:"Nico",
+      ruolo:"beatmaker",
+      origineLuogo:"fabbrica",
+      numero:false,
+      via:false
+    };
+    const ctx = {
+      G:{
+        year:1,week:1,day:3,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        gente:[],
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2]}
+          }
+        }
+      },
+      Number, Math, Array, Object, Set,
+      postoContattoLavoroCandidato:() => {
+        ctx.G.gente.push(persona);
+        return persona;
+      }
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const out = vm.runInContext('lavoroTentaIncontroContatto("fabbrica",0)', ctx);
+
+    expect(out.id).toBe("p-fab-1");
+    expect(ctx.G.gente).toHaveLength(1);
+    expect(ctx.G.workplaces.fabbrica.network.encounters).toBe(1);
+    expect(ctx.G.workplaces.fabbrica.network.lastEncounterAbsoluteDay).toBe(3);
+  });
+
+  it("non genera una sfilza di contatti nello stesso periodo", () => {
+    const persone = [
+      {id:"p1",ruolo:"beatmaker",origineLuogo:"fabbrica",numero:true,via:false},
+      {id:"p2",ruolo:"fonico",origineLuogo:"fabbrica",numero:true,via:false},
+      {id:"p3",ruolo:"beatmaker",origineLuogo:"fabbrica",numero:true,via:false},
+      {id:"p4",ruolo:"videomaker",origineLuogo:"fabbrica",numero:true,via:false}
+    ];
+    const ctx = {
+      G:{
+        year:1,week:2,day:3,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        gente:persone,
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2,7,8,9]}
+          }
+        }
+      },
+      Number, Math, Array, Object, Set,
+      postoContattoLavoroCandidato:() => { throw new Error("non deve creare un quinto contatto"); }
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    expect(vm.runInContext('lavoroTentaIncontroContatto("fabbrica",0)', ctx)).toBeNull();
+  });
+
+  it("i contatti di Fabbrica sono persone vere ma non occupano posti casuali al Circolo", () => {
+    const posto = leggi("js/game/posto.js");
+    const chat = leggi("js/game/chat.js");
+    const eventi = leggi("js/game/eventi-v2.js");
+
+    expect(posto).toContain('p.origineLuogo = luogo;');
+    expect(posto).toContain('p.storia = luogo === "fabbrica"');
+    expect(posto).toContain('p.numero = true;');
+    expect(posto).toContain('function postoSoloLavoro(p)');
+    expect(posto).toContain('!p.rivale && !postoSoloLavoro(p)');
+    expect(posto).toContain('p => !p.via && !postoSoloLavoro(p)');
+
+    expect(chat).toContain('" · collega di Fabbrica"');
+    expect(chat).toContain('p.origineLuogo === "fabbrica"');
+    expect(chat).toContain('Fuori dal turno faccio beat');
+    expect(chat).toContain('Fuori dal turno sto dietro al mixer');
+
+    expect(eventi).toContain('function adfFactoryContactAfterShift()');
+    expect(eventi).toContain('claimAutoEvent("factory-contact")');
+    expect(eventi).toContain('n:"Scambiatevi il numero"');
+    expect(eventi).toContain('postoScambiaNumeroLavoro(p)');
+    expect(eventi).toContain('const contactShown = a.id==="turno" && !overtimeShown');
+  });
+
   it("chiude il ciclo lavorativo prima di avanzare la settimana", () => {
     const sim = leggi("js/game/sim.js");
     const close = sim.indexOf('if(typeof lavoroChiudiCicli === "function") lavoroChiudiCicli();');
