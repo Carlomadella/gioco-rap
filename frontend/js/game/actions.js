@@ -278,7 +278,7 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
 
   ciclo = Number(ciclo);
   if(!Number.isInteger(ciclo) || ciclo < 0) return null;
-  if(Number(carriera.lastEvaluatedCycle) === ciclo) return carriera.lastEvaluation;
+  if(carriera.lastEvaluatedCycle != null && Number(carriera.lastEvaluatedCycle) === ciclo) return carriera.lastEvaluation;
 
   const startDay = lavoroCicloInizioGiorno(ciclo);
   const eligible = Number(contratto.signedAbsoluteDay || Infinity) <= startDay;
