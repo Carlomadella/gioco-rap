@@ -607,9 +607,8 @@ function lavoroApplicaDisciplina(luogo, evaluation){
 
   if(typeof pushLog === "function"){
     if(dismissed){
-      const blocco = lavoroBloccoRiassunzione(luogo);
       pushLog("<b>Licenziato dalla Fabbrica.</b> Dopo due richiami, le nuove assenze hanno chiuso il rapporto. " +
-        "Non puoi essere riassunto qui per " + blocco.weeksRemaining + " settimane.", "bad");
+        "Non puoi essere riassunto qui per " + Number(cfg.bloccoRiassunzioneSettimane || 0) + " settimane.", "bad");
     }else if(warningAdded){
       pushLog("<b>Richiamo formale in Fabbrica.</b> " + assenze + " assenze nel ciclo · richiami " +
         c.warnings + "/2 · affidabilità −" + Number(cfg.malusRichiamoAffidabilita || 0) + ".", "bad");
