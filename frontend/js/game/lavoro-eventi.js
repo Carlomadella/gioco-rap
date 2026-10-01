@@ -186,6 +186,115 @@ function fmtTime(m){
 
 /* ==================== 7. CONFLITTO LAVORO / MUSICA ==================== */
 
+function conflictShiftContext(job,hit){
+  const luogo=workKey(job);
+  const out={
+    luogo,
+    paga:Number(job&&job.pay||0),
+    pagaLabel:"",
+    energia:null,
+    benessere:null,
+    lucidita:null,
+    eventWeight:1,
+    attendance:null,
+    overtime:null
+  };
+
+  if(luogo && typeof lavoroPagaTurno==="function"){
+    const p=lavoroPagaTurno(luogo,Number(job&&job.pay||0));
+    if(p){
+      out.paga=Number(p.totale||out.paga||0);
+      out.pagaLabel=(p.percentuale?(" · +"+Number(p.percentuale)+"%"):"");
+    }
+  }
+  if(luogo && typeof lavoroEffettiTurno==="function"){
+    const fx=lavoroEffettiTurno(luogo,job);
+    if(fx){
+      out.energia=Number(fx.energia);
+      out.benessere=Number(fx.benessere||0);
+      out.lucidita=Number(fx.lucidita||0);
+    }
+  }
+  try{
+    if(window.AGENDA && typeof AGENDA.pesoDiOggi==="function" && hit && hit.voice)
+      out.eventWeight=Math.max(1,Number(AGENDA.pesoDiOggi(hit.voice.id)||1));
+  }catch(_){}
+
+  if(luogo && typeof lavoroCartellino==="function" && typeof lavoroContrattoDef==="function"){
+    const cart=lavoroCartellino(luogo);
+    const def=lavoroContrattoDef(luogo);
+    if(cart && def && Number(def.turniSettimanali||0)>0){
+      const richiesti=Math.max(0,Number(def.turniSettimanali||0));
+      const fatti=Math.max(0,Number(cart.giorniLavoratiSettimana||0));
+      const oggi=Math.max(1,Math.min(7,Number(G.day||1)));
+      const consentiti=Array.isArray(def.giorniConsentiti)?def.giorniConsentiti:[1,2,3,4,5,6,7];
+      const giaOggi=Number(cart.conteggi&&cart.conteggi[cart.posOggi]||0)>0;
+      const oggiConta=consentiti.includes(oggi) && !giaOggi;
+      const futuri=consentiti.filter(g=>g>oggi).length;
+      const maxSeSalti=fatti+futuri;
+      const maxSeLavori=fatti+futuri+(oggiConta?1:0);
+      const assenzeSeSalti=Math.max(0,richiesti-maxSeSalti);
+      const assenzeSeLavori=Math.max(0,richiesti-maxSeLavori);
+      out.attendance={
+        fatti,
+        richiesti,
+        giaOggi,
+        oggiConta,
+        futuri,
+        assenzeSeSalti,
+        assenzeSeLavori,
+        assenzeCreateDalConflitto:Math.max(0,assenzeSeSalti-assenzeSeLavori)
+      };
+    }
+  }
+
+  if(luogo && typeof lavoroStraordinarioOggi==="function"){
+    const extra=lavoroStraordinarioOggi(luogo);
+    if(extra){
+      let delta=0;
+      if(typeof lavoroCarrieraDef==="function"){
+        const cfg=lavoroCarrieraDef(luogo);
+        delta=Number(cfg&&cfg.straordinari&&cfg.straordinari.affidabilitaSaltato||0);
+      }
+      out.overtime={tipo:extra.tipo||null,reliabilityDelta:delta};
+    }
+  }
+  return out;
+}
+
+function conflictWorkDetail(ctx){
+  let d="+"+Math.round(Number(ctx.paga||0))+" €";
+  if(ctx.pagaLabel) d+=ctx.pagaLabel;
+  if(ctx.attendance){
+    const a=ctx.attendance;
+    const dopo=Math.min(a.richiesti,a.fatti+(a.oggiConta?1:0));
+    d+=" · presenza "+dopo+"/"+a.richiesti;
+  }
+  d+=" · perdi l'appuntamento";
+  if(ctx.eventWeight>1) d+=" ×"+ctx.eventWeight.toFixed(2);
+  return d;
+}
+
+function conflictMusicDetail(ctx){
+  const parts=[];
+  if(ctx.eventWeight>1) parts.push("evento Agenda ×"+ctx.eventWeight.toFixed(2));
+  if(ctx.overtime && ctx.overtime.reliabilityDelta<0)
+    parts.push("straordinario accettato: affidabilità "+ctx.overtime.reliabilityDelta);
+  else if(ctx.attendance){
+    const a=ctx.attendance;
+    if(a.assenzeCreateDalConflitto>0)
+      parts.push(a.assenzeCreateDalConflitto+
+        (a.assenzeCreateDalConflitto===1?" assenza diventa inevitabile":" assenze diventano inevitabili"));
+    else if(a.assenzeSeSalti===0)
+      parts.push("puoi ancora chiudere "+a.richiesti+"/"+a.richiesti);
+    else
+      parts.push("settimana già sotto quota");
+  }else{
+    parts.push("niente paga del turno");
+  }
+  return parts.join(" · ");
+}
+
 function conflictForShift(){
   if(!G.job || !window.AGENDA || typeof AGENDA.conflittiTra!=="function") return null;
   if(!window.GAME_TIME || typeof GAME_TIME.now!=="function" ||
@@ -217,25 +326,43 @@ function guardAction(id){
 
   const v=hit.voice;
   const s=state(G.job);
+  const ctx=conflictShiftContext(G.job,hit);
 
   /* È una scelta richiesta dal giocatore PRIMA della mossa, non un evento
      automatico: non occupa la chiave minuto dell'arbitro. Se chiudi e riprovi,
      la decisione deve poter ricomparire nello stesso minuto. */
   if(typeof showEvent!=="function") return {ok:true};
 
+  let quadro="Se entri adesso lavori dalle <b>"+fmtTime(hit.from)+"</b> alle <b>"+
+    fmtTime(hit.to)+"</b>. In Agenda hai <b>"+v.n+"</b> alle <b>"+v.ora+"</b>.";
+  if(ctx.attendance){
+    quadro+="<br><br>Questa settimana sei a <b>"+ctx.attendance.fatti+"/"+ctx.attendance.richiesti+
+      " presenze</b>.";
+    if(ctx.attendance.assenzeCreateDalConflitto>0)
+      quadro+=" Saltare proprio questo turno rende inevitabile "+
+        ctx.attendance.assenzeCreateDalConflitto+
+        (ctx.attendance.assenzeCreateDalConflitto===1?" assenza":" assenze")+".";
+    else if(ctx.attendance.assenzeSeSalti===0)
+      quadro+=" Puoi ancora coprire il contratto nei giorni rimasti.";
+  }
+  quadro+="<br><br>Non puoi fare entrambe le cose: qui scegli cosa vale di più per questa settimana.";
+
   showEvent({
     k:(G.job.n||"Lavoro")+" · Conflitto",
     t:"Il turno si mangia "+v.n,
-    d:"Se entri adesso lavori dalle <b>"+fmtTime(hit.from)+"</b> alle <b>"+
-      fmtTime(hit.to)+"</b>. In Agenda hai <b>"+v.n+"</b> alle <b>"+v.ora+
-      "</b>.<br><br>Le due cose si sovrappongono davvero: non puoi fare finta di essere in entrambi i posti.",
+    d:quadro,
     annulla(){},
     opts:[
-      {n:"Vai al turno",d:"Prendi paga e presenza, ma perdi l'appuntamento",run(){
+      {n:"Vai al turno",d:conflictWorkDetail(ctx),run(){
         /* Non togliamo ancora la voce: il secondo avvio può comunque essere
            respinto da luogo/orario. La perdita viene committata solo dopo che
            il clock certifica che il turno ha davvero attraversato l'evento. */
-        s.pendingConflictMiss={voice:v,key,day:absDay(),jobId:G.job&&G.job.id};
+        s.pendingConflictMiss={
+          voice:v,key,day:absDay(),jobId:G.job&&G.job.id,
+          pay:Number(ctx.paga||0),
+          eventWeight:Number(ctx.eventWeight||1),
+          attendance:ctx.attendance?Object.assign({},ctx.attendance):null
+        };
         try{ if(typeof save==="function") save(); }catch(_){}
         bypassConflict={key,day:absDay()};
         setTimeout(()=>{
@@ -243,17 +370,21 @@ function guardAction(id){
         },60);
         return null;
       }},
-      {n:"Tieni l'appuntamento",d:"Non fai il turno: niente paga e il lavoro resta scoperto",run(){
+      {n:"Tieni l'appuntamento",d:conflictMusicDetail(ctx),run(){
         delete s.pendingConflictMiss;
         record(s,"conflict",{
           choice:"music",
           jobId:G.job&&G.job.id,
           appointmentId:v.id,
           appointmentName:v.n,
-          appointmentTime:v.ora
+          appointmentTime:v.ora,
+          eventWeight:Number(ctx.eventWeight||1),
+          forgonePay:Number(ctx.paga||0),
+          attendance:ctx.attendance?Object.assign({},ctx.attendance):null,
+          overtime:ctx.overtime?Object.assign({},ctx.overtime):null
         });
-        addLucidity(1);
-        return {t:"Hai tenuto libero il tempo per <b>"+v.n+"</b>. Il turno non è stato fatto.",c:""};
+        return {t:"Hai tenuto libero il tempo per <b>"+v.n+
+          "</b>. Il turno non è stato fatto: l'appuntamento resta in Agenda e dovrai andarci davvero.",c:""};
       }}
     ]
   });
@@ -1146,7 +1277,10 @@ function commitConflictMiss(payload,job,s){
     appointmentTime:p.voice.ora,
     missed:!!missed,
     startedAt:from,
-    endedAt:to
+    endedAt:to,
+    earnedPay:Number(p.pay||0),
+    eventWeight:Number(p.eventWeight||1),
+    attendance:p.attendance?Object.assign({},p.attendance):null
   });
   return missed;
 }
