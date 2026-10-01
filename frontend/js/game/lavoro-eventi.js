@@ -22,12 +22,14 @@ const CFG = Object.freeze({
     colleague:4,
     music:6,
     crime:10,
+    role:6,
     physical:3
   }),
   chance:Object.freeze({
     colleague:.16,
     music:.14,
     crime:.12,
+    role:.18,
     physical:.24
   }),
   career:Object.freeze({
@@ -49,6 +51,7 @@ const FAMILIES = Object.freeze({
   career:Object.freeze({id:"career",label:"Carriera"}),
   overtime:Object.freeze({id:"overtime",label:"Straordinari e richieste"}),
   colleague:Object.freeze({id:"colleague",label:"Colleghi"}),
+  role:Object.freeze({id:"role",label:"Responsabilità di ruolo"}),
   music:Object.freeze({id:"music",label:"Opportunità musicali"}),
   crime:Object.freeze({id:"crime",label:"Opportunità criminali"}),
   conflict:Object.freeze({id:"conflict",label:"Conflitto lavoro/musica"}),
@@ -333,6 +336,162 @@ function showCareer(job,s,candidate){
         return {t:"Hai rifiutato l'aumento. La paga resta invariata.",c:""};
       }}
     ]
+  });
+  return true;
+}
+
+/* ==================== RUOLO IN FABBRICA ====================
+   Non sono eventi generici con il nome cambiato: ogni gradino della carriera
+   porta problemi diversi. Il cooldown evita che il ruolo diventi un popup a
+   ogni turno; le conseguenze usano le stesse statistiche vere del gioco. */
+const FACTORY_ROLE_EVENTS = Object.freeze({
+  operaio:Object.freeze([
+    Object.freeze({
+      id:"ritmo-linea",
+      t:"La linea oggi corre più del solito",
+      d:"Manca una persona e il ritmo è stato alzato. Non è uno straordinario: sei già dentro al tuo turno, ma devi decidere quanto tirare.",
+      opts:Object.freeze([
+        Object.freeze({n:"Tieni il ritmo",d:"+1 affidabilità · −2 benessere",fx:{reliability:1,wellbeing:-2},
+          result:"Hai tenuto il ritmo fino alla sirena. Il capo se n'è accorto, ma il turno ti è rimasto addosso."}),
+        Object.freeze({n:"Chiedi un cambio di postazione",d:"+1 benessere",fx:{wellbeing:1},
+          result:"Hai chiesto di girare postazione prima di arrivare cotto. Hai finito il turno senza trascinarti."})
+      ])
+    }),
+    Object.freeze({
+      id:"pezzo-fuori-sede",
+      t:"Un pezzo non entra come dovrebbe",
+      d:"La linea continua a muoversi ma qualcosa non torna. Puoi fermare e segnalare oppure provare a sistemarlo al volo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Ferma e segnala",d:"+1 affidabilità · +1 lucidità",fx:{reliability:1,lucidita:1},
+          result:"Hai fermato il passaggio prima che il problema si propagasse. Meno eroismo, più testa."}),
+        Object.freeze({n:"Sistemalo al volo",d:"−1 benessere · −1 lucidità",fx:{wellbeing:-1,lucidita:-1},
+          result:"L'hai rimesso in riga senza fermare tutto, ma hai passato il resto del turno in tensione."})
+      ])
+    })
+  ]),
+  operaio_esperto:Object.freeze([
+    Object.freeze({
+      id:"nuovo-assunto",
+      t:"Ti mettono accanto un nuovo assunto",
+      d:"Conosci abbastanza bene la linea da diventare quello a cui fanno le domande. Puoi seguirlo davvero o pensare solo alla tua postazione.",
+      opts:Object.freeze([
+        Object.freeze({n:"Affiancalo",d:"+1 affidabilità · +0,2 rete · −1 lucidità",fx:{reliability:1,rete:.2,lucidita:-1},
+          result:"Hai perso un po' di testa dietro alle sue domande, ma da oggi non sei più solo quello che esegue."}),
+        Object.freeze({n:"Resta sulla tua postazione",d:"+1 benessere",fx:{wellbeing:1},
+          result:"Hai fatto il tuo senza caricarti anche il turno di un altro."})
+      ])
+    }),
+    Object.freeze({
+      id:"qualita-lotto",
+      t:"Il controllo qualità non ti convince",
+      d:"Hai abbastanza esperienza per capire che un lotto è al limite. Fermarlo crea ritardo; lasciarlo andare può tornare indietro dopo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Blocca il lotto",d:"+2 affidabilità · −1 lucidità",fx:{reliability:2,lucidita:-1},
+          result:"Hai preferito prenderti la responsabilità adesso invece di nascondere il problema."}),
+        Object.freeze({n:"Lascialo scorrere",d:"+1 benessere · −2 affidabilità",fx:{wellbeing:1,reliability:-2},
+          result:"Il turno è filato più liscio, ma hai fatto finta di non vedere una cosa che ormai sai riconoscere."})
+      ])
+    })
+  ]),
+  capolinea:Object.freeze([
+    Object.freeze({
+      id:"linea-in-ritardo",
+      t:"La tua linea è indietro",
+      d:"Il numero di fine turno non torna. Ora non devi solo lavorare: devi decidere come far lavorare anche gli altri.",
+      opts:Object.freeze([
+        Object.freeze({n:"Redistribuisci le postazioni",d:"+1 affidabilità · −2 lucidità",fx:{reliability:1,lucidita:-2},
+          result:"Hai passato il resto del turno a spostare persone e controllare incastri. La linea ha recuperato, tu meno."}),
+        Object.freeze({n:"Spingi il ritmo",d:"+2 affidabilità · −2 benessere",fx:{reliability:2,wellbeing:-2},
+          result:"Avete recuperato tirando tutti più forte. Il risultato c'è, anche la fatica."})
+      ])
+    }),
+    Object.freeze({
+      id:"tensione-reparto",
+      t:"Due persone della linea si prendono male",
+      d:"Prima avresti potuto farti i fatti tuoi. Da capolinea, se la cosa si trascina, domani il problema è anche tuo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Li separi e chiarisci",d:"+1 affidabilità · +0,2 rete · −1 lucidità",fx:{reliability:1,rete:.2,lucidita:-1},
+          result:"Hai chiuso la discussione prima che diventasse il clima del reparto."}),
+        Object.freeze({n:"Tagli corto e li rimandi al lavoro",d:"+1 benessere · −1 affidabilità",fx:{wellbeing:1,reliability:-1},
+          result:"La linea è ripartita subito, ma la tensione è rimasta sotto."})
+      ])
+    })
+  ]),
+  capoturno:Object.freeze([
+    Object.freeze({
+      id:"priorita-reparti",
+      t:"Due linee chiedono la stessa manutenzione",
+      d:"Non puoi accontentare tutti. Il problema del capoturno è questo: il corpo lavora meno, ma la decisione sbagliata pesa su mezzo stabilimento.",
+      opts:Object.freeze([
+        Object.freeze({n:"Fermi la linea più a rischio",d:"+2 affidabilità · −2 lucidità",fx:{reliability:2,lucidita:-2},
+          result:"Hai scelto il rischio minore e ti sei preso la responsabilità della produzione persa."}),
+        Object.freeze({n:"Tieni aperta la produzione",d:"+1 benessere · −2 affidabilità",fx:{wellbeing:1,reliability:-2},
+          result:"Hai protetto il numero di oggi, ma la scelta non è passata inosservata."})
+      ])
+    }),
+    Object.freeze({
+      id:"capolinea-assente",
+      t:"Un capolinea salta il turno",
+      d:"Puoi assorbire tu il reparto oppure delegare a uno degli esperti e restare sul coordinamento generale.",
+      opts:Object.freeze([
+        Object.freeze({n:"Copri tu il reparto",d:"+1 affidabilità · −2 lucidità",fx:{reliability:1,lucidita:-2},
+          result:"Hai tenuto insieme due livelli di responsabilità per tutto il turno."}),
+        Object.freeze({n:"Delega a un esperto",d:"+0,3 rete · +1 benessere",fx:{rete:.3,wellbeing:1},
+          result:"Hai dato fiducia a chi conosce la linea e ti sei tenuto libero per il resto dello stabilimento."})
+      ])
+    })
+  ])
+});
+
+function workReliability(luogo,delta){
+  if(typeof lavoroCarriera!=="function") return 0;
+  const c=lavoroCarriera(luogo);
+  if(!c) return 0;
+  const prima=Number(c.reliability==null?50:c.reliability);
+  c.reliability=nclamp(prima+Number(delta||0),0,100);
+  return c.reliability-prima;
+}
+
+function applyFactoryRoleFx(fx){
+  fx=fx||{};
+  const out={wellbeing:0,lucidita:0,rete:0,reliability:0};
+  if(fx.wellbeing){ addWellbeing(fx.wellbeing); out.wellbeing=Number(fx.wellbeing); }
+  if(fx.lucidita){ addLucidity(fx.lucidita); out.lucidita=Number(fx.lucidita); }
+  if(fx.rete){ addNetwork(fx.rete); out.rete=Number(fx.rete); }
+  if(fx.reliability) out.reliability=workReliability("fabbrica",fx.reliability);
+  return out;
+}
+
+function showFactoryRole(job,s,roll){
+  if(!job || workKey(job)!=="fabbrica") return false;
+  const pool=FACTORY_ROLE_EVENTS[job.id];
+  if(!pool || !pool.length || !familyReady(s,"role")) return false;
+  if(Number(roll)>=CFG.chance.role || !claim("work-role:"+job.id)) return false;
+
+  if(!Array.isArray(s.roleRecent)) s.roleRecent=[];
+  const disponibili=pool.filter(x=>!s.roleRecent.includes(x.id));
+  const candidati=disponibili.length?disponibili:pool;
+  const scena=candidati[Math.floor(Math.random()*candidati.length)];
+  s.roleRecent.unshift(scena.id);
+  if(s.roleRecent.length>2) s.roleRecent.length=2;
+
+  record(s,"role",{status:"shown",roleId:job.id,eventId:scena.id});
+  if(typeof showEvent!=="function") return false;
+
+  showEvent({
+    k:"Fabbrica · "+(job.n||"Ruolo"),
+    t:scena.t,
+    d:scena.d,
+    annulla(){},
+    opts:scena.opts.map(opt=>({
+      n:opt.n,
+      d:opt.d,
+      run(){
+        const fx=applyFactoryRoleFx(opt.fx);
+        record(s,"role",{status:"resolved",roleId:job.id,eventId:scena.id,choice:opt.n,effects:fx});
+        return {t:opt.result,c:fx.reliability>0?"good":fx.reliability<0?"bad":""};
+      }
+    }))
   });
   return true;
 }
@@ -733,6 +892,7 @@ function afterShift(payload,rolls){
   const career=careerCandidate(job);
   if(career && showCareer(job,s,career)) return true;
   if(showMusic(job,s,r("music"))) return true;
+  if(showFactoryRole(job,s,r("role"))) return true;
   if(showCrime(job,s,r("crime"))) return true;
   if(showColleague(job,s,r("colleague"))) return true;
   if(showPhysical(job,s,r("physical"))) return true;
