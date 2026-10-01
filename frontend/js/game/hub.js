@@ -491,8 +491,12 @@ function assumitiCome(jobId){
 
   if(!stessoLuogo){
     if(G.job){
+      const puoiLasciareFabbrica = typeof lavoroLuogo === "function" &&
+        lavoroLuogo(G.job) === "fabbrica";
       hubChiuso({n:def.n, chiuso:"Lavori già come " + G.job.n.toLowerCase() +
-        ". Un posto alla volta, e da un lavoro non ci si licenzia: lo perdi solo se non rispetti il rapporto di lavoro."});
+        (puoiLasciareFabbrica
+          ? ". Se vuoi cambiare lavoro, dai prima le dimissioni dalla Fabbrica."
+          : ". Un posto alla volta: prima devi lasciare quello attuale.")});
       return;
     }
 
@@ -547,7 +551,9 @@ function schedaImpiego(){
   righe.push({n:"Lascia stare", d:"Torni alla mappa", run(){ return null; }});
   showEvent({k:"Centro per l'impiego", t:"Tutti i lavori in città",
     d:G.job ? "Lavori già come " + G.job.n.toLowerCase() +
-      ". Un posto alla volta, e da un lavoro non ci si licenzia: lo perdi solo se non ti presenti per tre settimane."
+      ((typeof lavoroLuogo === "function" && lavoroLuogo(G.job) === "fabbrica")
+        ? ". Per cambiare lavoro, dai prima le dimissioni dalla Fabbrica."
+        : ". Un posto alla volta.")
       : "Guarda cosa c'è, e fatti assumere.",
     annulla(){}, opts:righe});
 }
