@@ -2798,6 +2798,71 @@ di chi non conosci (prima era una sagoma): il nome resta «???». Due controlli 
 `audit-regressioni.js`. Il resto del gioco (Studio, classifica) disegna ancora le facce di
 `rivals.js`.
 
+## Il Circolo a stanze: Bancone, Sala, Palco, Backstage
+
+CARLO, 01/10/2026: «concentriamoci sul circolo, la barra di destra con gli orari, deve aprirsi
+quando ci si passa sopra col cursore, poi togliamo la barra in basso con la gente, il palco, la
+serata di oggi e i momenti durante il live e quei punti devono essere spostati nelle pagine che
+si aprono quando si clicca sul pulsante bancone, palco sala e backstage». Alle domande: pagine
+complete, come i riferimenti `bancone.png`, `sala.png`, `open_mic.png` e `backstage.png`;
+«sul palco deve esserci solo il live, e i momenti giocati»; nel backstage «si possano anche
+incontrare i fan per parlarci e dirti cosa gli è piaciuto e cosa no»; sul telefono gli orari
+si aprono col tocco.
+
+**FATTO (01/10/2026)** — branch `task/circolo-orari-e-pagine`, due file nuovi:
+`frontend/js/game/circolo-stanze.js` (le quattro pagine) e
+`frontend/js/game/circolo-incontri.js` (le mosse che prima non c'erano), col foglio
+`frontend/css/circolo-stanze.css`.
+
+- **La pagina del Circolo** è la foto coi quattro cartelli, intera (non più ritagliata: a
+  1536 × 864 tagliava Bancone e Backstage), coi bordi riempiti dalla stessa foto sfocata. La
+  colonna degli orari è una linguetta sul bordo destro (orologio, «Orari», pallino
+  aperto/chiuso) che si apre col mouse sopra e col tocco. I quattro riquadri di sotto non ci
+  sono più. Sotto i 900 punti le stanze sono anche quattro tasti grandi sotto alla foto;
+  sotto i 620 i cartelli sulla foto vanno via (sarebbero francobolli).
+- **Bancone** — la gente presente, chi non conosci in cima, con l'umore che le si legge in
+  faccia; l'**atmosfera del locale** (da tranquilla a locale pieno: la fascia dell'ora e il
+  fine settimana), che sposta di ±0,2 la riuscita delle mosse; quattro mosse: *Attacca
+  bottone* (il dialogo della Sala), *Offri da bere* (6 €, 15 min: un pezzo di rapporto,
+  secondo il carattere), *Ascolta la conversazione* (20 min: ne scopri il carattere),
+  *Presentati* (10 min, solo con chi non conosci: col locale pieno anche +1 hype).
+- **Sala** — tutta la gente presente con filtro (tutti, conosciuti, da conoscere), la scheda
+  grande col ritratto, una frase sua, il livello di rapporto in barra, le mosse di `posto.js`
+  con a destra cosa serve; «Chi c'è stasera» e «Opportunità dalla sala», che si sbloccano
+  davvero coi rapporti. Uno sconosciuto non ha nome nemmeno sotto alle mosse.
+- **Palco** — solo il live: *Live* (il live vero di `actions.js`) e *Open Mic* (per chi un
+  pezzo fuori non ce l'ha ancora); i tre momenti (Intro, Prima barra, Chiusura) con la
+  reazione del pubblico a sedici tacche, l'ordine della serata, le statistiche live
+  (Carisma, Rap, Scrittura, Energia) e le ricompense possibili calcolate sulle formule vere.
+  Il freestyle resta in Piazza; Showcase e Opening Act sono passati fra le cose da
+  sbloccare del backstage.
+- **Backstage** — apre con la serata (21:00–03:00). L'**artista della serata** (uno di cinque,
+  uno a sera): presentarsi, fare networking, chiedere un contatto (ti presenta un fonico, un
+  videomaker o un beatmaker che diventa un tuo contatto), proporre una collaborazione (una
+  ogni quattro settimane, con un pezzo fuori: se dice di sì hype e fan, se dice di no −2
+  hype), osservare l'ambiente. Con la gente del giro: networking, un pezzo di rapporto. **I
+  tuoi fan** (da uno a tre, quando hai un pezzo fuori): ognuno dice cosa gli è piaciuto e cosa
+  no dei tuoi pezzi veri (il mix piatto, il video che manca, il ritornello, pochi pezzi) e
+  scegli la foto (hype e qualche fan) o la critica (+0,4 all'abilità che serve). Occasioni
+  della serata, possibili sblocchi, rischio e prestigio.
+
+Ogni mossa vale una volta per sera (`G.circolo.oggi`, che si svuota col giorno) e costa
+tempo vero; l'hype non passa il tetto della fase e la pagina scrive solo quello che è
+entrato. Chi apriva un riquadro di prima (l'agenda: «passa dalla Sala») apre la stanza
+giusta. Nel giro è uscito anche un guasto di tutte le pagine dei luoghi sul telefono: sotto
+i 480 punti l'orologio del tempo va su una terza riga della fascia, che arriva a 143 punti,
+mentre la pagina partiva a 80 — le prime righe finivano sotto. Adesso la fascia si misura
+(`--lfAlta`, `luoghi-foto.js`). Le foto delle stanze sono ritagli dei riferimenti in
+`media/photo/circolo/stanze/`; `circolo/palco.jpg`, `circolo/serata.jpg` e `live_club.png`,
+che non usava più nessuno, sono uscite. Provato nel browser a 1536 × 864, 1280 × 720 e
+390 × 844: un live giocato fino all'esito, le mosse del bancone e del backstage, un fan;
+console pulita. Undici prove in `test/unit/circolo-stanze.test.js`, l'audit del Circolo
+riscritto sulle stanze.
+
+**Da decidere:** le meccaniche nuove sono piccole apposta (un pezzo di rapporto, un punto di
+hype, qualche fan) e il bot del simulatore di bilanciamento non le gioca — gioca le mosse di
+`actions.js`. Se servono nei conti dell'anno, il bot va insegnato a entrare al Circolo.
+
 ## Il resto in automatico
 
 CARLO, «Studio (16/09/2026)»: «l'utente deve poter fare solo le sezioni Beat, Testo, e

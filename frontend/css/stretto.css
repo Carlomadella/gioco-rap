@@ -976,54 +976,14 @@
 }
 
 /* ============================================================
-   IL CIRCOLO sugli schermi stretti (css/circolo.css). Il riferimento è
-   a 1536: sotto, i quattro riquadri passano a due per riga (1180), la
-   colonna degli orari va sotto alla foto (900), e sul telefono (620) tutto
-   è una pila — prima la foto, poi gli orari, poi i riquadri nell'ordine del
-   riferimento. I cartelli sulla foto a 390 punti sarebbero di cinque
-   pixel: restano l'icona e il nome, grandi abbastanza per il dito.
+   IL CIRCOLO sugli schermi stretti: dal 01/10/2026 la pagina è la foto coi
+   cartelli e le quattro stanze, e i loro blocchi stretti stanno coi loro
+   fogli (css/circolo.css in fondo, css/circolo-stanze.css in fondo). Qui
+   resta solo il dito: a qualsiasi larghezza, anche un telefono di traverso,
+   ogni tasto del Circolo ha una presa da 44.
    ============================================================ */
-@media (max-width:1180px){
-  .cc-giu{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:14px}
-  .cc-pan:nth-child(2n){box-shadow:none}
-}
-@media (max-width:900px){
-  .cc-su{grid-template-columns:minmax(0,1fr)}
-  .cc-scena{max-height:none;min-height:0;box-shadow:none}
-  .cc-info{padding:16px 16px 18px;contain:none;overflow:visible}
-  .cc-titolo{font-size:34px}
-  /* i cartelli perdono le righe sotto ma tengono la loro misura: coprono
-     la zona del riferimento, e il dito ha un bersaglio vero */
-  .cc-cart{align-items:center;gap:6px;padding:6px 9px;border-radius:6px}
-  .cc-cart i{width:18px;height:18px;margin:0}
-  .cc-cart b{font-size:12.5px;margin:0}
-  .cc-cart em{display:none}
-  .cc-c-backstage{left:auto;right:.5%}
-}
-/* il telefono girato: la foto lascia vedere che sotto c'è la pagina */
-@media (max-width:900px) and (orientation:landscape){
-  .cc-scena{max-height:68vh}
-}
-@media (max-width:620px){
-  .cc-giu{grid-template-columns:minmax(0,1fr);padding:4px 0 calc(14px + env(safe-area-inset-bottom,0px))}
-  .cc-pan{box-shadow:none;padding:0 12px}
-  .cc-box{min-height:0}
-  .cc-gente{grid-template-columns:minmax(0,1fr)}
-  .cc-lista{flex-direction:row;overflow-x:auto;padding:6px;gap:4px;border-right:0;
-    border-bottom:1px solid rgba(255,255,255,.12)}
-  .cc-chi{flex:none}
-  .cc-chi.on::after{left:6px;right:6px;top:auto;bottom:0;width:auto;height:3px}
-  .cc-palco{grid-template-columns:34% minmax(0,1fr)}
-  .cc-mossa{justify-content:center}
-  .cc-prog{grid-template-columns:minmax(0,1fr)}
-  .cc-prog .cc-foto{display:none}
-  .cc-momenti{min-height:300px;padding:12px}
-  .cc-momento{width:100%}
-}
-/* col dito, a qualsiasi larghezza (anche un telefono di traverso, fra 620
-   e 900): i tasti del Circolo non scendono sotto i 44 */
 @media (pointer:coarse){
-  .cc-az,.cc-mossa,.cc-mopz,.cc-chi,.cc-cart{min-height:44px}
+  .cc-cart,.cc-porta,.cc-linguetta,.cc-indietro,.cc-chip,.cc-pers,.cc-mossa2,.cc-risp,.cc-srow,.cc-opz,.cc-bsrow,.cc-sface{min-height:44px}
   .cc-beat button{min-width:44px;height:44px}
 }
 

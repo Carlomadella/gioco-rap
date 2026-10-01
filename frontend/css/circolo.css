@@ -2,15 +2,15 @@
    `media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/il_circolo.png`
    (js/game/circolo.js). Vive dentro `#luogo` (luoghi-foto.css): di quella
    pagina tiene la fascia in alto, e al posto della foto stesa sotto a tutto
-   ha una pagina sua — la foto coi cartelli e la colonna degli
-   orari sopra, i quattro riquadri sotto. Le misure sono quelle del
-   riferimento a 1536 × 1024. Sopra i 1180 punti la pagina sta tutta nello
-   schermo e non scorre (in fondo); i blocchi per gli schermi stretti stanno in
-   `stretto.css`, come per tutto il resto.
+   ha una pagina sua — la foto coi quattro cartelli che riempie lo schermo,
+   e la colonna degli orari chiusa sul bordo destro, che si apre passandoci
+   sopra (col tocco sul telefono). Dal 01/10/2026 i quattro riquadri di sotto
+   non ci sono più: ogni cartello apre la sua stanza, disegnata in
+   circolo-stanze.css.
 
    I caratteri: il corpo è Roboto Condensed (già nel gioco, lo usa la
-   Strada), i titoli a pennarello («IL CIRCOLO», «1. LA GENTE») sono
-   Permanent Marker, l'unico carattere caricato per questa pagina. */
+   Strada), i titoli a pennarello («IL CIRCOLO», «BANCONE») sono Permanent
+   Marker, l'unico carattere caricato per questa pagina. */
 
 #luogo[data-luogo="circolo"]{background:#08080A}
 #luogo[data-luogo="circolo"] .lfsfondo,
@@ -20,33 +20,32 @@
 
 .cc{--ccTesto:#ECE8E0;--ccSoft:#B9B4AA;--ccRiga:rgba(255,255,255,.16);--ccBox:#0D0E10;
   --ccOro:#F1D27E;--ccRosso:#E5383B;--ccVerde:#4ED06A;--ccMarker:"Permanent Marker","Archivo Black",cursive;
+  --ccLinguetta:52px;
   font-family:"Roboto Condensed","Barlow Condensed","Arial Narrow",Arial,sans-serif;
   color:var(--ccTesto);background:#0A0A0B;min-height:100%;display:flex;flex-direction:column}
 .cc button{font:inherit;color:inherit;cursor:pointer}
 .cc button:disabled{cursor:default}
 .cc svg{display:block;fill:currentColor}
+.cc-volto{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
+.cc-vuoto{padding:16px;font-size:14px;line-height:1.45;color:var(--ccSoft)}
 
-/* ==================== SOPRA: LA FOTO E LA COLONNA ==================== */
-.cc-su{display:grid;grid-template-columns:minmax(0,1fr) clamp(250px,18.65vw,340px);
-  border-bottom:1px solid var(--ccRiga)}
-/* la foto tiene il suo rapporto (1250 × 526) — a 1536 × 1024 è il
-   riferimento al pixel. Sugli schermi più larghi che alti ha un tetto,
-   perché i quattro riquadri sotto si vedano senza scorrere, e sotto i 340
-   punti non scende. Dentro, `.cc-quadro` è la foto intera col suo rapporto,
-   ritagliata come un `cover`: i cartelli stanno in lei, non nella scena,
-   così restano sopra alla cosa che indicano. L'altezza della fila la decide
-   la scena: la colonna degli orari si adatta (`contain:size`) e se non ci
-   sta scorre. */
-.cc-scena{position:relative;width:100%;aspect-ratio:1250/526;
-  max-height:calc(100vh - var(--stAlta) - 390px);min-height:340px;overflow:hidden;
-  container-type:size;box-shadow:inset -1px 0 0 rgba(255,255,255,.22)}
-.cc-quadro{position:absolute;left:50%;top:50%;width:max(100cqw, calc(100cqh * 1250 / 526));
+/* ==================== LA FOTO COI CARTELLI ====================
+   La foto riempie la pagina, tranne la striscia della linguetta degli
+   orari a destra. Dentro, `.cc-quadro` è la foto intera col suo rapporto
+   (1250 × 526), contenuta e non ritagliata — gli schermi sono meno larghi
+   della foto, e un ritaglio tagliava Bancone e Backstage —; i bordi che
+   restano li riempie la stessa foto sfocata (`.cc-sfondo`). I cartelli
+   stanno nel quadro, così restano sul bancone, sul palco, in sala e davanti
+   alla porta del backstage a qualsiasi misura. */
+.cc-sfondo{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;pointer-events:none}
+.cc-scena .cc-sfondo{inset:-30px;filter:blur(18px) brightness(.5)}
+.cc-casa{position:relative;height:100%;min-height:0}
+.cc-scena{position:relative;height:100%;margin-right:var(--ccLinguetta);overflow:hidden;container-type:size}
+.cc-quadro{position:absolute;z-index:1;left:50%;top:50%;width:min(100cqw, calc(100cqh * 1250 / 526));
   aspect-ratio:1250/526;transform:translate(-50%,-50%);
   background-size:100% 100%;background-repeat:no-repeat;container-type:inline-size}
-.cc-scena::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
-  box-shadow:inset -1px 0 0 rgba(255,255,255,.22)}
 /* di pomeriggio il palco è buio: la stanza si vede, un po' più scura */
-.cc-scena.cc-buio::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+.cc-scena.cc-buio::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
   background:radial-gradient(ellipse 30% 45% at 70% 45%,rgba(0,0,0,.42),transparent 75%)}
 
 /* i cartelli: riquadri scuri col filo chiaro, icona a sinistra */
@@ -66,14 +65,26 @@
 .cc-c-backstage{left:84.5%;top:55.3%;min-width:14.8%;min-height:15.6%}
 .cc-c-backstage i{color:#F5C451}
 
-/* ---- la colonna a destra ---- */
-.cc-info{padding:22px 24px 20px;display:flex;flex-direction:column;background:#0A0A0B;
-  contain:size;overflow-y:auto;scrollbar-width:none}
-.cc-info::-webkit-scrollbar{display:none}
+/* ==================== GLI ORARI, A SCOMPARSA ====================
+   CARLO, 01/10/2026: «la barra di destra con gli orari deve aprirsi quando
+   ci si passa sopra col cursore». Chiusa resta la linguetta (l'orologio,
+   «Orari», il pallino aperto/chiuso); col mouse sopra — o col tocco sulla
+   linguetta, `.aperta` — scorre fuori sopra alla foto. */
+.cc-info{position:absolute;z-index:6;top:0;right:0;bottom:0;width:min(360px,88vw);display:flex;
+  background:rgba(10,10,11,.97);box-shadow:-1px 0 0 rgba(255,255,255,.22);
+  transform:translateX(calc(100% - var(--ccLinguetta)));transition:transform .28s ease, box-shadow .28s}
+.cc-info.aperta{transform:none;box-shadow:-1px 0 0 rgba(255,255,255,.22),-24px 0 48px rgba(0,0,0,.6)}
+.cc-linguetta{flex:none;width:var(--ccLinguetta);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:16px 0;background:none;border:0;color:#F4F0E8}
+.cc-linguetta svg{width:24px;height:24px}
+.cc-linguetta b{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--ccMarker);font-weight:400;font-style:italic;
+  font-size:20px;letter-spacing:.06em;text-transform:uppercase}
+.cc-infocorpo{flex:1;min-width:0;padding:22px 24px 20px 6px;display:flex;flex-direction:column;
+  overflow-y:auto;scrollbar-width:none}
+.cc-infocorpo::-webkit-scrollbar{display:none}
 .cc-titolo{margin:0;padding:6px 0 14px;font-family:var(--ccMarker);font-weight:400;font-style:italic;
-  font-size:clamp(26px,2.5vw,46px);line-height:1;letter-spacing:.01em;text-transform:uppercase;color:#F4F0E8;
-  white-space:nowrap;
-  border-bottom:1px solid rgba(236,232,224,.5)}
+  font-size:clamp(26px,2.5vw,42px);line-height:1;letter-spacing:.01em;text-transform:uppercase;color:#F4F0E8;
+  white-space:nowrap;border-bottom:1px solid rgba(236,232,224,.5)}
 .cc-motto{margin:15px 0 0;font-size:17px;font-weight:700;color:#fff}
 .cc-desc{margin:12px 0 0;padding-bottom:18px;font-size:15px;line-height:1.46;color:var(--ccSoft);
   border-bottom:1px solid rgba(236,232,224,.4)}
@@ -90,216 +101,47 @@
   border-left:10px solid var(--ccRosso);border-top:7px solid transparent;border-bottom:7px solid transparent}
 .cc-stato{display:flex;align-items:center;gap:8px;margin:16px 0 0;font-size:15.5px;color:var(--ccSoft)}
 .cc-stato b{font-weight:600;color:var(--ccVerde)}
-.cc-pallino{width:13px;height:13px;border-radius:50%;background:var(--ccVerde);box-shadow:0 0 8px rgba(78,208,106,.5)}
+.cc-pallino{display:inline-block;flex:none;width:13px;height:13px;border-radius:50%;background:var(--ccVerde);box-shadow:0 0 8px rgba(78,208,106,.5)}
 .cc-pallino.no{background:var(--ccRosso);box-shadow:0 0 8px rgba(229,56,59,.5)}
 .cc-pallino.no + b{color:#FF8A8C}
 
-/* ==================== SOTTO: I QUATTRO RIQUADRI ==================== */
-.cc-giu{flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;padding:6px 0 10px}
-.cc-pan{display:flex;flex-direction:column;min-width:0;padding:0 11px;
-  box-shadow:inset -1px 0 0 rgba(255,255,255,.07)}
-.cc-pan:last-child{box-shadow:none}
-.cc-pank{position:relative;margin:0 0 0;padding:9px 0 8px 16px;font-family:var(--ccMarker);font-weight:400;font-style:italic;
-  font-size:clamp(16px,1.37vw,22px);line-height:1.1;letter-spacing:.02em;text-transform:uppercase;color:#F4F0E8;
-  white-space:nowrap;border-top:1px solid rgba(255,255,255,.22)}
-.cc-pank::before{content:"";position:absolute;left:1px;top:10px;bottom:6px;width:2px;background:rgba(244,240,232,.85)}
-.cc-pank span{margin-right:4px}
-.cc-box{position:relative;flex:1 1 auto;min-height:250px;border:1px solid rgba(255,255,255,.24);border-radius:6px;
-  background:var(--ccBox);overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.35)}
-.cc-dida{margin:9px 2px 0;font-size:13.5px;line-height:1.4;color:#D9D4CB}
-.cc-pan.lampo .cc-box{animation:ccLampo .9s ease-out}
-@keyframes ccLampo{0%{box-shadow:0 0 0 2px var(--ccOro),0 0 26px rgba(241,210,126,.45)}100%{box-shadow:0 10px 28px rgba(0,0,0,.35)}}
-.cc-vuoto{padding:16px;font-size:14px;line-height:1.45;color:var(--ccSoft)}
-.cc-foto{background-size:cover;background-position:center}
-
-/* ---- 1. la gente ---- */
-.cc-gente{display:grid;grid-template-columns:31% minmax(0,1fr)}
-.cc-lista{display:flex;flex-direction:column;padding:8px 0;border-right:1px solid rgba(255,255,255,.12);
-  overflow-y:auto;scrollbar-width:none}
-.cc-chi{position:relative;display:flex;align-items:center;gap:8px;padding:5px 8px 5px 6px;
-  background:none;border:0;text-align:left;border-radius:3px}
-.cc-chi.on{background:rgba(255,255,255,.07)}
-.cc-chi.on::after{content:"";position:absolute;right:0;top:4px;bottom:4px;width:3px;border-radius:2px;background:var(--ccRosso)}
-.cc-av{flex:none;width:36px;height:36px;border-radius:3px;overflow:hidden;border:1px solid rgba(255,255,255,.18)}
-.cc-volto{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
-.cc-chitx{display:flex;flex-direction:column;min-width:0}
-.cc-chitx b{display:block;font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-chitx i{font-style:normal;font-size:11.5px;color:var(--ccSoft)}
-.cc-tel{display:inline-block;vertical-align:-1px;width:11px;height:11px;color:#E8E3DA}
-.cc-dett{display:flex;flex-direction:column;gap:8px;padding:10px 10px 10px 12px;min-width:0;overflow-y:auto;scrollbar-width:thin}
-.cc-scheda{display:grid;grid-template-columns:clamp(70px,5.9vw,96px) minmax(0,1fr);gap:11px;align-items:start}
-.cc-ritratto{aspect-ratio:84/96;border-radius:4px;overflow:hidden;border:1.5px solid #C9A86A;background:#1a1a1a}
-.cc-chie{display:flex;flex-direction:column;min-width:0}
-.cc-chie > b{font-size:18px;font-weight:700;color:#fff;line-height:1.15}
-.cc-chie > i{font-style:normal;font-size:13px;color:var(--ccSoft)}
-.cc-badge{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 6px}
-.cc-badge span{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:4px;font-size:11.5px;font-weight:600}
-.cc-badge svg{width:11px;height:11px}
-.cc-badge .verde{background:rgba(52,168,83,.24);color:#8BE39A;box-shadow:inset 0 0 0 1px rgba(78,208,106,.3)}
-.cc-badge .grigio{background:rgba(255,255,255,.08);color:#C9C4BB}
-.cc-badge .viola{background:rgba(124,77,219,.3);color:#CDB2FF;box-shadow:inset 0 0 0 1px rgba(160,120,255,.3)}
-.cc-chie p{margin:0;font-size:12.5px;line-height:1.38;color:#D6D1C8}
-.cc-azioni,.cc-dialogo{display:flex;flex-direction:column;gap:4px}
-.cc-az{display:flex;align-items:center;gap:9px;min-height:30px;padding:4px 10px;text-align:left;
-  background:#16171A;border:1px solid rgba(255,255,255,.11);border-radius:4px;transition:background .12s,border-color .12s}
-.cc-az i{flex:none;width:16px;height:16px;color:#EDE8DF}
-.cc-az span{flex:1;min-width:0;font-size:14px;font-weight:600;color:#fff;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-az em{flex:0 1 auto;max-width:48%;font-style:normal;font-size:11px;line-height:1.25;color:var(--ccSoft);text-align:right}
-.cc-az.no{opacity:.5}
-.cc-dialogo p{margin:2px 0 4px;font-size:13.5px;line-height:1.4;color:#fff}
-.cc-dialogo .cc-az span{font-weight:500;font-size:13px;white-space:normal}
-.cc-beat{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:4px;background:#121316;
-  border:1px solid rgba(241,210,126,.3)}
-.cc-bcov{flex:none;width:26px;height:26px;border-radius:3px}
-.cc-bnm{flex:1;min-width:0;display:flex;flex-direction:column}
-.cc-bnm b{font-size:12.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-bnm i{font-style:normal;font-size:10.5px;color:var(--ccSoft)}
-.cc-beat button{flex:none;min-width:32px;height:32px;padding:0 7px;border-radius:4px;border:1px solid rgba(255,255,255,.16);
-  background:#1C1D21;font-size:12px}
-.cc-beat button.oro{color:#16120A;background:var(--ccOro);border-color:var(--ccOro);font-weight:700}
-.cc-beat button:disabled{opacity:.45}
-
-/* ---- 2. il palco ---- */
-.cc-palco{display:grid;grid-template-columns:47.5% minmax(0,1fr)}
-.cc-palco .cc-foto{border-right:1px solid rgba(255,255,255,.12)}
-.cc-cosa{display:flex;flex-direction:column;gap:5px;padding:11px 11px 10px}
-.cc-cosa h4{margin:0 0 3px;font-size:13.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff}
-.cc-mossa{position:relative;display:flex;flex-direction:column;padding:3px 11px 3px;text-align:left;
-  background:#141518;border:1px solid rgba(255,255,255,.16);border-radius:4px;transition:background .12s,border-color .12s}
-.cc-mossa b{font-size:14.5px;font-weight:700;color:#fff;line-height:1.15}
-.cc-mossa i{font-style:normal;font-size:11.5px;line-height:1.3;color:var(--ccSoft)}
-.cc-mossa em{position:absolute;right:9px;top:7px;font-style:normal;font-size:11px;color:var(--ccOro)}
-.cc-mossa.no b{color:#CFCAC1}
-.cc-mossa.no i{color:#E9A0A2}
-.cc-mossa.chiusa{opacity:.42;background:#111214}
-.cc-mossa.chiusa s{position:absolute;right:11px;top:50%;margin-top:-9px;width:18px;height:18px;color:#CFCAC1}
-
-/* ---- 3. la serata di oggi ---- */
-.cc-serata{display:flex;flex-direction:column}
-.cc-prog{display:grid;grid-template-columns:minmax(0,1fr) 34%;border-bottom:1px solid rgba(255,255,255,.14)}
-.cc-prog ul{list-style:none;margin:0;padding:6px 12px 6px 10px}
-.cc-prog li{display:flex;align-items:center;gap:12px;padding:8px 2px;border-bottom:1px solid rgba(255,255,255,.08)}
-.cc-prog li:last-child{border-bottom:0}
-.cc-prog li.passato{opacity:.55}
-.cc-prog li div{display:flex;flex-direction:column;min-width:0}
-.cc-prog li b{font-size:14.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-prog li i{font-style:normal;font-size:12px;color:var(--ccSoft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-ora{flex:none;display:inline-flex;align-items:center;gap:3px;padding:4px 7px;border-radius:4px;
-  font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
-.cc-ora svg{width:11px;height:11px}
-.cc-ora.rosso{background:#3B0F10;color:var(--ccOro);box-shadow:inset 0 0 0 1px #7C1E20}
-.cc-ora.rosso svg{color:#FF6B4A}
-.cc-ora.verde{background:#0F2A17;color:#D7F5DC;box-shadow:inset 0 0 0 1px #236B38}
-.cc-ora.verde svg{color:var(--ccVerde)}
-.cc-stasera{padding:10px 12px 10px;flex:1}
-.cc-stasera h4{margin:0 0 9px;font-size:14px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff}
-.cc-facce{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.cc-faccia{display:flex;flex-direction:column;align-items:stretch;padding:0;background:none;border:0;text-align:left;min-width:0}
-.cc-fr{position:relative;display:block;aspect-ratio:1/1;border-radius:4px;overflow:hidden;
-  background:#16171A;border:1px solid rgba(255,255,255,.14)}
-.cc-fr u{position:absolute;left:0;right:0;bottom:0;padding:2px 4px;text-decoration:none;font-size:10px;font-weight:700;
-  text-align:center;color:#16120A;background:var(--ccOro)}
-.cc-faccia b{margin-top:4px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cc-faccia i{font-style:normal;font-size:11px;color:var(--ccSoft)}
-
-/* ---- 4. i momenti durante il live ---- */
-.cc-momenti{display:flex;align-items:center;justify-content:flex-end;padding:14px 12px}
-.cc-mfoto{position:absolute;inset:0;background-size:cover;background-position:30% 60%}
-.cc-mfoto::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(40,6,10,.25),rgba(10,10,12,.35))}
-.cc-momento{position:relative;width:70%;display:flex;flex-direction:column;gap:8px;padding:14px 12px 12px;
-  border-radius:8px;background:rgba(12,12,14,.93);border:1px solid rgba(255,255,255,.26);
-  box-shadow:0 12px 30px rgba(0,0,0,.55)}
-.cc-msit{margin:0 0 4px;font-size:14px;line-height:1.45;color:#fff}
-.cc-mdetto{margin:0;font-size:12px;font-weight:600;color:var(--ccOro)}
-.cc-mopz{display:flex;flex-direction:column;padding:8px 12px;text-align:left;border-radius:6px;
-  background:rgba(34,34,37,.92);border:1px solid rgba(255,255,255,.13);transition:background .12s,border-color .12s}
-.cc-mopz b{font-size:14px;font-weight:700;color:#fff}
-.cc-mopz i{font-style:normal;font-size:12.5px;color:#D5D0C7}
-.cc-mopz i u{text-decoration:none;color:var(--ccOro)}
-.cc-meter{height:4px;border-radius:2px;background:rgba(255,255,255,.1);overflow:hidden}
-.cc-meter span{display:block;height:100%;background:linear-gradient(90deg,#E5383B,#F1D27E 55%,#4ED06A)}
-.cc-mvuoto{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:6px;
-  background:rgba(34,34,37,.6);border:1px dashed rgba(255,255,255,.16)}
-.cc-mvuoto b{font-size:13.5px;color:#fff}
-.cc-mvuoto i{font-style:normal;font-size:12.5px;color:var(--ccSoft)}
-.cc-esito p{margin:0;font-size:14px;line-height:1.45;color:#fff}
-.cc-esito p b{color:var(--ccOro)}
-.cc-esito .cc-extra{margin-top:6px;font-size:13px;color:#D5D0C7}
-.cc-esito .cc-extra b{color:#8FD6F0}
+/* le stanze come tasti sotto alla foto: solo sotto i 900 punti */
+.cc-porte{display:none}
 
 /* il passaggio del mouse, solo dove c'è un mouse: sul telefono il tocco
-   lascerebbe la riga accesa (la regola è di tutto il progetto) */
+   lascerebbe la colonna aperta (la regola è di tutto il progetto) */
 @media (hover:hover){
   .cc-cart:hover{border-color:#fff;transform:translateY(-2px)}
-  .cc-chi:hover{background:rgba(255,255,255,.04)}
-  .cc-az:hover:not(:disabled){background:#1D1F23;border-color:rgba(255,255,255,.22)}
-  .cc-mossa:hover:not(:disabled){background:#1C1D21;border-color:rgba(255,255,255,.3)}
-  .cc-faccia:hover .cc-fr{border-color:rgba(255,255,255,.35)}
-  .cc-mopz:hover{background:rgba(46,46,50,.95);border-color:rgba(255,255,255,.28)}
+  .cc-info:hover,.cc-info:focus-within{transform:none;box-shadow:-1px 0 0 rgba(255,255,255,.22),-24px 0 48px rgba(0,0,0,.6)}
+  .cc-porta:hover{border-color:rgba(255,255,255,.4);background:#17181B}
 }
 
-/* ==================== TUTTO NELLO SCHERMO ====================
-   Da 1181 punti in su (30/09/2026, CARLO: «non deve essere scrollabile ma
-   deve essere contenuta tutta nella viewport») la pagina non scorre: i
-   quattro riquadri hanno un'altezza fissa in fondo e la foto prende quello
-   che resta sopra, ritagliata come un `cover` (`.cc-quadro`, i cartelli si
-   spostano con lei). Sotto i 1180 i riquadri vanno su due righe e poi in
-   pila (stretto.css), e lì la pagina torna a scorrere. */
-@media (min-width:1181px){
-  .lfwrap.lfcircolo{overflow:hidden}
-  .cc{height:100%;min-height:0}
-  .cc-su{flex:1 1 0;min-height:0}
-  .cc-scena{aspect-ratio:auto;height:100%;max-height:none;min-height:0}
-  .cc-giu{flex:none;height:clamp(300px,41vh,440px);padding:4px 0 8px}
-  .cc-pan{min-height:0}
-  .cc-box{flex:1 1 0;min-height:0}
-  .cc-gente,.cc-palco{min-height:0;height:100%}
-  .cc-lista{min-height:0;overflow-y:auto;scrollbar-width:none}
-  .cc-lista::-webkit-scrollbar{display:none}
-  .cc-cosa{min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
-  .cc-dett{min-height:0}
-  .cc-serata{height:100%;min-height:0}
-  .cc-prog{flex:none}
-  .cc-stasera{min-height:0;overflow:hidden}
-  /* la serata a momenti: se la card non ci sta scorre lei, dentro al
-     riquadro, invece di uscire tagliata sopra e sotto */
-  .cc-momenti{height:100%;padding:8px 10px}
-  .cc-momento{max-height:100%;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.25) transparent}
-  /* le mosse chiuse (Showcase, Opening Act, Headline): il perché accanto
-     al nome quando ci sta, sotto quando no — mai coi puntini */
-  .cc-mossa.chiusa{flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:8px;padding-right:34px}
-  .cc-mossa.chiusa b{flex:none}
-  .cc-fr{aspect-ratio:auto;height:clamp(46px,7.8vh,120px)}
+/* ==================== SUGLI SCHERMI STRETTI ====================
+   Sotto i 900 punti la foto tiene il suo rapporto e sotto ci sono le
+   quattro stanze come tasti grandi; i cartelli sulla foto perdono le righe
+   sotto ma tengono la loro misura. La linguetta degli orari resta sul bordo
+   destro, e si apre col tocco. */
+@media (max-width:900px){
+  .cc-casa{height:auto;min-height:100%}
+  .cc-scena{height:auto;aspect-ratio:1250/526}
+  .cc-cart{align-items:center;gap:6px;padding:6px 9px;border-radius:6px}
+  .cc-cart i{width:18px;height:18px;margin:0}
+  .cc-cart b{font-size:12.5px;margin:0}
+  .cc-cart em{display:none}
+  .cc-c-backstage{left:auto;right:.5%}
+  .cc-porte{display:flex;flex-direction:column;gap:8px;margin-right:var(--ccLinguetta);
+    padding:14px 14px calc(16px + env(safe-area-inset-bottom,0px))}
+  .cc-porta{display:flex;align-items:center;gap:12px;min-height:58px;padding:10px 12px;text-align:left;
+    background:#111214;border:1px solid rgba(255,255,255,.18);border-radius:8px}
+  .cc-porta i{flex:none;width:26px;height:26px;color:#F3D9AE}
+  .cc-porta span{flex:1;min-width:0;display:flex;flex-direction:column}
+  .cc-porta b{font-size:16px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff}
+  .cc-porta em{font-style:normal;font-size:13px;color:var(--ccSoft)}
+  .cc-porta s{flex:none;width:18px;height:18px;color:var(--ccSoft)}
+  .cc-titolo{font-size:30px}
 }
-/* gli schermi bassi (1366 × 768, 1280 × 720): le didascalie sotto ai
-   riquadri e la descrizione nella colonna lasciano il posto a quello che
-   si usa, e le righe si stringono */
-@media (min-width:1181px) and (max-height:900px){
-  .cc-giu{height:clamp(300px,47vh,420px)}
-  .cc-dida{display:none}
-  .cc-desc{display:none}
-  .cc-motto{margin-top:10px}
-  .cc-info{padding:14px 20px 12px}
-  .cc-titolo{padding-bottom:10px;font-size:clamp(24px,2.2vw,38px)}
-  .cc-orari h4{margin:12px 0 6px}
-  .cc-orari li{padding:4px 10px}
-  .cc-stato{margin-top:10px}
-  .cc-pank{padding:6px 0 6px 16px}
-  .cc-cosa{gap:4px;padding:8px 9px}
-  .cc-mossa{padding:2px 10px}
-  .cc-mossa b{font-size:13.5px}
-  .cc-mossa i{font-size:11px;line-height:1.2}
-  .cc-prog li{padding:5px 2px}
-  .cc-stasera{padding:8px 10px}
-  .cc-stasera h4{margin-bottom:6px}
-  .cc-facce{gap:8px}
-  .cc-scheda{grid-template-columns:clamp(64px,5vw,84px) minmax(0,1fr)}
-  .cc-av{width:30px;height:30px}
-  .cc-chi{gap:6px;padding:4px 6px 4px 5px}
-  .cc-momento{width:84%;gap:6px;padding:10px 10px 9px}
-  .cc-msit{margin-bottom:2px;font-size:13px;line-height:1.35}
-  .cc-mopz{padding:6px 10px}
-  .cc-mopz b{font-size:13px}
-  .cc-mopz i{font-size:11.5px}
+/* sul telefono la foto è alta un dito: i cartelli sarebbero francobolli uno
+   sopra l'altro, e le stanze sono già i tasti grandi qui sotto */
+@media (max-width:620px){
+  .cc-cart{display:none}
 }

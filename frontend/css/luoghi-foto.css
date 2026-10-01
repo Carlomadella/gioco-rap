@@ -49,7 +49,10 @@
 /* ---- LE TRE COLONNE ----
    Come nello Studio, appoggiate in basso: il terzo alto è solo stanza. Senza
    le linguette sotto, il fondo è la riga in basso. */
-.lfwrap{position:absolute;left:0;right:0;top:var(--stAlta);bottom:calc(var(--stBanda) + 14px);
+/* la pagina parte dove finisce la fascia: `--lfAlta` la misura luoghi-foto.js
+   (sotto i 480 punti l'orologio va a capo e la fascia è più alta di
+   `--stAlta`: senza, le prime righe della pagina ci finivano sotto) */
+.lfwrap{position:absolute;left:0;right:0;top:var(--lfAlta,var(--stAlta));bottom:calc(var(--stBanda) + 14px);
   display:grid;grid-template-columns:330px minmax(0,1fr) 330px;gap:16px;
   padding:16px 18px;align-items:end;
   animation:rIn .38s cubic-bezier(.2,.9,.3,1)}
