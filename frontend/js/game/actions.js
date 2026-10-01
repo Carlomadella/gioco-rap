@@ -171,6 +171,32 @@ const ADF_LAVORO_CONTRATTI = Object.freeze({
   })
 });
 
+/* Carriera Fabbrica: requisiti di CANDIDATURA, non premi automatici.
+   L'evento che proporrà davvero aumento/promozione verrà collegato al catalogo
+   eventi in un passaggio dedicato. Qui costruiamo lo stato reale e gli effetti.
+   - aumento: dopo almeno 1 ciclo completo nel ruolo e affidabilità 60;
+   - promozione di ruolo: dopo almeno 3 cicli nel ruolo, affidabilità 75 e
+     almeno 2 cicli perfetti nel ruolo.
+   Le soglie sono centralizzate per poterle bilanciare senza toccare gli eventi. */
+const ADF_FABBRICA_CARRIERA = Object.freeze({
+  aumento:Object.freeze({
+    cicliNelRuolo:1,
+    affidabilita:60,
+    maxPerRuolo:1
+  }),
+  promozione:Object.freeze({
+    cicliNelRuolo:3,
+    affidabilita:75,
+    cicliPerfettiNelRuolo:2
+  }),
+  ruoli:Object.freeze([
+    Object.freeze({id:"operaio", n:"Operaio"}),
+    Object.freeze({id:"operaio_esperto", n:"Operaio esperto"}),
+    Object.freeze({id:"capolinea", n:"Capolinea"}),
+    Object.freeze({id:"capoturno", n:"Capoturno"})
+  ])
+});
+
 function lavoroSettimanaAssoluta(){
   return typeof totalWeeks === "function"
     ? Math.max(1, Number(totalWeeks()) || 1)
@@ -274,18 +300,163 @@ function lavoroCarriera(luogo){
       cyclesCompleted:0,
       perfectCycles:0,
       perfectStreak:0,
+      cyclesInRole:0,
+      perfectCyclesInRole:0,
+      roleId:null,
+      roleLevel:0,
+      raisesByRole:{},
+      payHistory:[],
+      roleHistory:[],
       lastEvaluatedCycle:null,
       lastEvaluation:null,
       evaluations:[]
     };
   }
+
   const c = sede.career;
   c.reliability = Math.max(0, Math.min(100, Number(c.reliability == null ? 50 : c.reliability)));
   c.cyclesCompleted = Math.max(0, Number(c.cyclesCompleted || 0));
   c.perfectCycles = Math.max(0, Number(c.perfectCycles || 0));
   c.perfectStreak = Math.max(0, Number(c.perfectStreak || 0));
+  c.cyclesInRole = Math.max(0, Number(c.cyclesInRole || 0));
+  c.perfectCyclesInRole = Math.max(0, Number(c.perfectCyclesInRole || 0));
+  if(!c.raisesByRole || typeof c.raisesByRole !== "object") c.raisesByRole = {};
+  if(!Array.isArray(c.payHistory)) c.payHistory = [];
+  if(!Array.isArray(c.roleHistory)) c.roleHistory = [];
   if(!Array.isArray(c.evaluations)) c.evaluations = [];
+
+  if(luogo === "fabbrica"){
+    const job = G.job && lavoroLuogo(G.job) === "fabbrica" ? G.job : null;
+    if(!c.roleId && job) c.roleId = job.id || "operaio";
+    const idx = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === c.roleId);
+    c.roleLevel = idx >= 0 ? idx : Math.max(0, Number(c.roleLevel || 0));
+  }
+
   return c;
+}
+
+function lavoroRuoloCorrente(luogo){
+  if(luogo !== "fabbrica") return null;
+  const c = lavoroCarriera(luogo);
+  if(!c) return null;
+  const job = G.job && lavoroLuogo(G.job) === luogo ? G.job : null;
+  const id = job && job.id ? job.id : c.roleId;
+  return ADF_FABBRICA_CARRIERA.ruoli.find(r => r.id === id) || null;
+}
+
+function lavoroProssimoRuolo(luogo){
+  if(luogo !== "fabbrica") return null;
+  const ruolo = lavoroRuoloCorrente(luogo);
+  if(!ruolo) return ADF_FABBRICA_CARRIERA.ruoli[0] || null;
+  const idx = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === ruolo.id);
+  return idx >= 0 ? (ADF_FABBRICA_CARRIERA.ruoli[idx + 1] || null) : null;
+}
+
+function lavoroAumentoDisponibile(luogo){
+  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return false;
+  const c = lavoroCarriera(luogo);
+  const ruolo = lavoroRuoloCorrente(luogo);
+  if(!c || !ruolo) return false;
+  const cfg = ADF_FABBRICA_CARRIERA.aumento;
+  const ricevuti = Math.max(0, Number(c.raisesByRole[ruolo.id] || 0));
+  return c.cyclesInRole >= cfg.cicliNelRuolo &&
+    c.reliability >= cfg.affidabilita &&
+    ricevuti < cfg.maxPerRuolo;
+}
+
+function lavoroPromozioneDisponibile(luogo){
+  if(luogo !== "fabbrica" || !G.job || lavoroLuogo(G.job) !== luogo) return false;
+  const c = lavoroCarriera(luogo);
+  const next = lavoroProssimoRuolo(luogo);
+  if(!c || !next) return false;
+  const cfg = ADF_FABBRICA_CARRIERA.promozione;
+  return c.cyclesInRole >= cfg.cicliNelRuolo &&
+    c.reliability >= cfg.affidabilita &&
+    c.perfectCyclesInRole >= cfg.cicliPerfettiNelRuolo;
+}
+
+/* Effetti reali che gli eventi useranno:
+   l'aumento modifica G.job.pay, quindi cambia da subito paga base e
+   maggiorazioni; la promozione cambia mansione ma NON il luogo di lavoro. */
+function lavoroApplicaAumento(luogo, opzioni){
+  opzioni = opzioni || {};
+  if(!lavoroAumentoDisponibile(luogo)) return null;
+
+  const c = lavoroCarriera(luogo);
+  const ruolo = lavoroRuoloCorrente(luogo);
+  const prima = Math.max(0, Number(G.job.pay || 0));
+  let dopo = prima;
+
+  if(opzioni.nuovaPaga != null) dopo = Math.round(Number(opzioni.nuovaPaga));
+  else if(opzioni.percentuale != null)
+    dopo = Math.round(prima * (1 + Number(opzioni.percentuale) / 100));
+  else if(opzioni.aumento != null) dopo = Math.round(prima + Number(opzioni.aumento));
+
+  if(!Number.isFinite(dopo) || dopo <= prima) return null;
+
+  G.job.pay = dopo;
+  c.raisesByRole[ruolo.id] = Math.max(0, Number(c.raisesByRole[ruolo.id] || 0)) + 1;
+  c.payHistory.push({
+    absoluteDay:lavoroGiornoAssoluto(),
+    roleId:ruolo.id,
+    from:prima,
+    to:dopo,
+    reason:opzioni.motivo || "aumento"
+  });
+  if(c.payHistory.length > 20) c.payHistory.shift();
+
+  return {luogo:luogo, ruolo:ruolo.id, prima:prima, dopo:dopo, aumento:dopo-prima};
+}
+
+function lavoroPromuoviRuolo(luogo, opzioni){
+  opzioni = opzioni || {};
+  if(!lavoroPromozioneDisponibile(luogo)) return null;
+
+  const c = lavoroCarriera(luogo);
+  const prima = lavoroRuoloCorrente(luogo);
+  const dopo = lavoroProssimoRuolo(luogo);
+  if(!prima || !dopo) return null;
+
+  const pagaPrima = Number(G.job.pay || 0);
+  const energiaPrima = Number(G.job.e || 0);
+
+  G.job.id = dopo.id;
+  G.job.n = dopo.n;
+  G.job.place = luogo;
+  if(opzioni.nuovaPaga != null && Number(opzioni.nuovaPaga) > 0)
+    G.job.pay = Math.round(Number(opzioni.nuovaPaga));
+  else if(opzioni.aumentoPaga != null && Number(opzioni.aumentoPaga) > 0)
+    G.job.pay = Math.round(pagaPrima + Number(opzioni.aumentoPaga));
+  if(opzioni.energia != null && Number(opzioni.energia) > 0)
+    G.job.e = Math.round(Number(opzioni.energia));
+
+  c.roleHistory.push({
+    absoluteDay:lavoroGiornoAssoluto(),
+    from:prima.id,
+    to:dopo.id,
+    payBefore:pagaPrima,
+    payAfter:Number(G.job.pay || pagaPrima),
+    energyBefore:energiaPrima,
+    energyAfter:Number(G.job.e || energiaPrima),
+    reason:opzioni.motivo || "promozione"
+  });
+  if(c.roleHistory.length > 12) c.roleHistory.shift();
+
+  c.roleId = dopo.id;
+  c.roleLevel = ADF_FABBRICA_CARRIERA.ruoli.findIndex(r => r.id === dopo.id);
+  c.cyclesInRole = 0;
+  c.perfectCyclesInRole = 0;
+  c.perfectStreak = 0;
+
+  return {
+    luogo:luogo,
+    da:prima,
+    a:dopo,
+    pagaPrima:pagaPrima,
+    pagaDopo:Number(G.job.pay || pagaPrima),
+    energiaPrima:energiaPrima,
+    energiaDopo:Number(G.job.e || energiaPrima)
+  };
 }
 
 function lavoroCicloInizioGiorno(ciclo){
@@ -333,8 +504,10 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
 
   if(eligible){
     carriera.cyclesCompleted += 1;
+    carriera.cyclesInRole += 1;
     if(perfect){
       carriera.perfectCycles += 1;
+      carriera.perfectCyclesInRole += 1;
       carriera.perfectStreak += 1;
       carriera.reliability = Math.min(100, carriera.reliability + 10);
     }else{
@@ -476,7 +649,11 @@ function lavoroCartellino(luogo){
     turniSettimanaliRichiesti:contratto ? Number(contratto.turniSettimanali || 0) : 0,
     affidabilita:carriera ? carriera.reliability : 50,
     mesiPerfetti:carriera ? carriera.perfectCycles : 0,
-    mesiPerfettiDiFila:carriera ? carriera.perfectStreak : 0
+    mesiPerfettiDiFila:carriera ? carriera.perfectStreak : 0,
+    cicliNelRuolo:carriera ? carriera.cyclesInRole : 0,
+    aumentoDisponibile:lavoroAumentoDisponibile(luogo),
+    promozioneDisponibile:lavoroPromozioneDisponibile(luogo),
+    prossimoRuolo:(lavoroProssimoRuolo(luogo) || {}).n || null
   };
 }
 
