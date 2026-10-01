@@ -379,8 +379,16 @@ function stradaTenta(colpoId, approccioId){
   s.giroAvviato=true;
   G.energy -= colpo.energia;
   const leadFabbrica = stradaFabbricaLeadAttivo(colpoId);
+  const leadLavoro = !leadFabbrica && window.ADF_WORK_EVENTS &&
+    typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
+      ? ADF_WORK_EVENTS.crimeLeadActive()
+      : null;
   const successo = Math.random() < stradaChance(colpo, approccio);
-  const leadUsato = leadFabbrica ? stradaConsumaPropostaFabbrica(colpoId, successo) : null;
+  const leadUsato = leadFabbrica
+    ? stradaConsumaPropostaFabbrica(colpoId, successo)
+    : (leadLavoro && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeCrimeLead === "function"
+      ? ADF_WORK_EVENTS.consumeCrimeLead(successo)
+      : null);
   const moltiplicatoreLead = leadUsato ? (1 + Number(leadUsato.bonusPct || 0) / 100) : 1;
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
   const rumoreLead = leadUsato ? Math.max(0, Number(leadUsato.extraHeat || 0)) : 0;
@@ -399,8 +407,11 @@ function stradaTenta(colpoId, approccioId){
     s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
     s.heat = clamp(s.heat + rumore * .6 + rumoreLead, 0, 100);
     diarioBordo().colpi++;
+    const fonteLead = leadUsato && leadUsato.sourceLabel
+      ? "Dritta dal lavoro (" + leadUsato.sourceLabel + ")"
+      : "Dritta fuori dalla Fabbrica";
     const notaLead = leadUsato
-      ? " <b>Dritta fuori dalla Fabbrica: +" + Number(leadUsato.bonusPct || 0) +
+      ? " <b>" + fonteLead + ": +" + Number(leadUsato.bonusPct || 0) +
         "% sul guadagno, +" + rumoreLead + " attenzione.</b>"
       : "";
     STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
@@ -409,7 +420,7 @@ function stradaTenta(colpoId, approccioId){
   }else{
     s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
     const notaLeadFallita = leadUsato
-      ? " La dritta arrivata fuori dalla Fabbrica è bruciata."
+      ? " La dritta arrivata " + (leadUsato.sourceLabel ? "dal lavoro" : "fuori dalla Fabbrica") + " è bruciata."
       : "";
     if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
       s.uomini--;
@@ -1230,12 +1241,22 @@ function renderStColpi(){
 
   centro.classList.remove("locked");
   const leadFabbrica = stradaFabbricaLeadAttivo();
+  const leadLavoro = window.ADF_WORK_EVENTS &&
+    typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
+      ? ADF_WORK_EVENTS.crimeLeadActive()
+      : null;
   griglia.innerHTML = STRADA_COLPI.map((c, i) => {
     const senzaEnergia = G.energy < c.energia;
-    const lead = leadFabbrica && leadFabbrica.colpoId === c.id ? leadFabbrica : null;
+    const leadFabbricaQui = leadFabbrica && leadFabbrica.colpoId === c.id ? leadFabbrica : null;
+    /* Il runtime usa la dritta Fabbrica solo sul colpo per cui è nata;
+       sugli altri colpi, un eventuale lead da Buttafuori/Fattorino resta valido. */
+    const lead = leadFabbricaQui || leadLavoro;
     const giorniLead = lead
       ? Math.max(1, Number(lead.expiresAbsoluteDay) - stradaAbsDay())
       : 0;
+    const fonteLead = leadFabbricaQui
+      ? "Dritta Fabbrica"
+      : (lead && lead.sourceLabel ? "Dritta " + lead.sourceLabel : "Dritta lavoro");
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
       '<div class="stchips">' +
@@ -1243,7 +1264,7 @@ function renderStColpi(){
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
         (lead
-          ? '<span class="stchip money">Dritta Fabbrica +' + Number(lead.bonusPct || 0) +
+          ? '<span class="stchip money">' + fonteLead + ' +' + Number(lead.bonusPct || 0) +
             '% · ' + giorniLead + (giorniLead === 1 ? ' giorno' : ' giorni') + '</span>'
           : '') +
       '</div><span class="go">→</span></button>';
