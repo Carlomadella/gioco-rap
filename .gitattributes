@@ -1,0 +1,2 @@
+# Il registro automatico resta LF anche nelle working copy Windows.
+registro-modifiche/*.md text eol=lf
