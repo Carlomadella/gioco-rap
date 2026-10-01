@@ -1062,6 +1062,8 @@ function lavoroAccettaStraordinario(luogo){
     bonusPct:offerta.bonusPct
   });
   if(stato.history.length > 24) stato.history.shift();
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+    ADF_WORK_EVENTS.onOvertime(luogo,"accepted",offerta);
   return offerta;
 }
 
@@ -1079,6 +1081,21 @@ function lavoroRifiutaStraordinario(luogo){
     bonusPct:offerta.bonusPct
   });
   if(stato.history.length > 24) stato.history.shift();
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+    ADF_WORK_EVENTS.onOvertime(luogo,"declined",offerta);
+  return offerta;
+}
+
+/* Se l'arbitro eventi non riesce a mostrare la richiesta non trasformiamo un
+   popup mai visto in un rifiuto del giocatore. Rimettiamo semplicemente lo
+   stato nella condizione precedente. */
+function lavoroAnnullaRichiestaStraordinario(luogo){
+  const stato = lavoroStraordinarioStato(luogo);
+  if(!stato || !stato.pendingOffer) return null;
+  const offerta = stato.pendingOffer;
+  stato.pendingOffer = null;
+  if(Number(stato.lastOfferWeek)===lavoroSettimanaAssoluta())
+    stato.lastOfferWeek = null;
   return offerta;
 }
 
@@ -1115,13 +1132,16 @@ function lavoroCompletaStraordinario(luogo){
     if(sede) delete sede.sundayPermitAbsoluteDay;
   }
 
-  return {
+  const result = {
     tipo:offerta.tipo,
     bonusPct:offerta.bonusPct,
     affidabilitaPrima:prima,
     affidabilitaDopo:c ? c.reliability : prima,
     affidabilitaDelta:c ? c.reliability - prima : 0
   };
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+    ADF_WORK_EVENTS.onOvertime(luogo,"completed",result);
+  return result;
 }
 
 function lavoroAggiornaStraordinariTempo(){
@@ -1153,6 +1173,14 @@ function lavoroAggiornaStraordinariTempo(){
       const sede = lavoroSede(luogo);
       if(sede) delete sede.sundayPermitAbsoluteDay;
     }
+
+    if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onOvertime === "function")
+      ADF_WORK_EVENTS.onOvertime(luogo,"missed",{
+        tipo:offerta.tipo,
+        targetAbsoluteDay:offerta.targetAbsoluteDay,
+        bonusPct:offerta.bonusPct,
+        reliabilityDelta:delta
+      });
 
     if(typeof pushLog === "function"){
       pushLog("<b>Straordinario saltato.</b> Avevi accettato il turno di " +
