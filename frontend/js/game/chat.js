@@ -779,6 +779,20 @@ function chatSpuntiLavoroGenerici(p){
        {n:"Finché reggo, reggo", d:"+rete", run(){ chRete(1); return "Basta che sai quando smettere."; }}
      ]}
   ];
+  if(p.ruolo === "collega") return [
+    {id:"turno", peso:3,
+     testo:() => "Domani tocca di nuovo. Se continuo così arrivo a casa e non ho testa per niente.",
+     opts:[
+       {n:"Ti capisco", d:"+benessere", run(){ chBene(3); chatAvvicina(p,1); return "Almeno con te non devo far finta che sia tutto leggero."; }},
+       {n:"Io provo a tenermi uno spazio fuori", d:"+lucidità", run(){ addLuc(3); return "Dovrei farlo anch'io. Se no il lavoro si mangia tutto."; }}
+     ]},
+    {id:"pausa", peso:2,
+     testo:() => "Alla prossima pausa prendiamoci un caffè con calma, senza parlare del turno.",
+     opts:[
+       {n:"Ci sto", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Perfetto. Almeno per dieci minuti si parla d'altro."; }},
+       {n:"Vediamo come gira la giornata", d:"+benessere", run(){ chBene(2); return "Ci sta. Tanto ci rivediamo qui."; }}
+     ]}
+  ];
   /* Rapper incontrato lavorando: resta un artista, ma il rapporto nasce fuori
      dal Circolo e non gli attribuiamo servizi che non ha. */
   return [
