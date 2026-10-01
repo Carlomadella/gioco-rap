@@ -363,14 +363,25 @@ function lfFabbricaCartellino(){
     for(let giorno = 0; giorno < 7; giorno++){
       const pos = settimana * 7 + giorno;
       const n = Number(cart.conteggi[pos] || 0);
+      const domenica = giorno === 6;
+      const settimanaConclusa = settimana < (cart.settimana - 1);
+      const nonLavorato = settimanaConclusa && !domenica && n === 0;
       const cls = "lfpres-day" +
         (n ? " fatto" : "") +
+        (domenica ? " domenica" : "") +
+        (nonLavorato ? " non-lavorato" : "") +
         (pos === cart.posOggi ? " oggi" : "") +
         (pos > cart.posOggi ? " futuro" : "");
       const testo = n > 1 ? "×" + n : n === 1 ? "✓" : "";
+      const stato = domenica
+        ? (n ? ": domenica straordinaria, " + n + (n === 1 ? " turno" : " turni") : ": domenica, riposo")
+        : n
+          ? ": " + n + (n === 1 ? " turno" : " turni")
+          : nonLavorato
+            ? ": non lavorato"
+            : "";
       html += '<span class="' + cls + '" title="Settimana ' + (settimana + 1) +
-        ', giorno ' + (giorno + 1) + (n ? ': ' + n + (n === 1 ? ' turno' : ' turni') : '') +
-        '">' + testo + '</span>';
+        ', giorno ' + (giorno + 1) + stato + '">' + testo + '</span>';
     }
     html += '</div>';
   }
