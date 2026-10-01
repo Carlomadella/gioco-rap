@@ -144,6 +144,8 @@ const POSTO_RUOLI = {
      al Circolo: sono contatti persistenti della vita fuori dalla Sala. */
   promoter: {n:"Promoter", k:"#FB7185",
     d:"Lavora con serate e locali. Può farti arrivare occasioni che al Circolo non passano."},
+  collega: {n:"Collega", k:"#94A3B8",
+    d:"Una persona conosciuta sul posto di lavoro. Non è per forza dentro alla musica."},
   strada: {n:"Conoscenza della Strada", k:"#F97316",
     d:"Una persona legata al giro della Strada. Compare solo se quel giro lo hai già avviato."}
 };
@@ -155,6 +157,7 @@ const POSTO_NOMI = {
   giornalista: ["Marta", "Dario", "Elisa", "Toni"],
   videomaker: ["Ciro", "Vale", "Manu", "Bea", "Tommy", "Zeta"],
   promoter: ["Riky", "Mauri", "Simo", "Vale P.", "Dado", "Nina"],
+  collega: ["Luca", "Marco", "Simo", "Vale", "Ale", "Marta", "Nico", "Sara"],
   strada: ["Cobra", "Lupo", "Moro", "Zero", "Nox", "Rami"]
 };
 
