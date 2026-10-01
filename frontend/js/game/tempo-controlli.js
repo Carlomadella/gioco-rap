@@ -701,7 +701,14 @@
   window.addEventListener("resize",()=>{queueSync(false);positionPanel();});
   window.addEventListener("scroll",()=>{if(panelOpen)positionPanel();},true);
 
-  const observer=new MutationObserver(()=>queueSync(false));
+  /* Le modifiche dentro al widget e al pannello le fa sync() stesso (testi,
+     classi del meteo): se contassero, ogni sync() ne chiederebbe un altro e il
+     widget rigirerebbe a ogni frame per sempre. Conta solo il resto della
+     pagina, cioè le schermate che si aprono e si chiudono. */
+  const proprio=n=>(dock&&dock.contains(n))||(panelRoot&&panelRoot.contains(n));
+  const observer=new MutationObserver(list=>{
+    if(list.some(m=>!proprio(m.target))) queueSync(false);
+  });
   observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});
 
   ensure();sync(true);

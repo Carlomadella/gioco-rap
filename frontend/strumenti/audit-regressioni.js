@@ -698,6 +698,13 @@ test("gli elementi dello Studio stanno in un file loro, caricato dopo studio.js"
   index.indexOf('js/game/studio-elementi.js') > index.indexOf('js/game/studio.js') &&
   index.includes('css/studio-elementi.css'));
 
+/* «Beat, Testo e Cabina a mano, il resto in automatico coi malus» */
+test("il resto in automatico sta in un file suo, dopo studio-elementi.js, e porta i due malus",
+  index.indexOf("js/game/studio-automatico.js") > index.indexOf("js/game/studio-elementi.js") &&
+  leggi("js/game/studio-automatico.js").includes("const STUDIO_AUTO_MIX = 3;") &&
+  studioEl.includes("(auto ? 0 : STUDIO_VENERDI_HYPE)") &&
+  studioEl.includes("delete s.esceAuto;"));
+
 test("la prima take e' lo stesso tiro di dado che registra faceva da sola",
   /* la cabina si apre vuota e ogni take, la prima compresa, e' quel dado */
   studioEl.includes("d.take = {k, l:[], s:0}") &&
@@ -725,7 +732,10 @@ test("tenere una take non costa energia: la sessione la paga la prima take (25 d
   studio.includes(`stPrimo(' data-ancora="1"', "Registra la take · " + costo + " energia"`));
 
 test("i cursori del banco partono al centro e al centro valgono zero",
-  studioEl.includes("d.banco = {voce:2, bassi:2, aria:2}") &&
+  /* dal 01/10/2026 stanno in `cursori`: `banco` e' il seed del pezzo sul banco (F2) */
+  studioEl.includes("d.cursori = {voce:2, bassi:2, aria:2}") && !studioEl.includes("d.banco = {voce") &&
+  /* la migrazione sta in studioDati, prima del recupero del pezzo sul banco */
+  /if\(d\.banco && typeof d\.banco === "object"\)\{\r?\n\s*if\(!d\.cursori\) d\.cursori = d\.banco;\r?\n\s*delete d\.banco;\r?\n\s*\}\r?\n[\s\S]{0,800}?if\(d\.banco === undefined\)/.test(studio) &&
   /* il carattere di ripiego, quello dei cursori fermi in mezzo, non da' punti */
   /PULITO",\s*q:0/.test(studioEl) &&
   actions.includes("+ studioBonus() + bancoBonus()"));
@@ -804,6 +814,18 @@ test("il Marketing sta sul telefono: «Che post fai?» in LaFamegram, e Fuori ci
   studio.includes("function studioFalloSapere()") &&
   studio.includes('data-lafamegram="1"') &&
   !studio.includes("function studioSezMarketing()"));
+/* «sull'app lafamegram non posta nessuno» (28/09/2026): rivali e gente della
+   Sala postano per conto loro, una volta a settimana, attaccati a vitaRivali. */
+test("su LaFamegram posta anche la gente: rivali e Sala, mescolati nel feed",
+  fs.existsSync(path.join(ROOT, "js/game/telefono-feed-gente.js")) &&
+  index.indexOf("js/game/telefono-feed-gente.js") > index.indexOf("js/game/telefono.js") &&
+  leggi("js/game/telefono-feed-gente.js").includes("vitaRivali = function") &&
+  leggi("js/game/telefono-feed-gente.js").includes("function feedGenteSala()") &&
+  tel.includes("G.lafamegramGente || []") &&
+  /* i post degli incontri si datano quando nascono, non quando apri l'app */
+  leggi("js/game/strada.js").includes('w:"in giro", tw:totalWeeks()') &&
+  ev.split('w:"adesso",tw:totalWeeks()').length >= 3 &&
+  !tel.includes("p.tw = ora"));
 test("il feat si sceglie in Cabina, da due porte: chi conosci gratis, la classifica a pagamento e con rifiuto",
   studio.includes("function studioCabinaConChi(ft)") &&
   studio.includes("function studioChiamaRivale(nome)") &&
@@ -861,9 +883,11 @@ test("il riquadro dei numeri divide qualita' e ascolti, con le parti scritte all
   actions.indexOf("const conFeat = featBonus()") < actions.indexOf("studioConsumaFeat() : null") &&
   actions.includes("parti:{beat:bt.q, testo:b.q, fonico:conFonico, feat:conFeat, take:presa}") &&
   actions.includes("if(s.parti) s.parti.mix = mixGain();"));
-test("il pezzo sul banco (F2): Mix e Uscita si aprono su di lui e si chiudono quando esce o va in cassaforte",
+/* dal 01/10/2026 Mix e Uscita non si chiudono piu' (le linguette sono aperte
+   sempre): il banco si riempie e si svuota lo stesso, e studioSbloccato non c'e' piu' */
+test("il pezzo sul banco (F2): Mix e Uscita lavorano su di lui, e il banco si svuota quando esce o va in cassaforte",
   studio.includes("function studioSulBanco()") &&
-  studio.includes("return !!studioSulBanco();") &&
+  !studio.includes("function studioSbloccato()") &&
   actions.includes('if(typeof studioMettiSulBanco === "function") studioMettiSulBanco(seed);') &&
   actions.includes('if(typeof studioSvuotaBanco === "function") studioSvuotaBanco(s);') &&
   studioEl.includes("studioSvuotaBanco(s);                    /* il banco si svuota") &&
@@ -1015,7 +1039,7 @@ test("la stima degli stream tiene conto del tetto della fase, come fa sim.js il 
 test("l'uscita di venerdi' costa la lucidita' come quella mandata fuori a mano",
   (() => {
     const a = studioEl.indexOf("function studioUscitePronte()");
-    const corpo = a >= 0 ? studioEl.slice(a, a + 1400) : "";
+    const corpo = a >= 0 ? studioEl.slice(a, a + 1900) : "";
     return corpo.includes('if(typeof addLuc === "function") addLuc(-1);');
   })());
 
@@ -2015,10 +2039,15 @@ test("quando la parte 2 esce (a mano o di venerdi') il primo torna a girare, e l
   sim.includes('const curve = typeof curvaPezzo === "function" ? curvaPezzo(s, age)') &&
   sim.includes('const seguitoPull = typeof seguitoAscolti === "function" ? seguitoAscolti(s) : 0;') &&
   sim.includes("let out = (fanPull + scoperta + featPull + seguitoPull) * curve * rnd(0.8, 1.25);"));
-test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, apre il Mix a banco vuoto, costa come un mix piu' la sala, una volta sola per pezzo",
+test("le linguette dello Studio sono aperte sempre (21/09/2026 sera, «lascia sbloccate le fasi dello studio bloccate»): studioSezAperta non guarda piu' il banco",
+  /function studioSezAperta\(x\)\{\r?\n  return !!x;\r?\n\}/.test(studio) &&
+  !studio.includes("if(!x.dopo || studioSbloccato()) return true;") &&
+  /* e il lucchetto non c'e' piu': niente classe chiusa, niente toast, niente ritorno al Beat */
+  !studio.includes('" chiusa"') && !studio.includes("rimettici un pezzo") &&
+  !leggi("css/studio.css").includes(".sttab.chiusa"));
+test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: la mossa c'e' solo finche' e' prenotata, costa come un mix piu' la sala, una volta sola per pezzo",
   actions.includes('{id:"remaster", n:"Remastered", e:24, luc:2,') &&
   actions.includes('avail:() => typeof remasterPrenotato === "function" && !!remasterPrenotato(),') &&
-  studio.includes('return x.id === "banco" && typeof remasterPrenotato === "function" && !!remasterPrenotato();') &&
   studio.includes('const remaster = typeof remasterPannello === "function" ? remasterPannello() : "";') &&
   seguiti.includes("if(!s || s.remaster){ d.remaster = null; return null; }") &&
   seguiti.includes("function remasterBase(){") && !seguiti.includes("? mixGain()") &&
@@ -3026,7 +3055,7 @@ console.log("\nLe tre del Marketing (20/09/2026)");
   test("il bot del simulatore di bilanciamento trova ancora finestre, colpi e azioni per nome", altro.length === 0, altro.join(", "));
 })();
 
-for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/lavoro-eventi.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
+for(const f of ["strumenti/build.js","strumenti/verifica-build.js","js/game/eventi-v2.js","js/game/eventi-tempo.js","js/game/telefono.js","js/game/actions.js","js/game/writer.js","js/game/hub.js","js/game/ui.js","js/game/orari.js","js/game/spostamenti.js","js/game/strada-crimine-ui.js","js/game/strada-crimine.js","js/game/tempo.js","js/game/tempo-controlli.js","js/menu-sistema.js","js/game/studio.js","js/game/studio-elementi.js","js/game/studio-automatico.js","js/game/piazza.js","js/game/negozio.js","js/game/crime-caption.js","js/game/abilita.js","js/servizio.js","js/game/agenda.js","js/game/lavoro-eventi.js","js/game/transizioni-video.js","js/game/luoghi-foto.js","js/preparo.js","js/gioco-ingresso.js"]){
   try{ new Function(leggi(f)); test(f + " compila", true); }
   catch(e){ test(f + " compila", false, e.message); }
 }
