@@ -769,7 +769,7 @@ function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle
     }
   }
 
-  return result;
+  if(!opts.silent && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onDiscipline === "function")\n    ADF_WORK_EVENTS.onDiscipline(luogo,result);\n\n  return result;
 }
 
 /* Recupera le settimane già concluse del ciclo corrente.
@@ -933,7 +933,7 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
         absences + (absences === 1 ? " assenza." : " assenze."), absences ? "bad" : "");
     }
   }
-  return evaluation;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.onCycle === "function")\n    ADF_WORK_EVENTS.onCycle(luogo,evaluation);\n  return evaluation;
 }
 
 function lavoroChiudiCiclo(luogo){
@@ -1906,7 +1906,10 @@ const ACTIONS = [
         è andata la gente, da 0,55 a 1,45, pesa sulla resa. Da fuori (l'agenda,
         una card) vale 1, com'è sempre stato. */
      const resa = typeof circoloResaSerata === "function" ? circoloResaSerata() : 1;
-     const molt = (giaOggi ? 0.45 : 1) * peso * resa;
+     const leadLavoro = (window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeMusicLead === "function")
+       ? ADF_WORK_EVENTS.consumeMusicLead("live") : null;
+     const moltLavoro = leadLavoro ? Math.max(1, Number(leadLavoro.multiplier || 1)) : 1;
+     const molt = (giaOggi ? 0.45 : 1) * peso * resa * moltLavoro;
      const f = Math.round((rnd(8,30) + presenzaSulPalco()*1.4 + G.hype*0.7) * RITMO * molt);
      const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO * molt);
      const lbb = lifeBonus();
@@ -1915,6 +1918,7 @@ const ACTIONS = [
      adfSegnaOggi("live");
      diarioBordo().live++;
      return "Serata fatta: +" + f + " fan, +" + m + " €." +
+       (leadLavoro ? " <b>Il contatto nato al lavoro ha spinto davvero la serata ×" + moltLavoro.toFixed(2) + ".</b>" : "") +
        (giaOggi ? " Il palco lo conoscevano già: oggi rende meno." : "");
    }},
 
