@@ -30,7 +30,6 @@
     anteprima:30,      /* punto 8 dello Studio: quindici secondi da girare e postare */
     free:120,
     live:180,
-    cercalavoro:90,
     stacca:180,
     palestra_pesi:75,
     palestra_cardio:45,
@@ -380,15 +379,6 @@
       return out;
     };
   }
-
-  /* Cerca lavoro apre una scelta ma il codice legacy non chiude la transazione. */
-  document.addEventListener("click",ev=>{
-    const opt=ev.target&&ev.target.closest?ev.target.closest("#m-opts .opt2"):null;
-    if(!opt || !TEMPO_AZIONE || !TEMPO_AZIONE.viva || TEMPO_AZIONE.id!=="cercalavoro") return;
-    window.azioneFatta();
-    if(typeof save === "function") save();
-    if(typeof renderGioco === "function") renderGioco();
-  },false);
 
   if(typeof avanzaGiorno === "function"){
     const originaleGiorno=avanzaGiorno;
