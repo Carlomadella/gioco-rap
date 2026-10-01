@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 01/10/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 02/10/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -123,6 +123,11 @@ non resta niente.
   sopra agli edifici»*;
 - Studio, Casa e Attività criminali sono ancora ammassate, e i pulsanti sopra la mappa
   restano grossi rispetto ai quadratini (foglio dei punti nuovi, Alessio);
+  **FATTO in parte (02/10/2026)** — la mappa non ha più solo il Circolo in alto al centro: lo
+  Shop è salito sul palazzo coi manifesti viola in alto a sinistra del Circolo (15 minuti dal
+  Circolo, 45 da Studio e Strada, 60 dalla zona industriale) e Casa è andata dov'era lo Shop
+  (`HUB_SAGOME` in `frontend/js/game/hub.js`, `TRAVEL_POS` in `spostamenti.js`). Il vecchio
+  palazzo di Casa resta senza cartello; i pulsanti grossi restano da fare;
 - meno cartelli chiusi e più roba che si apre — *«Meno cartelli chiusi sulla mappa, più
   roba che si apre»*, a metà;
 - ogni parte del gioco con la sua ambientazione, e le schermate rifatte identiche alle foto

@@ -149,11 +149,14 @@ const HUB_SAGOME = Object.freeze({
   pizzeria:[[49.64,69.29],[56.94,63.55],[62.44,66.95],[62.20,74.39],[58.31,80.23],
             [52.15,87.14],[47.73,83.74],[46.53,75.88]],
   beat:    [[44.86,31.88],[51.32,28.27],[58.31,31.03],[58.13,36.66],[52.93,39.53],[44.98,37.41]],
-  vita:    [[19.50,34.22],[23.92,31.03],[30.08,33.16],[29.90,41.23],[25.72,43.57],[19.74,41.23]],
+  /* 02/10/2026, Carlo: Casa va dov'era lo Shop (il palazzo stretto in alto a
+     sinistra), lo Shop sale sul palazzo coi manifesti viola in alto a
+     sinistra del Circolo. Il vecchio palazzo di Casa resta senza cartello. */
+  vita:    [[12.26,25.72],[14.53,23.59],[17.46,25.50],[17.52,31.88],[16.93,34.86],[12.44,33.79]],
   crimin:  [[1.79,65.36],[12.26,63.55],[14.95,72.26],[11.06,80.98],[3.29,78.64]],
   fabbrica:[[75.48,42.51],[79.84,38.89],[85.41,37.94],[92.11,42.72],[91.81,47.61],[87.44,49.73],[75.72,48.03]],
   palestra:[[74.16,76.09],[75.48,71.84],[82.24,69.08],[86.72,73.33],[86.48,79.91],[85.53,84.59],[74.64,85.02]],
-  shop:    [[12.26,25.72],[14.53,23.59],[17.46,25.50],[17.52,31.88],[16.93,34.86],[12.44,33.79]],
+  shop:    [[33.00,20.60],[39.60,19.60],[44.50,19.80],[44.50,30.30],[41.30,30.60],[33.20,28.40]],
 });
 
 /* Dal profilo si ricavano tre cose: il rettangolo che lo contiene (la misura
@@ -208,7 +211,7 @@ const HUB_DISTRICT = Object.freeze({
   vita:"periferia",
   crimin:"periferia",
   beat:"centro",
-  shop:"periferia",
+  shop:"centro",
   fabbrica:"industriale",
   pizzeria:"industriale",
   palestra:"industriale"

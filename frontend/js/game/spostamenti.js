@@ -44,7 +44,11 @@
     crimin:    {x:15.460, y:84.585},
     fabbrica:  {x:88.410, y:29.580},
     palestra:  {x:75.520, y:85.415},
-    shop:      {x:54.035, y:44.335},
+    /* 02/10/2026: lo Shop è salito in alto a sinistra del Circolo — sempre a
+       15 minuti dal Circolo, più vicino a Studio e Strada (45), più lontano
+       da Pizzeria, Fabbrica e Palestra (60). Casa ha solo cambiato palazzo
+       nella foto, a due passi, e i suoi tragitti restano quelli. */
+    shop:      {x:42.000, y:13.000},
   });
 
   /* Solo i lavori che hanno già un punto fisico esplicito sulla mappa. */

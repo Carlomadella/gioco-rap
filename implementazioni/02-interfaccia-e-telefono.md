@@ -2914,3 +2914,18 @@ sempre PULITO e muoverne uno dava «Cannot use 'in' operator». Adesso stanno in
 `G.studio.cursori`, e un salvataggio vecchio con l'oggetto in `banco` lo sposta lì. Le prove
 in `strumenti/prova.js` (le linguette a banco vuoto, i cursori con un pezzo sopra), due
 controlli nell'audit, il test della remastered in `seguiti.test.js` aggiornato.
+
+## La mappa: lo Shop in alto a sinistra del Circolo, Casa dov'era lo Shop
+
+CARLO, 02/10/2026: «non mi piace così con solo il circolo in alto al centro» — «sposta lo
+shop in alto a sinistra del circolo ovviamente con le relative distanze e mettere la casa al
+posto dello shop».
+
+**FATTO (02/10/2026)** — branch `task/mappa-shop-casa`. In `HUB_SAGOME`
+(`frontend/js/game/hub.js`) lo Shop ha la sagoma del palazzo coi manifesti viola in alto a
+sinistra del Circolo, misurata sulla foto, e il suo quartiere è il centro. Casa ha preso la
+sagoma che era dello Shop, il palazzo stretto in alto a sinistra. Il vecchio palazzo di Casa
+resta senza cartello. Le distanze: in `TRAVEL_POS` (`spostamenti.js`) lo Shop è in alto a
+sinistra del Circolo e ci resta a 15 minuti; da Studio e Attività criminali passa da 60 a
+45, da Pizzeria, Fabbrica e Palestra da 45 a 60, da Casa resta 45. I tragitti di Casa non
+cambiano: nella foto si è spostata di poco.
