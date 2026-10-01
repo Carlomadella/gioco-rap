@@ -840,7 +840,7 @@ function chatTuLavoroGenerico(p){
 }
 
 function chatTuSala(p, fonico){
-  if(["rapper","promoter","strada"].includes(p.ruolo))
+  if(["rapper","promoter","collega","strada"].includes(p.ruolo))
     return chatTuLavoroGenerico(p);
   if(p.ruolo === "videomaker") return [
     {n:"Quando giriamo?",
@@ -879,7 +879,7 @@ function chatTuSala(p, fonico){
 function chatContattoSala(p){
   const fonico = p.ruolo === "fonico";
   const video = p.ruolo === "videomaker";
-  const generico = ["rapper","promoter","strada"].includes(p.ruolo);
+  const generico = ["rapper","promoter","collega","strada"].includes(p.ruolo);
   const r = (typeof POSTO_RUOLI === "object" && POSTO_RUOLI[p.ruolo]) || {k:"#94A3B8", n:"Contatto"};
   const origine = p.origineLuogo
     ? " · " + (p.origineDettaglio || "conosciuto al lavoro")
@@ -907,7 +907,7 @@ function chatContattoSala(p){
 /* chi ti ha dato il numero ed è ancora in giro.
    Può essere una persona conosciuta alla Sala oppure sul lavoro: in entrambi
    i casi è la stessa persona persistente in G.gente, non un contatto finto. */
-const CHAT_MESTIERI = ["beatmaker","fonico","videomaker","rapper","promoter","strada"];
+const CHAT_MESTIERI = ["beatmaker","fonico","videomaker","rapper","promoter","collega","strada"];
 function chatDaSala(){
   return (G.gente || [])
     .filter(x => x.numero && !x.via && CHAT_MESTIERI.indexOf(x.ruolo) >= 0)
@@ -932,9 +932,11 @@ function chatPresentazione(p){
         ? intro + "Faccio beat. Se ti serve roba nuova, scrivimi."
         : p.ruolo === "promoter"
           ? intro + "Giro tra locali e serate. Se passa qualcosa di sensato, ti scrivo."
-          : p.ruolo === "strada"
-            ? intro + "Hai il mio numero. Usalo solo quando serve."
-            : intro + "Anche io faccio musica. Quando hai qualcosa fuori, mandamela.";
+          : p.ruolo === "collega"
+            ? intro + "Ci vediamo già al lavoro. Se hai bisogno di staccare un attimo dal turno, scrivimi."
+            : p.ruolo === "strada"
+              ? intro + "Hai il mio numero. Usalo solo quando serve."
+              : intro + "Anche io faccio musica. Quando hai qualcosa fuori, mandamela.";
   chatBolla(t, "loro", testo);
   t.nonLetti = (t.nonLetti || 0) + 1;
 }
