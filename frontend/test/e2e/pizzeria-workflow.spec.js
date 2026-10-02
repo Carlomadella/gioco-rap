@@ -78,7 +78,11 @@ test("Pizzeria: 24 servizi non diventano una raffica di popup o contatti musical
        - passa la chance rete Pizzeria (>= .22);
        - passa social/ruolo/fisico;
        - NON forza le coperture extra (.14/.16). */
-    Math.random=()=>.17;
+    let rngState=123456789;
+    Math.random=()=>{
+      rngState=(Math.imul(rngState,1664525)+1013904223)>>>0;
+      return .17+(rngState/4294967296)*.045;
+    };
 
     window.showEvent=e=>{
       const voce={
@@ -157,6 +161,7 @@ test("Pizzeria: 24 servizi non diventano una raffica di popup o contatti musical
       incontri:history.length,
       persone:persone.length,
       personeUniche:unici.size,
+      idPersoneUnici:new Set(persone.map(p=>p.id)).size,
       reincontri:Math.max(0,history.length-unici.size),
       musicali,
       rete:Number(G.skills&&G.skills.rete||0),
@@ -175,8 +180,10 @@ test("Pizzeria: 24 servizi non diventano una raffica di popup o contatti musical
   expect(risultato.warnings).toBe(0);
 
   expect(risultato.incontri).toBeGreaterThan(1);
-  expect(risultato.persone).toBeGreaterThan(0);
+  expect(risultato.persone).toBeGreaterThan(1);
   expect(risultato.persone).toBeLessThanOrEqual(5);
+  expect(risultato.idPersoneUnici).toBe(risultato.persone);
+  expect(risultato.personeUniche).toBe(risultato.persone);
   expect(risultato.reincontri).toBeGreaterThan(0);
 
   /* La maggioranza delle persone persistenti deve restare normale. */
@@ -187,3 +194,107 @@ test("Pizzeria: 24 servizi non diventano una raffica di popup o contatti musical
   expect(risultato.decisioni).toBeLessThan(24);
   expect(risultato.socialPopup).toBeLessThanOrEqual(8);
 });
+
+test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso giorno", async ({ page }) => {
+  test.setTimeout(60000);
+  await preparaPizzeria(page);
+
+  const out=await page.evaluate(async () => {
+    G.day=3;
+    G.timeMinutes=16*60;
+    G.energy=100;
+    G.fans=100;
+    G.hype=10;
+
+    const promoPlace=GAME_TRAVEL.requiredPlaceForAction("promo");
+    if(promoPlace) G.currentPlace=promoPlace;
+
+    const tempoPrima=GAME_TIME.now();
+    const promoOk=avviaAzioneDiretta("promo");
+    await new Promise(r=>setTimeout(r,80));
+    const dopoPromo=GAME_TIME.now();
+
+    const viaggio=GAME_TRAVEL.go("pizzeria");
+    const dopoViaggio=GAME_TIME.now();
+
+    const appuntamento={id:"live",n:"Serata live",ic:"microfono",k:"#fff",ora:"21:00"};
+    AGENDA.segna(appuntamento,"azione");
+
+    const originaleShow=window.showEvent;
+    let conflitti=0;
+    const scelte=[];
+
+    window.showEvent=e=>{
+      const opts=Array.isArray(e&&e.opts)?e.opts:[];
+      if(String(e&&e.k||"").includes("Conflitto")){
+        conflitti++;
+        const nome=conflitti===1 ? "Tieni l'appuntamento" : "Vai al turno";
+        const opt=opts.find(x=>x&&x.n===nome);
+        scelte.push(nome);
+        if(opt&&typeof opt.run==="function") opt.run();
+        return true;
+      }
+
+      const innocua=opts.find(x=>x&&[
+        "Saluta e vai","Non adesso","Lascia stare","Resta nel ruolo attuale",
+        "Rifiuta","Non posso","Va bene"
+      ].includes(x.n)) || opts[0];
+      if(innocua&&typeof innocua.run==="function"){
+        try{ innocua.run(); }catch(_){}
+      }
+      return true;
+    };
+
+    const primo=avviaAzioneDiretta("turno");
+    await new Promise(r=>setTimeout(r,120));
+    const dopoRifiuto={
+      shifts:Number(G.shifts||0),
+      money:Number(G.money||0),
+      time:GAME_TIME.now()
+    };
+
+    const secondo=avviaAzioneDiretta("turno");
+    await new Promise(r=>setTimeout(r,500));
+
+    const sede=G.workplaces.pizzeria||{};
+    const state=sede.workEvents||{};
+    const conflittoLavoro=(state.history||[]).find(x=>
+      x&&x.family==="conflict"&&x.choice==="work"&&x.appointmentId==="live"
+    );
+
+    const result={
+      tempoPrima,dopoPromo,dopoViaggio,
+      promoOk:promoOk!==false,
+      viaggioOk:!!(viaggio&&viaggio.ok),
+      primo,
+      secondo,
+      conflitti,scelte,
+      dopoRifiuto,
+      shifts:Number(G.shifts||0),
+      money:Number(G.money||0),
+      time:GAME_TIME.now(),
+      missed:!!(conflittoLavoro&&conflittoLavoro.missed),
+      appointmentStillThere:AGENDA.conflittiTra(17*60,22*60).some(x=>x.id==="live")
+    };
+
+    window.showEvent=originaleShow;
+    return result;
+  });
+
+  expect(out.promoOk).toBe(true);
+  expect(out.dopoPromo-out.tempoPrima).toBe(45);
+  expect(out.viaggioOk).toBe(true);
+  expect(out.dopoViaggio).toBeGreaterThanOrEqual(out.dopoPromo);
+
+  expect(out.conflitti).toBe(2);
+  expect(out.scelte).toEqual(["Tieni l'appuntamento","Vai al turno"]);
+  expect(out.dopoRifiuto.shifts).toBe(0);
+  expect(out.dopoRifiuto.money).toBe(0);
+
+  expect(out.shifts).toBe(1);
+  expect(out.money).toBe(100);
+  expect(out.time).toBe(out.dopoViaggio+300);
+  expect(out.missed).toBe(true);
+  expect(out.appointmentStillThere).toBe(false);
+});
+
