@@ -6,6 +6,40 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:39cec21b -->
+## 02/10/26, 21:24 — feature/strada-punto3-persone → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `39cec21b`
+
+### Cosa è entrato
+
+- `356f0ae9` — fix(circolo): mantieni il contratto storico del cast Sala — **mycolbraga**
+- `5336d549` — fix(circolo): preserva esplicitamente il filtro storico della Sala — **mycolbraga**
+- `0b08aa07` — chore(frontend): aggiorna cache per persone Strada persistenti — **mycolbraga**
+- `929b6979` — test(strada): copri la rivelazione criminale di un collega reale — **mycolbraga**
+- `a4a1dfa6` — feat(strada): lascia emergere il lato criminale dei colleghi reali — **mycolbraga**
+- `82bccd79` — test(persone): copri persistenza e integrazione Circolo dei contatti Strada — **mycolbraga**
+- `e4110fef` — feat(strada): registra le opportunita sulla persona reale — **mycolbraga**
+- `b295ed0b` — test(strada): richiedi persone reali per le dritta della Fabbrica — **mycolbraga**
+- `2b8ff590` — test(strada): verifica continuita della persona introduttiva — **mycolbraga**
+- `9aea26fc` — feat(circolo): mostra con continuita i contatti della Strada — **mycolbraga**
+- `c97317cd` — feat(persone): integra i contatti Strada nel Circolo senza romperne i dialoghi — **mycolbraga**
+- `a93923a6` — feat(strada): trasforma i contatti criminali in persone persistenti — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/circolo-stanze.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:252e6f8f -->
 ## 02/10/26, 21:07 — feature/strada-punto2-traphone → main
 
