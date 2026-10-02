@@ -34,6 +34,11 @@ function contestoStrada(overrides = {}){
     week:1,
     day:5,
     job:{id:"operaio",place:"fabbrica",n:"Operaio"},
+    gente:[{
+      id:"pf1",n:"Luca",ruolo:"collega",origine:"lavoro",origineLuogo:"fabbrica",
+      rel:1,pt:0,via:false,circoloSbloccato:true,
+      strada:{known:true,key:"intro:pf1",sources:["intro"],opportunityIds:[]}
+    }],
     strada:{
       rep:0,
       heat:0,
@@ -57,6 +62,7 @@ function contestoStrada(overrides = {}){
     ...overrides
   };
   const logs = [];
+  let personaSeq=0;
   const ctx = {
     G,
     Object,
@@ -64,6 +70,12 @@ function contestoStrada(overrides = {}){
     Math,
     Array,
     Set,
+    String,
+    window:{},
+    nuovaPersona:ruolo=>({
+      id:"ps"+(++personaSeq),ruolo,n:"Cobra",rel:0,pt:0,via:false,
+      attivita:{},car:"pratico",fama:10,circoloSbloccato:false
+    }),
     clamp:(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0)),
     lavoroLuogo: job => job && job.place || null,
     pushLog:(msg, cls) => logs.push({msg, cls})
@@ -109,6 +121,8 @@ describe("Fabbrica × Strada", () => {
     const proposta = vm.runInContext("stradaTentaPropostaFabbrica(0,0)", ctx);
     expect(proposta.id).toBe("giro-breve");
     expect(proposta.colpoId).toBe("consegne");
+    expect(proposta.personId).toBe("pf1");
+    expect(proposta.persona).toBe("Luca");
     expect(proposta.bonusPct).toBe(15);
     expect(proposta.chanceDelta).toBeCloseTo(.08);
     expect(proposta.successHeat).toBe(1);
@@ -121,6 +135,18 @@ describe("Fabbrica × Strada", () => {
     expect(attiva.expiresAbsoluteDay).toBe(12);
     expect(G.strada.fabbricaLead.pending).toBeNull();
     expect(G.strada.fabbricaLead.active.colpoId).toBe("consegne");
+  });
+
+  it("la Fabbrica non inventa una faccia criminale se nessun contatto reale del posto è collegato alla Strada",()=>{
+    const {ctx}=contestoStrada({
+      gente:[],
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]}
+      }
+    });
+    expect(vm.runInContext("stradaTentaPropostaFabbrica(0,0)",ctx)).toBeNull();
   });
 
   it("usa un pool generale ampio e non lega le offerte alla mansione", () => {
