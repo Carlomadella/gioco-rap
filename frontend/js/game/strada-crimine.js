@@ -81,7 +81,7 @@ const STRADA_ATTIVITA = [
 const STRADA_PROT = [
   {n:"Nessuna", costo:0},
   {n:"Occhi in giro", costo:260},
-  {n:"Uomini fissi", costo:620},
+  {n:"Presenza fissa", costo:620},
   {n:"Scorta", costo:1450}
 ];
 
@@ -2030,12 +2030,30 @@ function stradaSettimana(){
     const persi = Math.round(G.fans * rnd(.06, .13));
     if(persi > 0){ G.fans = Math.max(0, G.fans - persi); pushLog(fmt(persi) + " fan spariti mentre eri dentro.", "bad"); }
     G.hype = clamp(G.hype * .72, 0, (typeof hypeCap==="function"?hypeCap():100));
-    /* dentro si paga di più: l'avvocato, i pacchi, le telefonate, sopra alle
-       spese di fuori che advanceWeek() ha già tolto. Prima non lo diceva
-       nessuno e il resoconto ne mostrava una sola (giro del 27/09, voce 61) */
+    /* Il legale privato resta un incarico vero anche mentre sei dentro.
+       La protezione esterna resta invece sospesa come prima. */
+    const avvStDentro=stradaAvvocatoStato();
+    if(avvStDentro.retained){
+      if(avvStDentro.prepaidWeekKey===stradaWeekKey()){
+        avvStDentro.prepaidWeekKey=null;
+      }else if(Number(G.money||0)>=STRADA_AVVOCATO_COSTO){
+        G.money-=STRADA_AVVOCATO_COSTO;
+      }else{
+        const legale=avvStDentro.personId?(G.gente||[]).find(p=>p&&p.id===avvStDentro.personId&&!p.via):null;
+        if(legale) legale.rel=Math.max(0,Number(legale.rel||0)-1);
+        s.avvocato=false;avvStDentro.retained=false;avvStDentro.prepaidWeekKey=null;
+        avvStDentro.history.push({status:"unpaid-in-jail",personId:avvStDentro.personId||null,
+          name:avvStDentro.name||null,absoluteDay:stradaAbsDay()});
+        if(avvStDentro.history.length>12)avvStDentro.history.shift();
+        pushLog("<b>Il legale privato ha lasciato l'incarico.</b> Da ora ti segue il difensore d'ufficio.", "bad");
+      }
+    }
+
+    /* Dentro si paga comunque di più per pacchi, telefonate e gestione della
+       vita fuori; il legale privato è contabilizzato separatamente sopra. */
     const dentro = Math.round(weeklyCosts() * .6);
     G.money -= dentro;
-    pushLog("Da dentro costa: <b>−" + fmt(dentro) + " €</b> fra avvocato, pacchi e telefonate, oltre alle spese di fuori.", "bad");
+    pushLog("Da dentro costa: <b>−" + fmt(dentro) + " €</b> fra pacchi, telefonate e spese extra, oltre alle spese di fuori.", "bad");
     if(G.contract && Math.random() < .20){
       pushLog("<b>L'etichetta ha rescisso.</b> I giornali ci sono andati pesante.", "bad");
       G.contract = null;
