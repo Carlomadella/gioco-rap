@@ -942,7 +942,12 @@ function stradaPersonaMeta(p){
       unreachableSinceAbsoluteDay:null,
       returnAfterAbsoluteDay:null,
       streetStatusReason:null,
-      streetStatusHistory:[]
+      streetStatusHistory:[],
+      debitiGiocatore:0,
+      tensione:0,
+      rivalita:false,
+      lastReferralAbsoluteDay:null,
+      conseguenzeEventi:[]
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
@@ -950,6 +955,12 @@ function stradaPersonaMeta(p){
   if(!Array.isArray(p.strada.fiduciaEventi)) p.strada.fiduciaEventi=[];
   if(!Array.isArray(p.strada.favoriEventi)) p.strada.favoriEventi=[];
   if(!Array.isArray(p.strada.streetStatusHistory)) p.strada.streetStatusHistory=[];
+  if(!Array.isArray(p.strada.conseguenzeEventi)) p.strada.conseguenzeEventi=[];
+  if(!Number.isFinite(Number(p.strada.debitiGiocatore))) p.strada.debitiGiocatore=0;
+  p.strada.debitiGiocatore=Math.max(0,Math.min(3,Math.floor(Number(p.strada.debitiGiocatore)||0)));
+  if(!Number.isFinite(Number(p.strada.tensione))) p.strada.tensione=0;
+  p.strada.tensione=Math.max(0,Math.min(3,Math.floor(Number(p.strada.tensione)||0)));
+  p.strada.rivalita=!!p.strada.rivalita;
   if(!Number.isFinite(Number(p.strada.favori))) p.strada.favori=0;
   p.strada.favori=Math.max(0,Math.min(3,Math.floor(Number(p.strada.favori)||0)));
   if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
@@ -980,10 +991,73 @@ function stradaRelazioneForte(p){
     Number(st.favori||0)>0;
 }
 
+/* Punto 13: i risultati dei colpi lasciano conseguenze nelle persone, non
+   soltanto nei contatori globali. Debiti, tensioni e rivalità vivono sulla
+   stessa persona persistente di G.gente. */
+function stradaConseguenzePersona(p){
+  const st=stradaPersonaMeta(p);
+  if(!st) return null;
+  return {
+    debiti:Math.max(0,Number(st.debitiGiocatore||0)),
+    tensione:Math.max(0,Number(st.tensione||0)),
+    rivalita:st.rivalita===true
+  };
+}
+
+function stradaRivalitaAttiva(p){
+  const st=stradaPersonaMeta(p);
+  return !!(st&&st.rivalita);
+}
+
+function stradaRegistraConseguenzaPersona(p,type,meta){
+  if(!p || p.via) return null;
+  const st=stradaPersonaMeta(p);
+  const e={
+    type:String(type||"street-consequence"),
+    absoluteDay:stradaAbsDay(),
+    meta:meta&&typeof meta==="object"?Object.assign({},meta):null
+  };
+  st.conseguenzeEventi.push(e);
+  if(st.conseguenzeEventi.length>20) st.conseguenzeEventi.shift();
+  return e;
+}
+
+function stradaModificaDebitoPersona(p,delta,reason){
+  if(!p || p.via || !delta) return 0;
+  const st=stradaPersonaMeta(p);
+  const prima=Math.max(0,Number(st.debitiGiocatore||0));
+  st.debitiGiocatore=Math.max(0,Math.min(3,prima+Math.trunc(Number(delta)||0)));
+  const reale=st.debitiGiocatore-prima;
+  if(reale) stradaRegistraConseguenzaPersona(p,reale>0?"debt-created":"debt-repaid",{
+    delta:reale,reason:String(reason||"street-debt")
+  });
+  return reale;
+}
+
+function stradaModificaTensionePersona(p,delta,reason){
+  if(!p || p.via || !delta) return {delta:0,rivalitaNata:false};
+  const st=stradaPersonaMeta(p);
+  const prima=Math.max(0,Number(st.tensione||0));
+  st.tensione=Math.max(0,Math.min(3,prima+Math.trunc(Number(delta)||0)));
+  const reale=st.tensione-prima;
+  if(reale) stradaRegistraConseguenzaPersona(p,reale>0?"tension-up":"tension-down",{
+    delta:reale,reason:String(reason||"street-tension")
+  });
+  let rivalitaNata=false;
+  if(!st.rivalita && st.tensione>=2 && stradaFiduciaValore(p)<=20){
+    st.rivalita=true;
+    rivalitaNata=true;
+    stradaRegistraConseguenzaPersona(p,"rivalry-start",{
+      reason:String(reason||"street-rivalry")
+    });
+  }
+  return {delta:reale,rivalitaNata};
+}
+
 function stradaRelazioneDisponibile(p){
   if(!p || p.via || !p.strada || !p.strada.known) return false;
   const st=stradaPersonaMeta(p);
-  return st.streetStatus==="active" || st.streetStatus==="cold";
+  return (st.streetStatus==="active" || st.streetStatus==="cold") && !st.rivalita;
 }
 
 /* Punto 11: nessun grado criminale. Queste non sono "promozioni": sono
