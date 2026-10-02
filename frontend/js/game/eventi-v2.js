@@ -2667,6 +2667,18 @@ function adfStreetOpportunityAfterAction(a){
   }
 
   s.lastHookEventDay=absDay();
+  try{
+    if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+      TRAPHONE16.receiveStorySms({
+        id:"opportunity-"+String(proposta.id||proposta.colpoId||"street")+"-"+String(absDay()),
+        family:"street-opportunity",
+        voice:"contact",
+        from:proposta.persona||"SCONOSCIUTO",
+        text:proposta.intro||"Ho una cosa da proporti.",
+        tags:["street","deal"]
+      });
+    }
+  }catch(_){}
   afterClear(()=>showEvent({
     k:"Strada",
     t:(proposta.persona||"Qualcuno")+" si fa vivo",
