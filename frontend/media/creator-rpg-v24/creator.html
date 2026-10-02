@@ -2522,6 +2522,12 @@ body::before{
   body:has(#pageDressingRoom.on) .creator-exit-game{
     display:none!important;
   }
+
+  /* MakeHuman ha già il suo Indietro nella barra azioni. Evitiamo il secondo
+     pulsante del creator sopra all'editor mobile. */
+  body:has(#localEditorOverlay.on) .creator-exit-game{
+    display:none!important;
+  }
 }
 </style>
 </head>
