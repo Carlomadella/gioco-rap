@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4849d83d -->
+## 02/10/26, 00:32 — fix/mobile-makehuman-bootstrap → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `4849d83d`
+
+### Cosa è entrato
+
+- `018938d9` — test(mobile): check actual ingresso script order — **mycolbraga**
+- `20f99820` — fix(mobile): isola il bootstrap MakeHuman dal desktop — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f3132f30 -->
 ## 02/10/26, 00:12 — docs/mobile-desktop-isolation-rule → main
 

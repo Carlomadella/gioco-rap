@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4849d83d -->
+## 02/10/26, 00:32 — fix/mobile-makehuman-bootstrap → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `4849d83d`
+
+### Cosa è entrato
+
+- `018938d9` — test(mobile): check actual ingresso script order — **mycolbraga**
+- `20f99820` — fix(mobile): isola il bootstrap MakeHuman dal desktop — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Aggiunto:** `frontend/js/mobile/makehuman-mobile.js`
+- **Aggiunto:** `frontend/media/makehuman-mobile-v1/index.html`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/mobile-makehuman.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:202190f7 -->
 ## 02/10/26, 00:06 — task/fabbrica-esito-turno-in-scena → main
 
