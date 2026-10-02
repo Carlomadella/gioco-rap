@@ -31,19 +31,31 @@ test("landscape mobile: landing e hub restano utilizzabili al tocco", async ({ p
   await expect(page.locator(".pspot").first()).toBeVisible();
 });
 
-test("landscape mobile: landing termina alla barra e mostra copyright minimale", async ({ page }) => {
+test("landscape mobile: parte alta scorre e barra 01-06 resta fissa", async ({ page }) => {
   await page.goto("/pagine/landing.html");
 
   await expect(page.locator("#s-menu > .menu")).toBeHidden();
   const copyright = await page.locator(".land-dock").evaluate(el => getComputedStyle(el, "::after").content);
   expect(copyright).toContain("© 2026 La Fame Studio");
 
-  const continua = page.locator("#m-play");
+  const hero = page.locator(".land-hero");
   const dock = page.locator(".land-dock");
+  const continua = page.locator("#m-play");
+
+  await expect(hero).toHaveCSS("overflow-y", "auto");
+  const dockPrima = await dock.boundingBox();
+  expect(dockPrima).not.toBeNull();
+
+  await hero.evaluate(el => { el.scrollTop = el.scrollHeight; });
+  const dockDopo = await dock.boundingBox();
+  expect(dockDopo).not.toBeNull();
+  expect(Math.abs(dockDopo.y - dockPrima.y)).toBeLessThanOrEqual(1);
+
+  await continua.scrollIntoViewIfNeeded();
   const [continuaBox, dockBox] = await Promise.all([continua.boundingBox(), dock.boundingBox()]);
   expect(continuaBox).not.toBeNull();
   expect(dockBox).not.toBeNull();
-  expect(continuaBox.bottom).toBeLessThanOrEqual(dockBox.top + 1);
+  expect(continuaBox.y + continuaBox.height).toBeLessThanOrEqual(dockBox.y + 1);
 });
 
 test("landscape mobile: il suggerimento di rotazione non copre il gioco", async ({ page }) => {
