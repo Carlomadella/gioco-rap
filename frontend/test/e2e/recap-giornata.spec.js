@@ -17,6 +17,7 @@ test("chiusa la giornata esce il recap coi numeri, le mosse e gli highlights, e 
     for(const id of ["modal", "report", "recap", "adf-result-overlay"]){ const el = document.getElementById(id); if(el) el.classList.remove("on"); }
     G.day = 2;                         // un martedì: il settimo giorno esce il rapporto della settimana, non il recap
     recapFoto();
+    const soldiStamattina = G.money;
     G.money += 120;
     recapMossa({n:"Scrivi barre"}); recapMossa({n:"Scrivi barre"}); recapMossa({n:"Promo sui social"});
     pushLog("<b>Una serata che ricorderai.</b>", "big");
@@ -24,13 +25,17 @@ test("chiusa la giornata esce il recap coi numeri, le mosse e gli highlights, e 
     ADF_TIME_SKIP(1);
     await new Promise(res => setTimeout(res, 300));
     const el = document.getElementById("recap");
-    return {aperto:el.classList.contains("on"), testo:el.innerText, giorno:G.day};
+    /* il recap conta anche la notte, e nella notte un evento risolto da solo
+       può muovere i soldi: il confronto si fa con la differenza vera */
+    const d = Math.round(G.money - soldiStamattina);
+    const soldi = (d > 0 ? "+" : d < 0 ? "−" : "") + Math.abs(d).toLocaleString("it-IT") + " €";
+    return {aperto:el.classList.contains("on"), testo:el.innerText, giorno:G.day, soldi, d};
   });
 
   expect(r.giorno).toBe(3);
   expect(r.aperto).toBe(true);
   expect(r.testo).toMatch(/Martedì/);
-  expect(r.testo).toMatch(/\+120 €/);
+  expect(r.testo).toContain(r.soldi);
   expect(r.testo).toMatch(/3 mosse/);
   expect(r.testo).toMatch(/Scrivi barre ×2/);
   expect(r.testo).toMatch(/Una serata che ricorderai/);
