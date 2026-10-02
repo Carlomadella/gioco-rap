@@ -383,7 +383,7 @@ const ADF_LAVORO_RETE = Object.freeze({
        automatica di contatti: restano cooldown, cap e molti colleghi normali. */
     chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
     reteBonusIncontro:0.10,
-    ruoli:Object.freeze(["collega","collega","collega","rapper","promoter"]),
+    ruoli:Object.freeze(["collega","collega","rider","cliente","rapper","promoter"]),
     dettaglio:"persona conosciuta durante il servizio in Pizzeria",
     storia:"Vi siete conosciuti lavorando nello stesso giro della Pizzeria.",
     perRuolo:Object.freeze({
@@ -397,21 +397,21 @@ const ADF_LAVORO_RETE = Object.freeze({
       aiuto_cucina:Object.freeze({
         chanceIncontro:0.24, cooldownGiorni:5, minTurni:1, maxContatti:6,
         reteBonusIncontro:0.12,
-        ruoli:Object.freeze(["collega","collega","collega","rapper","promoter","fonico"]),
+        ruoli:Object.freeze(["collega","collega","fornitore","rider","cliente","rapper","fonico"]),
         dettaglio:"persona conosciuta muovendoti tra cucina e servizio",
         storia:"Vi siete conosciuti mentre davi una mano tra preparazioni e servizio."
       }),
       aiuto_pizzaiolo:Object.freeze({
         chanceIncontro:0.26, cooldownGiorni:4, minTurni:1, maxContatti:7,
         reteBonusIncontro:0.15,
-        ruoli:Object.freeze(["collega","collega","rapper","promoter","fonico","rapper"]),
+        ruoli:Object.freeze(["collega","fornitore","rider","cliente","cliente","rapper","promoter","fonico"]),
         dettaglio:"persona conosciuta durante il servizio in Pizzeria",
         storia:"Vi siete conosciuti mentre lavoravi vicino al banco e al forno."
       }),
       pizzaiolo:Object.freeze({
         chanceIncontro:0.28, cooldownGiorni:4, minTurni:1, maxContatti:8,
         reteBonusIncontro:0.18,
-        ruoli:Object.freeze(["collega","collega","rapper","promoter","promoter","fonico","rapper"]),
+        ruoli:Object.freeze(["collega","fornitore","rider","cliente","cliente","cliente","rapper","promoter","fonico"]),
         dettaglio:"persona conosciuta come riferimento del servizio",
         storia:"Vi siete conosciuti mentre eri uno dei riferimenti della Pizzeria durante il servizio."
       })
