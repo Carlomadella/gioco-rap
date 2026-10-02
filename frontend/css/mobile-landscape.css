@@ -1,5 +1,3 @@
-.land-mobile-copy{display:none}
-
 /* MOBILE LANDSCAPE — 02/10/2026
    Gameplay mobile supportato in orizzontale.
    Questo foglio viene caricato per ultimo e non modifica desktop o portrait. */
@@ -82,12 +80,11 @@
   .land-piede,.land-giu{display:none}
   /* Mobile: la landing finisce qui; niente teaser/copyright lungo sotto. */
   #s-menu > .menu{display:none}
-  .land-mobile-copy{
+  .land-dock::after{
+    content:"© 2026 La Fame Studio";
     display:block;
-    position:absolute;
-    right:12px;
-    bottom:3px;
-    z-index:2;
+    margin:3px 8px 0 auto;
+    width:max-content;
     font-size:6.5px;
     line-height:1;
     letter-spacing:.08em;
