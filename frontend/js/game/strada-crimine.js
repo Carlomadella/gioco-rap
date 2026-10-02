@@ -498,6 +498,22 @@ function stradaChanceConOpportunita(colpo,approccio,lead){
   );
 }
 
+function stradaEffettiOpportunita(lead,successo){
+  if(!lead) return {bonusPct:0,heatDelta:0,repDelta:0};
+  if(lead.source==="street-opportunity"){
+    return {
+      bonusPct:Number(lead.bonusPct||0),
+      heatDelta:Number(successo ? lead.successHeat : lead.failureHeat)||0,
+      repDelta:Number(successo ? lead.successRep : lead.failureRep)||0
+    };
+  }
+  return {
+    bonusPct:Number(lead.bonusPct||0),
+    heatDelta:Number(lead.extraHeat||0),
+    repDelta:0
+  };
+}
+
 function stradaChance(colpo, approccio){
   const s = G.strada;
   let p = .62 - colpo.difficolta * .34;
@@ -540,16 +556,11 @@ function stradaTenta(colpoId, approccioId){
     : (leadLavoro && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeCrimeLead === "function"
       ? ADF_WORK_EVENTS.consumeCrimeLead(successo)
       : null);
-  const moltiplicatoreLead = leadUsato ? (1 + Number(leadUsato.bonusPct || 0) / 100) : 1;
+  const effettiLead=stradaEffettiOpportunita(leadUsato,successo);
+  const moltiplicatoreLead = 1 + Number(effettiLead.bonusPct||0) / 100;
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
-  const rumoreLead = leadUsato
-    ? Number(leadUsato.source==="street-opportunity"
-        ? (successo ? leadUsato.successHeat : leadUsato.failureHeat)
-        : (leadUsato.extraHeat||0))
-    : 0;
-  const reputazioneLead = leadUsato && leadUsato.source==="street-opportunity"
-    ? Number(successo ? leadUsato.successRep : leadUsato.failureRep)||0
-    : 0;
+  const rumoreLead = Number(effettiLead.heatDelta||0);
+  const reputazioneLead = Number(effettiLead.repDelta||0);
   /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
      il suo peso — è il più rischioso dei sei eventi della settimana, e
      deve rendere in proporzione quando capita davvero quel giorno lì.
