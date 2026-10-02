@@ -51,6 +51,9 @@ function songWeekly(s){
   /* la spinta della promo (punto 9 dello Studio): scelta su LaFamegram,
      messa da actions.js, scende di settimana in settimana qui sotto */
   if(s.spinta) out *= s.spinta;
+  /* il disco (progetti.js): le tracce di un mixtape o di un album uscito
+     girano di più per qualche settimana, tutte insieme */
+  if(typeof progettoSpinta === "function") out *= progettoSpinta(s);
   return Math.round(out);
 }
 
@@ -373,6 +376,8 @@ function avanzaGiorno(){
      prima: così `totalWeeks()` è già quella nuova e il pezzo risulta uscito
      nella settimana in cui è uscito davvero. */
   if(typeof studioUscitePronte === "function") studioUscitePronte();
+  /* e così i dischi in coda per venerdì (progetti.js) */
+  if(typeof progettiUscitePronti === "function") progettiUscitePronti();
   if(chiusa) return true;   /* la settimana si è chiusa */
   /* punto 54: un incontro per strada, non ogni giorno e non se la settimana
      si è appena chiusa sopra (due finestre una sull'altra sono un fastidio,
