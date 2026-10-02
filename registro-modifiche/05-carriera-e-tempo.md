@@ -6,6 +6,33 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:60f258d7 -->
+## 02/10/26, 13:53 — task/pizzeria-eventi-ruolo-cucina → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `60f258d7`
+
+### Cosa è entrato
+
+- `bf38e391` — fix(test): rende robusti i test eventi Pizzeria — **mycolbraga**
+- `64bc8d45` — test(fabbrica): limita il conteggio eventi al blocco Fabbrica — **mycolbraga**
+- `8bd768f7` — fix(lavoro): conserva etichette scalate degli eventi Fabbrica — **mycolbraga**
+- `e89c418b` — test(pizzeria): copre eventi ruolo e vita di cucina — **mycolbraga**
+- `77441087` — feat(pizzeria): aggiunge dieci eventi di vita in cucina — **mycolbraga**
+- `234c0c42` — refactor(lavoro): usa gli eventi ruolo per Fabbrica e Pizzeria — **mycolbraga**
+- `0f19459c` — refactor(lavoro): generalizza carico ed effetti degli eventi per sede — **mycolbraga**
+- `86ea829c` — feat(pizzeria): aggiunge venti eventi specifici per ruolo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+- **Aggiunto:** `frontend/test/unit/pizzeria-eventi.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:4eafd8cf -->
 ## 02/10/26, 13:43 — task/pizzeria-disciplina-v2 → main
 
