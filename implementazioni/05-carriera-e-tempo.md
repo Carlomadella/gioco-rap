@@ -513,3 +513,41 @@ I guardrail sono:
 
 La pressione quindi nasce dal **tempo occupato dalla musica** e dagli appuntamenti,
 non da una penalità astratta per il solo fatto di avere un lavoro.
+
+## Pacing degli eventi Fabbrica
+
+**FATTO (02/10/2026)** — la revisione del sistema eventi Fabbrica interviene
+anche sull'arbitro, non soltanto sul numero di scene.
+
+- gli eventi automatici incidentali (`factory`, `colleague`, `role`, `music`,
+  `physical`, `crime`) condividono un **gap globale di 3 giorni**;
+- con un normale 5/5 questo limita il ritmo a circa **1–2 popup incidentali
+  per settimana**, invece di permettere a famiglie diverse di alternarsi a
+  ogni turno;
+- l'ordine delle famiglie **ruota** dopo ogni tentativo/evento: musica e ruolo
+  non hanno più una priorità fissa sui colleghi o sulla stanchezza;
+- carriera, disciplina, straordinari e conflitti Agenda non sono sottoposti a
+  questo freno, perché derivano da una conseguenza o scelta concreta del giocatore;
+- i cooldown specifici per famiglia restano attivi sopra il pacing globale.
+
+Il test automatico simula 20 turni su quattro settimane con tutte le famiglie
+abilitate: verifica massimo due eventi incidentali a settimana e almeno cinque
+famiglie diverse effettivamente raggiunte.
+
+## Capoturno come grado terminale della Fabbrica attuale
+
+**FATTO (02/10/2026)** — la carriera Fabbrica resta volutamente chiusa a
+**Capoturno**. Non viene introdotto un quinto ruolo finché non esiste un
+percorso verificato per la città/trasferimento successivo.
+
+Il comportamento attuale è protetto da test:
+
+- `lavoroProgressoCarriera("fabbrica")` restituisce `prossimo: null` a Capoturno;
+- `promozione.massimo` resta `true`;
+- `lavoroPromozioneDisponibile("fabbrica")` resta `false` anche con requisiti
+  ampiamente superati;
+- la UI continua a mostrare **Grado massimo raggiunto**.
+
+Questa è una decisione di perimetro, non il disegno definitivo della carriera:
+l'estensione oltre Capoturno va progettata insieme alla progressione geografica,
+non aggiunta come ruolo isolato dentro la Fabbrica attuale.

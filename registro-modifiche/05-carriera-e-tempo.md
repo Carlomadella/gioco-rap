@@ -6,6 +6,74 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3b581dea -->
+## 02/10/26, 11:28 — fix/pizzeria-hours-badge → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `3b581dea`
+
+### Cosa è entrato
+
+- `651e6b54` — docs: registra fix orario Pizzeria — **mycolbraga**
+- `456d4d49` — chore(cache): aggiorna versione orari — **mycolbraga**
+- `59bd96af` — test(hours): blocca regressione orario Pizzeria — **mycolbraga**
+- `346d0a65` — fix(hours): allinea apertura Pizzeria alle 17 — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:8663aedd -->
+## 02/10/26, 11:21 — task/fabbrica-capoturno-terminale → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `8663aedd`
+
+### Cosa è entrato
+
+- `9af6b6c3` — docs(fabbrica): chiarisce limite attuale della carriera — **mycolbraga**
+- `c4a81de2` — test(fabbrica): fissa Capoturno come grado terminale attuale — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:bbc0a744 -->
+## 02/10/26, 11:09 — task/fabbrica-eventi-pacing → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `bbc0a744`
+
+### Cosa è entrato
+
+- `f9036095` — Merge pull request #59 from Carlomadella/main — **mycolbraga**
+- `81df0dc4` — test(fabbrica): allinea eventi al nuovo pacing — **mycolbraga**
+- `a0f96795` — Merge pull request #55 from Carlomadella/main — **mycolbraga**
+- `3d4bf610` — docs(fabbrica): documenta pacing eventi lavoro — **mycolbraga**
+- `2bbf0ea2` — chore(cache): invalida pacing eventi lavoro — **mycolbraga**
+- `ce46b762` — test(fabbrica): protegge pacing e rotazione eventi — **mycolbraga**
+- `58174245` — feat(fabbrica): regola pacing e rotazione eventi lavoro — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:d01ea2eb -->
 ## 02/10/26, 10:42 — task/fabbrica-playtest-doppia-vita → main
 
