@@ -237,8 +237,32 @@ function stRigaApproccio(a){
   };
 }
 
+function stScenaPersonaSquadra(colpo){
+  const persone=stradaPersoneSquadra();
+  return {
+    k:"Con chi ti muovi?",
+    titolo:colpo.n,
+    testo:"Per questo approccio non basta pagare qualcuno: serve una persona che si fidi abbastanza da metterci la faccia con te.",
+    stats:[
+      {t:persone.length+" "+(persone.length===1?"persona disponibile":"persone disponibili")},
+      {t:"Fiducia costruita facendo cose insieme"}
+    ],
+    opts:[
+      ...persone.map(p=>({
+        n:p.n,
+        d:"Fiducia nel giro: "+stradaFiduciaEtichetta(p),
+        sx:"+"+Math.round(stradaBonusFiduciaSquadra(p)*100)+"% riuscita",
+        dx:String(p.ruolo||"contatto"),
+        run(){ stradaTenta(colpo.id,"squadra",p.id); }
+      })),
+      {n:"Torna indietro",d:"Scegli un altro approccio",run(){STRADA_SCENA=stScenaApproccio(colpo);}}
+    ]
+  };
+}
+
 function stScenaApproccio(colpo){
   const s = G.strada;
+  const personeSquadra=stradaPersoneSquadra();
   return {k:"Come vuoi muoverti?", titolo:colpo.n, testo:colpo.d, approcci:true,
     stats:[
       {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
@@ -247,9 +271,18 @@ function stScenaApproccio(colpo){
     ],
     opts:STRADA_APPROCCI.map(a => {
       const riga = stRigaApproccio(a);
-      return {n:a.n, d:a.d, sx:riga.sx, dx:riga.dx, hot:a.id === "ferro",
-        no:(a.serveUomo && s.uomini <= 0) || (a.serveFerro && !s.ferro) || G.energy < colpo.energia,
-        run(){ stradaTenta(colpo.id, a.id); }};
+      const squadra=a.id==="squadra";
+      const dx=squadra
+        ? (personeSquadra.length
+          ? personeSquadra.length+" "+(personeSquadra.length===1?"persona fidata":"persone fidate")
+          : "nessuno si fida abbastanza")
+        : riga.dx;
+      return {n:a.n, d:a.d, sx:riga.sx, dx, hot:a.id === "ferro",
+        no:(squadra && !personeSquadra.length) || (a.serveFerro && !s.ferro) || G.energy < colpo.energia,
+        run(){
+          if(squadra){ STRADA_SCENA=stScenaPersonaSquadra(colpo); return; }
+          stradaTenta(colpo.id, a.id);
+        }};
     })};
 }
 
