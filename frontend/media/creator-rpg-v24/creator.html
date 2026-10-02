@@ -2303,6 +2303,40 @@ body::before{
       max(14px,env(safe-area-inset-left,0px));
   }
 
+  /* Il ritorno dello step Aspetto vive visivamente nella topbar:
+     piccolo, a destra, stessa grammatica del creator. Il ::before amplia
+     l'area touch senza rendere il pulsante di nuovo ingombrante. */
+  body:has(#pageAppearance.on) .creator-exit-game{
+    left:auto;
+    right:max(12px,env(safe-area-inset-right,0px));
+    top:max(8px,env(safe-area-inset-top,0px));
+    bottom:auto;
+    width:auto;
+    min-width:78px;
+    height:38px;
+    min-height:38px;
+    padding:0 10px;
+    border:1px solid rgba(211,170,94,.22);
+    border-radius:9px;
+    background:rgba(255,255,255,.025);
+    color:#d8ccb8;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.018);
+    backdrop-filter:blur(8px);
+  }
+
+  body:has(#pageAppearance.on) .creator-exit-game::before{
+    content:"";
+    position:absolute;
+    inset:-3px;
+  }
+
+  body:has(#pageAppearance.on) .creator-exit-game::after{
+    content:"← Indietro";
+    font:800 9.5px/1 Inter,Arial,sans-serif;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+
   body:has(#pageAppearance.on) .viewport{
     position:relative;
     inset:auto;
