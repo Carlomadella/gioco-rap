@@ -239,4 +239,12 @@ describe("socialità Pizzeria e autopromozione",()=>{
     expect(env.shown[0].d).not.toBe(testi[0]);
   });
 
+
+  it("anche favore collega e dritta musicale Pizzeria passano dal budget rete per-persona",()=>{
+    const src=leggi("js/game/lavoro-eventi.js");
+    expect(src).toContain('lavoroBonusRetePersona(p,"pizzeria-colleague-help",.4,2)');
+    expect(src).toContain('lavoroBonusRetePersona(p,"pizzeria-music-lead",.5,2)');
+    expect(src).toContain('workKey(job)==="pizzeria"');
+  });
+
 });
