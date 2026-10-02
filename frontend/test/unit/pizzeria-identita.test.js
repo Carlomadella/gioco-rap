@@ -133,4 +133,42 @@ describe("identità gameplay Pizzeria", () => {
     expect(G.skills.rete).toBeCloseTo(.10);
     expect(G.workplaces.pizzeria.network.history.at(-1).networkBonus).toBe(0);
   });
+
+  it("mantiene una maggioranza di contatti normali a ogni livello Pizzeria", () => {
+    const ctx = contesto({
+      year:1,week:1,day:2,
+      job:{id:"lavapiatti",place:"pizzeria",n:"Lavapiatti",pay:100,e:18},
+      strada:{giroAvviato:false}
+    });
+    const musicali=new Set(["rapper","promoter","fonico","beatmaker","videomaker"]);
+    const ruoli=["lavapiatti","aiuto_cucina","aiuto_pizzaiolo","pizzaiolo"];
+
+    for(const id of ruoli){
+      ctx.G.job.id=id;
+      const cfg=vm.runInContext("lavoroReteDef(G.job)",ctx);
+      const pool=Array.from(cfg.ruoli);
+      const utili=pool.filter(x=>musicali.has(x)).length;
+      expect(utili).toBeLessThan(pool.length/2);
+    }
+  });
+
+  it("limita la rete ottenibile ripetendo la stessa interazione con la stessa persona", () => {
+    const G={
+      year:1,week:1,day:2,
+      job:{id:"lavapiatti",place:"pizzeria",n:"Lavapiatti",pay:100,e:18},
+      workplaces:{},gente:[],skills:{rete:0},strada:{giroAvviato:false}
+    };
+    const ctx=contesto(G,{
+      gain:(skill,v)=>{ G.skills[skill]=Number(G.skills[skill]||0)+Number(v||0); }
+    });
+    const p={id:"p1"};
+
+    ctx.p=p;
+    expect(vm.runInContext('lavoroBonusRetePersona(p,"social",0.2,2)',ctx)).toBeCloseTo(.2);
+    expect(vm.runInContext('lavoroBonusRetePersona(p,"social",0.2,2)',ctx)).toBeCloseTo(.1);
+    expect(vm.runInContext('lavoroBonusRetePersona(p,"social",0.2,2)',ctx)).toBe(0);
+    expect(G.skills.rete).toBeCloseTo(.3);
+    expect(p.workNetworkRewards.social).toBe(2);
+  });
+
 });
