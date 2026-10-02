@@ -1290,6 +1290,23 @@ test("punto 8: la preparazione cambia davvero riuscita e attenzione",
   crime.includes("p += prep.chance") &&
   crime.includes("effettiPreparazione.heat") &&
   crime.includes("stradaChanceConOpportunita(colpo,approccio,opportunita,personaSquadra,preparazione)"));
+test("punto 9: i colpi consumano tempo reale della giornata",
+  crime.includes("const STRADA_DURATA_BASE_CATEGORIA") &&
+  crime.includes("function stradaDurataColpo(colpo)") &&
+  crime.includes('GAME_TIME.spend(minuti,"crime:job"') &&
+  crime.includes("const tempoColpo=stradaSpendiTempoColpo(colpo);"));
+test("punto 9: il tempo viene impegnato prima di energia, dado e consumo opportunità",
+  crime.indexOf("const tempoColpo=stradaSpendiTempoColpo(colpo);") <
+  crime.indexOf("G.energy -= colpo.energia;") &&
+  crime.indexOf("G.energy -= colpo.energia;") <
+  crime.indexOf("const successo = Math.random() < stradaChanceConOpportunita") &&
+  crime.indexOf("const successo = Math.random() < stradaChanceConOpportunita") <
+  crime.indexOf("stradaConsumaOpportunita(colpoId, successo)"));
+test("punto 9: durata visibile prima di scegliere e range compatibile con la Pizzeria",
+  crime.includes('stradaDurataColpoLabel(colpo)+" di tempo"') &&
+  crime.includes("stradaDurataColpoLabel(c)") &&
+  crime.includes("Math.min(150,base+extra)") &&
+  time.includes("pizzeria:300"));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&

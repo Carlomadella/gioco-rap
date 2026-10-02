@@ -149,6 +149,61 @@ function stradaCategoriaLabel(colpo){
   return cat.n+" · "+cat.tag;
 }
 
+/* Punto 9: i colpi occupano tempo reale della giornata.
+   La durata nasce dalla categoria e cresce con la difficoltà, a scatti di
+   15 minuti. Il range attuale resta intenzionalmente compatto (circa
+   1h15–2h30): abbastanza da competere con Studio/lavoro/vita, ma senza
+   rendere impraticabile la Strada a chi fa 4 turni serali in Pizzeria. */
+const STRADA_DURATA_BASE_CATEGORIA = Object.freeze({
+  trasporto:60,
+  merce:75,
+  furto:90,
+  veicoli:75,
+  incassi:60
+});
+
+function stradaDurataColpo(colpo){
+  const base=Number(STRADA_DURATA_BASE_CATEGORIA[colpo&&colpo.categoria]||75);
+  const diff=clamp(Number(colpo&&colpo.difficolta||0),0,1);
+  const extra=Math.round((diff*75)/15)*15;
+  return Math.max(60,Math.min(150,base+extra));
+}
+
+function stradaDurataColpoLabel(colpo){
+  const minuti=stradaDurataColpo(colpo);
+  return (typeof GAME_TIME!=="undefined" && GAME_TIME.formatDuration)
+    ? GAME_TIME.formatDuration(minuti)
+    : minuti+" min";
+}
+
+function stradaSpendiTempoColpo(colpo){
+  const minuti=stradaDurataColpo(colpo);
+  if(typeof GAME_TIME==="undefined")
+    return {ok:false,reason:"Il sistema del tempo non è disponibile."};
+
+  const gate=typeof GAME_TIME.canSpend==="function"
+    ? GAME_TIME.canSpend(minuti)
+    : {ok:typeof GAME_TIME.remaining!=="function" || GAME_TIME.remaining()>=minuti};
+
+  if(!gate || gate.ok===false){
+    return {
+      ok:false,
+      reason:gate&&gate.reason==="day-end"
+        ? "Non fai in tempo oggi: questo colpo richiede "+stradaDurataColpoLabel(colpo)+"."
+        : "Prima devi chiudere la decisione o l'azione in corso."
+    };
+  }
+
+  const tx=typeof GAME_TIME.spend==="function"
+    ? GAME_TIME.spend(minuti,"crime:job",{detail:{crimeJob:true,colpoId:colpo&&colpo.id}})
+    : GAME_TIME.advance(minuti,"crime:job");
+
+  if(tx && tx.blocked)
+    return {ok:false,reason:"Prima devi chiudere la decisione o l'azione in corso."};
+
+  return {ok:true,minutes:minuti,tx:tx||null};
+}
+
 /* Città chiuse: restano in vista col nome, come chiede il documento — nessun
    numero, perché quelle mappe non esistono ancora. */
 const STRADA_COLPI_MILANO = [
@@ -505,6 +560,7 @@ function stScenaPreparazione(colpo){
     stats:[
       {t:fmt(colpo.min)+"–"+fmt(colpo.max)+" €",c:"money"},
       {t:colpo.energia+" energia"},
+      {t:stradaDurataColpoLabel(colpo)+" di tempo"},
       {t:"Rischio "+stRischio(colpo).toLowerCase(),c:stClasseRischio(colpo)}
     ],
     opts:STRADA_PREPARAZIONI.map(p=>{
@@ -563,6 +619,7 @@ function stScenaApproccio(colpo,preparazione){
     stats:[
       {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
       {t:colpo.energia + " energia"},
+      {t:stradaDurataColpoLabel(colpo)+" di tempo"},
       {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)},
       {t:stradaCategoriaLabel(colpo)},
       {t:"Preparazione: "+stradaPreparazioneEtichetta(preparazione)}
@@ -1860,6 +1917,15 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
   }
   if(approccio.serveFerro && !s.ferro){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve il ferro, e non ce l'hai ancora.", preparazione); return; }
 
+  /* Il tempo viene impegnato solo dopo avere superato i requisiti
+     dell'approccio, ma prima di energia, dado e consumo dell'opportunità:
+     se non fai in tempo oggi non perdi né energia né la dritta. */
+  const tempoColpo=stradaSpendiTempoColpo(colpo);
+  if(!tempoColpo.ok){
+    STRADA_SCENA=stScenaAvviso(colpo,tempoColpo.reason,preparazione);
+    return;
+  }
+
   if(stradaAttivitaSbloccate()) s.giroAvviato=true;
   G.energy -= colpo.energia;
   const opportunita = stradaOpportunitaAttiva(colpoId);
@@ -2867,6 +2933,7 @@ function renderStColpi(){
         '<span class="stchip">' + stradaCategoria(c).n + '</span>' +
         '<span class="stchip money">' + fmt(c.min) + '–' + fmt(c.max) + ' €</span>' +
         '<span class="stchip">' + c.energia + ' energia</span>' +
+        '<span class="stchip">' + stradaDurataColpoLabel(c) + '</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
         (lead
           ? '<span class="stchip money">' + fonteLead + ' ' +
