@@ -2699,6 +2699,12 @@ function adfWorkContactAfterShift(){
     dettaglio="Gira tra serate e locali e conosce parecchie persone del giro.";
   else if(p.ruolo==="collega")
     dettaglio="È una persona che lavori accanto abbastanza spesso da poterci costruire un rapporto vero.";
+  else if(p.ruolo==="cliente")
+    dettaglio="È una faccia che torna spesso: vi riconoscete ormai anche fuori dalla comanda.";
+  else if(p.ruolo==="fornitore")
+    dettaglio="Passa per rifornimenti e consegne: a forza di incrociarvi avete iniziato a parlare.";
+  else if(p.ruolo==="rider")
+    dettaglio="Lo incroci spesso durante i ritiri: ormai non è più soltanto una faccia di passaggio.";
   else if(p.ruolo==="strada")
     dettaglio="Lo riconosci come una persona che frequenta lo stesso giro della Strada.";
 
@@ -2729,7 +2735,9 @@ function adfWorkContactAfterShift(){
       {n:"Parlate un po'", d:"Costruisci il rapporto senza scambiarvi ancora il numero", run(){
         if(typeof postoAvvicinaContattoLavoro==="function")
           postoAvvicinaContattoLavoro(p,2);
-        if(typeof gain==="function") gain("rete",0.2);
+        if(typeof lavoroBonusRetePersona==="function")
+          lavoroBonusRetePersona(p,"work-contact-talk",0.2,2);
+        else if(typeof gain==="function") gain("rete",0.2);
         return {
           t:"Con <b>"+p.n+"</b> non è rimasta solo una chiacchiera da turno. Potrà ricapitare.",
           c:""
@@ -3130,7 +3138,7 @@ function adfShiftOutcomeEvent(luogo,jobBefore,flags){
   }else if(flags.contact){
     const sede=G.workplaces && G.workplaces[luogo];
     const row=sede && sede.network && Array.isArray(sede.network.history)
-      ? sede.network.history[0] : null;
+      ? sede.network.history[sede.network.history.length-1] : null;
     const p=row && (G.gente||[]).find(x=>x && x.id===row.personId);
     event={
       type:"contact",
