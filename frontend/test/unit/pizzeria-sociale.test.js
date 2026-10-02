@@ -237,6 +237,9 @@ describe("socialità Pizzeria e autopromozione",()=>{
     env.G.week=6; env.G.day=2; env.shown.length=0;
     expect(env.turnoSocial()).toBe(true);
     expect(env.shown[0].d).not.toBe(testi[0]);
+    expect(env.shown[0].d).not.toBe(testi[1]);
+    expect(env.shown[0].d).not.toBe(testi[2]);
+    expect(env.shown[0].d).toContain("due minuti veri");
   });
 
 
