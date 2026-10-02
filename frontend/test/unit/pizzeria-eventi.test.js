@@ -146,7 +146,7 @@ describe("eventi Pizzeria per ruolo e cucina",()=>{
   it("riusa il pacing globale invece di aggiungere popup extra",()=>{
     const src=leggi("js/game/lavoro-eventi.js");
     expect(src).toContain("incidentalGapDays:3");
-    expect(src).toContain('"factory","colleague","role","music","physical","crime"');
+    expect(src).toContain('"factory","colleague","social","role","music","physical","crime"');
     expect(src).not.toContain('"pizzeriaRole"');
     expect(src).not.toContain('"kitchen"');
   });
