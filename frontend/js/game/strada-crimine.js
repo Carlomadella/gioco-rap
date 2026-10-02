@@ -372,7 +372,8 @@ function stScenaApproccio(colpo){
     stats:[
       {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
       {t:colpo.energia + " energia"},
-      {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)}
+      {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)},
+      {t:stradaCategoriaLabel(colpo)}
     ],
     opts:STRADA_APPROCCI.map(a => {
       const riga = stRigaApproccio(a);
@@ -2599,12 +2600,13 @@ function renderStColpi(){
   }
 
   centro.classList.remove("locked");
+  const offerte = stradaColpiDisponibili();
   const leadIncontro = stradaOpportunitaAttiva();
   const leadLavoro = window.ADF_WORK_EVENTS &&
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
-  griglia.innerHTML = STRADA_COLPI.map((c, i) => {
+  griglia.innerHTML = offerte.map((c, i) => {
     const senzaEnergia = G.energy < c.energia;
     const leadIncontroQui = leadIncontro && leadIncontro.colpoId === c.id ? leadIncontro : null;
     /* L'opportunità dell'incontro vale solo per il colpo indicato; sugli altri
@@ -2619,6 +2621,7 @@ function renderStColpi(){
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
       '<div class="stchips">' +
+        '<span class="stchip">' + stradaCategoria(c).n + '</span>' +
         '<span class="stchip money">' + fmt(c.min) + '–' + fmt(c.max) + ' €</span>' +
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
