@@ -1188,6 +1188,65 @@ describe("cartellino presenze Fabbrica", () => {
     expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(70);
   });
 
+  it("salva un esito strutturato del turno e gli collega l'evento di fine turno", () => {
+    const ctx = {
+      G:{
+        year:1,week:2,day:3,
+        workplaces:{},
+        job:{id:"operaio",place:"fabbrica",n:"Operaio"}
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => 2;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    vm.runInContext(`
+      lavoroSalvaEsitoTurno("fabbrica",{
+        jobId:"operaio",
+        jobName:"Operaio",
+        pay:{base:220,total:286,bonus:66,percent:30,label:"6° giorno"},
+        energyDelta:-40,
+        wellbeingDelta:-3,
+        lucidityDelta:-1,
+        attendance:{worked:5,required:5,total:6}
+      });
+      lavoroSegnaEventoEsitoTurno("fabbrica",{
+        type:"factory",
+        title:"Vita di Fabbrica",
+        detail:"giornata-liscia"
+      });
+    `, ctx);
+
+    const out=ctx.G.workplaces.fabbrica.lastShiftOutcome;
+    expect(out.pay.total).toBe(286);
+    expect(out.pay.bonus).toBe(66);
+    expect(out.energyDelta).toBe(-40);
+    expect(out.attendance.worked).toBe(5);
+    expect(out.event.title).toBe("Vita di Fabbrica");
+    expect(out.absoluteDay).toBe(10);
+  });
+
+  it("la scena Fabbrica mostra il riepilogo completo del turno senza uscire dal luogo", () => {
+    const luoghi = leggi("js/game/luoghi-foto.js");
+    const eventi = leggi("js/game/eventi-v2.js");
+    const actions = leggi("js/game/actions.js");
+
+    expect(actions).toContain("function lavoroSalvaEsitoTurno(luogo,data)");
+    expect(actions).toContain("function lavoroSegnaEventoEsitoTurno(luogo,event)");
+    expect(luoghi).toContain("function lfFabbricaEsitoTurno()");
+    expect(luoghi).toContain('lfRiga("Paga"');
+    expect(luoghi).toContain('lfRiga("Bonus"');
+    expect(luoghi).toContain('lfRiga("Energia"');
+    expect(luoghi).toContain('lfRiga("Benessere"');
+    expect(luoghi).toContain('lfRiga("Lucidità"');
+    expect(luoghi).toContain('lfRiga("Presenze"');
+    expect(luoghi).toContain('lfRiga("Fine turno"');
+    expect(luoghi).toContain('LUOGO.esito && LUOGO.esito.a === "turno" && mio');
+    expect(eventi).toContain("adfShiftOutcomeEvent(shiftPayload.workplace,jobBefore");
+    expect(eventi).toContain('title:"Nessun evento extra"');
+  });
+
   it("marca sempre la domenica e colora i giorni non lavorati solo a settimana conclusa", () => {
     const luoghi = leggi("js/game/luoghi-foto.js");
     const css = leggi("css/luoghi-foto.css");
