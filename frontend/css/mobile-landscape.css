@@ -25,7 +25,7 @@
   .land-hero{
     margin-left:5vw;
     width:min(48vw,520px);
-    padding:48px 0 8px;
+    padding:38px 0 6px;
     justify-content:center
   }
   .land-kick{
@@ -55,7 +55,7 @@
   .land-hero .mrow.big .b{font-size:9px}
   .land-hero .mrow.big .arw{font-size:17px}
   .land-dock{
-    margin:0 10px max(6px,env(safe-area-inset-bottom,0px))
+    margin:0 10px max(4px,env(safe-area-inset-bottom,0px))
   }
   .land-dock nav{
     grid-template-columns:repeat(6,minmax(0,1fr));
@@ -78,6 +78,21 @@
   .land-voce .des{display:none}
   .land-voce::after{left:8px;right:8px;bottom:5px}
   .land-piede,.land-giu{display:none}
+  /* Mobile: la landing finisce qui; niente teaser/copyright lungo sotto. */
+  #s-menu > .menu{display:none}
+  .land-dock::after{
+    content:"© 2026 La Fame Studio";
+    display:block;
+    margin:3px 8px 0 auto;
+    width:max-content;
+    font-size:6.5px;
+    line-height:1;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:rgba(232,224,212,.55);
+    pointer-events:none;
+    white-space:nowrap
+  }
 
   /* Navigazione mobile: mai intrappolati nei pannelli della landing. */
   .avv-close-mobile{
