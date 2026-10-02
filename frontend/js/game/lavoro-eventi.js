@@ -1487,7 +1487,7 @@ function showWorkplaceFloor(job,s,roll){
       const adjustedFx=workplaceFloorFx(job,opt);
       return {
         n:opt.n,
-        d:opt.d || factoryFxLabel(adjustedFx),
+        d:factoryFxLabel(adjustedFx),
         run(){
           const fx=applyWorkRoleFx(job,adjustedFx);
           record(s,"factory",{
