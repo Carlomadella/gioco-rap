@@ -1263,12 +1263,21 @@ test("gli uomini legacy non sono più una crew comprabile né un costo invisibil
   crime.includes("function stradaPersoneSquadra()") &&
   crime.includes("stradaPersonaSquadra(personaSquadraId)") &&
   crime.includes("Non puoi comprare la fiducia di qualcuno"));
-test("protezione decade se non pagabile",
-  crime.includes("s.prot = 0") &&
+test("protezione è un accordo reale, prepagato all'avvio e decade se non pagabile",
+  crime.includes("function stScenaProtezione()") &&
+  crime.includes("providerPersonId") &&
+  crime.includes("prepaidWeekKey=stradaWeekKey()") &&
+  crime.includes('status:"unpaid"') &&
+  crime.includes('stradaModificaFiducia(provider,-5,"protezione-non-pagata")') &&
   crime.includes("Protezione saltata."));
-test("avvocato decade se non pagabile",
-  crime.includes("s.avvocato = false") &&
-  crime.includes("La parcella non era coperta."));
+test("avvocato privato è una persona reale e decade se non pagabile",
+  crime.includes("function stScenaAvvocato()") &&
+  crime.includes("function stradaAvvocatiConosciuti()") &&
+  crime.includes("STRADA_AVVOCATO_REL_MIN") &&
+  crime.includes('source="relationship"') &&
+  crime.includes("s.avvocato=false") &&
+  crime.includes("La parcella non era coperta.") &&
+  crime.includes("difensore d'ufficio"));
 test("UI principale mostra residuo e durata riciclaggio",
   crimeui.includes("const launderCap=") &&
   crimeui.includes('GAME_TIME.durationFor("ricicla")') &&
@@ -1465,10 +1474,12 @@ test("ora d'aria e giro hanno limiti giorno/settimana",
   crime.includes("if(c.daily.aria)") &&
   crime.includes("if(c.weekly.giro)") &&
   crime.includes('GAME_TIME.advance(minuti,"jail:"+id'));
-test("il ricorso dell'avvocato è una volta per detenzione e toglie solo 1 settimana",
+test("il ricorso legale è una volta per detenzione: privato affidabile, d'ufficio senza garanzia",
   crime.includes("if(c.ricorsoUsato)") &&
   crime.includes("a.settimane=Math.max(1,(Number(a.settimane)||1)-1)") &&
-  crime.includes("STRADA_AVVOCATO_COSTO"));
+  crime.includes("stradaHaAvvocatoPrivato()") &&
+  crime.includes("Math.random()<.35") &&
+  crime.includes("difensore d'ufficio"));
 test("sim sostituisce street e chat con carcereGiorno durante la detenzione",
   sim.includes("if(G.strada && G.strada.arresto)") &&
   sim.includes('typeof carcereGiorno === "function"') &&
