@@ -2280,7 +2280,42 @@ body::before{
    A 844x390 la scelta deve stare nello schermo; sui telefoni piu' bassi
    l'intera area resta scrollabile con un gesto verticale nativo. */
 @media (orientation:landscape) and (max-width:980px){
+  /* Il breakpoint mobile (<980) e quello "notebook basso" (>800 e <740h)
+     si sovrappongono a 844x390. Durante il solo step Aspetto azzeriamo
+     quell'offset doppio: topbar compatta, viewport subito sotto, niente
+     scroll del documento esterno. Gli altri step restano invariati. */
+  html:has(#pageAppearance.on),
+  body:has(#pageAppearance.on){
+    height:100%;
+    min-height:100%;
+    overflow:hidden;
+  }
+
+  body:has(#pageAppearance.on) .topbar{
+    position:sticky;
+    top:0;
+    height:54px;
+    min-height:54px;
+    padding:
+      0
+      max(14px,env(safe-area-inset-right,0px))
+      0
+      max(14px,env(safe-area-inset-left,0px));
+  }
+
+  body:has(#pageAppearance.on) .viewport{
+    position:relative;
+    inset:auto;
+    top:auto;
+    min-height:calc(100dvh - 54px);
+    height:calc(100dvh - 54px);
+    overflow:hidden;
+  }
+
   #pageAppearance{
+    position:relative;
+    min-height:calc(100dvh - 54px);
+    height:calc(100dvh - 54px);
     overflow:hidden;
   }
 
