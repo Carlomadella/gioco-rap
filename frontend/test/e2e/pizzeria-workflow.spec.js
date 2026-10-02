@@ -216,6 +216,8 @@ test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso gi
 
     const viaggio=GAME_TRAVEL.go("pizzeria");
     const dopoViaggio=GAME_TIME.now();
+    if(GAME_TIME.now()<17*60) GAME_TIME.advance(17*60-GAME_TIME.now(),"wait-for-shift");
+    const inizioTurno=GAME_TIME.now();
 
     const appuntamento={id:"live",n:"Serata live",ic:"microfono",k:"#fff",ora:"21:00"};
     AGENDA.segna(appuntamento,"azione");
@@ -263,7 +265,7 @@ test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso gi
     );
 
     const result={
-      tempoPrima,dopoPromo,dopoViaggio,
+      tempoPrima,dopoPromo,dopoViaggio,inizioTurno,
       promoOk:promoOk!==false,
       viaggioOk:!!(viaggio&&viaggio.ok),
       primo,
@@ -285,6 +287,7 @@ test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso gi
   expect(out.dopoPromo-out.tempoPrima).toBe(45);
   expect(out.viaggioOk).toBe(true);
   expect(out.dopoViaggio).toBeGreaterThanOrEqual(out.dopoPromo);
+  expect(out.inizioTurno).toBeGreaterThanOrEqual(17*60);
 
   expect(out.conflitti).toBe(2);
   expect(out.scelte).toEqual(["Tieni l'appuntamento","Vai al turno"]);
@@ -293,7 +296,7 @@ test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso gi
 
   expect(out.shifts).toBe(1);
   expect(out.money).toBe(100);
-  expect(out.time).toBe(out.dopoViaggio+300);
+  expect(out.time).toBe(out.inizioTurno+300);
   expect(out.missed).toBe(true);
   expect(out.appointmentStillThere).toBe(false);
 });
