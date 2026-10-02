@@ -2455,17 +2455,10 @@ body::before{
     line-height:1.25;
   }
 
+  /* Su mobile le due card sono gia' le azioni finali: nessun secondo
+     pulsante di conferma sotto. Il desktop mantiene il flusso seleziona+continua. */
   #pageAppearance .bottom{
-    position:relative;
-    bottom:auto;
-    margin-top:6px;
-    padding-top:0;
-    padding-bottom:0;
-    background:none;
-  }
-
-  #pageAppearance .btn{
-    min-height:44px;
+    display:none;
   }
 }
 
@@ -3164,7 +3157,9 @@ function renderAvatarSource(){
   const note = $('avatarSelectionNote');
   const go = $('goIdentity');
   if(!selected){
-    note.textContent = 'Seleziona uno dei due metodi. Dopo l’editor scelto passerai dal camerino prima di entrare nell’identità.';
+    note.textContent = mobileAvatarDirectTapEnabled()
+      ? 'Tocca Avaturn o MakeHuman per aprire subito l’editor scelto.'
+      : 'Seleziona uno dei due metodi. Dopo l’editor scelto passerai dal camerino prima di entrare nell’identità.';
     go.textContent = 'Seleziona un metodo';
     go.disabled = true;
     return;
@@ -3431,7 +3426,14 @@ function showResult(){
 }
 
 document.querySelectorAll('[data-avatar-source]').forEach(btn=>{
-  btn.addEventListener('click', ()=>selectAvatarSource(btn.dataset.avatarSource));
+  btn.addEventListener('click', ()=>{
+    const source=btn.dataset.avatarSource;
+    selectAvatarSource(source);
+
+    /* Mobile landscape: la card e' gia' un vero bottone touch. Evitiamo il
+       doppio passaggio "seleziona + conferma" e apriamo subito il metodo. */
+    if(mobileAvatarDirectTapEnabled()) activateAvatarSource(source);
+  });
 });
 
 const localEditorOverlay = $('localEditorOverlay');
@@ -3522,14 +3524,29 @@ function closeLocalEditor(){
   localEditorOverlay.setAttribute('aria-hidden','true');
 }
 
-$('goIdentity').onclick = ()=>{
-  const source = selectedAvatarSource();
-  if(!source) return;
+function mobileAvatarDirectTapEnabled(){
+  return !!(
+    window.matchMedia &&
+    window.matchMedia('(orientation:landscape) and (max-width:980px)').matches
+  );
+}
+
+function activateAvatarSource(source){
+  if(source!=='avaturn' && source!=='local') return;
   state.avatarPendingSource=source;
-  if(source==='local'){ openLocalEditor(); return; }
-  /* Avaturn vive dentro al camerino: il bottone MODIFICA CON AVATURN apre
-     l’SDK e Continua rimane disabilitato finché non esiste un export reale. */
+
+  if(source==='local'){
+    openLocalEditor();
+    return;
+  }
+
+  /* Avaturn vive dentro al camerino: da li' il comando MODIFICA CON AVATURN
+     apre l'SDK e Continua resta disabilitato finche' non esiste un export reale. */
   openDressingRoom(false);
+}
+
+$('goIdentity').onclick = ()=>{
+  activateAvatarSource(selectedAvatarSource());
 };
 
 $('backAppearance').onclick = ()=>{
