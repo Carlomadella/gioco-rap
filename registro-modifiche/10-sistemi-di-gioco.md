@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:fc054398 -->
+## 02/10/26, 23:43 — feature/strada-punto11-peso-capacita → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `fc054398`
+
+### Cosa è entrato
+
+- `74987e7f` — fix(strada): preserva ritorni legacy per offerte singole — **mycolbraga**
+- `f93cd631` — chore(frontend): aggiorna cache Strada punto 11 — **mycolbraga**
+- `eb31fae7` — test(audit): verifica progressione indiretta punto 11 — **mycolbraga**
+- `adc820ec` — test(strada): copri peso e capacità del punto 11 — **mycolbraga**
+- `bebe3556` — feat(state): persisti solo gli eventi di rete del punto 11 — **mycolbraga**
+- `47e118de` — fix(strada): evita sovrapposizioni negli eventi di rete — **mycolbraga**
+- `bdf57ece` — feat(eventi): inserisci gli eventi di rete nella catena gameplay — **mycolbraga**
+- `7a37cfac` — feat(eventi): porta in gioco rete e scelta opportunita punto 11 — **mycolbraga**
+- `f0391290` — feat(eventi): mostra scelta fra piu dritte della Strada — **mycolbraga**
+- `bde5ee16` — feat(strada): aggiungi richieste di nomi e ponti tra contatti — **mycolbraga**
+- `7327e207` — feat(strada): gestisci scelta rifiuto e ignore multipli — **mycolbraga**
+- `6fb738d2` — feat(strada): abilita scelta tra opportunita senza ranghi — **mycolbraga**
+- `30c034cc` — feat(strada): aumenta chiamate col peso reale della rete — **mycolbraga**
+- `b664eb9c` — feat(strada): deriva capacità di rete senza ranghi criminali — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-peso-capacita.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:21ca4050 -->
 ## 02/10/26, 17:16 — fix/pizzeria-audit-chiusura → main
 
