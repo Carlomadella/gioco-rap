@@ -3026,3 +3026,20 @@ essere applicato e renderizzato il preset; si ferma solo su risultato o errore d
 Dopo sei minuti il percorso mobile produce un errore esplicito. Il desktop non usa
 `quick=1` e non è stato modificato.
 
+### Secondo test reale — ancora timeout a 2:01
+
+**TEST FALLITO (02/10/2026)** — anche dopo aver esteso il keepalive a tutto il bootstrap,
+il telefono ha mostrato ancora «Il camerino non dà notizie da due minuti» a circa 2:01.
+
+Il problema rimasto era architetturale: quel keepalive continuava a usare `setInterval`
+dentro `media/makehuman-mobile-v1/index.html`, cioè dentro il creator che
+`gioco-ingresso.js` tiene nascosto durante l'avvio rapido. Un watchdog mobile non deve
+dipendere dai timer di un iframe non visibile.
+
+**CORRETTO, terzo giro (02/10/2026)** — il timer è stato spostato in
+`frontend/js/mobile/makehuman-mobile.js`, nel documento principale che mostra «Preparo il
+tuo artista». Ogni 10 secondi emette verso il watchdog condiviso un evento con la stessa
+sorgente logica del creator; dopo sei minuti emette l'errore mobile esplicito. Il relay
+`media/makehuman-mobile-v1/index.html` non contiene più timer: inoltra soltanto i messaggi
+fra creator e camerino. Il desktop continua a uscire subito dal modulo mobile e non cambia.
+
