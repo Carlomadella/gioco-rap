@@ -38,7 +38,10 @@ function contesto(overrides={}){
     diarioBordo:()=>G.diario,
     pushLog:(msg,cls)=>logs.push({msg,cls}),
     save:()=>{},
-    window:{}
+    window:{},
+    STRADA_FERRO_REP_MIN:20,
+    STRADA_FERRO_FIDUCIA_MIN:50,
+    STRADA_FERRO_COSTO:1200
   };
   vm.createContext(ctx);
   vm.runInContext(helperIngresso(),ctx);
@@ -226,6 +229,88 @@ describe("Strada · ingresso nascosto",()=>{
     expect(strada).not.toContain("p += Math.min(s.uomini, 5) * .025");
     expect(strada).not.toContain("return s.uomini * STRADA_UOMO_UPKEEP");
     expect(strada).toContain("Gli uomini numerici sono solo compatibilità legacy");
+  });
+
+  it("il ferro richiede un contatto molto fidato e conserva chi lo procura",()=>{
+    const {ctx,G}=contesto({
+      money:2000,
+      gente:[{id:"f1",n:"Nico",ruolo:"strada",rel:0,pt:0,via:false,
+        strada:{known:true,key:"street:nico",sources:["opportunity"],opportunityIds:["a"],fiducia:55,colpiInsieme:2}}],
+      strada:{
+        rep:25,heat:10,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,badgeSbloccato:true,
+        traphone:{owned:true,source:"test"},
+        ferroStato:{sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]}
+      }
+    });
+    ctx.stradaGiroAvviato=()=>true;
+    ctx.stradaHaTrapPhone=()=>true;
+    const proposta=vm.runInContext("stradaTentaPropostaFerro(0)",ctx);
+    expect(proposta.personId).toBe("f1");
+    expect(proposta.persona).toBe("Nico");
+    const out=vm.runInContext("stradaAccettaFerro()",ctx);
+    expect(out.ok).toBe(true);
+    expect(G.strada.ferro).toBe(true);
+    expect(G.strada.ferroStato.sourcePersonId).toBe("f1");
+    expect(G.strada.ferroStato.sourceName).toBe("Nico");
+    expect(G.strada.ferroStato.source).toBe("trusted-contact");
+    expect(G.gente[0].strada.fiducia).toBe(59);
+    expect(G.money).toBe(800);
+  });
+
+  it("senza fiducia o reputazione il ferro non viene proposto",()=>{
+    const {ctx,G}=contesto({
+      gente:[{id:"f1",n:"Nico",ruolo:"strada",via:false,
+        strada:{known:true,key:"street:nico",sources:[],opportunityIds:[],fiducia:49,colpiInsieme:2}}],
+      strada:{
+        rep:25,heat:0,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,badgeSbloccato:true,
+        traphone:{owned:true,source:"test"},
+        ferroStato:{sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]}
+      }
+    });
+    ctx.stradaGiroAvviato=()=>true;
+    ctx.stradaHaTrapPhone=()=>true;
+    expect(vm.runInContext("stradaTentaPropostaFerro(0)",ctx)).toBeNull();
+    G.gente[0].strada.fiducia=60;
+    G.strada.rep=19;
+    G.strada.ferroStato.lastCheckAbsoluteDay=null;
+    expect(vm.runInContext("stradaTentaPropostaFerro(0)",ctx)).toBeNull();
+  });
+
+  it("rifiutare il ferro richiude la porta per due settimane",()=>{
+    const {ctx,G}=contesto({
+      gente:[{id:"f1",n:"Nico",ruolo:"strada",via:false,
+        strada:{known:true,key:"street:nico",sources:[],opportunityIds:[],fiducia:60,colpiInsieme:2}}],
+      strada:{
+        rep:25,heat:0,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,badgeSbloccato:true,
+        traphone:{owned:true,source:"test"},
+        ferroStato:{sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]}
+      }
+    });
+    ctx.stradaGiroAvviato=()=>true;
+    ctx.stradaHaTrapPhone=()=>true;
+    vm.runInContext("stradaTentaPropostaFerro(0)",ctx);
+    vm.runInContext("stradaRifiutaFerro()",ctx);
+    expect(G.strada.ferro).toBe(false);
+    expect(G.strada.ferroStato.pending).toBeNull();
+    expect(G.strada.ferroStato.nextOfferAbsoluteDay).toBe(15);
+  });
+
+  it("il ferro non è più acquistabile direttamente dalla schermata e il possesso aumenta il rischio controllo",()=>{
+    const strada=leggi("js/game/strada-crimine.js");
+    const eventi=leggi("js/game/eventi-v2.js");
+    expect(strada).toContain("Non è merce da scaffale");
+    expect(strada).toContain("function stradaTentaPropostaFerro");
+    expect(strada).toContain("STRADA_FERRO_FIDUCIA_MIN = 50");
+    expect(strada).toContain("const rischioControllo=s.ferro");
+    expect(strada).toContain('status:"seized"');
+    expect(strada).toContain('status:"seized-on-crime"');
+    expect(strada).toContain("ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30");
+    expect(eventi).toContain("adfStreetFerroAfterAction");
+    expect(eventi).toContain("stradaAccettaFerro()");
+    expect(eventi).toContain("TRAPHONE16.receiveStorySms");
   });
 
   it("hub e colpo rapido rispettano lo stesso gate",()=>{

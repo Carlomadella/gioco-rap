@@ -34,6 +34,7 @@ const START = () => ({
   promoSaturation:{key:"", baseFans:0, pctUsed:0},
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
+    ferroStato:{sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]},
     attivita:{}, precedenti:0, arresto:null, giroAvviato:false,
     /* Punto Strada 1: il mondo criminale nasce nascosto. La "strana proposta"
        apre una fase introduttiva di due lavoretti protetti; solo dopo compare
