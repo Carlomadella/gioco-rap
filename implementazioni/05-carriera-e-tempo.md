@@ -533,3 +533,21 @@ anche sull'arbitro, non soltanto sul numero di scene.
 Il test automatico simula 20 turni su quattro settimane con tutte le famiglie
 abilitate: verifica massimo due eventi incidentali a settimana e almeno cinque
 famiglie diverse effettivamente raggiunte.
+
+## Capoturno come grado terminale della Fabbrica attuale
+
+**FATTO (02/10/2026)** — la carriera Fabbrica resta volutamente chiusa a
+**Capoturno**. Non viene introdotto un quinto ruolo finché non esiste un
+percorso verificato per la città/trasferimento successivo.
+
+Il comportamento attuale è protetto da test:
+
+- `lavoroProgressoCarriera("fabbrica")` restituisce `prossimo: null` a Capoturno;
+- `promozione.massimo` resta `true`;
+- `lavoroPromozioneDisponibile("fabbrica")` resta `false` anche con requisiti
+  ampiamente superati;
+- la UI continua a mostrare **Grado massimo raggiunto**.
+
+Questa è una decisione di perimetro, non il disegno definitivo della carriera:
+l'estensione oltre Capoturno va progettata insieme alla progressione geografica,
+non aggiunta come ruolo isolato dentro la Fabbrica attuale.
