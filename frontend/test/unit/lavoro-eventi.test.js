@@ -88,6 +88,28 @@ describe("famiglie eventi lavoro", () => {
     ]);
   });
 
+  it("ogni ruolo Fabbrica ha cinque eventi propri e un anti-ripetizione coerente", () => {
+    const src=leggi("js/game/lavoro-eventi.js");
+    const start=src.indexOf("const FACTORY_ROLE_EVENTS");
+    const end=src.indexOf("const FACTORY_ROLE_EVENT_LOAD",start);
+    const block=src.slice(start,end);
+    const ruoli=["operaio","operaio_esperto","capolinea","capoturno"];
+
+    for(let i=0;i<ruoli.length;i++){
+      const from=block.indexOf(ruoli[i]+":Object.freeze([");
+      const to=i<ruoli.length-1
+        ? block.indexOf(ruoli[i+1]+":Object.freeze([",from)
+        : block.length;
+      const pezzo=block.slice(from,to);
+      expect((pezzo.match(/\\bid:"[^"]+"/g)||[]).length).toBe(5);
+    }
+
+    expect(src).toContain("if(s.roleRecent.length>4) s.roleRecent.length=4");
+    expect(src).toContain("x.roles.includes(job.id)");
+    expect((src.match(/roles:Object\\.freeze\\(\\["operaio","operaio_esperto"\\]\\)/g)||[]).length)
+      .toBeGreaterThanOrEqual(3);
+  });
+
   it("gli straordinari esistenti entrano nella stessa storia persistente", () => {
     const env=ambiente({
       G:{
@@ -699,7 +721,7 @@ describe("famiglie eventi lavoro", () => {
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(strada).toContain('"Dritta " + lead.sourceLabel');
     expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
-    expect(html).toContain('js/game/lavoro-eventi.js?v=6');
+    expect(html).toContain('js/game/lavoro-eventi.js?v=7');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
 });
