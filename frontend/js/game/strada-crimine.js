@@ -1585,7 +1585,9 @@ function stradaEffettiOpportunita(lead,successo){
 
 function stradaChance(colpo, approccio, personaSquadra){
   const s = G.strada;
+  const categoria=stradaEffettiCategoria(colpo);
   let p = .62 - colpo.difficolta * .34;
+  p += categoria.chance;
   p += s.rep/100 * .20;
   if(approccio && approccio.id==="squadra" && personaSquadra)
     p += stradaBonusFiduciaSquadra(personaSquadra);
@@ -1632,7 +1634,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
       : null);
   const effettiLead=stradaEffettiOpportunita(leadUsato,successo);
   const moltiplicatoreLead = 1 + Number(effettiLead.bonusPct||0) / 100;
-  const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
+  const effettiCategoria=stradaEffettiCategoria(colpo);
+  const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore * effettiCategoria.heat, 2, 30);
   const rumoreLead = Number(effettiLead.heatDelta||0);
   const reputazioneLead = Number(effettiLead.repDelta||0);
   const personaLead=leadUsato&&leadUsato.personId?stradaPersonaDaId(leadUsato.personId):null;
@@ -1659,10 +1662,13 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
     ? AGENDA.consumaPeso("colpo") : 1;
 
   if(successo){
-    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso * moltiplicatoreLead;
-    const pulito = Math.round(grezzo * .4), sporco = Math.round(grezzo * .6);
+    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso *
+      moltiplicatoreLead * effettiCategoria.guadagno;
+    const sporco = Math.round(grezzo * effettiCategoria.sporco);
+    const pulito = Math.round(grezzo - sporco);
     G.money += pulito; s.sporchi += sporco;
-    s.rep = clamp(s.rep + 3 + colpo.difficolta * 6 + reputazioneLead, 0, 100);
+    const repBase=(3 + colpo.difficolta * 6) * effettiCategoria.rep;
+    s.rep = clamp(s.rep + repBase + reputazioneLead, 0, 100);
     s.heat = clamp(s.heat + rumore * .6 + rumoreLead, 0, 100);
     diarioBordo().colpi++;
     const fonteLead = leadUsato && leadUsato.source==="street-opportunity"
@@ -2510,11 +2516,17 @@ function chiudiStrada(){
 }
 
 /* ==================== QUELLO CHE CAMBIA ==================== */
+function stradaRischioValore(colpo){
+  const eff=stradaEffettiCategoria(colpo);
+  return clamp(Number(colpo.difficolta||0)-eff.chance*.55+(eff.heat-1)*.32,0,1);
+}
 function stRischio(colpo){
-  return colpo.difficolta <= .2 ? "Basso" : colpo.difficolta <= .45 ? "Medio" : "Alto";
+  const r=stradaRischioValore(colpo);
+  return r <= .2 ? "Basso" : r <= .45 ? "Medio" : "Alto";
 }
 function stClasseRischio(colpo){
-  return colpo.difficolta <= .2 ? "risk-low" : colpo.difficolta <= .45 ? "risk-mid" : "risk-high";
+  const r=stradaRischioValore(colpo);
+  return r <= .2 ? "risk-low" : r <= .45 ? "risk-mid" : "risk-high";
 }
 function stOcchiAddosso(){
   const h = G.strada.heat;
