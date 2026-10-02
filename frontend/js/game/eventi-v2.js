@@ -2337,6 +2337,106 @@ function adfFactoryOvertimeScenario(offerta){
   return scelta;
 }
 
+
+/* La Pizzeria usa lo stesso motore delle coperture ma un tono diverso:
+   niente straordinari "da stabilimento". Sono buchi reali del servizio,
+   abbastanza rari da restare eccezioni. Il motivo persiste nella richiesta
+   accettata e chi te lo chiede cambia con la mansione. */
+const ADF_PIZZERIA_OVERTIME_SCENARIOS = Object.freeze([
+  Object.freeze({
+    id:"collega-malato",
+    label:"collega assente all'ultimo",
+    title:"Uno ha dato forfait per domani",
+    body:"A fine servizio arriva il messaggio: una persona della cucina si è messa male e il turno del weekend è rimasto corto."
+  }),
+  Object.freeze({
+    id:"prenotazione-grossa",
+    label:"prenotazione più grossa del previsto",
+    title:"Domani entra una tavolata grossa",
+    body:"È arrivata una prenotazione che riempie buona parte della sala. Il servizio previsto non basta e stanno cercando una persona in più in cucina."
+  }),
+  Object.freeze({
+    id:"serata-zona",
+    label:"serata piena nel quartiere",
+    title:"Domani si prevede più gente del solito",
+    body:"Tra evento in zona e prenotazioni il locale si aspetta un picco. Non è un'emergenza: vogliono solo evitare di andare corti nel rush."
+  }),
+  Object.freeze({
+    id:"delivery-pieno",
+    label:"molte consegne già prenotate",
+    title:"Le consegne di domani sono già troppe",
+    body:"Prima ancora di aprire c'è già parecchio delivery segnato. Cercano una copertura in più per non far saltare cucina e ritiri insieme."
+  })
+]);
+
+const ADF_PIZZERIA_OVERTIME_ROLE_CONTEXT = Object.freeze({
+  lavapiatti:Object.freeze({
+    asker:"Il responsabile di cucina",
+    duty:"tenere coperti lavaggio e chiusura mentre il resto della cucina gira pieno"
+  }),
+  aiuto_cucina:Object.freeze({
+    asker:"Il responsabile di cucina",
+    duty:"coprire preparazioni e dare supporto durante il rush"
+  }),
+  aiuto_pizzaiolo:Object.freeze({
+    asker:"Il pizzaiolo",
+    duty:"dare copertura tra banco, preparazioni e forno"
+  }),
+  pizzaiolo:Object.freeze({
+    asker:"Il titolare",
+    duty:"tenere il forno e fare da riferimento alla cucina nel servizio extra"
+  })
+});
+
+function adfPizzeriaOvertimeRoleContext(){
+  const id=G.job && typeof lavoroLuogo==="function" && lavoroLuogo(G.job)==="pizzeria"
+    ? G.job.id : "lavapiatti";
+  return Object.assign(
+    {roleId:id},
+    ADF_PIZZERIA_OVERTIME_ROLE_CONTEXT[id]||ADF_PIZZERIA_OVERTIME_ROLE_CONTEXT.lavapiatti
+  );
+}
+
+function adfPizzeriaOvertimeScenario(offerta){
+  if(!offerta) return null;
+  const pool=ADF_PIZZERIA_OVERTIME_SCENARIOS;
+  const s=st();
+  const recent=Array.isArray(s.runtime.pizzeriaOvertimeRecent)
+    ? s.runtime.pizzeriaOvertimeRecent
+    : (s.runtime.pizzeriaOvertimeRecent=[]);
+  const candidati=pool.filter(x=>!recent.includes(x.id));
+  const sceltaBase=(candidati.length?candidati:pool)[
+    Math.floor(Math.random()*(candidati.length?candidati.length:pool.length))
+  ];
+  const ruolo=adfPizzeriaOvertimeRoleContext();
+  const scelta=Object.assign({},sceltaBase,{
+    roleId:ruolo.roleId,
+    asker:ruolo.asker,
+    duty:ruolo.duty
+  });
+
+  recent.unshift(scelta.id);
+  if(recent.length>3) recent.length=3;
+
+  offerta.scenarioId=scelta.id;
+  offerta.scenarioLabel=scelta.label;
+  offerta.scenarioRoleId=scelta.roleId;
+  offerta.scenarioAsker=scelta.asker;
+  offerta.scenarioDuty=scelta.duty;
+
+  if(typeof lavoroStraordinarioStato==="function"){
+    const overtime=lavoroStraordinarioStato("pizzeria");
+    if(overtime&&overtime.pendingOffer){
+      overtime.pendingOffer.scenarioId=scelta.id;
+      overtime.pendingOffer.scenarioLabel=scelta.label;
+      overtime.pendingOffer.scenarioRoleId=scelta.roleId;
+      overtime.pendingOffer.scenarioAsker=scelta.asker;
+      overtime.pendingOffer.scenarioDuty=scelta.duty;
+    }
+  }
+  return scelta;
+}
+
 function adfWorkOvertimeAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function") return false;
   const luogo=lavoroLuogo(G.job);
@@ -2366,23 +2466,27 @@ function adfWorkOvertimeAfterShift(){
 
   const fabbrica=luogo==="fabbrica";
   const domenica=offerta.tipo==="domenica";
-  const scenario=fabbrica ? adfFactoryOvertimeScenario(offerta) : null;
+  const scenario=fabbrica
+    ? adfFactoryOvertimeScenario(offerta)
+    : adfPizzeriaOvertimeScenario(offerta);
   const ruoloStraordinario=fabbrica
-    ? (scenario||adfFactoryOvertimeRoleContext()) : null;
+    ? (scenario||adfFactoryOvertimeRoleContext())
+    : (scenario||adfPizzeriaOvertimeRoleContext());
   const nome=fabbrica?"Fabbrica":"Pizzeria";
-  const titolo=fabbrica
-    ? (scenario ? scenario.title : (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?"))
-    : "Riesci a coprire un altro servizio?";
-  const descrizione=fabbrica
-    ? ((scenario
-        ? scenario.body
-        : (domenica
+  const titolo=scenario
+    ? scenario.title
+    : (fabbrica
+      ? (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?")
+      : "Riesci a coprire un altro servizio?");
+  const descrizione=((scenario
+      ? scenario.body
+      : (fabbrica
+        ? (domenica
           ? "Domani la Fabbrica sarebbe chiusa per il tuo contratto, ma manca personale."
-          : "Hai già coperto i cinque giorni del contratto. Domani serve una copertura extra in stabilimento.")) +
-      "<br><br>"+ruoloStraordinario.asker+" ti chiede se puoi entrare <b>"+giorno+
-      "</b> per "+ruoloStraordinario.duty+".")
-    : ("Hai già coperto i quattro servizi del contratto. Nel weekend la sala è piena e manca una persona in cucina." +
-      "<br><br>Il titolare ti chiede se puoi coprire anche <b>"+giorno+"</b>.");
+          : "Hai già coperto i cinque giorni del contratto. Domani serve una copertura extra in stabilimento.")
+        : "Hai già coperto i quattro servizi del contratto. Nel weekend manca una persona in cucina.")) +
+    "<br><br>"+ruoloStraordinario.asker+" ti chiede se puoi entrare <b>"+giorno+
+    "</b> per "+ruoloStraordinario.duty+".");
 
   afterClear(()=>showEvent({
     k:nome+" · "+(fabbrica?"Straordinario":"Copertura extra"),
