@@ -284,6 +284,7 @@ function esegui(){
   const cinque=simulaFatica("5 servizi",()=>5);
   const sei=simulaFatica("6 servizi",()=>6);
   const carriera=simulaCarrieraPerfetta(13);
+  const carrieraLunga=simulaCarrieraPerfetta(19);
   const profili=simulaProfiliRuolo();
   const rete=simulaConfrontoReteFabbrica();
   const doppiaVita=simulaDoppiaVita();
@@ -309,10 +310,14 @@ function esegui(){
       ok:profili.lavapiatti.energiaTurno===18&&profili.pizzaiolo.energiaTurno===15&&
         Math.abs(profili.lavapiatti.benessereTurno)<=1&&
         Math.abs(profili.pizzaiolo.luciditaTurno)<=1},
-    {nome:"la carriera arriva a Pizzaiolo ma resta economicamente secondaria",
-      ok:carriera.finale.ruolo==="pizzaiolo"&&
-        carriera.storia.filter(x=>x.evento&&x.evento.tipo==="promozione").length===3&&
+    {nome:"la carriera resta secondaria: un anno perfetto non basta per arrivare a Pizzaiolo",
+      ok:carriera.finale.ruolo==="aiuto_pizzaiolo"&&
+        carriera.storia.filter(x=>x.evento&&x.evento.tipo==="promozione").length===2&&
+        carriera.storia.filter(x=>x.evento&&x.evento.tipo==="aumento").length===2&&
         economia.pagaTopPizzeria<economia.pagaIngressoFabbrica},
+    {nome:"Pizzaiolo resta raggiungibile solo continuando oltre il primo anno",
+      ok:carrieraLunga.finale.ruolo==="pizzaiolo"&&
+        carrieraLunga.storia.filter(x=>x.evento&&x.evento.tipo==="promozione").length===3},
     {nome:"la Pizzeria usa metà delle ore settimanali della Fabbrica",
       ok:economia.orePizzeriaSettimana===20&&economia.oreFabbricaSettimana===40},
     {nome:"la Pizzeria paga molto meno della Fabbrica già all'ingresso",
@@ -332,7 +337,7 @@ function esegui(){
   return {
     ok:controlli.every(x=>x.ok),
     controlli,fatica:{quattro,cinque,sei},carriera:{pagaAnnua:carriera.pagaAnnua,finale:carriera.finale,tappe:carriera.storia.filter(x=>x.evento)},
-    profili,rete,doppiaVita,pacing,economia
+    profili,rete,doppiaVita,pacing,economia,carrieraLunga:{finale:carrieraLunga.finale,tappe:carrieraLunga.storia.filter(x=>x.evento)}
   };
 }
 
