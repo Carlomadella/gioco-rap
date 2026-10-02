@@ -539,6 +539,11 @@ function lavoroTerminaContratto(luogo, motivo){
      a impedire la riassunzione immediata; lo storico del rapporto appena
      chiuso resta in contractHistory.careerAtEnd. */
   if(motivo==="dimissioni" || motivo==="licenziamento"){
+    /* La chiusura deve essere atomica: finché G.job resta agganciato alla sede,
+       lavoroCarriera() può ricostruire roleId dal vecchio ruolo e vanificare
+       il reset. Il contratto chiuso non deve lasciare un dipendente attivo
+       nemmeno per un tick. */
+    if(G.job && lavoroLuogo(G.job)===luogo) G.job=null;
     lavoroResetCarriera(luogo,{preserveBlock:motivo==="licenziamento"});
     if(sede.attendance && typeof sede.attendance==="object"){
       sede.attendance={
