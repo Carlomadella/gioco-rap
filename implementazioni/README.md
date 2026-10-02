@@ -170,7 +170,7 @@ nell'insieme, tappa per tappa, sta in [`../documentazione/roadmap.md`](../docume
 | **—** | L'evento fatto esce dall'agenda | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | I prezzi dei beat per fama del beatmaker | fatto | [musica-e-suoni](04-musica-e-suoni.md) |
 | **—** | Si parte con tutti i parametri a 1 | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
-| **—** | Non ci si può licenziare | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
+| **—** | Dimissioni e licenziamento nei lavori strutturati | fatto | [carriera-e-tempo](05-carriera-e-tempo.md) |
 | **—** | Le pagine dei posti sulla loro foto: Casa, Palestra, Live Club, stacca la spina | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | L'avvio rapido: la schermata «Preparo il tuo artista» | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
 | **—** | La fascia della plancia fra 980 e 1240, e la plancia a 1280 × 800 | fatto | [interfaccia-e-telefono](02-interfaccia-e-telefono.md) |
