@@ -1581,6 +1581,72 @@ function showColleague(job,s,roll){
    almeno una volta (o esiste già un rapporto) e solo per musica già uscita. */
 const PIZZERIA_SOCIAL_MUSIC_ROLES = new Set(["rapper","promoter","fonico","beatmaker","videomaker"]);
 const PIZZERIA_SOCIAL_PERSON_GAP = 8;
+const PIZZERIA_SOCIAL_STORIES = Object.freeze({
+  collega:Object.freeze([
+    Object.freeze({
+      line:"A fine servizio finite a parlare di quanto resta della serata quando smetti di lavorare.",
+      result:n=>"<b>"+n+"</b> ti racconta che sta provando a difendersi almeno una sera libera a settimana."
+    }),
+    Object.freeze({
+      line:"Vi ritrovate a confrontare i vostri incastri: turni, amici, cose lasciate a metà.",
+      result:n=>"Con <b>"+n+"</b> il discorso cambia: non parlate più solo del turno, ma di come non farvi mangiare tutto dal lavoro."
+    }),
+    Object.freeze({
+      line:"Ormai quando chiudete insieme sapete già dove finirà il discorso.",
+      result:n=>"<b>"+n+"</b> ti propone di vedervi fuori dal lavoro uno di questi giorni. Nessuna ricompensa speciale: il rapporto ha semplicemente superato la cucina."
+    })
+  ]),
+  cliente:Object.freeze([
+    Object.freeze({
+      line:"È una faccia che torna spesso e stavolta resta al banco un minuto in più del solito.",
+      result:n=>"<b>"+n+"</b> smette di essere soltanto «quello che ordina sempre la stessa cosa»: adesso sapete almeno qualcosa l'uno dell'altro."
+    }),
+    Object.freeze({
+      line:"Ti riconosce subito e riprende una cosa che avevate detto l'altra volta.",
+      result:n=>"Con <b>"+n+"</b> la conversazione riparte senza presentazioni. È diventato uno di quei rapporti piccoli che esistono perché frequenti davvero un posto."
+    }),
+    Object.freeze({
+      line:"Stavolta vi mettete a parlare del quartiere e della gente che gira fuori dal locale.",
+      result:n=>"<b>"+n+"</b> ti indica due posti e due facce che conosce. Non è una scorciatoia musicale: è semplicemente qualcuno che ormai ti considera del giro."
+    })
+  ]),
+  rider:Object.freeze([
+    Object.freeze({
+      line:"Aspetta un ordine e avete finalmente il tempo di parlare invece di limitarvi a un cenno.",
+      result:n=>"Con <b>"+n+"</b> scopri che vi siete già incrociati un sacco di volte senza mai presentarvi davvero."
+    }),
+    Object.freeze({
+      line:"Arriva di nuovo e scherza sul fatto che ormai conosce i vostri tempi meglio di voi.",
+      result:n=>"<b>"+n+"</b> ti racconta quali locali gli fanno perdere mezz'ora e quali invece funzionano davvero."
+    }),
+    Object.freeze({
+      line:"Durante un'attesa più lunga finite a parlare di orari, quartieri e persone incontrate in giro.",
+      result:n=>"Con <b>"+n+"</b> il rapporto resta leggero, ma ormai non siete più due sconosciuti che condividono una porta."
+    })
+  ]),
+  fornitore:Object.freeze([
+    Object.freeze({
+      line:"La consegna è quasi finita e avete un minuto prima che riparta.",
+      result:n=>"<b>"+n+"</b> ti spiega quante cucine vede in una settimana e quanto cambiano da posto a posto."
+    }),
+    Object.freeze({
+      line:"Alla consegna successiva riprendete il discorso senza dover ricominciare da zero.",
+      result:n=>"Con <b>"+n+"</b> finite a parlare di chi regge davvero un locale e chi invece vive di emergenze."
+    }),
+    Object.freeze({
+      line:"Ormai sa chi sei e ti tratta come una persona del posto, non come uno qualunque dello staff.",
+      result:n=>"<b>"+n+"</b> ti lascia due dritte sulla zona e sulle persone che incontra ogni giorno. Sono informazioni normali, non un premio automatico."
+    })
+  ])
+});
+
+function socialStoryBeat(p,st){
+  const arc=p&&PIZZERIA_SOCIAL_STORIES[p.ruolo];
+  if(!arc || !arc.length) return null;
+  const step=Math.max(0,Math.min(arc.length-1,Number(st&&st.storyStep||0)));
+  return {step,beat:arc[step],done:Number(st&&st.storyStep||0)>=arc.length};
+}
+
 
 function socialPeopleState(s){
   if(!s.socialPeople || typeof s.socialPeople!=="object") s.socialPeople={};
@@ -1591,11 +1657,12 @@ function socialPersonState(s,p){
   const all=socialPeopleState(s);
   const id=String(p&&p.id||"");
   if(!all[id] || typeof all[id]!=="object"){
-    all[id]={shown:0,talks:0,lastDay:null,heardSongs:{},lastPromoOutcome:null};
+    all[id]={shown:0,talks:0,storyStep:0,lastDay:null,heardSongs:{},lastPromoOutcome:null};
   }
   const st=all[id];
   st.shown=Math.max(0,Number(st.shown||0));
   st.talks=Math.max(0,Number(st.talks||0));
+  st.storyStep=Math.max(0,Number(st.storyStep||0));
   if(!st.heardSongs || typeof st.heardSongs!=="object") st.heardSongs={};
   return st;
 }
@@ -1632,8 +1699,10 @@ function socialPickPerson(job,s){
   return pool[Math.floor(Math.random()*pool.length)] || null;
 }
 
-function socialRoleLine(p){
+function socialRoleLine(p,st){
   if(!p) return "Vi fermate due minuti a parlare.";
+  const story=socialStoryBeat(p,st);
+  if(story && story.beat) return story.beat.line;
   if(p.ruolo==="rapper") return "Fra una cosa e l'altra tornate a parlare di musica e di come incastrarla con il resto.";
   if(p.ruolo==="promoter") return "Il discorso finisce su locali, serate e gente che gira davvero in zona.";
   if(p.ruolo==="fonico") return "Da una battuta sul servizio finite a parlare di come suonano i pezzi fuori da qui.";
@@ -1641,11 +1710,20 @@ function socialRoleLine(p){
 }
 
 function socialTalkResult(p,st){
+  const story=socialStoryBeat(p,st);
   st.talks+=1;
   relation(p,1);
   if(typeof lavoroBonusRetePersona==="function")
     lavoroBonusRetePersona(p,"pizzeria-social-talk",.1,2);
   else addNetwork(.1);
+
+  if(story && story.beat){
+    st.storyStep=Math.min(
+      (PIZZERIA_SOCIAL_STORIES[p.ruolo]||[]).length,
+      Number(st.storyStep||0)+1
+    );
+    return story.beat.result(p.n);
+  }
   if(p.ruolo==="rapper")
     return "Avete parlato di musica senza trasformarla in una gara. Con <b>"+p.n+"</b> adesso c'è un pezzo di rapporto in più.";
   if(p.ruolo==="promoter")
@@ -1753,7 +1831,7 @@ function showPizzeriaSocial(job,s,roll){
   showEvent({
     k:"Pizzeria · Due minuti",
     t:p.n+" si ferma a parlare",
-    d:socialRoleLine(p),
+    d:socialRoleLine(p,st),
     annulla(){},
     opts
   });
