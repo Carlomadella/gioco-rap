@@ -2257,8 +2257,10 @@ accorge di una notifica appena arrivata; il fuoco da tastiera entra nel telefono
 tasto; il Menu accanto al tasto è alto 44; le scene delle azioni scorrono quando sono più alte
 dello schermo (`effects.css`). **Fra i 981 e i 1180** — tablet di traverso — la barra in alto
 trabocca già di suo (1100 punti in 1000) e il tasto in coda finiva fuori: lì il tasto
-**galleggia** in basso a destra, finché quella barra non avrà un disegno suo. Resta da decidere
-se il gioco sugli store gira anche in orizzontale.
+**galleggia** in basso a destra, finché quella barra non avrà un disegno suo.
+**DECISO (02/10/2026): sugli store il gioco supporta anche l'orizzontale e il landscape
+diventa la modalità mobile di riferimento.** Il portrait resta supportato, ma non guida più
+la struttura delle schermate e non si rimuove contenuto solo per farlo stare in verticale.
 
 ## Le transizioni video: il primo, lo Studio
 
@@ -2707,8 +2709,10 @@ antenato che lo tagli. Dopo il giro: **nessuna schermata scorre di lato a nessun
 La landing e l'accesso sono stati provati a parte, a sei misure: puliti. Le pagine più
 lunghe scorrono in verticale, che è quello che devono fare.
 
-**Resta quello che restava:** la prova su un telefono vero, e di traverso (844 × 390) il
-gioco si usa ma va deciso se sugli store gira anche in orizzontale.
+**Decisione chiusa (02/10/2026):** sugli store il gioco supporta landscape e portrait;
+**844 × 390 è la misura mobile di riferimento per il layout**, mentre 390 × 844 e 360 × 640
+restano misure obbligatorie di compatibilità portrait. La prova su telefono vero resta
+necessaria per verificare entrambe le orientazioni.
 
 ---
 
