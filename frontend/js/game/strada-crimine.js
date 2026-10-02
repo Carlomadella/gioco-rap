@@ -879,6 +879,20 @@ function stradaConsegnaTrapPhone(personId,personName,source){
    criminale: qui costruiamo soltanto identità e continuità. */
 const STRADA_FIDUCIA_SQUADRA = 25;
 
+/* Punto 10: una relazione criminale non perde un punto a settimana.
+   Può invece cambiare stato quando il giocatore sparisce davvero oppure
+   ignora ripetutamente la stessa persona. Il personaggio resta sempre in
+   G.gente: è il suo rapporto col giro a diventare inattivo/non raggiungibile. */
+const STRADA_RELAZIONI = Object.freeze({
+  ignoredLimit:3,
+  inactiveAfterDays:84,
+  unreachableAfterDays:168,
+  strongTrust:50,
+  strongJobs:2,
+  coldReturnAfterDays:84,
+  coldTrustLoss:15
+});
+
 function stradaPersonaMeta(p){
   if(!p) return null;
   if(!p.strada || typeof p.strada!=="object"){
@@ -893,16 +907,36 @@ function stradaPersonaMeta(p){
       fiduciaEventi:[],
       favori:0,
       favoriEventi:[],
-      colpiInsieme:0
+      colpiInsieme:0,
+      streetStatus:"active",
+      lastPlayerStreetInteractionAbsoluteDay:null,
+      lastStreetContactAttemptAbsoluteDay:null,
+      ignoredStreetOffers:0,
+      inactiveSinceAbsoluteDay:null,
+      unreachableSinceAbsoluteDay:null,
+      returnAfterAbsoluteDay:null,
+      streetStatusReason:null,
+      streetStatusHistory:[]
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
   if(!Array.isArray(p.strada.opportunityIds)) p.strada.opportunityIds=[];
   if(!Array.isArray(p.strada.fiduciaEventi)) p.strada.fiduciaEventi=[];
   if(!Array.isArray(p.strada.favoriEventi)) p.strada.favoriEventi=[];
+  if(!Array.isArray(p.strada.streetStatusHistory)) p.strada.streetStatusHistory=[];
   if(!Number.isFinite(Number(p.strada.favori))) p.strada.favori=0;
   p.strada.favori=Math.max(0,Math.min(3,Math.floor(Number(p.strada.favori)||0)));
   if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
+  if(!["active","inactive","unreachable","cold"].includes(p.strada.streetStatus))
+    p.strada.streetStatus="active";
+  if(!Number.isFinite(Number(p.strada.ignoredStreetOffers))) p.strada.ignoredStreetOffers=0;
+  p.strada.ignoredStreetOffers=Math.max(0,Math.floor(Number(p.strada.ignoredStreetOffers)||0));
+  /* I salvataggi precedenti al punto 10 non vengono puniti retroattivamente:
+     il loro contatore di assenza parte dal primo caricamento col nuovo sistema. */
+  if(p.strada.known &&
+     (p.strada.lastPlayerStreetInteractionAbsoluteDay==null ||
+      !Number.isFinite(Number(p.strada.lastPlayerStreetInteractionAbsoluteDay))))
+    p.strada.lastPlayerStreetInteractionAbsoluteDay=stradaAbsDay();
   if(!Number.isFinite(Number(p.strada.fiducia))){
     let base=p.strada.known?10:0;
     if(p.strada.sources.includes("intro")) base+=10;
@@ -910,6 +944,128 @@ function stradaPersonaMeta(p){
     p.strada.fiducia=clamp(base,0,40);
   }else p.strada.fiducia=clamp(Number(p.strada.fiducia)||0,0,100);
   return p.strada;
+}
+
+function stradaRelazioneForte(p){
+  const st=stradaPersonaMeta(p);
+  if(!st) return false;
+  return Number(st.fiducia||0)>=STRADA_RELAZIONI.strongTrust ||
+    Number(st.colpiInsieme||0)>=STRADA_RELAZIONI.strongJobs ||
+    Number(st.favori||0)>0;
+}
+
+function stradaRelazioneDisponibile(p){
+  if(!p || p.via || !p.strada || !p.strada.known) return false;
+  const st=stradaPersonaMeta(p);
+  return st.streetStatus==="active" || st.streetStatus==="cold";
+}
+
+function stradaRelazioneTransizione(p,status,reason,oggi){
+  if(!p) return null;
+  const st=stradaPersonaMeta(p);
+  oggi=Number.isFinite(Number(oggi))?Number(oggi):stradaAbsDay();
+  if(st.streetStatus===status) return st;
+
+  const from=st.streetStatus||"active";
+  st.streetStatus=status;
+  st.streetStatusReason=String(reason||"street");
+  st.streetStatusHistory.push({from,to:status,absoluteDay:oggi,reason:st.streetStatusReason});
+  if(st.streetStatusHistory.length>12) st.streetStatusHistory.shift();
+
+  if(status==="inactive"){
+    st.inactiveSinceAbsoluteDay=oggi;
+  }else if(status==="unreachable"){
+    st.unreachableSinceAbsoluteDay=oggi;
+    st.returnAfterAbsoluteDay=stradaRelazioneForte(p)
+      ? oggi+STRADA_RELAZIONI.coldReturnAfterDays
+      : null;
+  }else if(status==="cold"){
+    st.inactiveSinceAbsoluteDay=null;
+    st.unreachableSinceAbsoluteDay=null;
+    st.returnAfterAbsoluteDay=null;
+    st.ignoredStreetOffers=0;
+    st.fiducia=clamp(Number(st.fiducia||0)-STRADA_RELAZIONI.coldTrustLoss,5,100);
+  }else if(status==="active"){
+    st.inactiveSinceAbsoluteDay=null;
+    st.unreachableSinceAbsoluteDay=null;
+    st.returnAfterAbsoluteDay=null;
+  }
+  return st;
+}
+
+function stradaRegistraInterazione(p,reason){
+  if(!p || p.via) return null;
+  const st=stradaPersonaMeta(p);
+  const oggi=stradaAbsDay();
+  st.lastPlayerStreetInteractionAbsoluteDay=oggi;
+  st.ignoredStreetOffers=0;
+  if(st.streetStatus!=="active")
+    stradaRelazioneTransizione(p,"active",reason||"player-interaction",oggi);
+  return st;
+}
+
+function stradaRegistraTentativoContatto(p,reason){
+  if(!p || p.via) return null;
+  const st=stradaPersonaMeta(p);
+  st.lastStreetContactAttemptAbsoluteDay=stradaAbsDay();
+  if(reason) st.lastStreetContactReason=String(reason);
+  return st;
+}
+
+function stradaIgnoraContatto(p,reason){
+  if(!p || p.via) return null;
+  const st=stradaPersonaMeta(p);
+  const oggi=stradaAbsDay();
+  st.lastStreetContactAttemptAbsoluteDay=oggi;
+  st.ignoredStreetOffers=Math.max(0,Number(st.ignoredStreetOffers||0))+1;
+  if(st.ignoredStreetOffers>=STRADA_RELAZIONI.ignoredLimit)
+    stradaRelazioneTransizione(p,"inactive",reason||"ignored-three-times",oggi);
+  return st;
+}
+
+function stradaAggiornaRelazioniCriminali(silent){
+  const oggi=stradaAbsDay();
+  const cambi=[];
+  for(const p of (G.gente||[])){
+    if(!p || p.via || !p.strada || !p.strada.known) continue;
+    const st=stradaPersonaMeta(p);
+    const last=Number(st.lastPlayerStreetInteractionAbsoluteDay);
+    const giorni=Number.isFinite(last)?Math.max(0,oggi-last):0;
+
+    if((st.streetStatus==="active" || st.streetStatus==="cold") &&
+       st.ignoredStreetOffers>=STRADA_RELAZIONI.ignoredLimit){
+      stradaRelazioneTransizione(p,"inactive","ignored-three-times",oggi);
+      cambi.push({p,status:"inactive"});
+    }else if((st.streetStatus==="active" || st.streetStatus==="cold") &&
+             giorni>=STRADA_RELAZIONI.inactiveAfterDays){
+      stradaRelazioneTransizione(p,"inactive","long-silence",oggi);
+      cambi.push({p,status:"inactive"});
+    }
+
+    if(st.streetStatus==="inactive" && giorni>=STRADA_RELAZIONI.unreachableAfterDays){
+      stradaRelazioneTransizione(p,"unreachable","six-months-away",oggi);
+      cambi.push({p,status:"unreachable"});
+    }else if(st.streetStatus==="unreachable" &&
+             st.returnAfterAbsoluteDay!=null &&
+             Number.isFinite(Number(st.returnAfterAbsoluteDay)) &&
+             oggi>=Number(st.returnAfterAbsoluteDay)){
+      stradaRelazioneTransizione(p,"cold","old-history-resurfaces",oggi);
+      st.lastPlayerStreetInteractionAbsoluteDay=oggi;
+      cambi.push({p,status:"cold"});
+    }
+  }
+
+  if(!silent && typeof pushLog==="function"){
+    for(const c of cambi){
+      if(c.status==="inactive")
+        pushLog("<b>"+c.p.n+" si è raffreddato.</b> È da troppo che non vi incrociate davvero nel giro.", "");
+      else if(c.status==="unreachable")
+        pushLog("<b>"+c.p.n+" non è più raggiungibile nel giro.</b> La persona resta nel tuo mondo, ma quella porta si è chiusa.", "bad");
+      else if(c.status==="cold")
+        pushLog("<b>"+c.p.n+" è ricomparso.</b> La storia comune pesa ancora, ma il rapporto è molto più freddo.", "");
+    }
+  }
+  return cambi;
 }
 
 function stradaFiduciaValore(p){
@@ -929,6 +1085,7 @@ function stradaFiduciaEtichetta(p){
 function stradaModificaFiducia(p,delta,motivo){
   if(!p || p.via || !delta) return p;
   const st=stradaPersonaMeta(p);
+  stradaRegistraInterazione(p,motivo||"fiducia");
   st.fiducia=clamp(Number(st.fiducia||0)+Number(delta||0),0,100);
   st.fiduciaEventi.push({absoluteDay:stradaAbsDay(),delta:Number(delta||0),reason:String(motivo||"street")});
   if(st.fiduciaEventi.length>12) st.fiduciaEventi.shift();
@@ -966,15 +1123,17 @@ function stradaConsumaFavore(p,motivo){
 }
 
 function stradaPersoneConFavore(){
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known && stradaFavoriValore(p)>0)
+    .filter(p=>stradaRelazioneDisponibile(p) && stradaFavoriValore(p)>0)
     .sort((a,b)=>stradaFavoriValore(b)-stradaFavoriValore(a) ||
       stradaFiduciaValore(b)-stradaFiduciaValore(a));
 }
 
 function stradaPersoneSquadra(){
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+    .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) || Number(b.rel||0)-Number(a.rel||0));
 }
@@ -982,7 +1141,7 @@ function stradaPersoneSquadra(){
 function stradaPersonaSquadra(id){
   if(!id) return null;
   const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via) || null;
-  if(!p || !p.strada || !p.strada.known) return null;
+  if(!stradaRelazioneDisponibile(p)) return null;
   return stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA ? p : null;
 }
 
@@ -1024,8 +1183,9 @@ function stradaProtezioneStato(){
 function stradaProtezioneProvider(livello){
   const req=STRADA_PROTEZIONE_REQ[livello];
   if(!req || livello<=0 || Number(G.strada&&G.strada.rep||0)<req.rep) return null;
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+    .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=req.fiducia)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
       Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0))[0] || null;
@@ -1036,7 +1196,7 @@ function stradaProtezioneDisponibile(livello,personId){
   if(!req || livello<=0) return null;
   if(Number(G.strada&&G.strada.rep||0)<req.rep) return null;
   const p=personId ? stradaPersonaDaId(personId) : stradaProtezioneProvider(livello);
-  if(!p || !p.strada || !p.strada.known || stradaFiduciaValore(p)<req.fiducia) return null;
+  if(!stradaRelazioneDisponibile(p) || stradaFiduciaValore(p)<req.fiducia) return null;
   return p;
 }
 
@@ -1207,8 +1367,9 @@ function stradaFerroStato(){
 }
 
 function stradaPersonaFerro(){
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+    .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=STRADA_FERRO_FIDUCIA_MIN)
     .sort((a,b)=>
       stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
@@ -1292,7 +1453,12 @@ function stradaSegnaPersona(p,meta){
   const st=stradaPersonaMeta(p);
   const eraConosciuto=!!st.known;
   st.known=true;
-  if(!eraConosciuto && stradaFiduciaValore(p)<5) st.fiducia=5;
+  if(!eraConosciuto){
+    if(stradaFiduciaValore(p)<5) st.fiducia=5;
+    st.streetStatus="active";
+    st.lastPlayerStreetInteractionAbsoluteDay=stradaAbsDay();
+    st.ignoredStreetOffers=0;
+  }
   if(!st.key && meta.key) st.key=String(meta.key);
   if(st.firstLinkedAbsoluteDay==null) st.firstLinkedAbsoluteDay=stradaAbsDay();
   if(meta.source && !st.sources.includes(meta.source)) st.sources.push(meta.source);
@@ -1368,17 +1534,26 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
      l'offerta, lo storico e ogni ricomparsa futura. */
   if(trigger!=="fabbrica" || legacy===true){
     const key=variante.contactKey||stradaContattoKey(variante.persona);
-    return stradaCreaContatto(variante.persona,key,{
+    const esistente=(G.gente||[]).find(x=>x && !x.via &&
+      ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
+    if(esistente && esistente.strada && esistente.strada.known &&
+       !stradaRelazioneDisponibile(esistente)) return null;
+    const p=stradaCreaContatto(variante.persona,key,{
       source:legacy===true?"legacy-opportunity":"opportunity",
       opportunityId:variante.id,
       introducedByPersonId:(G.strada&&G.strada.ingressoPersonaId)||null
     });
+    return p && stradaRelazioneDisponibile(p) ? p : null;
   }
 
   /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Una dritta
      post-turno può esistere solo se in quel posto c'è già una persona reale
      che il giocatore ha scoperto essere collegata alla Strada. */
-  const candidati=stradaContattiLuogo("fabbrica").sort((a,b)=>{
+  const candidati=stradaContattiLuogo("fabbrica")
+    /* Un collega reale che non ha ancora rivelato il lato Strada resta
+       eleggibile: il decadimento vale solo per rapporti criminali già noti. */
+    .filter(p=>!p.strada || !p.strada.known || stradaRelazioneDisponibile(p))
+    .sort((a,b)=>{
     const ak=a.strada&&a.strada.known?1:0;
     const bk=b.strada&&b.strada.known?1:0;
     return (bk-ak) ||
@@ -1708,6 +1883,7 @@ function stradaFabbricaLeadVariante(roll){ return stradaScegliOpportunita(roll);
 
 function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
+  stradaAggiornaRelazioniCriminali(true);
   /* Le dritte "dal mondo" viaggiano sul TrapPhone. Gli incontri Fabbrica
      restano faccia a faccia e non dipendono dal dispositivo. */
   if(trigger==="mondo" && !stradaHaTrapPhone()) return null;
@@ -1740,6 +1916,7 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
   variante.personId=persona.id;
   variante.persona=persona.n;
   variante.contactKey=(persona.strada&&persona.strada.key)||stradaContattoKey(persona.n);
+  stradaRegistraTentativoContatto(persona,"opportunity:"+String(variante.id||""));
 
   st.lastOfferAbsoluteDay=oggi;
   st.nextOfferAbsoluteDay=oggi+Number(cfg.cooldownGiorni||10);
@@ -1767,6 +1944,8 @@ function stradaTentaPropostaFabbrica(roll,variantRoll){
 function stradaAccettaOpportunita(){
   const st=stradaOpportunitaStato();
   if(!st.pending) return null;
+  const persona=stradaPersonaDaId(st.pending.personId);
+  if(persona) stradaRegistraInterazione(persona,"opportunity-accepted");
   const oggi=stradaAbsDay();
   const lead=Object.assign({},st.pending,{
     status:"active",
@@ -1797,6 +1976,8 @@ function stradaAccettaPropostaFabbrica(){ return stradaAccettaOpportunita(); }
 function stradaRifiutaOpportunita(){
   const st=stradaOpportunitaStato();
   if(!st.pending) return null;
+  const persona=stradaPersonaDaId(st.pending.personId);
+  if(persona) stradaRegistraInterazione(persona,"opportunity-declined");
   const proposta=Object.assign({},st.pending,{status:"declined",declinedAbsoluteDay:stradaAbsDay()});
   st.pending=null;
   st.history.push({
@@ -1811,6 +1992,28 @@ function stradaRifiutaOpportunita(){
 }
 function stradaRifiutaPropostaFabbrica(){ return stradaRifiutaOpportunita(); }
 
+function stradaIgnoraOpportunita(){
+  const st=stradaOpportunitaStato();
+  if(!st.pending) return null;
+  const proposta=Object.assign({},st.pending,{status:"ignored",ignoredAbsoluteDay:stradaAbsDay()});
+  const persona=stradaPersonaDaId(proposta.personId);
+  if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
+  st.pending=null;
+  st.history.push({
+    type:"ignored",
+    absoluteDay:stradaAbsDay(),
+    opportunityId:proposta.id,
+    trigger:proposta.trigger||null,
+    colpoId:proposta.colpoId,
+    personId:proposta.personId||null
+  });
+  if(st.history.length>30) st.history.shift();
+  return proposta;
+}
+function stradaIgnoraPropostaFabbrica(){ return stradaIgnoraOpportunita(); }
+
+/* Cancellazione tecnica: se un altro evento ha già occupato quello slot il
+   giocatore non ha visto né ignorato nessuno, quindi la relazione non cambia. */
 function stradaAnnullaOpportunita(){
   const st=stradaOpportunitaStato();
   if(!st.pending) return null;
@@ -1835,6 +2038,8 @@ function stradaConsumaOpportunita(colpoId,successo){
     consumedAbsoluteDay:stradaAbsDay(),
     success:!!successo
   });
+  const persona=stradaPersonaDaId(usata.personId);
+  if(persona) stradaRegistraInterazione(persona,"opportunity-consumed");
   st.active=null;
   st.history.push({
     type:"consumed",
@@ -2511,6 +2716,16 @@ window.ADF_JAIL=Object.freeze({
 function stradaSettimana(){
   const s = G.strada;
 
+  /* Un accordo di protezione ancora attivo è una relazione viva: il pagamento
+     settimanale conta come contatto e non deve far "sparire" il provider per
+     semplice trascorrere del tempo. */
+  const protRel=stradaProtezioneStato();
+  if(Number(s.prot||0)>0 && protRel.providerPersonId){
+    const providerRel=stradaPersonaDaId(protRel.providerPersonId);
+    if(providerRel) stradaRegistraInterazione(providerRel,"protezione-attiva");
+  }
+  stradaAggiornaRelazioniCriminali(false);
+
   if(s.arresto){
     s.arresto.settimane--;
     const persi = Math.round(G.fans * rnd(.06, .13));
@@ -2593,8 +2808,10 @@ function stradaSettimana(){
       protSt.prepaidWeekKey=null;
     }else{
       const costoProt=Number(STRADA_PROT[s.prot].costo||0);
-      if(Number(G.money||0)>=costoProt) G.money-=costoProt;
-      else{
+      if(Number(G.money||0)>=costoProt){
+        G.money-=costoProt;
+        if(provider) stradaRegistraInterazione(provider,"protezione-pagata");
+      }else{
         if(provider) stradaModificaFiducia(provider,-5,"protezione-non-pagata");
         protSt.history.push({status:"unpaid",level:Number(s.prot||0),providerPersonId:protSt.providerPersonId||null,
           providerName:protSt.providerName||null,absoluteDay:stradaAbsDay()});
@@ -2950,23 +3167,30 @@ function renderStColpi(){
 /* ---- a destra: chi ti copre, le attività ---- */
 function renderStCopre(){
   const s = G.strada;
+  stradaAggiornaRelazioniCriminali(true);
   const prot = STRADA_PROT[s.prot];
   const protSt=stradaProtezioneStato();
   const avvSt=stradaAvvocatoStato();
-  const contatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via)
+  const tuttiContatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via);
+  const contatti=tuttiContatti.filter(stradaRelazioneDisponibile)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const dormienti=tuttiContatti.filter(p=>!stradaRelazioneDisponibile(p));
   const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
   const avvConosciuti=stradaAvvocatiConosciuti();
   $("st-tab-copre").innerHTML =
-    '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ')</strong>' +
+    '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ' attive)</strong>' +
       '<span>' + (fidati.length
         ? fidati.length + ' ' + (fidati.length===1?'si fida':'si fidano') + ' abbastanza da muoversi con te.'
-        : 'Conosci gente, ma nessuno si fida ancora abbastanza da venire a un colpo con te.') + '</span></div>' +
+        : 'Conosci gente, ma nessuno attivo si fida ancora abbastanza da venire a un colpo con te.') +
+        (dormienti.length ? ' · ' + dormienti.length + ' ' +
+          (dormienti.length===1?'contatto è fuori dal giro per ora':'contatti sono fuori dal giro per ora') + '.' : '') +
+      '</span></div>' +
       '<div class="pills">' +
         (contatti.slice(0,3).map(p=>'<span class="pill' +
           (stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
           p.n + ' · ' + stradaFiduciaEtichetta(p) + '</span>').join('') ||
-          '<span class="pill no">Nessun contatto</span>') +
+          '<span class="pill no">Nessun contatto attivo</span>') +
+        (dormienti.length ? '<span class="pill no">' + dormienti.length + ' non raggiungibili</span>' : '') +
       '</div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +

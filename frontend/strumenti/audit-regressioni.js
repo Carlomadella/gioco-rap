@@ -1307,6 +1307,31 @@ test("punto 9: durata visibile prima di scegliere e range compatibile con la Piz
   crime.includes("stradaDurataColpoLabel(c)") &&
   crime.includes("Math.min(150,base+extra)") &&
   time.includes("pizzeria:300"));
+test("punto 10: le relazioni criminali decadono per stato, non con -1 fisso a settimana",
+  crime.includes("const STRADA_RELAZIONI") &&
+  crime.includes('streetStatus:"active"') &&
+  crime.includes("function stradaAggiornaRelazioniCriminali") &&
+  crime.includes("ignoredLimit:3") &&
+  crime.includes("unreachableAfterDays:168"));
+test("punto 10: tre offerte ignorate possono rendere un contatto inattivo senza cancellare la persona",
+  crime.includes("function stradaIgnoraContatto") &&
+  crime.includes('stradaRelazioneTransizione(p,"inactive","ignored-three-times"') &&
+  crime.includes("function stradaIgnoraOpportunita()") &&
+  !crime.includes("p.via=true"));
+test("punto 10: inattivi e non raggiungibili non valgono come crew/favori/copertura",
+  crime.includes(".filter(p=>stradaRelazioneDisponibile(p) && stradaFavoriValore(p)>0)") &&
+  crime.includes(".filter(stradaRelazioneDisponibile)") &&
+  crime.includes("stradaRelazioneDisponibile(p) &&") &&
+  crime.includes("dormienti=tuttiContatti.filter"));
+test("punto 10: una storia forte può riemergere più fredda",
+  crime.includes('stradaRelazioneTransizione(p,"cold","old-history-resurfaces"') &&
+  crime.includes("coldTrustLoss:15") &&
+  crime.includes("coldReturnAfterDays:84"));
+test("punto 10: ghosting, rifiuto e cancellazione tecnica sono distinti",
+  ev.includes('typeof stradaIgnoraOpportunita==="function"') &&
+  ev.includes('typeof stradaIgnoraPropostaFabbrica==="function"') &&
+  ev.includes('typeof stradaRifiutaPropostaFabbrica==="function"') &&
+  crime.includes("Cancellazione tecnica"));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&

@@ -2619,8 +2619,8 @@ function adfStreetOpportunityDecision(proposta){
       (termini ? "<br><br><b>Se accetti:</b> "+termini+"." : "")+
       "<br><br>L'offerta resta valida per <b>"+Number(proposta.durataGiorni||7)+" giorni</b>.",
     annulla(){
-      if(typeof stradaRifiutaPropostaFabbrica==="function")
-        stradaRifiutaPropostaFabbrica();
+      if(typeof stradaIgnoraPropostaFabbrica==="function")
+        stradaIgnoraPropostaFabbrica();
     },
     opts:[
       {n:"Accetta",d:termini||"Ti prendi il rischio e l'occasione",run(){
@@ -2739,16 +2739,16 @@ function adfStreetOpportunityAfterAction(a){
       "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
       (proposta.intro||"«Ho una cosa da proporti.»"),
     annulla(){
-      if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
+      if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
     },
     opts:[
       {n:"Sentiamo",d:"Ti fai spiegare la proposta",run(){
         afterClear(()=>adfStreetOpportunityDecision(proposta),60);
         return null;
       }},
-      {n:"Ignora",d:"Non vuoi aprire quella porta oggi",run(){
-        if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
-        return {t:"Hai ignorato il messaggio. Nessun effetto sulla Strada.",c:""};
+      {n:"Ignora",d:"Non rispondi: se succede spesso, smetteranno di cercarti",run(){
+        if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
+        return {t:"Hai lasciato cadere il messaggio. Il contatto se lo ricorda.",c:""};
       }}
     ]
   }),80);
