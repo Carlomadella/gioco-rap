@@ -233,7 +233,7 @@ function stRigaApproccio(a){
   const delta = Math.round((a.guadagno - 1) * 100);
   return {
     sx:(delta > 0 ? "+" : "−") + Math.abs(delta) + "% guadagno",
-    dx:a.serveFerro ? "pena ×2,2" : a.serveUomo ? "serve un uomo" : "rischio ↓"
+    dx:a.serveFerro ? "pena ×2,2" : a.serveUomo ? "serve una persona fidata" : "rischio ↓"
   };
 }
 
@@ -1762,19 +1762,9 @@ function stradaSettimana(){
     s.sporchi += Math.round(a.resa * .55);
   }
 
-  /* Blocco 4: le coperture non sono credito infinito.
-     A fine settimana resta attivo solo ciò che puoi davvero pagare. */
-  if(s.uomini > 0){
-    const prima = s.uomini;
-    const pagabili = Math.min(prima, Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP));
-    if(pagabili < prima){
-      s.uomini = pagabili;
-      pushLog((prima - pagabili === 1 ? "Un uomo se n'è andato" :
-        (prima - pagabili) + " uomini se ne sono andati") +
-        ": non entrava abbastanza per tenerli.", "");
-    }
-    G.money -= s.uomini * STRADA_UOMO_UPKEEP;
-  }
+  /* Dal punto 4 gli uomini numerici non vengono più comprati/usati come crew.
+     Restano nel save solo per compatibilità fino al punto 6 e non costano più.
+     Protezione e avvocato mantengono invece la loro logica attuale. */
   if(s.prot > 0){
     const costoProt = STRADA_PROT[s.prot].costo;
     if(G.money >= costoProt) G.money -= costoProt;
@@ -1979,7 +1969,9 @@ function stOcchiAddosso(){
 }
 function stCopertura(){
   const s = G.strada;
-  return s.uomini * STRADA_UOMO_UPKEEP + STRADA_PROT[s.prot].costo + (s.avvocato ? STRADA_AVVOCATO_COSTO : 0);
+  /* Gli uomini numerici sono solo compatibilità legacy fino al punto 6:
+     non sono più una copertura acquistabile né un costo invisibile. */
+  return STRADA_PROT[s.prot].costo + (s.avvocato ? STRADA_AVVOCATO_COSTO : 0);
 }
 
 /* ---- la testata e la colonna di sinistra ---- */
