@@ -312,6 +312,9 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
 - la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no.
   Il simulatore di bilanciamento (29/09) aggiunge che non rende: con un colpo al giorno
   l'anno finisce in carcere e in rosso (voce 65 di `problemi-riscontrati.md`);
+  **FATTO in parte (02/10/2026)** — le opportunità criminali hanno un pool generale, un dialogo con la
+  decisione e conseguenze vere, e arrivano anche fuori dalla Fabbrica (pull request #30 di Carletto,
+  segnata dal push degli altri; `frontend/js/game/strada-crimine.js`). Il bilanciamento resta da fare;
 - i dialoghi tanti e diversi, e gli scenari uguali nella forma e diversi nelle circostanze:
   tutti e due a metà.
 
