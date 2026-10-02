@@ -1533,6 +1533,10 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
      l'offerta, lo storico e ogni ricomparsa futura. */
   if(trigger!=="fabbrica" || legacy===true){
     const key=variante.contactKey||stradaContattoKey(variante.persona);
+    const esistente=(G.gente||[]).find(x=>x && !x.via &&
+      ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
+    if(esistente && esistente.strada && esistente.strada.known &&
+       !stradaRelazioneDisponibile(esistente)) return null;
     const p=stradaCreaContatto(variante.persona,key,{
       source:legacy===true?"legacy-opportunity":"opportunity",
       opportunityId:variante.id,
