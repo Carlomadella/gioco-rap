@@ -860,6 +860,7 @@ function showFactoryRole(job,s,roll){
 const FACTORY_FLOOR_EVENTS = Object.freeze([
   Object.freeze({
     id:"fermo-linea",
+    roles:Object.freeze(["operaio","operaio_esperto","capolinea"]),
     t:"La linea si ferma per venti minuti",
     d:"Una protezione scatta e il reparto resta fermo mentre arriva la manutenzione. Per una volta il ritmo si spezza davvero.",
     opts:Object.freeze([
@@ -917,6 +918,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   }),
   Object.freeze({
     id:"rumore-anomalo",
+    roles:Object.freeze(["operaio","operaio_esperto","capolinea"]),
     t:"Una macchina fa un rumore che ieri non faceva",
     d:"Continua a lavorare, ma il rumore è nuovo. Può essere niente oppure l'inizio del fermo che nessuno vuole.",
     opts:Object.freeze([
@@ -951,6 +953,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   }),
   Object.freeze({
     id:"materiale-in-ritardo",
+    roles:Object.freeze(["operaio","operaio_esperto","capolinea"]),
     t:"Il materiale arriva tardi alla linea",
     d:"Per quasi mezz'ora non puoi produrre al ritmo previsto. Il ritardo non dipende da te, ma il clima del reparto cambia lo stesso.",
     opts:Object.freeze([
