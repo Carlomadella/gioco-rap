@@ -253,15 +253,19 @@ const ADF_FABBRICA_CARRIERA = Object.freeze({
 });
 
 const ADF_PIZZERIA_CARRIERA = Object.freeze({
+  /* La Pizzeria e' un part-time: la carriera lavorativa esiste, ma deve
+     avanzare piu' lentamente della Fabbrica e non diventare il motivo
+     principale per scegliere questo lavoro. Il valore della Pizzeria e'
+     soprattutto tempo residuo e rete sociale. */
   aumento:Object.freeze({
-    cicliNelRuolo:1,
-    affidabilita:55,
+    cicliNelRuolo:2,
+    affidabilita:65,
     maxPerRuolo:1
   }),
   promozione:Object.freeze({
-    cicliNelRuolo:2,
-    affidabilita:70,
-    cicliPerfettiNelRuolo:1
+    cicliNelRuolo:4,
+    affidabilita:75,
+    cicliPerfettiNelRuolo:2
   }),
   disciplina:Object.freeze({
     assenzeLieveMax:1,
@@ -273,17 +277,38 @@ const ADF_PIZZERIA_CARRIERA = Object.freeze({
     malusRichiamoAffidabilita:8
   }),
   straordinari:Object.freeze({
-    chanceSestoGiorno:0.30,
-    chanceDomenica:0.35,
+    /* Le coperture extra devono esistere, non dominare il part-time. */
+    chanceSestoGiorno:0.14,
+    chanceDomenica:0.16,
     affidabilitaCompletato:1,
     affidabilitaSaltato:-3
   }),
   affidabilitaCicloPerfetto:8,
   ruoli:Object.freeze([
-    Object.freeze({id:"lavapiatti", n:"Lavapiatti"}),
-    Object.freeze({id:"aiuto_cucina", n:"Aiuto cucina"}),
-    Object.freeze({id:"aiuto_pizzaiolo", n:"Aiuto pizzaiolo"}),
-    Object.freeze({id:"pizzaiolo", n:"Pizzaiolo"})
+    Object.freeze({
+      id:"lavapiatti", n:"Lavapiatti",
+      energia:18, benessereTurno:-1, luciditaTurno:0,
+      fisico:"medio-alto", stress:"basso",
+      d:"Stai soprattutto nel retro: lavoro fisico e ripetitivo, ma il turno corto lascia ancora spazio alla tua vita fuori."
+    }),
+    Object.freeze({
+      id:"aiuto_cucina", n:"Aiuto cucina",
+      energia:17, benessereTurno:-1, luciditaTurno:0,
+      fisico:"medio", stress:"medio",
+      d:"Ti muovi tra preparazioni e servizio: meno lavoro cieco, piu' coordinamento con il resto della cucina."
+    }),
+    Object.freeze({
+      id:"aiuto_pizzaiolo", n:"Aiuto pizzaiolo",
+      energia:16, benessereTurno:0, luciditaTurno:-1,
+      fisico:"medio-basso", stress:"medio",
+      d:"Il lavoro diventa piu' tecnico: preparazione, tempi e qualita' contano piu' della fatica pura."
+    }),
+    Object.freeze({
+      id:"pizzaiolo", n:"Pizzaiolo",
+      energia:15, benessereTurno:0, luciditaTurno:-1,
+      fisico:"basso", stress:"medio-alto",
+      d:"Sei un riferimento durante il servizio: meno peso fisico, piu' attenzione a tempi, qualita' e persone."
+    })
   ])
 });
 
@@ -348,10 +373,44 @@ const ADF_LAVORO_RETE = Object.freeze({
     })
   }),
   pizzeria:Object.freeze({
-    chanceIncontro:0.24, cooldownGiorni:4, minTurni:1, maxContatti:6,
-    ruoli:Object.freeze(["collega","collega","rapper","promoter","fonico"]),
-    dettaglio:"collega della Pizzeria",
-    storia:"Vi siete conosciuti durante i turni in Pizzeria."
+    /* La Pizzeria paga meno della Fabbrica ma espone a piu' persone.
+       L'esposizione cresce col ruolo senza trasformarsi in una macchina
+       automatica di contatti: restano cooldown, cap e molti colleghi normali. */
+    chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
+    reteBonusIncontro:0.10,
+    ruoli:Object.freeze(["collega","collega","collega","rapper","promoter"]),
+    dettaglio:"persona conosciuta durante il servizio in Pizzeria",
+    storia:"Vi siete conosciuti lavorando nello stesso giro della Pizzeria.",
+    perRuolo:Object.freeze({
+      lavapiatti:Object.freeze({
+        chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
+        reteBonusIncontro:0.10,
+        ruoli:Object.freeze(["collega","collega","collega","rapper","promoter"]),
+        dettaglio:"persona conosciuta nel retro della Pizzeria",
+        storia:"Vi siete conosciuti tra cucina, lavaggio e fine servizio."
+      }),
+      aiuto_cucina:Object.freeze({
+        chanceIncontro:0.24, cooldownGiorni:5, minTurni:1, maxContatti:6,
+        reteBonusIncontro:0.12,
+        ruoli:Object.freeze(["collega","collega","collega","rapper","promoter","fonico"]),
+        dettaglio:"persona conosciuta muovendoti tra cucina e servizio",
+        storia:"Vi siete conosciuti mentre davi una mano tra preparazioni e servizio."
+      }),
+      aiuto_pizzaiolo:Object.freeze({
+        chanceIncontro:0.26, cooldownGiorni:4, minTurni:1, maxContatti:7,
+        reteBonusIncontro:0.15,
+        ruoli:Object.freeze(["collega","collega","rapper","promoter","fonico","rapper"]),
+        dettaglio:"persona conosciuta durante il servizio in Pizzeria",
+        storia:"Vi siete conosciuti mentre lavoravi vicino al banco e al forno."
+      }),
+      pizzaiolo:Object.freeze({
+        chanceIncontro:0.28, cooldownGiorni:4, minTurni:1, maxContatti:8,
+        reteBonusIncontro:0.18,
+        ruoli:Object.freeze(["collega","collega","rapper","promoter","promoter","fonico","rapper"]),
+        dettaglio:"persona conosciuta come riferimento del servizio",
+        storia:"Vi siete conosciuti mentre eri uno dei riferimenti della Pizzeria durante il servizio."
+      })
+    })
   }),
   barista:Object.freeze({
     chanceIncontro:0.42, cooldownGiorni:2, minTurni:1, maxContatti:10,
@@ -1833,6 +1892,16 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
   );
   if(!persona) return null;
 
+  const giaConosciuta = esistenti.some(p => p && p.id === persona.id);
+  const reteBonus = !giaConosciuta
+    ? Math.max(0, Number(cfg.reteBonusIncontro || 0))
+    : 0;
+  /* Il piccolo vantaggio rete della Pizzeria non arriva per aver timbrato:
+     scatta soltanto quando il turno allarga davvero il giro del giocatore.
+     Gli incontri ripetuti possono far evolvere il rapporto, ma non farmano
+     automaticamente la skill rete. */
+  if(reteBonus > 0 && typeof gain === "function") gain("rete", reteBonus);
+
   stato.lastEncounterAbsoluteDay = oggi;
   stato.encounters += 1;
   stato.history.push({
@@ -1841,6 +1910,7 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
     role:persona.ruolo,
     jobId:corrente.id || null,
     workRoleId:corrente.id || null,
+    networkBonus:reteBonus,
     type:persona.numero ? "known_contact" : "encounter"
   });
   if(stato.history.length > 24) stato.history.shift();
