@@ -361,6 +361,62 @@ function stradaAttivitaSbloccate(){
   return stradaIngressoStato().badgeSbloccato===true;
 }
 
+/* Punto 2: il TrapPhone è un oggetto reale e persistente. I vecchi salvataggi
+   che avevano già accesso alla Strada lo possiedono automaticamente, perché
+   prima di questo gate il telefono era sempre presente nella schermata. */
+function stradaTrapPhoneStato(){
+  const s=stradaIngressoStato();
+  if(!s.traphone || typeof s.traphone!=="object"){
+    s.traphone={
+      owned:!!s.badgeSbloccato,
+      sourcePersonId:null,
+      sourceName:null,
+      acquiredAbsoluteDay:s.badgeSbloccato?stradaAbsDay():null,
+      source:s.badgeSbloccato?"legacy":null
+    };
+  }
+  if(typeof s.traphone.owned!=="boolean") s.traphone.owned=!!s.badgeSbloccato;
+  return s.traphone;
+}
+
+function stradaHaTrapPhone(){
+  return stradaTrapPhoneStato().owned===true;
+}
+
+function stradaConsegnaTrapPhone(personId,personName,source){
+  const s=stradaIngressoStato();
+  /* Se il salvataggio è stato creato dopo il punto 1 ma prima del punto 2 può
+     essere ancora a metà introduzione e non avere affatto il campo traphone.
+     Qui non va trattato come legacy già sbloccato: è proprio il momento in cui
+     l'oggetto viene consegnato. */
+  if(!s.traphone || typeof s.traphone!=="object"){
+    s.traphone={owned:false,sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null};
+  }
+  const t=s.traphone;
+  if(t.owned) return {acquired:false,state:t};
+
+  t.owned=true;
+  t.sourcePersonId=personId||null;
+  t.sourceName=personName||null;
+  t.acquiredAbsoluteDay=stradaAbsDay();
+  t.source=source||"intro";
+
+  /* Il modulo grafico viene caricato dopo strada-crimine.js, ma quando il
+     giocatore completa l'introduzione è già disponibile. Se non lo fosse,
+     lo stato persistente resta comunque la fonte di verità. */
+  try{
+    if(window.TRAPHONE16 && typeof TRAPHONE16.acquire==="function")
+      TRAPHONE16.acquire({
+        personId:t.sourcePersonId,
+        personName:t.sourceName,
+        acquiredAbsoluteDay:t.acquiredAbsoluteDay,
+        source:t.source
+      });
+  }catch(_){}
+
+  return {acquired:true,state:t};
+}
+
 function stradaPersonaIngressoValida(p){
   if(!p || p.via || !p.id || !p.n || p.ruolo==="giornalista") return false;
   /* Contatti del lavoro: esistono perché li hai incontrati davvero.
@@ -510,11 +566,17 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
   s.ingressoPending=null;
   s.ingressoLastShownAbsoluteDay=null;
   const sbloccato=s.ingressoTentativi>=STRADA_INGRESSO.colpiRichiesti;
+  let trapPhoneAcquired=false;
   if(sbloccato){
     s.badgeSbloccato=true;
     s.ingressoFase="unlocked";
     s.giroAvviato=true;
     s.ingressoSbloccatoAbsoluteDay=stradaAbsDay();
+    trapPhoneAcquired=stradaConsegnaTrapPhone(
+      proposta.personId||s.ingressoPersonaId,
+      proposta.persona||s.ingressoPersonaNome,
+      "intro"
+    ).acquired;
   }else{
     s.ingressoFase="contact";
     s.ingressoNextOfferAbsoluteDay=stradaAbsDay()+STRADA_INGRESSO.cooldownTraColpiGiorni;
@@ -529,8 +591,11 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
         : "<b>"+nome+"</b>: il favore è saltato. Hai perso "+fmt(multa)+" € e attirato attenzione, ma non sei finito dentro.",
       successo?"good":""
     );
-    if(sbloccato)
+    if(sbloccato){
+      const nome=proposta.persona||s.ingressoPersonaNome||"Il contatto";
       pushLog("<b>Attività criminali sbloccate.</b> Adesso sai dove andare e con chi parlare.", "big");
+      pushLog("<b>"+nome+" ti consegna un TrapPhone.</b> Da ora le dritte che non passano faccia a faccia possono arrivare lì.", "good");
+    }
   }
   if(typeof save==="function") save();
   return {
@@ -538,6 +603,7 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
     success:successo,
     step,
     unlocked:sbloccato,
+    trapPhoneAcquired,
     personId:proposta.personId||s.ingressoPersonaId,
     persona:proposta.persona||s.ingressoPersonaNome,
     energia,
@@ -640,6 +706,9 @@ function stradaFabbricaLeadVariante(roll){ return stradaScegliOpportunita(roll);
 
 function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
+  /* Le dritte "dal mondo" viaggiano sul TrapPhone. Gli incontri Fabbrica
+     restano faccia a faccia e non dipendono dal dispositivo. */
+  if(trigger==="mondo" && !stradaHaTrapPhone()) return null;
 
   const st=stradaOpportunitaStato();
   stradaAggiornaOpportunita(true);

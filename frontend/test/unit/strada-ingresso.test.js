@@ -37,7 +37,8 @@ function contesto(overrides={}){
     fmt:v=>String(Math.round(Number(v)||0)),
     diarioBordo:()=>G.diario,
     pushLog:(msg,cls)=>logs.push({msg,cls}),
-    save:()=>{}
+    save:()=>{},
+    window:{}
   };
   vm.createContext(ctx);
   vm.runInContext(helperIngresso(),ctx);
@@ -95,6 +96,11 @@ describe("Strada · ingresso nascosto",()=>{
     expect(secondo.unlocked).toBe(true);
     expect(G.strada.badgeSbloccato).toBe(true);
     expect(G.strada.giroAvviato).toBe(true);
+    expect(secondo.trapPhoneAcquired).toBe(true);
+    expect(G.strada.traphone.owned).toBe(true);
+    expect(G.strada.traphone.sourcePersonId).toBe("p1");
+    expect(G.strada.traphone.sourceName).toBe("Milo");
+    expect(G.strada.traphone.source).toBe("intro");
     expect(G.strada.arresto).toBeNull();
     expect(G.strada.precedenti).toBe(0);
   });
@@ -111,12 +117,51 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.ingressoPending).toBeTruthy();
   });
 
+  it("un salvataggio a meta ingresso conserva il vero contatto che consegna il TrapPhone",()=>{
+    const {ctx,G}=contesto({
+      day:4,
+      gente:[{id:"p1",n:"Milo",ruolo:"rider",origine:"lavoro",origineLuogo:"pizzeria"}],
+      strada:{
+        rep:1,heat:2,sporchi:80,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:false,
+        badgeSbloccato:false,ingressoFase:"contact",ingressoPersonaId:"p1",
+        ingressoPersonaNome:"Milo",ingressoTentativi:1,
+        ingressoLastOfferAbsoluteDay:null,ingressoNextOfferAbsoluteDay:4
+      }
+    });
+    expect(G.strada.traphone).toBeUndefined();
+    vm.runInContext("stradaTentaIngresso(0,0)",ctx);
+    const out=vm.runInContext("stradaAccettaIngresso(0,.5)",ctx);
+    expect(out.unlocked).toBe(true);
+    expect(out.trapPhoneAcquired).toBe(true);
+    expect(G.strada.traphone.sourcePersonId).toBe("p1");
+    expect(G.strada.traphone.sourceName).toBe("Milo");
+    expect(G.strada.traphone.source).toBe("intro");
+  });
+
   it("migra i salvataggi legacy senza richiudere una carriera gia avviata",()=>{
     const {ctx,G}=contesto();
     delete G.strada.badgeSbloccato;
+    delete G.strada.traphone;
     G.strada.giroAvviato=true;
     expect(vm.runInContext("stradaAttivitaSbloccate()",ctx)).toBe(true);
     expect(G.strada.badgeSbloccato).toBe(true);
+    expect(vm.runInContext("stradaHaTrapPhone()",ctx)).toBe(true);
+    expect(G.strada.traphone.source).toBe("legacy");
+  });
+
+  it("il TrapPhone e la sua UI rispettano il possesso reale",()=>{
+    const ui=leggi("js/game/strada-crimine-ui.js");
+    const trap=leggi("js/game/traphone16.js");
+    expect(ui).toContain('trapDock.hidden=!trapOwned');
+    expect(ui).toContain('hasTrapPhone:');
+    expect(trap).toContain("function trapOwned()");
+    expect(trap).toContain("function acquire(meta)");
+    expect(trap).toContain("function receiveStorySms(data)");
+    expect(trap).toContain("if(!trapOwned()) return null");
+    expect(trap).toContain("receiveStorySms,");
+    expect(trap).toContain("acquire,");
+    expect(leggi("js/game/eventi-v2.js")).toContain("TRAPHONE16.receiveStorySms");
   });
 
   it("hub e colpo rapido rispettano lo stesso gate",()=>{
@@ -126,5 +171,6 @@ describe("Strada · ingresso nascosto",()=>{
     expect(hub).toContain('e.id!=="colpo" || hubCrimineSbloccato()');
     expect(strada).toContain("if(!stradaAttivitaSbloccate())");
     expect(strada).toContain("const ingressoProtetto = !stradaAttivitaSbloccate()");
+    expect(strada).toContain('if(trigger==="mondo" && !stradaHaTrapPhone()) return null');
   });
 });
