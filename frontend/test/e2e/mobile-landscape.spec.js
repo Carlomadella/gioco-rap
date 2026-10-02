@@ -293,72 +293,54 @@ test("landscape mobile: camerino Avaturn usa tutto lo schermo e apre l'editor se
   expect(misure.progressBottom).toBeLessThanOrEqual(misure.vh + 1);
 
   await openAvaturn.tap();
-  await expect(room.locator("#avaturnOverlay")).toHaveClass(/open/);
 
-  const shell = await room.locator(".avaturn-shell").evaluate(el => {
+  /* Su telefono Avaturn NON deve più aprirsi dentro il camerino iframe. */
+  await expect(room.locator("#avaturnOverlay")).not.toHaveClass(/open/);
+  await expect(page.locator("#adf-rpg-v24-avaturn-mobile-host")).toBeVisible();
+
+  const portal = await page.locator("#adf-rpg-v24-avaturn-mobile-host").evaluate(el => {
     const r=el.getBoundingClientRect();
-    return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,vw:innerWidth,vh:innerHeight};
+    return {
+      parentIsBody:el.parentElement===document.body,
+      left:r.left,top:r.top,right:r.right,bottom:r.bottom,
+      vw:innerWidth,vh:innerHeight
+    };
   });
-  expect(shell.left).toBeLessThanOrEqual(1);
-  expect(shell.top).toBeLessThanOrEqual(1);
-  expect(shell.right).toBeGreaterThanOrEqual(shell.vw - 1);
-  expect(shell.bottom).toBeGreaterThanOrEqual(shell.vh - 1);
+  expect(portal.parentIsBody).toBe(true);
+  expect(portal.left).toBeLessThanOrEqual(1);
+  expect(portal.top).toBeLessThanOrEqual(1);
+  expect(portal.right).toBeGreaterThanOrEqual(portal.vw - 1);
+  expect(portal.bottom).toBeGreaterThanOrEqual(portal.vh - 1);
 });
 
-test("landscape mobile: iframe SDK Avaturn resta touchabile e confinato nel viewport", async ({ page }) => {
+test("landscape mobile: Avaturn viene montato fuori dagli iframe del creator", async ({ page }) => {
   await page.goto("/pagine/gioco.html");
   await page.waitForFunction(() => window.ADF_RPG_V24);
   await page.evaluate(() => ADF_RPG_V24.open());
 
   const creator = page.frameLocator("#adf-rpg-v24-frame");
   await creator.getByRole("button", { name: /Avaturn/i }).tap();
-
   const room = creator.frameLocator("#dressingRoomFrame");
   await room.locator("#openAvaturn").tap();
-  await expect(room.locator("#avaturnOverlay")).toHaveClass(/open/);
 
-  /* Non dipendiamo dalla rete Avaturn per questo test: se il frame SDK non è
-     ancora arrivato, ne inseriamo uno equivalente per verificare il contratto
-     CSS/touch del nostro contenitore. */
-  await room.locator("#avaturnFrameHost").evaluate(host => {
-    if(!host.querySelector("iframe")){
-      const iframe=document.createElement("iframe");
-      iframe.className="avaturn-frame";
-      iframe.src="about:blank";
-      host.appendChild(iframe);
-    }
-  });
+  const portal=page.locator("#adf-rpg-v24-avaturn-mobile-host");
+  const sdkHost=page.locator("#adf-rpg-v24-avaturn-mobile-frame-host");
+  await expect(portal).toBeVisible();
+  await expect(sdkHost).toBeVisible();
 
-  const sdkFrame = room.locator("#avaturnFrameHost iframe");
-  await expect(sdkFrame).toBeVisible();
+  const struttura=await portal.evaluate(el=>({
+    parentTag:el.parentElement?.tagName,
+    insideCreator:!!el.closest("#adf-rpg-v24-host"),
+    rows:getComputedStyle(el).gridTemplateRows
+  }));
 
-  const dati = await sdkFrame.evaluate(el => {
-    const r=el.getBoundingClientRect();
-    const host=el.parentElement.getBoundingClientRect();
-    const cs=getComputedStyle(el);
-    const overlay=getComputedStyle(document.querySelector("#avaturnOverlay"));
-    return {
-      pointerEvents:cs.pointerEvents,
-      touchAction:cs.touchAction,
-      minWidth:cs.minWidth,
-      minHeight:cs.minHeight,
-      frameWidth:r.width,
-      frameHeight:r.height,
-      hostWidth:host.width,
-      hostHeight:host.height,
-      overlayDisplay:overlay.display,
-      overlayPosition:overlay.position
-    };
-  });
+  expect(struttura.parentTag).toBe("BODY");
+  expect(struttura.insideCreator).toBe(false);
+  expect(struttura.rows).toMatch(/^34px /);
 
-  expect(dati.pointerEvents).toBe("auto");
-  expect(dati.touchAction).toBe("auto");
-  expect(dati.minWidth).toBe("0px");
-  expect(dati.minHeight).toBe("0px");
-  expect(Math.abs(dati.frameWidth-dati.hostWidth)).toBeLessThanOrEqual(1);
-  expect(Math.abs(dati.frameHeight-dati.hostHeight)).toBeLessThanOrEqual(1);
-  expect(dati.overlayDisplay).toBe("block");
-  expect(dati.overlayPosition).toBe("fixed");
+  await page.locator("#adf-rpg-v24-avaturn-mobile-close").tap();
+  await expect(portal).toHaveCount(0);
+  await expect(room.locator("#openAvaturn")).toBeVisible();
 });
 
 test("landscape mobile: nella scelta avatar Indietro e' compatto e integrato a destra", async ({ page }) => {
