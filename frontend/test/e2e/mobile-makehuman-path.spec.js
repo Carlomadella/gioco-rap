@@ -70,13 +70,38 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
   /* Il relay finto non manda alcuna fase: se dopo 10 s compare questa frase,
      il keepalive del documento principale ha attraversato DAVVERO lo stesso
      listener usato dal watchdog di gioco-ingresso.js. */
-  await expect(page.locator("#preparo-fase")).toContainText(
-    "caricamento ancora in corso",
-    { timeout: 15000 }
-  );
+  await page.waitForTimeout(12000);
 
   const diag = await page.evaluate(() => ADF_MAKEHUMAN_MOBILE.diagnostica());
-  expect(diag.relayLoads).toBeGreaterThanOrEqual(1);
-  expect(diag.heartbeatCount).toBeGreaterThanOrEqual(1);
+  const faseAutomatica = await page.locator("#preparo-fase").textContent();
+  console.log("ADF_MOBILE_DIAG", JSON.stringify(diag), "FASE", faseAutomatica);
+
+  expect(diag.relayLoads, "il relay mobile deve aver completato almeno un load")
+    .toBeGreaterThanOrEqual(1);
+  expect(diag.heartbeatCount, "il timer top-level deve aver inviato almeno un ping")
+    .toBeGreaterThanOrEqual(1);
   expect(diag.watchdogAttivo).toBe(true);
+
+  /* Prova separata del tratto relay -> creator -> gioco. Se questa arriva ma
+     quella automatica no, il guasto e' nel timing; se non arriva neppure
+     questa, il guasto e' nell'inoltro fra iframe. */
+  await page.evaluate(() => {
+    const creator = document.getElementById("adf-rpg-v24-frame");
+    const editor = creator?.contentDocument?.getElementById("localEditorFrame");
+    editor?.contentWindow?.postMessage({
+      type:"adf-mobile-watchdog-ping",
+      kind:"progress",
+      message:"PING DIRETTO TEST"
+    },"*");
+  });
+
+  await expect(page.locator("#preparo-fase")).toContainText(
+    "PING DIRETTO TEST",
+    { timeout: 3000 }
+  );
+
+  expect(
+    faseAutomatica,
+    "il keepalive automatico deve arrivare allo stesso listener del watchdog"
+  ).toContain("caricamento ancora in corso");
 });
