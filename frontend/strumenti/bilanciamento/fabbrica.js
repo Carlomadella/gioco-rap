@@ -1,7 +1,8 @@
 /* Stress test rapido della Fabbrica.
    Fa parte del sistema strumenti/bilanciamento: usa le stesse funzioni del gioco
    lette da actions.js, ma senza avviare Chromium. Serve per regressioni veloci su
-   fatica, carriera e paga; il simulatore lungo resta simulatore-bilanciamento.js. */
+   fatica, carriera, paga e scenari operativi (ruoli, disciplina, eventi,
+   conflitti musica/lavoro); il simulatore lungo resta simulatore-bilanciamento.js. */
 "use strict";
 
 const fs = require("node:fs");
