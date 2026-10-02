@@ -173,6 +173,8 @@ const ADF_LAVORO_CONTRATTI = Object.freeze({
     domenicaRiposo:true,
     bonusSestoGiornoPct:30,
     bonusDomenicaPct:75,
+    ferieGiorniPerCiclo:2,
+    ferieAnticipoMinimoGiorni:1,
     cicloSettimane:4
   }),
   pizzeria:Object.freeze({
@@ -443,6 +445,196 @@ function lavoroGiornoAssoluto(){
   return (lavoroSettimanaAssoluta() - 1) * 7 + Math.max(1, Math.min(7, Number(G.day || 1)));
 }
 
+function lavoroCicloDaGiornoAssoluto(absoluteDay){
+  return Math.floor((Math.max(1,Number(absoluteDay)||1)-1)/ADF_LAVORO_GIORNI_CICLO);
+}
+
+function lavoroFerieStato(luogo){
+  const sede=lavoroSede(luogo);
+  if(!sede) return null;
+  if(!sede.leave || typeof sede.leave!=="object") sede.leave={requests:[]};
+  if(!Array.isArray(sede.leave.requests)) sede.leave.requests=[];
+
+  sede.leave.requests=sede.leave.requests.filter(r =>
+    r && Number.isInteger(Number(r.targetAbsoluteDay)) && Number(r.targetAbsoluteDay)>0
+  ).map(r=>({
+    targetAbsoluteDay:Number(r.targetAbsoluteDay),
+    requestedAbsoluteDay:Number(r.requestedAbsoluteDay||0),
+    cycle:Number.isInteger(Number(r.cycle))
+      ? Number(r.cycle)
+      : lavoroCicloDaGiornoAssoluto(r.targetAbsoluteDay),
+    status:r.status||"approved"
+  }));
+
+  if(sede.leave.requests.length>48)
+    sede.leave.requests=sede.leave.requests.slice(-48);
+  return sede.leave;
+}
+
+function lavoroFeriePerCiclo(luogo,ciclo){
+  const stato=lavoroFerieStato(luogo);
+  if(!stato) return [];
+  ciclo=Number(ciclo);
+  return stato.requests.filter(r =>
+    r.status==="approved" && Number(r.cycle)===ciclo
+  );
+}
+
+function lavoroFeriePerGiorno(luogo,absoluteDay){
+  const stato=lavoroFerieStato(luogo);
+  if(!stato) return null;
+  absoluteDay=Number(absoluteDay);
+  return stato.requests.find(r =>
+    r.status==="approved" && Number(r.targetAbsoluteDay)===absoluteDay
+  ) || null;
+}
+
+function lavoroFerieOggi(luogo){
+  return lavoroFeriePerGiorno(luogo,lavoroGiornoAssoluto());
+}
+
+function lavoroFerieDisponibili(luogo,ciclo){
+  const def=lavoroContrattoDef(luogo);
+  const max=Math.max(0,Number(def&&def.ferieGiorniPerCiclo||0));
+  if(!max) return 0;
+  ciclo=ciclo==null ? lavoroCicloCorrente() : Number(ciclo);
+  return Math.max(0,max-lavoroFeriePerCiclo(luogo,ciclo).length);
+}
+
+function lavoroFerieSettimana(luogo,absoluteWeek){
+  const stato=lavoroFerieStato(luogo);
+  const def=lavoroContrattoDef(luogo);
+  if(!stato || !def) return [];
+  absoluteWeek=Number(absoluteWeek);
+  const from=(absoluteWeek-1)*7+1, to=from+7;
+  const consentiti=Array.isArray(def.giorniConsentiti)?def.giorniConsentiti:[1,2,3,4,5,6,7];
+  return stato.requests.filter(r=>{
+    const d=Number(r.targetAbsoluteDay);
+    if(r.status!=="approved" || d<from || d>=to) return false;
+    const giorno=((d-1)%7)+1;
+    return consentiti.includes(giorno);
+  });
+}
+
+function lavoroFerieCoperturaSettimana(luogo,absoluteWeek,giorniLavorati,richiesti){
+  const lavorati=giorniLavorati instanceof Set ? giorniLavorati : new Set(giorniLavorati||[]);
+  const ferie=new Set(
+    lavoroFerieSettimana(luogo,absoluteWeek)
+      .map(r=>((Number(r.targetAbsoluteDay)-1)%7)+1)
+      .filter(g=>!lavorati.has(g))
+  );
+  const utili=Math.min(ferie.size,Math.max(0,Number(richiesti||0)-lavorati.size));
+  return {
+    richieste:ferie.size,
+    utili:utili,
+    coperti:Math.min(Math.max(0,Number(richiesti||0)),lavorati.size+utili),
+    giorni:Array.from(ferie)
+  };
+}
+
+function lavoroFerieEtichetta(absoluteDay){
+  const nomi=["","lunedì","martedì","mercoledì","giovedì","venerdì","sabato","domenica"];
+  const d=Math.max(1,Number(absoluteDay)||1);
+  const absoluteWeek=Math.floor((d-1)/7)+1;
+  const anno=Math.floor((absoluteWeek-1)/52)+1;
+  const settimana=((absoluteWeek-1)%52)+1;
+  const giorno=((d-1)%7)+1;
+  return "Anno "+anno+" · settimana "+settimana+" · "+nomi[giorno];
+}
+
+function lavoroFerieRichiedi(luogo,targetAbsoluteDay){
+  const def=lavoroContrattoDef(luogo);
+  const contratto=lavoroContratto(luogo);
+  const max=Math.max(0,Number(def&&def.ferieGiorniPerCiclo||0));
+  const anticipo=Math.max(1,Number(def&&def.ferieAnticipoMinimoGiorni||1));
+  if(!def || !max) return {ok:false,reason:"Ferie non previste da questo contratto"};
+  if(!G.job || lavoroLuogo(G.job)!==luogo || !contratto || !contratto.signed)
+    return {ok:false,reason:"Non hai un contratto attivo qui"};
+
+  const oggi=lavoroGiornoAssoluto();
+  const target=Number(targetAbsoluteDay);
+  if(!Number.isInteger(target) || target-oggi<anticipo)
+    return {ok:false,reason:"Le ferie vanno chieste almeno il giorno prima"};
+
+  const giorno=((target-1)%7)+1;
+  const consentiti=Array.isArray(def.giorniConsentiti)?def.giorniConsentiti:[1,2,3,4,5,6,7];
+  if(!consentiti.includes(giorno))
+    return {ok:false,reason:"Quel giorno non è un giorno ordinario di lavoro"};
+
+  if(lavoroFeriePerGiorno(luogo,target))
+    return {ok:false,reason:"Hai già ferie approvate per quel giorno"};
+
+  const extra=lavoroStraordinarioStato(luogo);
+  const impegno=extra && (extra.accepted||extra.pendingOffer);
+  if(impegno && Number(impegno.targetAbsoluteDay)===target)
+    return {ok:false,reason:"Hai già un impegno di straordinario per quel giorno"};
+
+  const ciclo=lavoroCicloDaGiornoAssoluto(target);
+  if(lavoroFerieDisponibili(luogo,ciclo)<=0)
+    return {ok:false,reason:"Hai già usato i 2 giorni di ferie di quel ciclo"};
+
+  const stato=lavoroFerieStato(luogo);
+  const richiesta={
+    targetAbsoluteDay:target,
+    requestedAbsoluteDay:oggi,
+    cycle:ciclo,
+    status:"approved"
+  };
+  stato.requests.push(richiesta);
+  return {
+    ok:true,
+    richiesta:Object.assign({},richiesta),
+    label:lavoroFerieEtichetta(target),
+    remaining:lavoroFerieDisponibili(luogo,ciclo)
+  };
+}
+
+function lavoroFerieCandidati(luogo,giorniAvanti){
+  const def=lavoroContrattoDef(luogo);
+  if(!def || !Number(def.ferieGiorniPerCiclo||0)) return [];
+  const oggi=lavoroGiornoAssoluto();
+  const anticipo=Math.max(1,Number(def.ferieAnticipoMinimoGiorni||1));
+  const orizzonte=Math.max(anticipo,Math.min(56,Number(giorniAvanti||35)));
+  const consentiti=Array.isArray(def.giorniConsentiti)?def.giorniConsentiti:[1,2,3,4,5,6,7];
+  const out=[];
+  for(let delta=anticipo;delta<=orizzonte;delta++){
+    const target=oggi+delta;
+    const giorno=((target-1)%7)+1;
+    if(!consentiti.includes(giorno)) continue;
+    if(lavoroFeriePerGiorno(luogo,target)) continue;
+    const ciclo=lavoroCicloDaGiornoAssoluto(target);
+    if(lavoroFerieDisponibili(luogo,ciclo)<=0) continue;
+    const extra=lavoroStraordinarioStato(luogo);
+    const impegno=extra && (extra.accepted||extra.pendingOffer);
+    if(impegno && Number(impegno.targetAbsoluteDay)===target) continue;
+    out.push({
+      targetAbsoluteDay:target,
+      cycle:ciclo,
+      label:lavoroFerieEtichetta(target)
+    });
+  }
+  return out;
+}
+
+function lavoroFerieRiepilogo(luogo){
+  const def=lavoroContrattoDef(luogo);
+  const stato=lavoroFerieStato(luogo);
+  const ciclo=lavoroCicloCorrente();
+  const max=Math.max(0,Number(def&&def.ferieGiorniPerCiclo||0));
+  const oggi=lavoroGiornoAssoluto();
+  if(!def || !stato || !max) return null;
+  return {
+    maxPerCiclo:max,
+    usateCiclo:lavoroFeriePerCiclo(luogo,ciclo).length,
+    disponibiliCiclo:lavoroFerieDisponibili(luogo,ciclo),
+    oggi:lavoroFerieOggi(luogo),
+    future:stato.requests
+      .filter(r=>r.status==="approved" && Number(r.targetAbsoluteDay)>=oggi)
+      .sort((a,b)=>a.targetAbsoluteDay-b.targetAbsoluteDay)
+      .map(r=>Object.assign({},r,{label:lavoroFerieEtichetta(r.targetAbsoluteDay)}))
+  };
+}
+
 function lavoroContrattoDef(luogo){
   return ADF_LAVORO_CONTRATTI[luogo] || null;
 }
@@ -551,6 +743,7 @@ function lavoroTerminaContratto(luogo, motivo){
         turni:[]
       };
     }
+    delete sede.leave;
   }
 
   return contratto || null;
@@ -1647,6 +1840,8 @@ function lavoroTentaIncontroContatto(luogo, roll, job){
 function lavoroTurnoConsentitoOggi(luogo){
   const def = lavoroContrattoDef(luogo);
   if(!def) return {ok:true, reason:null};
+  if(lavoroFerieOggi(luogo))
+    return {ok:false, reason:"Ferie approvate oggi", phase:"vacation"};
   const giorno = Math.max(1, Math.min(7, Number(G.day || 1)));
   if(def.domenicaRiposo && giorno === 7){
     if(!lavoroDomenicaAutorizzata(luogo))
