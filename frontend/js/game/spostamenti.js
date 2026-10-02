@@ -474,6 +474,20 @@
         departedAt:GAME_TIME.now(), arrivedAt:GAME_TIME.now(), reason:"day-start"
       });
     }
+
+    /* Posizione e schermata devono raccontare la stessa cosa. Prima il nuovo
+       giorno spostava G.currentPlace a Casa ma lasciava aperta Fabbrica,
+       Pizzeria, Palestra ecc.; da lì una mossa risultava giustamente
+       "nel posto sbagliato". Se sei libero, la giornata nuova si mostra
+       quindi dalla mappa. Il carcere resta l'eccezione. */
+    if(!inJail()){
+      try{
+        if(window.ADF_NAVIGATION && typeof ADF_NAVIGATION.toMap === "function"){
+          ADF_NAVIGATION.toMap({nuovoGiorno:true});
+        }
+      }catch(_){}
+    }
+
     const hubScreen = document.getElementById("s-hub");
     if(hubScreen && hubScreen.classList.contains("on") && typeof renderHub === "function") renderHub();
   });
