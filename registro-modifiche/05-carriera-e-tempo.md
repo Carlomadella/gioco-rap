@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d01ea2eb -->
+## 02/10/26, 10:42 — task/fabbrica-playtest-doppia-vita → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `d01ea2eb`
+
+### Cosa è entrato
+
+- `ad348e44` — Merge pull request #52 from Carlomadella/main — **mycolbraga**
+- `6a3ca5c9` — docs(fabbrica): documenta playtest doppia vita — **mycolbraga**
+- `2b3e5e58` — test(fabbrica): protegge playtest lavoro musica — **mycolbraga**
+- `c6aabcc9` — test(fabbrica): aggiunge playtest doppia vita lavoro musica — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/unit/fabbrica-bilanciamento.test.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:7d758154 -->
 ## 02/10/26, 10:25 — task/fabbrica-stress-test-operativo → main
 
