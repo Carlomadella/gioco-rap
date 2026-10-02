@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7d758154 -->
+## 02/10/26, 10:25 — task/fabbrica-stress-test-operativo → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `7d758154`
+
+### Cosa è entrato
+
+- `80b1b594` — docs(fabbrica): documenta stress test operativo — **mycolbraga**
+- `54005b52` — docs(fabbrica): chiarisce copertura stress test operativo — **mycolbraga**
+- `746793ee` — test(fabbrica): copre ruolo disciplina eventi e musica — **mycolbraga**
+- `a27f3ba5` — test(fabbrica): estende stress test all'esperienza operativa — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/unit/fabbrica-bilanciamento.test.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:d88a31c4 -->
 ## 02/10/26, 09:55 — task/studio-mixtape-album → main
 
