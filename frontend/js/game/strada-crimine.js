@@ -2638,6 +2638,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
   const rumoreLead = Number(effettiLead.heatDelta||0);
   const reputazioneLead = Number(effettiLead.repDelta||0);
   const personaLead=leadUsato&&leadUsato.personId?stradaPersonaDaId(leadUsato.personId):null;
+  const squadraCopre=!successo && approccio.id==="squadra" && personaSquadra && Math.random()<.5;
+  let notaPersone="";
 
   if(personaSquadra){
     const stessa=personaLead&&personaLead.id===personaSquadra.id;
@@ -2653,6 +2655,29 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       successo?"opportunita-success":"opportunita-failure");
   if(successo && personaLead)
     stradaAggiungiFavore(personaLead,1,"opportunita-success");
+
+  if(successo){
+    if(personaSquadra && stradaConseguenzePersona(personaSquadra).debiti>0){
+      if(stradaModificaDebitoPersona(personaSquadra,-1,"colpo-insieme-success")<0)
+        notaPersone+=" <b>Con "+personaSquadra.n+" chiudi uno dei conti rimasti aperti fra voi.</b>";
+    }
+    if(personaLead){
+      stradaModificaTensionePersona(personaLead,-1,"opportunita-success");
+      const presentazione=stradaPresentazioneDopoSuccesso(personaLead,Math.random(),Math.random());
+      if(presentazione)
+        notaPersone+=" <b>"+personaLead.n+" ti apre un'altra porta e ti presenta "+presentazione.nuovo.n+".</b>";
+    }
+  }else{
+    if(personaLead){
+      const tensione=stradaModificaTensionePersona(personaLead,1,"opportunita-failure");
+      if(tensione.rivalitaNata)
+        notaPersone+=" <b>Con "+personaLead.n+" non è più solo un rapporto freddo: la cosa è diventata personale.</b>";
+    }
+    if(personaSquadra && squadraCopre){
+      if(stradaModificaDebitoPersona(personaSquadra,1,"si-prende-il-casino")>0)
+        notaPersone+=" <b>"+personaSquadra.n+" ti ha coperto: adesso gli devi un favore.</b>";
+    }
+  }
 
   /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
      il suo peso — è il più rischioso dei sei eventi della settimana, e
@@ -2684,7 +2709,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
         (reputazioneLead ? ", nome nel giro " + stradaSegno(reputazioneLead) : "") + ".</b>"
       : "";
     STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
-        fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne." + notaLead,
+        fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne." + notaLead + notaPersone,
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
     s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
@@ -2696,9 +2721,9 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
             (reputazioneLead ? ", nome nel giro " + stradaSegno(reputazioneLead) : "") + ".</b>"
           : " La dritta arrivata dal lavoro è bruciata.")
       : "";
-    if(approccio.id === "squadra" && personaSquadra && Math.random() < .5){
+    if(squadraCopre){
       STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. <b>" +
-          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." + notaLeadFallita,
+          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." + notaLeadFallita + notaPersone,
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
       const ingressoProtetto = !stradaAttivitaSbloccate();
@@ -2707,13 +2732,13 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
         const multa = Math.max(40, Math.round(colpo.min * .45));
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Saltato, ma sei fuori", testo:"<b>" + colpo.n + "</b> è saltato. " +
-            "Perdi " + fmt(multa) + " € e attiri attenzione, ma in questa fase nessuno ha abbastanza per mandarti dentro." + notaLeadFallita,
+            "Perdi " + fmt(multa) + " € e attiri attenzione, ma in questa fase nessuno ha abbastanza per mandarti dentro." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
       }else if(primaVolta && Math.random() < .6){
         const multa = Math.round(colpo.min * .8);
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
-            fmt(multa) + " € di multa. Stavolta è andata." + notaLeadFallita,
+            fmt(multa) + " € di multa. Stavolta è andata." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
@@ -2734,7 +2759,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
         s.arresto = {settimane:settimane, colpo:colpo.n};
         STRADA_SCENA = {k:"Com'è andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
-            ". Niente musica, niente strada: solo il tempo che passa." + notaLeadFallita,
+            ". Niente musica, niente strada: solo il tempo che passa." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
       }
     }
