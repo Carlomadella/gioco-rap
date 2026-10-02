@@ -98,6 +98,9 @@ const STRADA_FABBRICA_LEAD = Object.freeze({
   durataGiorni:7,
   trigger:"fabbrica"
 });
+const STRADA_OPPORTUNITA_TRIGGER = Object.freeze({
+  fabbrica:STRADA_FABBRICA_LEAD
+});
 
 /* Pool di opportunità criminali. Non aggiunge nuovi metodi operativi nel mondo
    reale: varia i quattro colpi già esistenti sul piano di gameplay.
@@ -190,7 +193,9 @@ function stradaDescriviOpportunita(p){
   if(!p) return "";
   const successoHeat=Number(p.successHeat||0);
   const fallimentoHeat=Number(p.failureHeat||0);
+  const colpo=STRADA_COLPI.find(x=>x.id===p.colpoId);
   const parti=[
+    colpo ? colpo.n : String(p.colpoId||"Colpo"),
     (Number(p.bonusPct||0)>=0?"+":"")+Number(p.bonusPct||0)+"% guadagno",
     stradaSegnoPct(p.chanceDelta)+" riuscita",
     "attenzione "+stradaSegno(successoHeat)+" se riesce / "+stradaSegno(fallimentoHeat)+" se fallisce",
@@ -372,7 +377,8 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(Number(st.lastCheckAbsoluteDay)===oggi) return null;
   st.lastCheckAbsoluteDay=oggi;
 
-  const cfg=trigger==="fabbrica" ? STRADA_FABBRICA_LEAD : STRADA_FABBRICA_LEAD;
+  const cfg=STRADA_OPPORTUNITA_TRIGGER[trigger];
+  if(!cfg) return null;
   if(st.lastOfferAbsoluteDay!=null &&
      oggi-Number(st.lastOfferAbsoluteDay)<Number(cfg.cooldownGiorni||14))
     return null;
@@ -595,7 +601,7 @@ function stradaTenta(colpoId, approccioId){
     if(reputazioneLead) s.rep=clamp(s.rep+reputazioneLead,0,100);
     const notaLeadFallita = leadUsato
       ? (leadUsato.source==="street-opportunity"
-          ? " <b>" + (leadUsato.titolo||"L'opportunità") + " è bruciata: attenzione " +
+          ? " <b>L'opportunità «" + (leadUsato.titolo||"senza nome") + "» è bruciata: attenzione " +
             stradaSegno(rumoreLead) +
             (reputazioneLead ? ", reputazione " + stradaSegno(reputazioneLead) : "") + ".</b>"
           : " La dritta arrivata dal lavoro è bruciata.")
