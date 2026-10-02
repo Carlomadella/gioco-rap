@@ -282,7 +282,7 @@ test("Continua resta sul pulsante principale della landing",
   avvio.includes("function continuaUltima()") &&
   avvio.includes('if(play) play.onclick = () => ultimoSlot() ? continuaUltima() : apri();'));
 test("landing carica la nuova versione del menu di avvio",
-  landing.includes('js/avvio.js?v=6'));
+  landing.includes('js/avvio.js?v=7'));
 
 console.log("\nBlocco 1 — Eventi V2 / telefono / dist");
 test("catalogo contiene esattamente 1000 eventi", Array.isArray(cat) && cat.length === 1000);

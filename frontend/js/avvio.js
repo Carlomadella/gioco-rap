@@ -109,7 +109,8 @@
   }
 
   function htmlMenu(){
-    return testa("Partita", "Da dove vuoi partire?", "Scegli il modo in cui entrare nella tua storia.", false) +
+    return '<button class="avv-close-mobile" data-avvio="indietro" type="button" aria-label="Chiudi il menu Inizia">✕ <span>Chiudi</span></button>' +
+      testa("Partita", "Da dove vuoi partire?", "Scegli il modo in cui entrare nella tua storia.", false) +
       '<div class="avv-lista">' +
       riga("nuova", "Nuova partita", "Crea il tuo artista e scegli in quale dei 3 slot salvarlo") +
       riga("rapido", "Avvio rapido", "Usa automaticamente il primo slot libero e vai subito in città") +

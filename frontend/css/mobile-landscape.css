@@ -79,6 +79,30 @@
   .land-voce::after{left:8px;right:8px;bottom:5px}
   .land-piede,.land-giu{display:none}
 
+  /* Navigazione mobile: mai intrappolati nei pannelli della landing. */
+  .avv-close-mobile{
+    position:sticky;
+    top:0;
+    z-index:4;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    min-width:88px;
+    min-height:44px;
+    margin:0 0 6px auto;
+    padding:8px 12px;
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:999px;
+    background:rgba(7,8,10,.72);
+    color:#f1eadb;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    backdrop-filter:blur(10px)
+  }
+
   /* avvio/slot: in landscape usa la larghezza, non una colonna lunga */
   .land-avvio{
     top:56px;
