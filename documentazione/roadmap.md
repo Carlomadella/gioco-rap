@@ -190,6 +190,8 @@ Carletto, segnati dal push degli altri): carico dei turni e straordinari per ruo
 reparto e per mansione con bonus e malus diversi, sovraccarico settimanale progressivo con la
 fatica solo sul carico lungo, il conflitto fra turno e musica leggibile, e la rete dei contatti
 separata per ruolo (`frontend/js/game/lavoro-eventi.js`, `actions.js`, `posto.js`).
+Con la pull request #43 (stesso giorno, segnata dal push degli altri) gli eventi per ruolo sono
+di più, quelli di linea non capitano più ai ruoli alti e anche gli straordinari seguono il ruolo.
 **FATTO (02/10/2026)** — le **ferie in Fabbrica** (pull request #39, segnate dal push degli
 altri): due giorni ogni ciclo di quattro settimane, chiesti almeno il giorno prima; il giorno
 di ferie non è un turno e non è un'assenza, copre la quota del contratto senza malus e non si
