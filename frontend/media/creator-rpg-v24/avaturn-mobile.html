@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Avaturn · Anni di Fame</title>
+<style>
+  :root{
+    color-scheme:dark;
+    --gold:#d3aa5e;
+    --paper:#f1eadb;
+  }
+  *{box-sizing:border-box}
+  html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    min-height:100%;
+    overflow:hidden;
+    background:#0b0b0d;
+    overscroll-behavior:none;
+  }
+  #avaturn{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100dvh;
+    min-width:0;
+    min-height:0;
+    overflow:hidden;
+    background:#101014;
+  }
+  #loading{
+    position:fixed;
+    inset:0;
+    z-index:20;
+    display:grid;
+    place-items:center;
+    padding:24px;
+    background:#101014;
+    color:#aaa;
+    font:700 12px/1.35 Inter,Arial,sans-serif;
+    text-align:center;
+  }
+  #loading[hidden]{display:none}
+  #controls{
+    position:fixed;
+    z-index:30;
+    top:max(8px,env(safe-area-inset-top,0px));
+    right:max(8px,env(safe-area-inset-right,0px));
+    display:flex;
+    gap:7px;
+    pointer-events:none;
+  }
+  #controls button{
+    pointer-events:auto;
+    min-height:40px;
+    border:1px solid rgba(255,255,255,.16);
+    border-radius:10px;
+    padding:0 12px;
+    background:rgba(12,12,15,.84);
+    color:var(--paper);
+    font:900 9px/1 Inter,Arial,sans-serif;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    backdrop-filter:blur(10px);
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  #confirm{
+    border-color:rgba(211,170,94,.48)!important;
+    background:rgba(211,170,94,.16)!important;
+    color:#f3d9a6!important;
+  }
+  #confirm:disabled{opacity:.42}
+  #close{
+    width:40px;
+    padding:0!important;
+    font-size:18px!important;
+    letter-spacing:0!important;
+  }
+  #error{
+    position:fixed;
+    z-index:35;
+    left:50%;
+    bottom:max(10px,env(safe-area-inset-bottom,0px));
+    transform:translateX(-50%);
+    display:none;
+    max-width:min(520px,calc(100vw - 24px));
+    padding:9px 12px;
+    border:1px solid rgba(255,90,54,.38);
+    border-radius:10px;
+    background:rgba(30,13,13,.92);
+    color:#ffd7cf;
+    font:700 10px/1.35 Inter,Arial,sans-serif;
+    text-align:center;
+  }
+  #error.on{display:block}
+</style>
+</head>
+<body>
+<div id="avaturn" aria-label="Editor Avaturn"></div>
+<div id="loading">Carico Avaturn…</div>
+<div id="controls">
+  <button id="confirm" type="button" disabled>Conferma</button>
+  <button id="close" type="button" aria-label="Chiudi Avaturn">×</button>
+</div>
+<div id="error" role="status"></div>
+
+<script type="module">
+import { AvaturnSDK } from "https://cdn.jsdelivr.net/npm/@avaturn/sdk/dist/index.js";
+
+const container=document.getElementById("avaturn");
+const loading=document.getElementById("loading");
+const confirmBtn=document.getElementById("confirm");
+const closeBtn=document.getElementById("close");
+const errorBox=document.getElementById("error");
+let sdk=null;
+let finishing=false;
+
+function showError(message){
+  errorBox.textContent=String(message||"Errore Avaturn");
+  errorBox.classList.add("on");
+}
+
+function notify(type,data){
+  try{
+    if(window.opener && !window.opener.closed){
+      window.opener.postMessage({type,data},location.origin);
+    }
+  }catch(e){}
+}
+
+function finish(data){
+  if(finishing || !data?.url) return;
+  finishing=true;
+  notify("adf-rpg-v24-avaturn-window-export",data);
+  try{ window.close(); }catch(e){}
+}
+
+function cancel(){
+  if(finishing) return;
+  notify("adf-rpg-v24-avaturn-window-cancel");
+  try{ window.close(); }catch(e){}
+}
+
+closeBtn.addEventListener("click",cancel);
+
+confirmBtn.addEventListener("click",async()=>{
+  if(!sdk || finishing) return;
+  confirmBtn.disabled=true;
+  confirmBtn.textContent="Esporto…";
+  errorBox.classList.remove("on");
+  try{
+    const data=await sdk.exportAvatar();
+    finish(data);
+  }catch(err){
+    console.error(err);
+    confirmBtn.disabled=false;
+    confirmBtn.textContent="Conferma";
+    showError("Non riesco a esportare l'avatar. Riprova dopo aver completato le modifiche.");
+  }
+});
+
+try{
+  sdk=new AvaturnSDK();
+
+  /* Integrazione mobile volutamente minimale: il container è l'unico elemento
+     che dimensioniamo. Il frame creato da Avaturn resta con i suoi stili
+     originali, come raccomandato dalla documentazione ufficiale. */
+  await sdk.init(container,{url:"https://demo.avaturn.dev"});
+
+  loading.hidden=true;
+  confirmBtn.disabled=false;
+
+  sdk.on("export",data=>finish(data));
+}catch(err){
+  console.error(err);
+  loading.hidden=true;
+  confirmBtn.disabled=true;
+  showError("Avaturn non si è caricato. Chiudi e riprova.");
+}
+
+window.addEventListener("beforeunload",()=>{
+  try{ sdk?.destroy?.(); }catch(e){}
+});
+</script>
+</body>
+</html>

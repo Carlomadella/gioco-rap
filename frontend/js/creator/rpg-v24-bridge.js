@@ -1,7 +1,7 @@
 /* Creator RPG V24 — ponte isolato fra il creator approvato e la partita vera. */
 "use strict";
 (function(){
-  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=34";
+  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=35";
   let overlay=null, frame=null;
   let modalita="normal";
   let aperta=false, overflowPrima="", faseAudioPrima=null;
@@ -14,6 +14,7 @@
   let avaturnMobileHost=null;
   let avaturnMobileSdk=null;
   let avaturnMobileToken=0;
+  let avaturnMobileWindow=null;
 
   function ensure(){
     if(overlay) return;
@@ -60,6 +61,41 @@
       window.matchMedia &&
       window.matchMedia("(orientation:landscape) and (max-width:980px) and (max-height:520px)").matches
     );
+  }
+
+  function apriAvaturnMobileWindow(){
+    if(!usaAvaturnMobileTopLevel()) return false;
+
+    chiudiAvaturnMobile(false);
+
+    try{
+      if(avaturnMobileWindow && !avaturnMobileWindow.closed){
+        avaturnMobileWindow.focus();
+        return true;
+      }
+    }catch(e){ avaturnMobileWindow=null; }
+
+    const url=new URL(
+      "media/creator-rpg-v24/avaturn-mobile.html?v=1",
+      document.baseURI
+    ).href;
+
+    /* Deve essere chiamata direttamente dal tap nel camerino: così Chrome
+       Android conserva la user activation e non tratta Avaturn come popup
+       asincrono. */
+    let win=null;
+    try{
+      win=window.open(
+        url,
+        "adf-avaturn-mobile",
+        "popup=yes,width=960,height=640"
+      );
+    }catch(e){}
+
+    if(!win) return false;
+    avaturnMobileWindow=win;
+    try{ win.focus(); }catch(e){}
+    return true;
   }
 
   function comunicaCreator(type, extra){
@@ -301,6 +337,10 @@
     const faseDaRipristinare=faseAudioPrima;
     aperta=false;
     chiudiAvaturnMobile(false);
+    try{
+      if(avaturnMobileWindow && !avaturnMobileWindow.closed) avaturnMobileWindow.close();
+    }catch(e){}
+    avaturnMobileWindow=null;
 
     if(overlay){
       overlay.style.display="none";
@@ -375,8 +415,28 @@
   }
 
   window.addEventListener("message",e=>{
-    if(!aperta || !frame || e.source!==frame.contentWindow) return;
     const m=e.data||{};
+
+    /* La pagina Avaturn mobile dedicata è same-origin e vive fuori dal creator.
+       Gestiamo il suo export PRIMA del filtro e.source===creatorFrame. */
+    if(
+      avaturnMobileWindow &&
+      e.source===avaturnMobileWindow &&
+      e.origin===location.origin
+    ){
+      if(m.type==="adf-rpg-v24-avaturn-window-export" && m.data?.url){
+        comunicaCreator("adf-rpg-v24-avaturn-mobile-export",{data:m.data});
+        avaturnMobileWindow=null;
+        return;
+      }
+      if(m.type==="adf-rpg-v24-avaturn-window-cancel"){
+        comunicaCreator("adf-rpg-v24-avaturn-mobile-cancel");
+        avaturnMobileWindow=null;
+        return;
+      }
+    }
+
+    if(!aperta || !frame || e.source!==frame.contentWindow) return;
 
     if(m.type==="adf-rpg-v24-ready"){
       inviaStato();
@@ -453,7 +513,12 @@
 
   function install(){}
 
-  window.ADF_RPG_V24={open,openAppearance,close};
+  window.ADF_RPG_V24={
+    open,
+    openAppearance,
+    close,
+    openAvaturnMobileWindow:apriAvaturnMobileWindow
+  };
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",install);
   else install();
 })();
