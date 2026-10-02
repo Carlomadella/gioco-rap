@@ -2,8 +2,10 @@ import { createRequire } from "node:module";
 import { describe, expect, it } from "vitest";
 
 const require = createRequire(import.meta.url);
-const { esegui, simulaFatica, simulaCarrieraPerfetta } =
-  require("../../strumenti/bilanciamento/fabbrica.js");
+const {
+  esegui, simulaFatica, simulaCarrieraPerfetta,
+  simulaProfiliRuolo, simulaDisciplina, simulaEventiRuolo, simulaConflittiMusica
+} = require("../../strumenti/bilanciamento/fabbrica.js");
 
 describe("stress test annuale Fabbrica", () => {
   it("il contratto normale 5/5 resta sostenibile per 52 settimane", () => {
@@ -54,6 +56,66 @@ describe("stress test annuale Fabbrica", () => {
     expect(out.economia.pagaTopSettimana).toBeLessThan(out.economia.costoMinimoSettimanaleMassimo);
     expect(out.economia.pagaTopSestoGiorno).toBe(2873);
     expect(out.economia.pagaTopSestoGiorno).toBeGreaterThanOrEqual(out.economia.costoMinimoSettimanaleMassimo);
+  });
+
+  it("lo stress test misura il carico settimanale reale dei quattro ruoli", () => {
+    const p=simulaProfiliRuolo();
+
+    expect(p.operaio).toMatchObject({
+      energiaTurno:40,benessereTurno:-3,luciditaTurno:-1,
+      settimana:{turni:5,energia:200,benessere:-15,lucidita:-5}
+    });
+    expect(p.operaio_esperto).toMatchObject({
+      energiaTurno:36,benessereTurno:-2,luciditaTurno:-1
+    });
+    expect(p.capolinea).toMatchObject({
+      energiaTurno:32,benessereTurno:-1,luciditaTurno:-2
+    });
+    expect(p.capoturno).toMatchObject({
+      energiaTurno:28,benessereTurno:-1,luciditaTurno:-3,
+      settimana:{turni:5,energia:140,benessere:-5,lucidita:-15}
+    });
+  });
+
+  it("lo stress test attraversa davvero disciplina, richiami e licenziamento", () => {
+    const d=simulaDisciplina();
+
+    expect(d.normale).toMatchObject({absences:0,warningAdded:0,reliabilityDelta:0,dismissed:false});
+    expect(d.lieve).toMatchObject({absences:1,warningAdded:0,reliabilityDelta:-5,dismissed:false});
+    expect(d.gravi).toHaveLength(3);
+    expect(d.gravi[0]).toMatchObject({absences:3,warningAdded:1,dismissed:false});
+    expect(d.gravi[1]).toMatchObject({absences:3,warningAdded:1,dismissed:false});
+    expect(d.gravi[2]).toMatchObject({absences:3,dismissed:true});
+    expect(d.blocco.active).toBe(true);
+    expect(d.blocco.weeksRemaining).toBeGreaterThan(0);
+  });
+
+  it("in cinque settimane ogni ruolo attraversa i cinque eventi specifici senza ripetersi", () => {
+    const eventi=simulaEventiRuolo();
+
+    for(const ruolo of ["operaio","operaio_esperto","capolinea","capoturno"]){
+      expect(eventi[ruolo].mostrati).toBe(5);
+      expect(eventi[ruolo].unici).toBe(5);
+      expect(new Set(eventi[ruolo].eventi).size).toBe(5);
+    }
+    expect(eventi.operaio.delta.wellbeing).not.toBe(0);
+    expect(eventi.capoturno.delta.lucidita).toBeLessThan(0);
+  });
+
+  it("il conflitto musica/lavoro distingue costo opportunità, rischio assenza e appuntamento perso", () => {
+    const c=simulaConflittiMusica();
+
+    expect(c.musicaRecuperabile.row).toMatchObject({
+      choice:"music",forgonePay:220
+    });
+    expect(c.musicaRecuperabile.row.attendance.assenzeCreateDalConflitto).toBe(0);
+
+    expect(c.musicaCritica.row.choice).toBe("music");
+    expect(c.musicaCritica.row.attendance.assenzeCreateDalConflitto).toBe(1);
+
+    expect(c.scegliLavoro.row.choice).toBe("work");
+    expect(c.scegliLavoro.started).toEqual(["turno"]);
+    expect(c.scegliLavoro.missed).toBe(1);
   });
 
   it("il pacchetto di guardrail del punto 16 passa interamente", () => {
