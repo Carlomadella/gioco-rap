@@ -43,6 +43,19 @@ test("landscape mobile: parte alta scorre e barra 01-06 resta fissa", async ({ p
   const continua = page.locator("#m-play");
 
   await expect(hero).toHaveCSS("overflow-y", "auto");
+
+  const areaScroll = await hero.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    const punto = document.elementFromPoint(innerWidth - 20, r.top + Math.min(r.height / 2, 80));
+    return {
+      larghezza: r.width,
+      viewport: innerWidth,
+      prendeDestra: punto === el || el.contains(punto)
+    };
+  });
+  expect(areaScroll.larghezza).toBeGreaterThanOrEqual(areaScroll.viewport - 1);
+  expect(areaScroll.prendeDestra).toBe(true);
+
   const dockPrima = await dock.boundingBox();
   expect(dockPrima).not.toBeNull();
 
