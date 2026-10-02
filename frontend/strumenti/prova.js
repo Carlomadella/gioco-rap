@@ -1215,8 +1215,8 @@ console.log("\nlo Studio: la gente della Sala conta");
        si legge dal codice invece di essere ricopiato: se domani se ne
        aggiunge o toglie una, questa prova la copre da sola. */
     const sezioni = dentro("STUDIO_SEZIONI.map(x => x.id)");
-    controlla("le sezioni sono quelle del punto 4 meno il Marketing, più la cabina",
-      sezioni.join(",") === "beat,testo,cabina,banco,fuori",
+    controlla("le sezioni sono quelle del punto 4 meno il Marketing, più la cabina e il disco (02/10/2026)",
+      sezioni.join(",") === "beat,testo,cabina,banco,fuori,disco",
       sezioni.join(","));
     const rotte = [];
     for(const s of sezioni){

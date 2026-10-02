@@ -834,7 +834,9 @@ function renderDiscografia(){
         (c ? '<i class="dcert" style="--c:' + c.k + '" title="' + c.etichetta + '">' +
              c.etichetta + '</i>' : '') + '</b>' +
         '<span>' + discoQuando(x) + ' \u00b7 qualit\u00e0 ' + x.q +
-        (x.video ? ' \u00b7 con il video' : '') + '</span></span>' +
+        (x.video ? ' \u00b7 con il video' : '') +
+        /* da quale mixtape o album viene (progetti.js) */
+        (typeof progettoRigaPezzo === "function" ? progettoRigaPezzo(x) : '') + '</span></span>' +
       discoCurva(x.storia, a.c) +
       '<span class="dand"><u>' + a.t + '</u>' + (a.f ? '<em>' + a.f + '</em>' : '') + '</span>' +
       '<span class="dnum"><b>' + short(x.streams || 0) + '</b><span>' + short(x.last || 0) + ' questa sett.</span></span>' +
@@ -844,6 +846,8 @@ function renderDiscografia(){
   }).join("");
 
   box.innerHTML = '<div class="list"><h3>Discografia</h3>' + testa +
+    /* i mixtape e gli album usciti, sopra ai pezzi (progetti.js) */
+    (typeof progettiDiscografia === "function" ? progettiDiscografia() : '') +
     '<div class="dlista">' + righe + '</div>' +
     '<p class="dnota">La curva sono le ultime settimane di ascolti. Un pezzo che scende non \u00e8 ' +
     'un pezzo brutto: \u00e8 un pezzo vecchio. Quello che lo rimette in piedi \u00e8 quello che gli ' +

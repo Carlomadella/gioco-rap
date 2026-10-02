@@ -122,7 +122,10 @@ test("la CI copre gameplay landscape e avviso portrait",
   leggi("test/e2e/mobile-landscape.spec.js").includes("hasTouch: true") &&
   leggi("test/e2e/mobile-touch.spec.js").includes("viewport: { width: 390, height: 844 }") &&
   leggi("test/e2e/mobile-touch.spec.js").includes("ruota il telefono in orizzontale") &&
-  fs.readFileSync(path.resolve(ROOT,"..",".claude","agents","prova-sul-telefono.md"),"utf8").includes("non eseguire il gameplay in portrait"));
+  /* l'agente prova-sul-telefono è stato tolto il 02/10/2026 (Carlo): non
+     torna, e con lui il suo promemoria */
+  !fs.existsSync(path.resolve(ROOT,"..",".claude","agents","prova-sul-telefono.md")) &&
+  !fs.existsSync(path.resolve(ROOT,"..","scripts","promemoria-telefono.js")));
 /* Il gate CI verifica il flusso Avvio rapido fino all'hub senza affidare
    l'esito alle prestazioni di targets.bin sul runner headless. La prova
    MakeHuman completa non sparisce: resta esplicita e manuale. */
@@ -814,11 +817,12 @@ test("la plancia e l'Agenda dicono i 45 della take, non «gratis»",
   telefono.includes("(a.costoScritto ? a.costoScritto() : a.e)"));
 
 console.log("\nLo Studio a cinque linguette (14/09/2026)");
-test("le linguette dello Studio sono cinque: Beat, Testo, Cabina, Mix, Uscita",
+/* la sesta, Disco, dal 02/10/2026: mixtape e album (progetti.js) */
+test("le linguette dello Studio sono sei: Beat, Testo, Cabina, Mix, Uscita, Disco",
   (() => {
     const ids = (studio.match(/\{id:"([a-z]+)",\s*n:"[^"]+",\s*bar:/g) || [])
       .map(m => m.match(/id:"([a-z]+)"/)[1]);
-    return ids.join(",") === "beat,testo,cabina,banco,fuori";
+    return ids.join(",") === "beat,testo,cabina,banco,fuori,disco";
   })());
 test("il Marketing sta sul telefono: «Che post fai?» in LaFamegram, e Fuori ci manda",
   telefono.includes("function telPromo()") &&
@@ -2080,6 +2084,29 @@ test("la remastered si prenota dalla Discografia e si chiude al banco del Mix: l
 test("nel telefono la riga della Discografia va su due righe: prima il titolo non si leggeva e i numeri uscivano dal bordo",
   tel.length > 0 && leggi("css/telefono.css").includes(".telslot .drow{flex-wrap:wrap;") &&
   leggi("css/telefono.css").includes(".telslot .dnm{flex:1 1 60%;min-width:0}"));
+
+/* Mixtape e album (02/10/2026, CARLO «Studio (16/09/2026)»: «fai in modo che si
+   possano creare mixtape e album»). File nuovo, js/game/progetti.js, e
+   css/progetti.css: la linguetta Disco dello Studio, i dischi in Discografia. */
+console.log("\nMixtape e album \u2014 la linguetta Disco dello Studio");
+const progettiJs = leggi("js/game/progetti.js");
+test("mixtape e album stanno in un file loro, caricato dopo seguiti.js con il suo foglio, e hanno il loro test",
+  index.indexOf('<script src="js/game/progetti.js') > index.indexOf('<script src="js/game/seguiti.js') &&
+  index.includes('href="css/progetti.css') &&
+  progettiJs.includes("const PROGETTO_TIPI = {") &&
+  fs.existsSync(path.join(ROOT, "test/unit/progetti.test.js")));
+test("lo Studio ha la linguetta Disco, e G parte con la lista dei dischi",
+  studio.includes('{id:"disco",  n:"Disco",') &&
+  studio.includes('sez.id === "disco" && typeof studioSezDisco === "function" ? studioSezDisco() :') &&
+  state.includes("progetti:[],"));
+test("il disco esce di venerdi' da solo, e spinge le sue tracce nella sim",
+  sim.includes('if(typeof progettiUscitePronti === "function") progettiUscitePronti();') &&
+  sim.includes('if(typeof progettoSpinta === "function") out *= progettoSpinta(s);'));
+test("le tracce di un disco in coda non si ritirano una a una dalla cassaforte",
+  studioEl.includes("s.tenuto && s.progetto == null"));
+test("la Discografia mostra i dischi e da quale disco viene un pezzo",
+  ui.includes('(typeof progettiDiscografia === "function" ? progettiDiscografia() : \'\') +') &&
+  ui.includes('(typeof progettoRigaPezzo === "function" ? progettoRigaPezzo(x) : \'\') +'));
 
 console.log("\nProblemi riscontrati \u2014 carcere senza notifiche, didascalie scritte in casa");
 const caption = leggi("js/game/crime-caption.js");

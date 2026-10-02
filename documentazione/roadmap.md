@@ -190,6 +190,12 @@ Carletto, segnati dal push degli altri): carico dei turni e straordinari per ruo
 reparto e per mansione con bonus e malus diversi, sovraccarico settimanale progressivo con la
 fatica solo sul carico lungo, il conflitto fra turno e musica leggibile, e la rete dei contatti
 separata per ruolo (`frontend/js/game/lavoro-eventi.js`, `actions.js`, `posto.js`).
+Con la pull request #43 (stesso giorno, segnata dal push degli altri) gli eventi per ruolo sono
+di più, quelli di linea non capitano più ai ruoli alti e anche gli straordinari seguono il ruolo.
+**FATTO (02/10/2026)** — le **ferie in Fabbrica** (pull request #39, segnate dal push degli
+altri): due giorni ogni ciclo di quattro settimane, chiesti almeno il giorno prima; il giorno
+di ferie non è un turno e non è un'assenza, copre la quota del contratto senza malus e non si
+sovrappone agli straordinari. «Ferie in Fabbrica» in `05-carriera-e-tempo.md`.
 
 **Manca**:
 
@@ -278,6 +284,15 @@ rimette in piedi anche il primo, la remastered si chiude al banco del Mix (24 en
 metà del mix più il fonico) e il pezzo riparte quasi come nuovo. La riga della Discografia nel
 telefono, che era rotta, va su due righe. «Remastered e parti 2» in `04-musica-e-suoni.md`.
 
+**FATTO (02/10/2026)** — **mixtape e album**, la sesta linguetta dello Studio, «Disco»: le
+tracce si mettono in fila coi pezzi incisi e non usciti (banco e cassaforte) più qualche
+singolo già fuori; il mixtape va da 4 a 8 tracce ed è gratis, l'album da 8 a 16 e costa 350 €.
+Il disco ha un voto (la media meno i riempitivi) e una coesione (le tracce sullo stesso tema);
+esce stanotte o venerdì, fa uscire insieme le tracce nuove, rilancia i singoli, porta hype e
+gente, e spinge gli ascolti delle sue tracce per qualche settimana. Nella Discografia i dischi
+stanno sopra ai pezzi. «Studio · Mixtape e album» in `04-musica-e-suoni.md`; i numeri vanno
+misurati col simulatore.
+
 **Manca**: la cover «stile emblema», l'editor a livelli (una pagina a parte). L'app della
 discografia che dice come invecchiano i pezzi **c'era già** dal 04/09/2026: questa riga
 diceva che mancava, e non era vero. (Il buco dei 1180px — «Che post fai?» che sotto non si
@@ -341,6 +356,11 @@ composizione, sfondi, mappa e informazioni senza impoverire l'esperienza. Il por
 è una seconda disposizione del gioco: mostra l'invito a ruotare il dispositivo, senza forzare
 la rotazione a livello di sistema. Restano obbligatori bersagli da almeno 44 punti, niente `hover` indispensabili e
 testi leggibili senza zoom. Il giro mobile di gameplay copre 844×390; in portrait si controlla soltanto l'avviso di rotazione.
+**FATTO (02/10/2026)** — il layout orizzontale ha un foglio suo, `css/mobile-landscape.css`,
+con le prove su scala e viewport (pull request #41), e le Impostazioni in orizzontale si
+impilano e restano leggibili (#42): segnati dal push degli altri.
+Dal 02/10/2026 l'agente `prova-sul-telefono` e il suo promemoria non ci sono più (Carlo): il
+giro sul telefono lo coprono le e2e in orizzontale, e quello su un telefono vero si fa a mano.
 
 *«Responsività di tutto il gioco»* — **il giro sugli `:hover` è fatto (08/09/2026)**: tutte
 le regole `:hover` dei 24 fogli che ne avevano stanno dentro a `@media (hover:hover)`, e un

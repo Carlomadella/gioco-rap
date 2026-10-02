@@ -12,18 +12,6 @@
         ]
       }
     ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"${CLAUDE_PROJECT_DIR:-.}/scripts/promemoria-telefono.js\" --hook 2>/dev/null || true",
-            "timeout": 20,
-            "statusMessage": "Guardo se serve un giro sul telefono..."
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Bash",

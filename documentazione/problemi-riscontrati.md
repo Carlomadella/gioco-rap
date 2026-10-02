@@ -99,8 +99,14 @@ mappa (02/10). È la conseguenza di una scelta, non un errore.
 **94.** Nota: sugli schermi bassi (1366 × 768, 1280 × 720) le descrizioni delle card del
 Bancone e le frasi della gente si tagliano coi puntini (02/10). È una scelta, non un errore.
 
+**98, 99, 100.** Dal giro del 02/10 sullo Studio · Mixtape e album (branch
+`task/studio-mixtape-album`, dettaglio in fondo). La 95, la 96 e la 97 sono chiuse prima del
+push; della 98 resta la lista dei pezzi che scivola giù sul telefono a ogni «metti», della 99 i
+pezzi senza `seed` da guardare su un salvataggio vecchio; la 100 (il disco esce senza costare
+mosse né lucidità, e venerdì conviene sempre) è una decisione di bilanciamento, non un errore.
+
 Le voci 92 e 93 (il Bancone del 02/10) sono chiuse lo stesso giorno, prima del push, e stanno in
-`problemi-risolti.md`. La prossima voce nuova è la 95.
+`problemi-risolti.md`. La prossima voce nuova è la 101.
 
 ---
 
@@ -845,4 +851,104 @@ servito su un'altra porta. Guardato e **a posto**:
   è fatto apposta: **è una scelta, non un errore**. Lo scrivo perché sono i due schermi da
   portatile più comuni, e la frase intera si legge solo passandoci sopra col mouse.
 - **come si vede** — finestra 1366 × 768, Bancone, la terza card.
+- **quanto pesa** — da sistemare con calma.
+
+## Giro del 02/10/2026 (segnala-problemi, fine task `task/studio-mixtape-album`, modifiche non ancora committate)
+
+Fatti girare `npm run prova` (497 ok, 0 falliti), `node strumenti/audit-regressioni.js`
+(189 a posto, 0 no), `npm run verifica:build` (33 ok, 0 falliti) e i test di
+`test/unit/progetti.test.js` e `seguiti.test.js` (19 passati). Letto `progetti.js` riga per
+riga e gli agganci in `studio.js`, `sim.js`, `ui.js`, `studio-elementi.js`, `state.js`,
+`gioco.html`, e messi accanto a `pubblica` (actions.js), `studioUscitePronte`,
+`studio-automatico.js` e `seguiti.js`. Non ho aperto il gioco nel browser: quello che dico
+del telefono viene dal CSS, non da uno schermo.
+
+Guardato e **a posto**: nessun richiamo a funzioni che non esistono (le `st…` dello Studio,
+`cover`, `short`, `fmt`, le icone ci sono tutte); i nomi delle classi nuove non pestano quelli
+di altri fogli; un salvataggio vecchio senza `G.progetti` né la bozza si ricrea da solo; le
+tracce di un disco in coda non escono per sbaglio dalla plancia, dal resto automatico o dalla
+cassaforte; il disco in coda esce nel passaggio di giorno anche quando quel giorno chiude la
+settimana; la foto della linguetta esiste.
+
+### 95. Tre frasi sbagliate nel disco
+- **dove** — `frontend/js/game/progetti.js:223`, `:118`, `:293` e `:381-382`
+- **cosa succede** — l'album in coda per venerdì scrive nel diario «**Il album** «…» è in coda
+  per venerdì» (dovrebbe essere «L'album»); se metti troppi singoli in un album il gioco dice
+  «**Nel album** entrano al massimo 4 singoli» («Nell'album»). E quando ritiri dalla coda un
+  **mixtape**, che è gratis, il diario e la nota della coda dicono «il mastering è pagato:
+  resta pagato», di una cosa che non hai mai pagato.
+- **come si vede** — Studio, Disco: un album su «Venerdì» e chiudilo; oppure un album con
+  quattro singoli e prova ad aggiungerne un quinto; oppure un mixtape in coda e «Ritiralo».
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (02/10/2026)**, prima del push: ogni tipo porta i suoi articoli (`il`, `nel`, `un`
+  in `PROGETTO_TIPI`), e il mastering si nomina solo per l'album.
+
+### 96. Mettere un singolo nel disco può farlo girare di meno, non di più
+- **dove** — `frontend/js/game/progetti.js:254-258`, insieme a `frontend/js/game/seguiti.js:118-119`
+- **cosa succede** — quando il disco esce, ogni singolo già fuori riparte da capo con la spinta
+  del disco (0,3 il mixtape, 0,5 l'album). Ma la spinta di prima la tiene solo se era della
+  **stessa settimana**: un pezzo rimasterizzato due settimane fa (che gira ancora a circa 0,6)
+  viene rimesso a 0,3 se lo infili in un mixtape, e dal lunedì dopo fa meno ascolti di prima.
+  Al contrario, nella stessa settimana: se in un album c'è un pezzo e anche la sua parte 2
+  nuova, e il pezzo vecchio sta **prima** in scaletta, la parte 2 gli rimette sopra il suo
+  0,45 e l'album perde il suo 0,5. Il commento nel codice dice «vince la spinta più forte»,
+  ma vince quella che arriva per ultima.
+- **come si vede** — fai una remastered, aspetta due settimane, metti quel pezzo in un mixtape
+  e guarda la sua curva in Discografia.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (02/10/2026)**, prima del push: prima escono le tracce nuove (le parti 2 rilanciano
+  i loro primi), poi i singoli; su un singolo vince la spinta più forte fra quella che gli resta
+  del rilancio di prima e quella del disco. Una prova nuova in `progetti.test.js`.
+
+### 97. Il feat con un nome grosso non porta hype se il pezzo esce in un disco
+- **dove** — `frontend/js/game/progetti.js:247-252` (contro `studio-elementi.js:798` e
+  `actions.js`, mossa «Pubblica il pezzo»)
+- **cosa succede** — un pezzo nuovo col feat di uno famoso, uscito da solo, aggiunge l'hype
+  della gente del feat. Uscito dentro a un mixtape o a un album quell'hype non arriva: il disco
+  conta solo il suo. Chi tiene il pezzo col feat per il disco ci rimette senza saperlo.
+- **come si vede** — un pezzo col feat di un nome grosso: una volta da solo, una volta in un
+  mixtape, e guarda l'hype del giorno.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (02/10/2026)**, prima del push: `discoFeatHype` somma `featHypeUscita` delle
+  tracce nuove, nel conto dell'hype all'uscita e nella stima della linguetta.
+
+### 98. Sul telefono la linguetta Disco dice «qui a destra» ma i pezzi stanno sotto
+- **dove** — `frontend/js/game/progetti.js:407` e `:414`, con `frontend/css/stretto.css:184-187`;
+  i tasti a `frontend/css/progetti.css:30`
+- **cosa succede** — sotto i 900 punti (il telefono, anche di traverso) le tre colonne dello
+  Studio vanno una sotto l'altra: prima la scaletta, poi «Che disco» e «Quando», e solo in fondo
+  i pezzi da mettere. La nota dice «le tracce si mettono in fila **da destra**» e «si sceglie
+  dai pezzi **qui a destra**», ma a destra non c'è niente. E ogni «metti» allunga la scaletta
+  sopra di una riga, così la lista sotto scivola giù e il tocco dopo cade sul pezzo sbagliato
+  o nel vuoto. I tasti su, giù e via della scaletta sono da 36 punti, sotto ai 44 che il
+  resto dello Studio usa per il dito. (Visto dal CSS, non su un telefono.)
+- **come si vede** — finestra stretta o telefono, Studio, Disco, metti quattro pezzi di fila.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO in parte (02/10/2026)**, prima del push: le note non dicono più «a destra» ma
+  «dall'elenco dei pezzi, con «metti»», e i tasti della scaletta sono da 44. **Resta** la lista
+  che scivola giù a ogni «metti» quando le colonne sono una sotto l'altra: va guardata su un
+  telefono vero.
+
+### 99. Alcuni singoli già fuori non si possono mettere nel disco
+- **dove** — `frontend/js/game/progetti.js:446` e `:88`
+- **cosa succede** — nella colonna dei pezzi compaiono solo **gli ultimi 12** singoli usciti: un
+  pezzo più vecchio (proprio quello che avrebbe senso far tornare a girare) non c'è e non si
+  può scegliere. E un pezzo senza il suo numero di copertina non entra mai e non compare,
+  senza dire perché: i pezzi nuovi lo hanno sempre, ma la Discografia (`ui.js`, `x.seed ||`)
+  si prepara anche a pezzi che non ce l'hanno, quindi in qualche salvataggio vecchio ci
+  potrebbero essere — **questo va guardato** su un salvataggio vecchio vero, io non l'ho visto.
+- **come si vede** — una carriera con più di 12 singoli fuori: in Disco il tredicesimo non c'è.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (02/10/2026)**, prima del push, la prima metà: compaiono tutti i singoli. La seconda
+  (pezzi senza `seed`) resta da guardare su un salvataggio vecchio vero: `registra` in
+  `actions.js` il seed lo scrive sempre.
+
+### 100. Nota: il disco esce senza costare niente, e venerdì conviene sempre
+- **dove** — `frontend/js/game/progetti.js:201-231` (contro la mossa «Pubblica il pezzo»,
+  `actions.js:2349`, e l'uscita di venerdì, `studio-elementi.js:809`)
+- **cosa succede** — **è una scelta, non un errore.** Un pezzo che esce da solo costa un punto
+  di lucidità, sia stanotte sia venerdì (è la voce 7). Un disco con dentro otto pezzi nuovi
+  esce con un tocco, senza mossa e senza lucidità, e su «Venerdì» prende +4 di hype senza
+  pagare niente in cambio: stanotte non conviene mai. Va deciso se è giusto così.
+- **come si vede** — chiudi un mixtape su «Stanotte» e guarda la lucidità: non si muove.
 - **quanto pesa** — da sistemare con calma.

@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d88a31c4 -->
+## 02/10/26, 09:55 — task/studio-mixtape-album → main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `d88a31c4`
+
+### Cosa è entrato
+
+- `0a1b18a7` — La roadmap si aggiorna al push di chiunque: gli eventi della Fabbrica per ruolo (#43) — **Carlomadella**
+- `db4db0e2` — Merge remote-tracking branch 'origin/main' into task/studio-mixtape-album — **Carlomadella**
+- `762541d7` — La roadmap si aggiorna al push di chiunque: il layout orizzontale del telefono (#41, #42) — **Carlomadella**
+- `2fac1790` — Merge remote-tracking branch 'origin/main' into task/studio-mixtape-album — **Carlomadella**
+- `9791bac1` — Studio: «fai in modo che si possano creare mixtape e album» — **Carlomadella**
+
+### File di questa categoria
+
+- **Aggiunto:** `frontend/css/progetti.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:072806cf -->
 ## 02/10/26, 09:17 — task/fix-mobile-landscape-settings → main
 
