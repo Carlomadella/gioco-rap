@@ -1390,6 +1390,38 @@ function lavoroAggiornaStraordinariTempo(){
   }
 }
 
+function lavoroUltimoEsitoTurno(luogo){
+  const sede=lavoroSede(luogo);
+  return sede && sede.lastShiftOutcome && typeof sede.lastShiftOutcome==="object"
+    ? sede.lastShiftOutcome
+    : null;
+}
+
+function lavoroSalvaEsitoTurno(luogo,data){
+  if(!luogo) return null;
+  const sede=lavoroSede(luogo);
+  if(!sede) return null;
+  const out=Object.assign({
+    absoluteDay:lavoroGiornoAssoluto(),
+    year:Number(G.year)||1,
+    week:Number(G.week)||1,
+    day:Number(G.day)||1,
+    event:null
+  },data||{});
+  sede.lastShiftOutcome=out;
+  return out;
+}
+
+function lavoroSegnaEventoEsitoTurno(luogo,event){
+  const out=lavoroUltimoEsitoTurno(luogo);
+  if(!out || Number(out.absoluteDay)!==Number(lavoroGiornoAssoluto())) return null;
+  out.event=event && typeof event==="object"
+    ? Object.assign({},event)
+    : {type:"none",title:"Nessun evento extra",detail:"Turno chiuso senza imprevisti."};
+  try{ if(typeof save==="function") save(); }catch(_){}
+  return out.event;
+}
+
 function lavoroReteStato(luogo){
   const sede = lavoroSede(luogo);
   if(!sede) return null;
@@ -2207,6 +2239,34 @@ const ACTIONS = [
      const luogoLavoro = lavoroLuogo(j);
      if(luogoLavoro) lavoroRegistraPresenza(luogoLavoro);
      const straordinario = luogoLavoro ? lavoroCompletaStraordinario(luogoLavoro) : null;
+     const cartellinoDopo = luogoLavoro && typeof lavoroCartellino==="function"
+       ? lavoroCartellino(luogoLavoro)
+       : null;
+     if(luogoLavoro){
+       lavoroSalvaEsitoTurno(luogoLavoro,{
+         jobId:j.id||null,
+         jobName:j.n||null,
+         pay:{
+           base:Number(paga.base||0),
+           total:Number(paga.totale||0),
+           bonus:Number(paga.bonus||0),
+           percent:Number(paga.percentuale||0),
+           label:paga.etichetta||""
+         },
+         energyDelta:-Math.abs(Number(effettiTurno.energia||0)),
+         wellbeingDelta:Number(effettiTurno.benessere||0),
+         lucidityDelta:Number(effettiTurno.lucidita||0),
+         attendance:cartellinoDopo ? {
+           worked:Number(cartellinoDopo.giorniLavoratiSettimana||0),
+           required:Number(cartellinoDopo.turniSettimanaliRichiesti||0),
+           total:Number(cartellinoDopo.totale||0)
+         } : null,
+         overtime:straordinario ? {
+           type:straordinario.tipo||null,
+           reliabilityDelta:Number(straordinario.affidabilitaDelta||0)
+         } : null
+       });
+     }
      const def = JOBS.find(x => x.id === j.id);
      let extra = "";
      if(def && def.extra) extra = def.extra();

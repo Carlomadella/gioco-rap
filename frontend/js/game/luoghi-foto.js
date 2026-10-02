@@ -462,6 +462,62 @@ function lfDimissioniLavoro(luogo, nome){
 
 function lfDimissioniFabbrica(){ return lfDimissioniLavoro("fabbrica", "Fabbrica"); }
 
+function lfDeltaTurno(attuale,prima,fallback){
+  if(prima!=null && Number.isFinite(Number(prima)))
+    return Math.round((Number(attuale)||0)-Number(prima));
+  return Math.round(Number(fallback||0));
+}
+
+function lfSegnoTurno(v,unita){
+  const n=Math.round(Number(v)||0);
+  return (n>0?"+":n<0?"−":"")+Math.abs(n)+(unita||"");
+}
+
+function lfFabbricaEsitoTurno(){
+  const e=LUOGO.esito||{};
+  const p=LUOGO.prima||{};
+  const out=typeof lavoroUltimoEsitoTurno==="function"
+    ? lavoroUltimoEsitoTurno("fabbrica")
+    : null;
+  const pay=out&&out.pay ? out.pay : {};
+  const presenza=out&&out.attendance ? out.attendance : null;
+  const evento=out&&out.event ? out.event : null;
+
+  const soldi=lfDeltaTurno(G.money,p.money,pay.total||0);
+  const energia=lfDeltaTurno(G.energy,p.energy,out&&out.energyDelta);
+  const benessere=lfDeltaTurno(G.wellbeing,p.well,out&&out.wellbeingDelta);
+  const lucidita=lfDeltaTurno(G.lucidita,p.lucidita,out&&out.lucidityDelta);
+
+  const bonus=Number(pay.bonus||0)>0
+    ? ("+"+fmt(Number(pay.bonus||0))+" € · +"+Number(pay.percent||0)+"%"+
+       (pay.label ? " · "+lfEsc(pay.label) : ""))
+    : "Nessuna maggiorazione";
+  const presenze=presenza
+    ? (Math.min(presenza.worked,presenza.required)+"/"+presenza.required+" questa settimana")
+    : "—";
+  const eventoTesto=evento
+    ? (lfEsc(evento.title||"Evento di fine turno")+
+       (evento.detail ? " · "+lfEsc(evento.detail) : ""))
+    : "Aggiornamento fine turno…";
+
+  return '<div class="lfesito lfturnoesito">' +
+    lfRiga("Paga", lfSegnoTurno(soldi," €"), "oro") +
+    lfRiga("Bonus", bonus, Number(pay.bonus||0)>0 ? "oro" : "") +
+    lfRiga("Energia", lfSegnoTurno(energia)) +
+    lfRiga("Benessere", lfSegnoTurno(benessere)) +
+    lfRiga("Lucidità", lfSegnoTurno(lucidita)) +
+    lfRiga("Presenze", presenze) +
+    lfRiga("Fine turno", eventoTesto) +
+    (out&&out.overtime&&Number(out.overtime.reliabilityDelta||0)
+      ? lfRiga("Affidabilità straordinario",
+          lfSegnoTurno(out.overtime.reliabilityDelta))
+      : "") +
+    '<p class="lfdetto">'+(e.msg||"")+'</p>' +
+    (e.extra ? '<p class="lfextra">'+e.extra+'</p>' : "") +
+    '<div class="stazioni"><button type="button" class="stprimo" data-continua="1">Continua</button></div>' +
+    '</div>';
+}
+
 function lfFabbrica(){
   const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
   if(!baseDef) return {mid:lfPan("Fabbrica", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
@@ -564,7 +620,9 @@ function lfFabbrica(){
       ? "Riassunzione bloccata"
       : "Leggi e firma il contratto";
   const azioneLavoro = mio ? ' data-vai="turno"' : ' data-lavoro="' + baseDef.id + '"';
-  const mid = lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
+  const mid = LUOGO.esito && LUOGO.esito.a === "turno" && mio
+    ? lfPan("Turno completato", lfFabbricaEsitoTurno(), "spunta")
+    : lfPan(mio ? "Vai al lavoro" : "Vuoi lavorare qui?",
     '<p class="stnota">' +
       (mio
         ? (straordinarioOggi
@@ -728,7 +786,9 @@ function lfPizzeria(){
 /* ==================== LE MOSSE ====================
    Da qui parte una mossa di actions.js, come dai cartelli. Prima si fotografa
    com'eri, per scrivere i numeri veri nell'esito. */
-const lfFotografia = () => ({well:G.wellbeing, rete:(G.skills && G.skills.rete) || 0,
+const lfFotografia = () => ({well:G.wellbeing, lucidita:Number(G.lucidita||0),
+  energy:Number(G.energy||0), maxEnergy:Number(G.maxEnergy||0),
+  rete:(G.skills && G.skills.rete) || 0,
   pres:(G.skills && G.skills.presenza) || 0, money:G.money, fans:G.fans});
 function luogoVai(id){
   if(!LUOGO) return;
