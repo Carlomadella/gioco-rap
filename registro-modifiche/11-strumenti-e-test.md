@@ -6,6 +6,43 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7d7fc52e -->
+## 02/10/26, 22:21 — feature/strada-punto6-coperture → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `7d7fc52e`
+
+### Cosa è entrato
+
+- `bf12b2f0` — fix(test): allinea asserzione protezione al testo reale — **mycolbraga**
+- `3b200338` — fix(strada): salva correttamente il livello della protezione — **mycolbraga**
+- `ec8f35f7` — test(regressioni): aggiorna contratti protezione e legale al punto 6 — **mycolbraga**
+- `fe55e43e` — fix(carcere): contabilizza davvero il legale privato durante la detenzione — **mycolbraga**
+- `51b05a75` — chore(frontend): aggiorna cache per coperture relazionali — **mycolbraga**
+- `d97db67e` — test(strada): copri accordi reali di protezione e avvocato — **mycolbraga**
+- `82d34f54` — feat(circolo): dai identita sociale all avvocato — **mycolbraga**
+- `70482913` — feat(strada-ui): gestisci protezione e legale come relazioni — **mycolbraga**
+- `1f52d770` — feat(strada): lega i costi settimanali agli accordi persistenti — **mycolbraga**
+- `5e5ecd1a` — feat(carcere): usa difensore d ufficio o avvocato privato reale — **mycolbraga**
+- `89887b54` — fix(strada): rimuovi i vecchi toggle di protezione e avvocato — **mycolbraga**
+- `115a7735` — feat(strada): trasforma protezione e avvocato in accordi con persone reali — **mycolbraga**
+- `624bef54` — feat(persone): aggiungi avvocato come contatto reale del Circolo — **mycolbraga**
+- `0cffa9cd` — feat(strada): aggiungi stato persistente per protezione e avvocato — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/circolo-stanze.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:7c60f0f2 -->
 ## 02/10/26, 22:00 — feature/strada-punto5-ferro → main
 
