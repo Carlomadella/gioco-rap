@@ -173,4 +173,13 @@ describe("identità sociale dei lavori", () => {
     expect(famepedia).toContain("il Fonico junior incrocia più facilmente beatmaker, artisti e tecnici");
     expect(famepedia).toContain("diventa una persona persistente");
   });
+
+  it("i contatti nati in Pizzeria usano un budget rete per-persona anche nelle chat", () => {
+    const chat=leggi("js/game/chat.js");
+    expect(chat).toContain("function chatReteLavoro(p,fonte,n)");
+    expect(chat).toContain('p.origineLuogo==="pizzeria"');
+    expect(chat).toContain('lavoroBonusRetePersona(p,"pizzeria-chat:"');
+    expect(chat).toContain('chatReteLavoro(p,"contact-chat",1)');
+  });
+
 });
