@@ -60,7 +60,7 @@ const FAMILIES = Object.freeze({
   overtime:Object.freeze({id:"overtime",label:"Straordinari e richieste"}),
   colleague:Object.freeze({id:"colleague",label:"Colleghi"}),
   role:Object.freeze({id:"role",label:"Responsabilità di ruolo"}),
-  factory:Object.freeze({id:"factory",label:"Vita di Fabbrica"}),
+  factory:Object.freeze({id:"factory",label:"Vita del posto di lavoro"}),
   music:Object.freeze({id:"music",label:"Opportunità musicali"}),
   crime:Object.freeze({id:"crime",label:"Opportunità criminali"}),
   conflict:Object.freeze({id:"conflict",label:"Conflitto lavoro/musica"}),
@@ -756,6 +756,242 @@ const FACTORY_ROLE_EVENTS = Object.freeze({
   ])
 });
 
+
+/* ==================== RUOLO IN PIZZERIA ====================
+   Stesso motore della Fabbrica, contenuti diversi: il part-time pesa meno
+   su benessere/lucidità e usa più spesso piccoli effetti di rete. La rete
+   qui rappresenta familiarità ed esposizione sociale, non contatti regalati. */
+const PIZZERIA_ROLE_EVENTS = Object.freeze({
+  lavapiatti:Object.freeze([
+    Object.freeze({
+      id:"chiusura-lavaggio",
+      t:"A fine servizio resta una montagna di roba",
+      d:"Il grosso è finito ma il retro è ancora pieno. Un collega ti chiede una mano per chiudere prima.",
+      opts:Object.freeze([
+        Object.freeze({n:"Resti a dargli una mano",fx:{rete:.2,wellbeing:-1},
+          result:"Avete chiuso insieme senza farla diventare un'impresa. Da domani non sei più solo quello del lavaggio."}),
+        Object.freeze({n:"Finisci il tuo e vai",fx:{lucidita:1},
+          result:"Hai chiuso la tua parte e sei uscito in orario. Il turno resta un part-time, non una seconda vita."})
+      ])
+    }),
+    Object.freeze({
+      id:"rider-porta-retro",
+      t:"Un rider aspetta vicino alla porta del retro",
+      d:"L'ordine non è ancora pronto. Hai due minuti veri prima che riparta il servizio.",
+      opts:Object.freeze([
+        Object.freeze({n:"Scambi due parole",fx:{rete:.2},
+          result:"Due minuti, niente di epocale. Però una faccia in più adesso ti riconosce."}),
+        Object.freeze({n:"Rientri subito",fx:{reliability:1},
+          result:"Hai lasciato la chiacchiera e sei tornato alla postazione prima che si accumulasse altro."})
+      ])
+    }),
+    Object.freeze({
+      id:"nuovo-al-lavaggio",
+      t:"Arriva uno nuovo al lavaggio",
+      d:"Non sa ancora dove va niente e continua a chiedere. Puoi mostrargli il giro oppure lasciarlo prendere il ritmo da solo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli fai vedere come gira",fx:{rete:.2,reliability:1},
+          result:"Gli hai evitato mezz'ora di caos e da subito avete un rapporto meno anonimo."}),
+        Object.freeze({n:"Lo lasci imparare",fx:{wellbeing:1},
+          result:"Non ti sei caricato anche il suo turno. Alla fine ha trovato da solo il suo ritmo."})
+      ])
+    }),
+    Object.freeze({
+      id:"mano-alla-prep",
+      t:"Dalla prep chiedono una mano",
+      d:"Per dieci minuti sono corti e tu sei l'unico che può staccarsi senza bloccare tutto.",
+      opts:Object.freeze([
+        Object.freeze({n:"Vai a dare una mano",fx:{reliability:1,wellbeing:-1},
+          result:"Hai coperto il buco e poi sei tornato al lavaggio. Poco glamour, ma utile davvero."}),
+        Object.freeze({n:"Resti sulla tua postazione",fx:{lucidita:1},
+          result:"Hai evitato di spezzare il tuo ritmo per rincorrere un problema che non era tuo."})
+      ])
+    }),
+    Object.freeze({
+      id:"pausa-retro",
+      t:"Cinque minuti fuori dalla porta",
+      d:"Due colleghi escono a prendere aria. Puoi unirti o usare il buco per stare un attimo per conto tuo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Esci con loro",fx:{rete:.2,wellbeing:1},
+          result:"Avete parlato del turno e di altro. Piccolo rapporto, nessuna ricompensa magica."}),
+        Object.freeze({n:"Ti isoli un attimo",fx:{lucidita:1},
+          result:"Cinque minuti senza rumore ti sono bastati per rientrare più pulito di testa."})
+      ])
+    })
+  ]),
+  aiuto_cucina:Object.freeze([
+    Object.freeze({
+      id:"comande-accavallate",
+      t:"Le comande si accavallano tutte insieme",
+      d:"Per qualche minuto nessuno capisce più cosa deve uscire prima. Puoi coordinarti con gli altri o chiuderti sulla tua prep.",
+      opts:Object.freeze([
+        Object.freeze({n:"Metti ordine con gli altri",fx:{reliability:1,lucidita:-1,rete:.1},
+          result:"Avete rimesso una sequenza alle comande. Hai speso un po' di testa, ma il servizio ha ripreso forma."}),
+        Object.freeze({n:"Proteggi la tua prep",fx:{wellbeing:1},
+          result:"Hai tenuto pulita la tua parte senza caricarti anche il caos del resto della cucina."})
+      ])
+    }),
+    Object.freeze({
+      id:"fornitore-consegna",
+      t:"Arriva una consegna mentre siete nel pieno",
+      d:"Manca qualcuno per controllare e sistemare la merce. Puoi occupartene tu oppure lasciare la cosa al responsabile.",
+      opts:Object.freeze([
+        Object.freeze({n:"Dai una mano alla consegna",fx:{reliability:1,rete:.2},
+          result:"Hai sistemato la consegna e scambiato due parole con chi passa qui ogni settimana."}),
+        Object.freeze({n:"Resti sulla cucina",fx:{lucidita:1},
+          result:"Hai lasciato la consegna a chi la gestisce di solito e tenuto la tua testa sul servizio."})
+      ])
+    }),
+    Object.freeze({
+      id:"cambio-postazione",
+      t:"Un collega ti chiede di scambiarvi per un po'",
+      d:"È in difficoltà sulla sua postazione e ti propone un cambio fino alla fine del rush.",
+      opts:Object.freeze([
+        Object.freeze({n:"Accetti il cambio",fx:{rete:.2,wellbeing:-1},
+          result:"Gli hai tolto pressione e vi siete capiti al volo. Tu, a fine rush, senti un po' di più il turno."}),
+        Object.freeze({n:"Proponi una rotazione",fx:{lucidita:1,rete:.1},
+          result:"Avete diviso il pezzo difficile invece di spostarlo tutto da una parte sola."})
+      ])
+    }),
+    Object.freeze({
+      id:"richiesta-fuori-menu",
+      t:"Arriva una richiesta fuori dal solito",
+      d:"Il cliente vuole una modifica che complica la preparazione. Puoi gestirla tu oppure far decidere davanti.",
+      opts:Object.freeze([
+        Object.freeze({n:"La gestisci tu",fx:{reliability:1,lucidita:-1},
+          result:"Hai trovato un modo semplice per farla uscire senza scombinare il resto."}),
+        Object.freeze({n:"Passi la decisione davanti",fx:{wellbeing:1},
+          result:"Hai evitato di trasformare una modifica in un problema di tutta la cucina."})
+      ])
+    }),
+    Object.freeze({
+      id:"pizza-staff",
+      t:"A chiusura resta una pizza per lo staff",
+      d:"Gli altri si fermano dieci minuti prima di andare. Puoi restare con loro oppure uscire subito.",
+      opts:Object.freeze([
+        Object.freeze({n:"Resti a mangiare con gli altri",fx:{rete:.2,wellbeing:1},
+          result:"Dieci minuti normali, ma sono proprio quelli in cui i colleghi smettono di essere solo colleghi."}),
+        Object.freeze({n:"Vai a casa",fx:{lucidita:1},
+          result:"Hai preferito tenerti il resto della serata. Nessuno se l'è presa."})
+      ])
+    })
+  ]),
+  aiuto_pizzaiolo:Object.freeze([
+    Object.freeze({
+      id:"impasto-indietro",
+      t:"L'impasto pronto è meno del previsto",
+      d:"Se il ritmo continua così finite corti. Puoi recuperare subito oppure chiedere aiuto e distribuire il problema.",
+      opts:Object.freeze([
+        Object.freeze({n:"Recuperi tu",fx:{reliability:1,lucidita:-1},
+          result:"Hai rimesso margine nel servizio senza fermare il forno, ma sei rimasto concentrato fino all'ultimo."}),
+        Object.freeze({n:"Chiami una mano",fx:{rete:.2},
+          result:"Avete sistemato il problema in due. Meno eroismo, più squadra."})
+      ])
+    }),
+    Object.freeze({
+      id:"rider-in-attesa",
+      t:"Un rider è di nuovo qui ad aspettare",
+      d:"Lo hai già visto altre volte. L'ordine ha ancora qualche minuto prima di uscire.",
+      opts:Object.freeze([
+        Object.freeze({n:"Ci scambi due parole",fx:{rete:.2},
+          result:"La faccia adesso ha anche una conversazione attaccata. Non è un contatto utile per forza: è una persona che ti conosce."}),
+        Object.freeze({n:"Prepari il prossimo ordine",fx:{reliability:1},
+          result:"Hai usato quei minuti per portarti avanti invece di riempirli per forza."})
+      ])
+    }),
+    Object.freeze({
+      id:"cliente-al-banco",
+      t:"Un cliente si ferma due secondi al banco",
+      d:"Vuole sapere cosa state preparando e non sembra avere fretta. Puoi rispondere o lasciare la conversazione davanti.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli rispondi tu",fx:{rete:.2},
+          result:"Due battute sul cibo e la serata riparte. Niente premio: semplicemente, ti ha visto e ti ricorderà."}),
+        Object.freeze({n:"Resti sul servizio",fx:{reliability:1},
+          result:"Hai lasciato il banco a chi deve gestirlo e tenuto gli occhi sul forno."})
+      ])
+    }),
+    Object.freeze({
+      id:"collega-prova-forno",
+      t:"Un collega vuole capire meglio il forno",
+      d:"Ti chiede un trucco sui tempi mentre c'è un momento di calma.",
+      opts:Object.freeze([
+        Object.freeze({n:"Glielo fai vedere",fx:{rete:.2,reliability:1},
+          result:"Gli hai fatto vedere due cose concrete. Il prossimo rush sarete un po' meno dipendenti da te."}),
+        Object.freeze({n:"Fai tu e basta",fx:{lucidita:1},
+          result:"Hai tenuto il lavoro semplice e il momento di calma è rimasto davvero calmo."})
+      ])
+    }),
+    Object.freeze({
+      id:"tavolata-tempi",
+      t:"Una tavolata vuole uscire tutta insieme",
+      d:"Le pizze sono tante e i tempi non si incastrano da soli. Puoi coordinare il pass oppure semplificare il ritmo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Coordini le uscite",fx:{reliability:1,lucidita:-1,rete:.1},
+          result:"Avete fatto uscire quasi tutto insieme. Ti sei preso un po' di pressione, ma la squadra ha seguito."}),
+        Object.freeze({n:"Tieni un ritmo regolare",fx:{wellbeing:1},
+          result:"Non hai trasformato la tavolata in un'emergenza. Le pizze sono uscite bene, solo meno teatralmente."})
+      ])
+    })
+  ]),
+  pizzaiolo:Object.freeze([
+    Object.freeze({
+      id:"cliente-abituale",
+      t:"Un cliente abituale ti saluta dal banco",
+      d:"Lo hai visto diverse volte. Stavolta ti chiama direttamente mentre aspetta.",
+      opts:Object.freeze([
+        Object.freeze({n:"Scambi due parole",fx:{rete:.2},
+          result:"Avete parlato un minuto. Il valore è quello: una relazione che esiste, non un premio automatico."}),
+        Object.freeze({n:"Resti sul forno",fx:{lucidita:1},
+          result:"Hai salutato e continuato il servizio. Il rapporto non sparisce perché stasera hai lavorato."})
+      ])
+    }),
+    Object.freeze({
+      id:"fornitore-ingrediente",
+      t:"Il fornitore ti chiede come sta andando un ingrediente nuovo",
+      d:"Sei abbastanza dentro al lavoro da avere un'opinione utile. Puoi fermarti un minuto oppure chiudere la consegna e basta.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli dai un feedback vero",fx:{reliability:1,rete:.2},
+          result:"Avete parlato da persone che lavorano sullo stesso prodotto, non da cliente e consegnatore."}),
+        Object.freeze({n:"Chiudi la consegna",fx:{wellbeing:1},
+          result:"Hai evitato di aggiungere una riunione improvvisata dentro un turno che era già pieno."})
+      ])
+    }),
+    Object.freeze({
+      id:"collega-da-formare",
+      t:"Ti affidano un collega da far crescere",
+      d:"Non è una promozione: semplicemente sei quello che sa far girare meglio il forno.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli insegni davvero",fx:{rete:.3,lucidita:-1},
+          result:"Hai rallentato un po' il tuo automatismo per spiegargli il perché delle cose. Il rapporto cambia."}),
+        Object.freeze({n:"Gli fai vedere e basta",fx:{reliability:1},
+          result:"Ha visto come fai tu e il servizio non ha perso ritmo. Imparerà il resto col tempo."})
+      ])
+    }),
+    Object.freeze({
+      id:"rush-delega",
+      t:"Il rush cresce e non puoi fare tutto da solo",
+      d:"Puoi distribuire pezzi del lavoro oppure tenerti addosso ogni passaggio critico.",
+      opts:Object.freeze([
+        Object.freeze({n:"Deleghi con chiarezza",fx:{rete:.2,lucidita:1},
+          result:"Hai dato compiti chiari e il forno ha respirato. Anche gli altri hanno sentito che ti fidi di loro."}),
+        Object.freeze({n:"Ti prendi tutto tu",fx:{reliability:1,wellbeing:-1},
+          result:"Hai tenuto il controllo totale. Il servizio è uscito, tu un po' più cotto."})
+      ])
+    }),
+    Object.freeze({
+      id:"fine-serata-staff",
+      t:"A fine serata nessuno ha fretta di uscire",
+      d:"Il locale è chiuso e per dieci minuti si resta tutti lì a parlare. Puoi fermarti oppure tenerti il resto della notte.",
+      opts:Object.freeze([
+        Object.freeze({n:"Resti dieci minuti",fx:{rete:.3,wellbeing:1},
+          result:"Non è networking costruito: è semplicemente tempo passato con persone che ormai fanno parte del tuo giro."}),
+        Object.freeze({n:"Saluti e vai",fx:{lucidita:1},
+          result:"Hai chiuso il turno e tenuto spazio per il resto della tua vita. Anche questo è il senso del part-time."})
+      ])
+    })
+  ])
+});
+
 /* Il turno base differenzia già fatica fisica e pressione mentale per ruolo.
    Gli eventi trasversali della Fabbrica devono rispettare la stessa logica:
    - il lavoro fisico pesa di più in basso nella gerarchia;
@@ -797,6 +1033,42 @@ const FACTORY_ROLE_EVENT_LOAD = Object.freeze({
   })
 });
 
+
+const PIZZERIA_ROLE_EVENT_LOAD = Object.freeze({
+  lavapiatti:Object.freeze({
+    physicalPenalty:.7,
+    mentalPenalty:.5,
+    recovery:Object.freeze({wellbeing:2,lucidita:1}),
+    push:Object.freeze({wellbeing:-2,lucidita:-1}),
+    fatigueTitle:"Il servizio oggi ti è rimasto un po' addosso",
+    fatigueText:"Il turno è corto, ma il retro può comunque pesare. Fermarti protegge il resto della serata; tirare ancora costa poco, non quanto una giornata in Fabbrica."
+  }),
+  aiuto_cucina:Object.freeze({
+    physicalPenalty:.6,
+    mentalPenalty:.6,
+    recovery:Object.freeze({wellbeing:2,lucidita:1}),
+    push:Object.freeze({wellbeing:-2,lucidita:-1}),
+    fatigueTitle:"Il rush ti ha lasciato addosso un po' di stanchezza",
+    fatigueText:"Tra prep e servizio hai corso più del solito. È ancora un part-time: il punto è decidere se conservare energie per quello che viene dopo."
+  }),
+  aiuto_pizzaiolo:Object.freeze({
+    physicalPenalty:.5,
+    mentalPenalty:.7,
+    recovery:Object.freeze({wellbeing:1,lucidita:2}),
+    push:Object.freeze({wellbeing:-1,lucidita:-1}),
+    fatigueTitle:"Il forno oggi ti è rimasto in testa",
+    fatigueText:"Il peso fisico è contenuto, ma tempi e precisione possono lasciarti acceso anche dopo il servizio."
+  }),
+  pizzaiolo:Object.freeze({
+    physicalPenalty:.4,
+    mentalPenalty:.8,
+    recovery:Object.freeze({wellbeing:1,lucidita:2}),
+    push:Object.freeze({wellbeing:-1,lucidita:-2}),
+    fatigueTitle:"Hai chiuso il servizio, ma stai ancora facendo conti",
+    fatigueText:"Da pizzaiolo pesa più la responsabilità del servizio che il corpo. Anche qui, però, il part-time deve lasciarti margine per la tua vita."
+  })
+});
+
 const DEFAULT_WORK_EVENT_LOAD = Object.freeze({
   recovery:Object.freeze({wellbeing:3,lucidita:2}),
   push:Object.freeze({wellbeing:-4,lucidita:-3}),
@@ -804,10 +1076,16 @@ const DEFAULT_WORK_EVENT_LOAD = Object.freeze({
   fatigueText:"Non è solo una frase: hai già accumulato parecchi turni o una delle tue risorse sta scendendo troppo. Come chiudi la giornata cambia davvero come stai."
 });
 
+function workRoleEventLoad(job){
+  if(!job) return null;
+  const key=workKey(job);
+  if(key==="fabbrica") return FACTORY_ROLE_EVENT_LOAD[job.id] || null;
+  if(key==="pizzeria") return PIZZERIA_ROLE_EVENT_LOAD[job.id] || null;
+  return null;
+}
+
 function factoryRoleEventLoad(job){
-  return job && workKey(job)==="fabbrica"
-    ? (FACTORY_ROLE_EVENT_LOAD[job.id] || null)
-    : null;
+  return workKey(job)==="fabbrica" ? workRoleEventLoad(job) : null;
 }
 
 function scaleNegative(v,factor){
@@ -816,9 +1094,9 @@ function scaleNegative(v,factor){
   return -Math.max(1,Math.round(Math.abs(n)*Number(factor||1)));
 }
 
-function factoryFloorFx(job,opt){
+function workplaceFloorFx(job,opt){
   const fx=Object.assign({},opt&&opt.fx||{});
-  const profile=factoryRoleEventLoad(job);
+  const profile=workRoleEventLoad(job);
   if(!profile || !opt || !opt.load) return fx;
 
   if(opt.load==="physical" && Number(fx.wellbeing)<0)
@@ -827,6 +1105,8 @@ function factoryFloorFx(job,opt){
     fx.lucidita=scaleNegative(fx.lucidita,profile.mentalPenalty);
   return fx;
 }
+
+function factoryFloorFx(job,opt){ return workplaceFloorFx(job,opt); }
 
 function effectNumber(v){
   const n=Number(v||0);
@@ -854,21 +1134,37 @@ function workReliability(luogo,delta){
   return c.reliability-prima;
 }
 
-function applyFactoryRoleFx(fx){
+function applyWorkRoleFx(job,fx){
   fx=fx||{};
   const out={wellbeing:0,lucidita:0,rete:0,reliability:0};
   if(fx.wellbeing){ addWellbeing(fx.wellbeing); out.wellbeing=Number(fx.wellbeing); }
   if(fx.lucidita){ addLucidity(fx.lucidita); out.lucidita=Number(fx.lucidita); }
   if(fx.rete){ addNetwork(fx.rete); out.rete=Number(fx.rete); }
-  if(fx.reliability) out.reliability=workReliability("fabbrica",fx.reliability);
+  const luogo=workKey(job);
+  if(fx.reliability && (luogo==="fabbrica" || luogo==="pizzeria"))
+    out.reliability=workReliability(luogo,fx.reliability);
   return out;
 }
 
-function showFactoryRole(job,s,roll){
-  if(!job || workKey(job)!=="fabbrica") return false;
-  const pool=FACTORY_ROLE_EVENTS[job.id];
+function applyFactoryRoleFx(fx){
+  return applyWorkRoleFx({id:"operaio",place:"fabbrica"},fx);
+}
+
+function roleEventsForJob(job){
+  if(!job) return null;
+  const key=workKey(job);
+  if(key==="fabbrica") return FACTORY_ROLE_EVENTS[job.id] || null;
+  if(key==="pizzeria") return PIZZERIA_ROLE_EVENTS[job.id] || null;
+  return null;
+}
+
+function showWorkRole(job,s,roll){
+  if(!job) return false;
+  const key=workKey(job);
+  if(key!=="fabbrica" && key!=="pizzeria") return false;
+  const pool=roleEventsForJob(job);
   if(!pool || !pool.length || !familyReady(s,"role")) return false;
-  if(Number(roll)>=CFG.chance.role || !claim("work-role:"+job.id)) return false;
+  if(Number(roll)>=CFG.chance.role || !claim("work-role:"+key+":"+job.id)) return false;
 
   if(!Array.isArray(s.roleRecent)) s.roleRecent=[];
   const disponibili=pool.filter(x=>!s.roleRecent.includes(x.id));
@@ -877,25 +1173,38 @@ function showFactoryRole(job,s,roll){
   s.roleRecent.unshift(scena.id);
   if(s.roleRecent.length>4) s.roleRecent.length=4;
 
-  record(s,"role",{status:"shown",roleId:job.id,eventId:scena.id});
+  record(s,"role",{status:"shown",workplace:key,roleId:job.id,eventId:scena.id});
   if(typeof showEvent!=="function") return false;
 
   showEvent({
-    k:"Fabbrica · "+(job.n||"Ruolo"),
+    k:(key==="fabbrica"?"Fabbrica":"Pizzeria")+" · "+(job.n||"Ruolo"),
     t:scena.t,
     d:scena.d,
     annulla(){},
     opts:scena.opts.map(opt=>({
       n:opt.n,
-      d:opt.d,
+      d:opt.d || factoryFxLabel(opt.fx),
       run(){
-        const fx=applyFactoryRoleFx(opt.fx);
-        record(s,"role",{status:"resolved",roleId:job.id,eventId:scena.id,choice:opt.n,effects:fx});
-        return {t:opt.result,c:fx.reliability>0?"good":fx.reliability<0?"bad":""};
+        const fx=applyWorkRoleFx(job,opt.fx);
+        record(s,"role",{
+          status:"resolved",workplace:key,roleId:job.id,eventId:scena.id,
+          choice:opt.n,effects:fx
+        });
+        const saldo=Number(fx.reliability||0)+Number(fx.wellbeing||0)+
+          Number(fx.lucidita||0)+Number(fx.rete||0);
+        return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
       }
     }))
   });
   return true;
+}
+
+function showFactoryRole(job,s,roll){
+  return workKey(job)==="fabbrica" ? showWorkRole(job,s,roll) : false;
+}
+
+function showPizzeriaRole(job,s,roll){
+  return workKey(job)==="pizzeria" ? showWorkRole(job,s,roll) : false;
 }
 
 /* ==================== VITA DI FABBRICA ====================
@@ -1023,13 +1332,142 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   })
 ]);
 
-function showFactoryFloor(job,s,roll){
-  if(!job || workKey(job)!=="fabbrica") return false;
-  if(!familyReady(s,"factory") || Number(roll)>=CFG.chance.factory) return false;
-  if(!claim("work-factory-floor")) return false;
 
+const PIZZERIA_FLOOR_EVENTS = Object.freeze([
+  Object.freeze({
+    id:"rush-improvviso",
+    t:"Entrano ordini tutti insieme",
+    d:"Per dieci minuti il locale cambia ritmo. Puoi provare a mettere ordine o limitarti alla tua corsia.",
+    opts:Object.freeze([
+      Object.freeze({n:"Aiuti a coordinare",load:"mental",fx:{reliability:1,lucidita:-1,rete:.1},
+        result:"Il picco passa senza trasformarsi in caos. Hai speso un po' di testa, non la serata intera."}),
+      Object.freeze({n:"Tieni pulita la tua parte",fx:{wellbeing:1},
+        result:"Hai evitato di farti risucchiare dal casino generale. La tua parte è rimasta solida."})
+    ])
+  }),
+  Object.freeze({
+    id:"comanda-sbagliata",
+    t:"Una comanda torna indietro",
+    d:"Qualcosa è uscito diverso da come era stato chiesto. Il cliente aspetta e la cucina deve recuperare.",
+    opts:Object.freeze([
+      Object.freeze({n:"La rifai subito",fx:{reliability:1,wellbeing:-1},
+        result:"Hai chiuso l'errore in fretta. Un piccolo costo, non una tragedia."}),
+      Object.freeze({n:"Ricostruisci prima dov'è nato l'errore",fx:{lucidita:1},
+        result:"Hai capito il passaggio storto prima di rifare tutto. La seconda uscita è stata pulita."})
+    ])
+  }),
+  Object.freeze({
+    id:"forno-capriccioso",
+    roles:Object.freeze(["aiuto_pizzaiolo","pizzaiolo"]),
+    t:"Il forno oggi non tiene il solito ritmo",
+    d:"Non è rotto, ma devi correggere tempi e posizione più del normale.",
+    opts:Object.freeze([
+      Object.freeze({n:"Lo gestisci a occhio",load:"mental",fx:{reliability:1,lucidita:-1},
+        result:"Hai compensato per tutto il servizio senza bruciare il ritmo."}),
+      Object.freeze({n:"Chiami qualcuno a controllare",fx:{rete:.1,lucidita:1},
+        result:"Avete verificato insieme e tolto il dubbio. Meno pressione sulle tue spalle."})
+    ])
+  }),
+  Object.freeze({
+    id:"ingrediente-finito",
+    t:"Un ingrediente finisce prima del previsto",
+    d:"Va deciso subito cosa togliere, cosa sostituire e cosa comunicare davanti.",
+    opts:Object.freeze([
+      Object.freeze({n:"Riorganizzi il servizio",fx:{reliability:1,lucidita:-1},
+        result:"Avete cambiato il giro senza lasciare ordini sospesi."}),
+      Object.freeze({n:"Passi subito l'informazione a tutti",fx:{rete:.1,lucidita:1},
+        result:"Niente improvvisazioni sparse: per una volta tutti sanno la stessa cosa nello stesso momento."})
+    ])
+  }),
+  Object.freeze({
+    id:"cliente-difficile",
+    roles:Object.freeze(["aiuto_cucina","aiuto_pizzaiolo","pizzaiolo"]),
+    t:"Un cliente continua a rimandare indietro richieste",
+    d:"La tensione arriva fino in cucina. Puoi entrare nella questione o proteggere il tuo lavoro.",
+    opts:Object.freeze([
+      Object.freeze({n:"Dai una mano a trovare una soluzione",load:"mental",fx:{rete:.1,lucidita:-1},
+        result:"Hai aiutato a chiudere la situazione senza trasformarla in una guerra personale."}),
+      Object.freeze({n:"Lasci gestire davanti",fx:{wellbeing:1},
+        result:"Hai tenuto il problema fuori dalla cucina e continuato il servizio."})
+    ])
+  }),
+  Object.freeze({
+    id:"cliente-simpatico",
+    roles:Object.freeze(["aiuto_cucina","aiuto_pizzaiolo","pizzaiolo"]),
+    t:"Un cliente abituale scherza con lo staff",
+    d:"C'è un minuto leggero mentre aspetta. Puoi starci dentro oppure continuare a lavorare.",
+    opts:Object.freeze([
+      Object.freeze({n:"Stai al gioco",fx:{rete:.1,wellbeing:1},
+        result:"Una battuta, una faccia riconoscibile in più. Nessuna ricompensa automatica."}),
+      Object.freeze({n:"Continui il servizio",fx:{lucidita:1},
+        result:"Hai lasciato la socialità agli altri e tenuto il tuo ritmo."})
+    ])
+  }),
+  Object.freeze({
+    id:"rider-in-coda",
+    t:"Si accumulano tre rider davanti",
+    d:"Gli ordini ci sono, ma il ritiro si sta incastrando male. Puoi aiutare a rimettere ordine oppure stare sulla tua postazione.",
+    opts:Object.freeze([
+      Object.freeze({n:"Aiuti a riorganizzare i ritiri",fx:{reliability:1,rete:.1},
+        result:"La coda si scioglie e qualche faccia ti associa finalmente a qualcosa di diverso dal ritardo."}),
+      Object.freeze({n:"Resti sul tuo lavoro",fx:{wellbeing:1},
+        result:"Hai evitato di aggiungere una seconda mansione dentro un turno corto."})
+    ])
+  }),
+  Object.freeze({
+    id:"momento-morto",
+    t:"Per venti minuti non entra quasi niente",
+    d:"Capita anche questo. Puoi usarlo per parlare con gli altri o portarti avanti col lavoro.",
+    opts:Object.freeze([
+      Object.freeze({n:"Resti a parlare con lo staff",fx:{rete:.2,wellbeing:1},
+        result:"Un momento morto diventa un pezzo di rapporto. Non hai guadagnato un contatto: hai conosciuto meglio chi è già lì."}),
+      Object.freeze({n:"Ti porti avanti",fx:{reliability:1},
+        result:"Hai usato il buco per rendere più semplice il rush successivo."})
+    ])
+  }),
+  Object.freeze({
+    id:"chiusura-tranquilla",
+    t:"La chiusura stasera è sorprendentemente calma",
+    d:"Non c'è nessuno che corre. Restano dieci minuti in cui si parla mentre si sistema.",
+    opts:Object.freeze([
+      Object.freeze({n:"Resti nel giro",fx:{rete:.2,wellbeing:1},
+        result:"Hai chiuso parlando con gli altri. È il tipo di tempo che in un part-time può diventare socialità vera."}),
+      Object.freeze({n:"Sistemi e vai",fx:{lucidita:1},
+        result:"Hai chiuso pulito e salvato il resto della serata per te."})
+    ])
+  }),
+  Object.freeze({
+    id:"tavolata-compleanno",
+    t:"Arriva una tavolata che riempie mezza sala",
+    d:"Per un'ora il locale sembra un altro. Il rischio è farsi trascinare dal caos più che dal lavoro.",
+    opts:Object.freeze([
+      Object.freeze({n:"Spingi sul coordinamento",load:"mental",fx:{reliability:1,lucidita:-1,rete:.1},
+        result:"La serata resta intensa ma leggibile. Hai parlato con più persone del solito senza perdere il servizio."}),
+      Object.freeze({n:"Mantieni un ritmo normale",fx:{wellbeing:1},
+        result:"Non hai provato a fare l'eroe. La tavolata è uscita con qualche minuto in più e basta."})
+    ])
+  })
+]);
+
+function floorEventsForJob(job){
+  if(!job) return null;
+  const key=workKey(job);
+  if(key==="fabbrica") return FACTORY_FLOOR_EVENTS;
+  if(key==="pizzeria") return PIZZERIA_FLOOR_EVENTS;
+  return null;
+}
+
+function showWorkplaceFloor(job,s,roll){
+  if(!job) return false;
+  const key=workKey(job);
+  if(key!=="fabbrica" && key!=="pizzeria") return false;
+  if(!familyReady(s,"factory") || Number(roll)>=CFG.chance.factory) return false;
+  if(!claim("work-floor:"+key)) return false;
+
+  const source=floorEventsForJob(job);
+  if(!source || !source.length) return false;
   if(!Array.isArray(s.factoryRecent)) s.factoryRecent=[];
-  const adatti=FACTORY_FLOOR_EVENTS.filter(x=>!Array.isArray(x.roles) || x.roles.includes(job.id));
+  const adatti=source.filter(x=>!Array.isArray(x.roles) || x.roles.includes(job.id));
   if(!adatti.length) return false;
   const disponibili=adatti.filter(x=>!s.factoryRecent.includes(x.id));
   const pool=disponibili.length?disponibili:adatti;
@@ -1037,32 +1475,41 @@ function showFactoryFloor(job,s,roll){
 
   s.factoryRecent.unshift(scena.id);
   if(s.factoryRecent.length>4) s.factoryRecent.length=4;
-  record(s,"factory",{status:"shown",eventId:scena.id,roleId:job.id});
+  record(s,"factory",{status:"shown",workplace:key,eventId:scena.id,roleId:job.id});
 
   if(typeof showEvent!=="function") return false;
   showEvent({
-    k:"Fabbrica · Reparto",
+    k:key==="fabbrica" ? "Fabbrica · Reparto" : "Pizzeria · Cucina",
     t:scena.t,
     d:scena.d,
     annulla(){},
     opts:scena.opts.map(opt=>{
-      const adjustedFx=factoryFloorFx(job,opt);
+      const adjustedFx=workplaceFloorFx(job,opt);
       return {
-      n:opt.n,
-      d:factoryFxLabel(adjustedFx),
-      run(){
-        const fx=applyFactoryRoleFx(adjustedFx);
-        record(s,"factory",{
-          status:"resolved",eventId:scena.id,roleId:job.id,choice:opt.n,effects:fx
-        });
-        const saldo=Number(fx.reliability||0)+Number(fx.wellbeing||0)+
-          Number(fx.lucidita||0)+Number(fx.rete||0);
-        return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
-      }
-    };
+        n:opt.n,
+        d:factoryFxLabel(adjustedFx),
+        run(){
+          const fx=applyWorkRoleFx(job,adjustedFx);
+          record(s,"factory",{
+            status:"resolved",workplace:key,eventId:scena.id,roleId:job.id,
+            choice:opt.n,effects:fx
+          });
+          const saldo=Number(fx.reliability||0)+Number(fx.wellbeing||0)+
+            Number(fx.lucidita||0)+Number(fx.rete||0);
+          return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
+        }
+      };
     })
   });
   return true;
+}
+
+function showFactoryFloor(job,s,roll){
+  return workKey(job)==="fabbrica" ? showWorkplaceFloor(job,s,roll) : false;
+}
+
+function showPizzeriaFloor(job,s,roll){
+  return workKey(job)==="pizzeria" ? showWorkplaceFloor(job,s,roll) : false;
 }
 
 /* ==================== 4. COLLEGHI ==================== */
@@ -1300,7 +1747,7 @@ function consumeCrimeLead(success){
 /* ==================== 8. CONSEGUENZE FISICHE / MENTALI ==================== */
 
 function showPhysical(job,s,roll){
-  const roleProfile=factoryRoleEventLoad(job);
+  const roleProfile=workRoleEventLoad(job);
   const wellbeing=Number(G.wellbeing==null?100:G.wellbeing);
   const lucidita=Number(G.lucidita==null?100:G.lucidita);
   /* La lucidità bassa diventa un trigger aggiuntivo solo per i ruoli Fabbrica,
@@ -1492,8 +1939,8 @@ function afterShift(payload,rolls){
 
   const handlers={
     music:()=>showMusic(job,s,r("music")),
-    role:()=>showFactoryRole(job,s,r("role")),
-    factory:()=>showFactoryFloor(job,s,r("factory")),
+    role:()=>showWorkRole(job,s,r("role")),
+    factory:()=>showWorkplaceFloor(job,s,r("factory")),
     crime:()=>showCrime(job,s,r("crime")),
     colleague:()=>showColleague(job,s,r("colleague")),
     physical:()=>showPhysical(job,s,r("physical"))
