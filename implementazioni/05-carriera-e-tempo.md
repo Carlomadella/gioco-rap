@@ -466,3 +466,26 @@ maggiorazioni già applicate dal motore economico:
 La UI non duplica questi numeri: legge `bonusSestoGiornoPct` e `bonusDomenicaPct`
 da `ADF_LAVORO_CONTRATTI.fabbrica`, la stessa configurazione usata da
 `lavoroPagaTurno()`. La regola resta visibile anche dopo la firma del contratto.
+
+## Stress test Fabbrica operativo
+
+**FATTO (02/10/2026)** — lo stress test Fabbrica non controlla più soltanto
+fatica globale, paga e progressione ideale. `npm run bilanciamento:fabbrica`
+esegue anche una suite deterministica sulle funzioni reali di `actions.js` e
+`lavoro-eventi.js`.
+
+La suite copre:
+
+- il carico dei quattro ruoli, verificando il passaggio da lavoro più fisico a
+  pressione mentale crescente;
+- la disciplina settimanale: 5/5, una assenza, richiami formali ripetuti e
+  licenziamento con blocco di riassunzione;
+- i cinque eventi specifici di ciascun ruolo, attraversati senza ripetizioni
+  nelle prime cinque finestre utili;
+- il conflitto musica/lavoro, distinguendo una scelta musicale ancora
+  recuperabile da una che rende inevitabile un'assenza, e verificando anche
+  il caso opposto in cui il giocatore lavora e perde l'appuntamento.
+
+Il vecchio stress test annuale resta invariato: questa suite lo completa invece
+di sostituirlo. In questo modo una regressione economica e una regressione di
+gameplay vengono segnalate separatamente.
