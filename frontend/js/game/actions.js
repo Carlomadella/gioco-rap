@@ -464,7 +464,11 @@ function lavoroReteChiave(job){
 function lavoroReteDef(job){
   if(!job) return null;
   const chiave = lavoroReteChiave(job);
-  const base = ADF_LAVORO_RETE[job.id] || ADF_LAVORO_RETE[chiave] || null;
+  /* Se il lavoro appartiene a una sede strutturata, la sede e' la fonte di
+     verita' anche per la rete. Questo evita che l'id della mansione iniziale
+     (es. lavapiatti) scavalchi il profilo Pizzeria e continui a usare il
+     vecchio bacino legacy dopo l'introduzione della carriera per luogo. */
+  const base = ADF_LAVORO_RETE[chiave] || ADF_LAVORO_RETE[job.id] || null;
   if(!base) return null;
 
   /* I luoghi con carriera interna possono cambiare profilo rete senza cambiare
