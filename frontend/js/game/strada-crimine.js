@@ -1274,7 +1274,7 @@ function stradaProtezioneStato(){
 
 function stradaProtezioneProvider(livello){
   const req=STRADA_PROTEZIONE_REQ[livello];
-  if(!req || livello<=0 || Number(G.strada&&G.strada.rep||0)<req.rep) return null;
+  if(!req || livello<=0 || stradaReputazioneGlobale()<req.rep) return null;
   stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
     .filter(p=>stradaRelazioneDisponibile(p) &&
@@ -1286,7 +1286,7 @@ function stradaProtezioneProvider(livello){
 function stradaProtezioneDisponibile(livello,personId){
   const req=STRADA_PROTEZIONE_REQ[livello];
   if(!req || livello<=0) return null;
-  if(Number(G.strada&&G.strada.rep||0)<req.rep) return null;
+  if(stradaReputazioneGlobale()<req.rep) return null;
   const p=personId ? stradaPersonaDaId(personId) : stradaProtezioneProvider(livello);
   if(!stradaRelazioneDisponibile(p) || stradaFiduciaValore(p)<req.fiducia) return null;
   return p;
@@ -1472,7 +1472,7 @@ function stradaPersonaFerro(){
 function stradaTentaPropostaFerro(roll){
   const s=G.strada||{}, st=stradaFerroStato();
   if(!stradaGiroAvviato() || s.arresto || s.ferro || st.pending) return null;
-  if(Number(s.rep||0)<STRADA_FERRO_REP_MIN) return null;
+  if(stradaReputazioneGlobale()<STRADA_FERRO_REP_MIN) return null;
   if(typeof stradaHaTrapPhone==="function" && !stradaHaTrapPhone()) return null;
 
   const persona=stradaPersonaFerro();
@@ -2569,7 +2569,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       ? (leadUsato.source==="street-opportunity"
           ? " <b>L'opportunità «" + (leadUsato.titolo||"senza nome") + "» è bruciata: attenzione " +
             stradaSegno(rumoreLead) +
-            (reputazioneLead ? ", reputazione " + stradaSegno(reputazioneLead) : "") + ".</b>"
+            (reputazioneLead ? ", nome nel giro " + stradaSegno(reputazioneLead) : "") + ".</b>"
           : " La dritta arrivata dal lavoro è bruciata.")
       : "";
     if(approccio.id === "squadra" && personaSquadra && Math.random() < .5){
@@ -3449,8 +3449,8 @@ function renderStBarre(){
   rip.classList.toggle("no", s.sporchi <= 0 || !!s.arresto || ripCap <= 0);
   rip.disabled = !!s.arresto || s.sporchi <= 0 || ripCap <= 0;
 
-  $("st-repn").textContent = Math.round(s.rep);
-  $("st-repbar").style.width = clamp(s.rep, 0, 100) + "%";
+  $("st-repn").textContent = Math.round(stradaReputazioneGlobale());
+  $("st-repbar").style.width = stradaReputazioneGlobale() + "%";
   $("st-heatn").textContent = Math.round(s.heat);
   $("st-heatbar").style.width = clamp(s.heat, 0, 100) + "%";
   $("st-energia").textContent = G.energy + " / " + G.maxEnergy;
