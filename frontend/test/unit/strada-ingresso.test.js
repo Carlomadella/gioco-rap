@@ -360,7 +360,7 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.prot).toBe(0);
     G.strada.rep=30;
     const out2=vm.runInContext('stImpostaProtezione(2,"p1")',ctx);
-    expect(out2).toContain("non hai una persona");
+    expect(out2).toContain("Non hai una persona");
     expect(G.strada.prot).toBe(0);
   });
 
