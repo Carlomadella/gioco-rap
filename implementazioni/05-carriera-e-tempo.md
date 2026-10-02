@@ -489,3 +489,27 @@ La suite copre:
 Il vecchio stress test annuale resta invariato: questa suite lo completa invece
 di sostituirlo. In questo modo una regressione economica e una regressione di
 gameplay vengono segnalate separatamente.
+
+## Playtest doppia vita: Fabbrica + musica
+
+**FATTO (02/10/2026)** — il bilanciamento della Fabbrica include ora un playtest
+deterministico dedicato alla convivenza fra contratto 5/5 e carriera musicale.
+
+Il test non introduce malus nuovi. Legge direttamente da `tempo.js`, `orari.js`
+e `agenda.js` la durata del turno, le durate delle azioni musicali, gli orari
+della Fabbrica e gli appuntamenti settimanali.
+
+I guardrail sono:
+
+- con il turno fatto presto, **5 giorni di Fabbrica + musica serale restano
+  compatibili** e rimane anche un giorno lavorativo di margine;
+- una mattina piena di musica (`scrivi` + `beat`, 4 ore) rende impossibile
+  infilare dopo un turno da 8 ore prima della chiusura, ma il **sabato può
+  ancora recuperare** il 5/5;
+- due mattine così nella stessa settimana lasciano solo 4 giorni lavorabili
+  su 6: a quel punto il giocatore deve scegliere davvero fra contratto e musica;
+- una sessione da 3 ore prima del turno sposta il lavoro alle 11:00–19:00 e
+  può trasformare un appuntamento serale in un conflitto reale di Agenda.
+
+La pressione quindi nasce dal **tempo occupato dalla musica** e dagli appuntamenti,
+non da una penalità astratta per il solo fatto di avere un lavoro.
