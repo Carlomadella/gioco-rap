@@ -140,6 +140,10 @@ function avviaAzioneDiretta(id){
     if(window.GAME_TIME && typeof GAME_TIME.captureAction === "function") GAME_TIME.captureAction(a.id);
     iniziaAzione(en2);
 
+    /* se la giornata non ha ancora la sua fotografia (partita nuova,
+       salvataggio vecchio, rientro da una trasferta) la si fa adesso, prima
+       che la mossa cambi i numeri (recap-giornata.js) */
+    if(typeof recapGiornata === "function") recapGiornata();
     const msg = a.run();
 
     if(!overlayAperto()) azioneFatta();

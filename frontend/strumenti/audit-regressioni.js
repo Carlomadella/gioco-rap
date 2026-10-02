@@ -2106,6 +2106,11 @@ test("il recap esce dalla fine giornata vera, non il settimo giorno né sui salt
   ev.includes("if(recapPrima && done===1 && weeks===0 && !errore && !interrotto &&") &&
   ev.includes('const ids=["modal","report","recap",') &&
   leggi("js/game/uscita.js").includes('{id:"recap", chiudi(){'));
+test("il recap conta come finestra aperta anche per il menu di sistema, le trasferte e il widget del tempo, e la fotografia della mattina si fa prima della mossa",
+  leggi("js/menu-sistema.js").includes('"#recap.on",') &&
+  leggi("js/game/trasferte.js").includes('["modal", "report", "recap", "writer",') &&
+  leggi("js/game/tempo-controlli.js").includes('"#report.on","#recap.on",') &&
+  /\(typeof recapGiornata === "function"\) recapGiornata\(\);\r?\n\s*const msg = a\.run\(\);/.test(leggi("js/game/ui.js")));
 test("il recap si spegne dalle impostazioni",
   leggi("js/impostazioni.js").includes("conferme:true, recap:true}") &&
   leggi("js/impostazioni-ui.js").includes('sw("gioco.recap")'));

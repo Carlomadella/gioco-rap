@@ -106,7 +106,12 @@ pezzi senza `seed` da guardare su un salvataggio vecchio; la 100 (il disco esce 
 mosse né lucidità, e venerdì conviene sempre) è una decisione di bilanciamento, non un errore.
 
 Le voci 92 e 93 (il Bancone del 02/10) sono chiuse lo stesso giorno, prima del push, e stanno in
-`problemi-risolti.md`. La prossima voce nuova è la 101.
+`problemi-risolti.md`.
+
+**103.** Dal giro del 02/10 sul recap di fine giornata (branch `task/recap-giornaliero`,
+dettaglio in fondo): le mosse fatte fuori dalle card non entrano nel conto delle mosse del
+recap, solo nel diario — è una decisione. La 101, la 102 e la 104 sono chiuse prima del push.
+La prossima voce nuova è la 105.
 
 ---
 
@@ -952,3 +957,74 @@ settimana; la foto della linguetta esiste.
   pagare niente in cambio: stanotte non conviene mai. Va deciso se è giusto così.
 - **come si vede** — chiudi un mixtape su «Stanotte» e guarda la lucidità: non si muove.
 - **quanto pesa** — da sistemare con calma.
+
+## Giro del 02/10/2026 (segnala-problemi, fine task `task/recap-giornaliero`, commit `9e026938` + merge `cea8628b`)
+
+Controllati: `npm run prova` (189 a posto, 0 no), `audit-regressioni.js` (501 ok, 0 falliti),
+`npm run verifica:build` (33 ok, 0 falliti). Poi il recap girato davvero nel browser
+(Playwright, su una porta mia): Esc, il «+1» dall'Abilità e dalla Strada, la prima mossa di una
+partita nuova, il telefono in orizzontale (844 × 390). **A posto**: in orizzontale la finestra
+sta nello schermo, scorre dentro e «Domani» resta in vista in fondo; il «+1» da Abilità,
+Pannello e Strada chiude quelle schermate, quindi il recap non finisce sotto a niente; i
+salvataggi vecchi senza `G.logN` e senza `G.giornata` ripartono da una fotografia nuova senza
+errori; gli highlights mettono l'HTML delle righe del diario così com'è, ma è lo stesso che fa
+già il diario (`ui.js:570`), non è un rischio nuovo; il settimo giorno esce solo il rapporto
+della settimana, in carcere e sui salti lunghi niente recap.
+
+### 101. Il recap manca in tre liste delle «finestre aperte»: Esc apre il menu invece di chiuderlo
+- **dove** — `frontend/js/menu-sistema.js:52` (`dialogoFlottante`), `frontend/js/game/trasferte.js:701`
+  (`schermoLibero`), `frontend/js/game/tempo-controlli.js:204` (`blockingOverlay`). Il recap è
+  stato aggiunto in `uscita.js` e in `skipOverlayBusy`, ma queste tre liste hanno dentro
+  `#report` (il rapporto della settimana) e non `#recap`.
+- **cosa succede** — **visto:** col recap aperto, Esc apre il menu di sistema e il recap resta
+  lì sotto (il menu si prende il tasto per primo e non lo lascia passare a `uscita.js`); dallo
+  stesso menu «Torna alla mappa» non è bloccato. **Visto nel codice, non riprodotto:** un invito
+  di trasferta o un'«occasione» nati nella notte guardano `schermoLibero()`, che non vede il
+  recap, e dopo un quarto di secondo si aprono **sopra** al recap — proprio le due finestre una
+  sull'altra che il recap vuole evitare. Il widget del tempo, infine, col recap aperto dice di
+  non essere bloccato (a 1280 × 800 sta sotto alla finestra, quindi non si preme: è solo un
+  conto sbagliato).
+- **come si vede** — +1 giorno da un martedì, esce il recap, premi Esc: si apre il menu.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (02/10/2026)**, prima del push: `#recap` sta nelle liste di `menu-sistema.js`
+  (`dialogoFlottante`), `trasferte.js` (`schermoLibero`) e `tempo-controlli.js`
+  (`blockingOverlay`); un controllo dell'audit le tiene ferme.
+
+### 102. La prima mossa di una partita nuova, o dopo una trasferta, non entra nei numeri del recap
+- **dove** — `frontend/js/game/recap-giornata.js:51-61` (`recapGiornata`, `recapMossa`) con
+  `frontend/js/game/ui.js:143-148`; la fotografia della mattina la fa solo
+  `frontend/js/game/eventi-v2.js:2970-2974`, a fine notte.
+- **cosa succede** — quando la fotografia di stamattina manca o è di un altro giorno (partita
+  nuova, salvataggio di prima, rientro da una trasferta) la si rifà **alla prima mossa**, ma
+  `recapMossa` viene chiamata dopo che la mossa ha già cambiato soldi e fan e ha già scritto
+  la sua riga nel diario. Così quella mossa è contata fra le mosse, ma i suoi soldi, i suoi
+  fan e la sua riga spariscono dal recap. Provato: +50 € e una riga, il recap dice 0 € e
+  nessun highlight.
+- **come si vede** — partita nuova, prima mossa che paga, poi «+1 giorno»: «in cassa» non la conta.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (02/10/2026)**, prima del push: `avviaAzioneDiretta` (ui.js) chiama
+  `recapGiornata()` prima di `a.run()`, così la fotografia della mattina si fa prima che la
+  mossa cambi i numeri.
+
+### 103. Le mosse fatte fuori dalle card non si contano
+- **dove** — `frontend/js/game/ui.js:146-147` è l'unico posto che chiama `recapMossa`; i colpi in
+  Strada (`strada-crimine*.js`) e le stanze dello Studio che non passano da `hubAzione` non la
+  chiamano.
+- **cosa succede** — una giornata passata a fare colpi in Strada esce come «Nessuna mossa»,
+  con gli highlights pieni di quello che hai fatto. Può essere una scelta («mossa» = card),
+  ma letta dal giocatore sembra un errore. Va deciso.
+- **come si vede** — fai solo colpi in Strada, poi «+1 giorno».
+- **quanto pesa** — da sistemare con calma.
+- **RISPOSTA (02/10/2026)** — è una scelta, scritta in «Il recap di fine giornata»
+  (`05-carriera-e-tempo.md`): le mosse fuori dalle card entrano nel recap come righe del
+  diario, non nel conto delle mosse. Se si vuole contarle, va deciso quali (i colpi sì, le
+  take della Cabina no?): è una decisione di Carlo.
+
+### 104. Il commento dei mixtape è finito sulla riga del recap
+- **dove** — `frontend/pagine/gioco.html:718-719`
+- **cosa succede** — la riga di `progetti.js` ha perso il suo commento («mixtape e album…»), che
+  adesso sta in coda alla riga di `recap-giornata.js`, attaccato al commento del recap. Non
+  cambia niente nel gioco, ma chi legge la pagina attribuisce il commento al file sbagliato.
+- **come si vede** — apri `gioco.html` alla riga 719.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (02/10/2026)**, prima del push: il commento è tornato sulla riga di `progetti.js`.
