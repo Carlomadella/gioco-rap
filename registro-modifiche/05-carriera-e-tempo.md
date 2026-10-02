@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4eafd8cf -->
+## 02/10/26, 13:43 — task/pizzeria-disciplina-v2 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `4eafd8cf`
+
+### Cosa è entrato
+
+- `945d2ad9` — test(pizzeria): copre disciplina part-time e recidiva — **mycolbraga**
+- `dbca8b6c` — test(pizzeria): allinea la disciplina al part-time — **mycolbraga**
+- `238e7dd2` — balance(pizzeria): rende la disciplina coerente col part-time — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Aggiunto:** `frontend/test/unit/pizzeria-disciplina.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:44a71b61 -->
 ## 02/10/26, 13:30 — task/pizzeria-ferie-v2 → main
 
