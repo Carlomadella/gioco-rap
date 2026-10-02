@@ -54,6 +54,9 @@ const START = () => ({
        non è più un oggetto sempre disponibile: conserva chi l'ha consegnato
        e quando è entrato davvero nella vita del personaggio. */
     traphone:{owned:false,sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null},
+    /* Punto Strada 11: nessun rango criminale persistito. Salviamo soltanto
+       gli eventi di rete realmente accaduti e i loro cooldown. */
+    reteInfluenza:{lastCheckAbsoluteDay:null,nextEventAbsoluteDay:null,pending:null,history:[],connectionsMade:0},
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
