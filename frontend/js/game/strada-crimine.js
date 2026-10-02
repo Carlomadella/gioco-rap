@@ -417,6 +417,138 @@ function stradaConsegnaTrapPhone(personId,personName,source){
   return {acquired:true,state:t};
 }
 
+
+/* ==================== PERSONE DELLA STRADA ====================
+   Punto 3: nessun nome criminale deve restare solo testo in un popup.
+   Ogni contatto vive in G.gente, conserva la propria identità/origine e può
+   ricomparire nei sistemi sociali esistenti. Il punto 4 aggiungerà la fiducia
+   criminale: qui costruiamo soltanto identità e continuità. */
+function stradaPersonaMeta(p){
+  if(!p) return null;
+  if(!p.strada || typeof p.strada!=="object"){
+    p.strada={
+      known:false,
+      key:null,
+      firstLinkedAbsoluteDay:null,
+      sources:[],
+      opportunityIds:[],
+      introducedByPersonId:null
+    };
+  }
+  if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
+  if(!Array.isArray(p.strada.opportunityIds)) p.strada.opportunityIds=[];
+  return p.strada;
+}
+
+function stradaSegnaPersona(p,meta){
+  if(!p || p.via) return null;
+  meta=meta||{};
+  const st=stradaPersonaMeta(p);
+  st.known=true;
+  if(!st.key && meta.key) st.key=String(meta.key);
+  if(st.firstLinkedAbsoluteDay==null) st.firstLinkedAbsoluteDay=stradaAbsDay();
+  if(meta.source && !st.sources.includes(meta.source)) st.sources.push(meta.source);
+  if(meta.opportunityId && !st.opportunityIds.includes(meta.opportunityId))
+    st.opportunityIds.push(meta.opportunityId);
+  if(st.introducedByPersonId==null && meta.introducedByPersonId)
+    st.introducedByPersonId=meta.introducedByPersonId;
+
+  /* Una persona conosciuta sul lavoro continua a essere collega/rider/cliente:
+     non le cambiamo ruolo. Da quando scopri il suo lato Strada può però
+     ricomparire anche al Circolo, come la stessa identica persona. */
+  p.circoloSbloccato=true;
+  p.visto=true;
+  if(!p.storia && meta.story) p.storia=meta.story;
+  return p;
+}
+
+function stradaContattoKey(nome){
+  return "street:"+String(nome||"contatto")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+}
+
+function stradaPersonaDaId(id){
+  return id ? (G.gente||[]).find(p=>p&&p.id===id&&!p.via) || null : null;
+}
+
+function stradaContattiLuogo(luogo){
+  return (G.gente||[]).filter(p=>
+    p && !p.via &&
+    p.origineLuogo===luogo &&
+    p.strada && p.strada.known
+  );
+}
+
+function stradaCreaContatto(nome,key,meta){
+  if(!G.gente) G.gente=[];
+  meta=meta||{};
+
+  /* Se un nome già appartiene a una persona persistente, quello non diventa
+     un omonimo nuovo: scopri semplicemente un lato che prima non conoscevi.
+     È intenzionale e collega davvero Circolo/lavoro/Strada. */
+  let p=(G.gente||[]).find(x=>x && !x.via && x.strada && x.strada.key===key) || null;
+  if(!p && nome)
+    p=(G.gente||[]).find(x=>x && !x.via && x.n===nome) || null;
+
+  if(!p){
+    if(typeof nuovaPersona!=="function") return null;
+    p=nuovaPersona("strada");
+    p.n=String(nome||p.n||"Contatto");
+    p.origine="strada";
+    p.origineDettaglio="conoscenza della Strada";
+    p.storia="L'hai conosciuto attraverso il giro della Strada.";
+    p.circoloSbloccato=true;
+    p.numero=false; /* il TrapPhone non equivale al numero personale */
+    p.numDa=null;
+    G.gente.push(p);
+  }
+
+  return stradaSegnaPersona(p,{
+    key,
+    source:meta.source||"street",
+    opportunityId:meta.opportunityId||null,
+    introducedByPersonId:meta.introducedByPersonId||null,
+    story:meta.story||null
+  });
+}
+
+function stradaRisolviContattoOpportunita(variante,trigger,legacy){
+  if(!variante) return null;
+
+  /* Una dritta nata fuori dalla Fabbrica può introdurre una nuova persona.
+     Da quel momento quella persona è persistente e il suo id accompagna
+     l'offerta, lo storico e ogni ricomparsa futura. */
+  if(trigger!=="fabbrica" || legacy===true){
+    const key=variante.contactKey||stradaContattoKey(variante.persona);
+    return stradaCreaContatto(variante.persona,key,{
+      source:legacy===true?"legacy-opportunity":"opportunity",
+      opportunityId:variante.id,
+      introducedByPersonId:(G.strada&&G.strada.ingressoPersonaId)||null
+    });
+  }
+
+  /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Una dritta
+     post-turno può esistere solo se in quel posto c'è già una persona reale
+     che il giocatore ha scoperto essere collegata alla Strada. */
+  const candidati=stradaContattiLuogo("fabbrica").sort((a,b)=>
+    Number(b.rel||0)-Number(a.rel||0) ||
+    Number(b.pt||0)-Number(a.pt||0)
+  );
+  return candidati[0] || null;
+}
+
+function stradaCollegaLeadPersona(lead,trigger,legacy){
+  if(!lead || lead.personId) return lead||null;
+  const p=stradaRisolviContattoOpportunita(lead,trigger||lead.trigger,legacy===true);
+  if(!p) return null;
+  lead.personId=p.id;
+  lead.persona=p.n;
+  lead.contactKey=(p.strada&&p.strada.key)||lead.contactKey||stradaContattoKey(p.n);
+  return lead;
+}
+
 function stradaPersonaIngressoValida(p){
   if(!p || p.via || !p.id || !p.n || p.ruolo==="giornalista") return false;
   /* Contatti del lavoro: esistono perché li hai incontrati davvero.
@@ -535,6 +667,15 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
   G.energy=Math.max(0,Number(G.energy||0)-energia);
   s.ingressoFase="accepted";
 
+  const personaIngresso=stradaPersonaDaId(proposta.personId||s.ingressoPersonaId);
+  if(personaIngresso){
+    stradaSegnaPersona(personaIngresso,{
+      key:"intro:"+personaIngresso.id,
+      source:"intro",
+      story:"È la persona che ti ha aperto per prima la porta della Strada."
+    });
+  }
+
   const r=Number.isFinite(Number(successRoll))
     ? Math.max(0,Math.min(.999999,Number(successRoll)))
     : Math.random();
@@ -647,6 +788,10 @@ function stradaOpportunitaStato(){
   }
   if(st.nextOfferAbsoluteDay==null && st.lastOfferAbsoluteDay!=null)
     st.nextOfferAbsoluteDay=Number(st.lastOfferAbsoluteDay)+Number(STRADA_FABBRICA_LEAD.cooldownGiorni||14);
+  /* Punto 3: migrazione di offerte create quando la "persona" era solo testo. */
+  if(st.pending && !st.pending.personId) stradaCollegaLeadPersona(st.pending,st.pending.trigger,true);
+  if(st.active && !st.active.personId) stradaCollegaLeadPersona(st.active,st.active.trigger,true);
+
   /* alias legacy finché tutti i salvataggi non sono passati dal nuovo runtime */
   s.fabbricaLead=st;
   return st;
@@ -732,6 +877,12 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
 
   const variante=stradaScegliOpportunita(variantRoll);
   if(!variante) return null;
+
+  const persona=stradaRisolviContattoOpportunita(variante,trigger,false);
+  if(!persona) return null;
+  variante.personId=persona.id;
+  variante.persona=persona.n;
+  variante.contactKey=(persona.strada&&persona.strada.key)||stradaContattoKey(persona.n);
 
   st.lastOfferAbsoluteDay=oggi;
   st.nextOfferAbsoluteDay=oggi+Number(cfg.cooldownGiorni||10);
