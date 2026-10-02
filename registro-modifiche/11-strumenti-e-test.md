@@ -6,6 +6,37 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b8c9b56b -->
+## 02/10/26, 09:40 — task/fabbrica-eventi-role-aware → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `b8c9b56b`
+
+### Cosa è entrato
+
+- `5dedb1c4` — Merge pull request #44 from Carlomadella/main — **mycolbraga**
+- `ab486391` — test(fabbrica): allinea eventi ai nuovi pool per ruolo — **mycolbraga**
+- `d9924110` — docs(fabbrica): documenta eventi role-aware — **mycolbraga**
+- `ed7edca0` — fix(fabbrica): evita eventi di linea incoerenti ai ruoli alti — **mycolbraga**
+- `67b7004c` — test(fabbrica): corregge conteggio catalogo ruolo — **mycolbraga**
+- `585caff9` — chore(cache): invalida eventi Fabbrica aggiornati — **mycolbraga**
+- `d85b3405` — test(fabbrica): copre straordinari role-aware — **mycolbraga**
+- `e1324fee` — test(fabbrica): copre varietà eventi per ruolo — **mycolbraga**
+- `4930ed86` — feat(fabbrica): rende gli straordinari coerenti col ruolo — **mycolbraga**
+- `e4b874cd` — feat(fabbrica): amplia eventi specifici per ruolo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:58261118 -->
 ## 02/10/26, 09:11 — task/fabbrica-ferie → main
 
