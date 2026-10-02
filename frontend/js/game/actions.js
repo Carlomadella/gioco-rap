@@ -383,7 +383,7 @@ const ADF_LAVORO_RETE = Object.freeze({
        automatica di contatti: restano cooldown, cap e molti colleghi normali. */
     chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
     reteBonusIncontro:0.10,
-    ruoli:Object.freeze(["collega","collega","collega","rapper","promoter"]),
+    ruoli:Object.freeze(["collega","collega","rider","cliente","rapper","promoter"]),
     dettaglio:"persona conosciuta durante il servizio in Pizzeria",
     storia:"Vi siete conosciuti lavorando nello stesso giro della Pizzeria.",
     perRuolo:Object.freeze({
@@ -397,21 +397,21 @@ const ADF_LAVORO_RETE = Object.freeze({
       aiuto_cucina:Object.freeze({
         chanceIncontro:0.24, cooldownGiorni:5, minTurni:1, maxContatti:6,
         reteBonusIncontro:0.12,
-        ruoli:Object.freeze(["collega","collega","collega","rapper","promoter","fonico"]),
+        ruoli:Object.freeze(["collega","collega","fornitore","rider","cliente","rapper","fonico"]),
         dettaglio:"persona conosciuta muovendoti tra cucina e servizio",
         storia:"Vi siete conosciuti mentre davi una mano tra preparazioni e servizio."
       }),
       aiuto_pizzaiolo:Object.freeze({
         chanceIncontro:0.26, cooldownGiorni:4, minTurni:1, maxContatti:7,
         reteBonusIncontro:0.15,
-        ruoli:Object.freeze(["collega","collega","rapper","promoter","fonico","rapper"]),
+        ruoli:Object.freeze(["collega","fornitore","rider","cliente","cliente","rapper","promoter","fonico"]),
         dettaglio:"persona conosciuta durante il servizio in Pizzeria",
         storia:"Vi siete conosciuti mentre lavoravi vicino al banco e al forno."
       }),
       pizzaiolo:Object.freeze({
         chanceIncontro:0.28, cooldownGiorni:4, minTurni:1, maxContatti:8,
         reteBonusIncontro:0.18,
-        ruoli:Object.freeze(["collega","collega","rapper","promoter","promoter","fonico","rapper"]),
+        ruoli:Object.freeze(["collega","fornitore","rider","cliente","cliente","cliente","rapper","promoter","fonico"]),
         dettaglio:"persona conosciuta come riferimento del servizio",
         storia:"Vi siete conosciuti mentre eri uno dei riferimenti della Pizzeria durante il servizio."
       })
@@ -1809,6 +1809,28 @@ function lavoroSegnaEventoEsitoTurno(luogo,event){
     : {type:"none",title:"Nessun evento extra",detail:"Turno chiuso senza imprevisti."};
   try{ if(typeof save==="function") save(); }catch(_){}
   return out.event;
+}
+
+/* Evita che una singola conoscenza diventi una sorgente infinita di rete.
+   Le ricompense ripetibili legate al lavoro hanno rendimento decrescente:
+   prima volta piena, seconda dimezzata, poi zero per quella fonte/persona. */
+function lavoroBonusRetePersona(persona,fonte,base,maxVolte){
+  if(!persona || !fonte) return 0;
+  base=Math.max(0,Number(base||0));
+  maxVolte=Math.max(1,Number(maxVolte||2));
+  if(!base) return 0;
+
+  if(!persona.workNetworkRewards || typeof persona.workNetworkRewards!=="object")
+    persona.workNetworkRewards={};
+
+  const key=String(fonte);
+  const usi=Math.max(0,Number(persona.workNetworkRewards[key]||0));
+  if(usi>=maxVolte) return 0;
+
+  const delta=usi===0 ? base : base*.5;
+  persona.workNetworkRewards[key]=usi+1;
+  if(typeof gain==="function") gain("rete",delta);
+  return delta;
 }
 
 function lavoroReteStato(luogo){
