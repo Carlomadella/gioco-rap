@@ -1478,7 +1478,8 @@ describe("cartellino presenze Fabbrica", () => {
        e la classe «domenica» resta solo alla Fabbrica */
     expect(luoghi).toContain("const giornoRiposo = riposo === numeroGiorno;");
     expect(luoghi).toContain("const settimanaConclusa = settimana < (cart.settimana - 1);");
-    expect(luoghi).toContain("const nonLavorato = settimanaConclusa && giornoOrdinario && !giornoRiposo && n === 0;");
+    expect(luoghi).toContain("const inFerie = feriePosizioni.has(pos) && !n;");
+    expect(luoghi).toContain("const nonLavorato = settimanaConclusa && giornoOrdinario && !giornoRiposo && n === 0 && !inFerie;");
     expect(luoghi).toContain('(luogo === "fabbrica" && numeroGiorno === 7 ? " domenica" : "")');
     expect(luoghi).toContain('(nonLavorato ? " non-lavorato" : "")');
 
