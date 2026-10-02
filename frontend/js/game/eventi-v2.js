@@ -2227,7 +2227,7 @@ const ADF_FACTORY_OVERTIME_SCENARIOS = Object.freeze({
       id:"linea-scoperta",
       label:"linea rimasta scoperta",
       title:"Domani manca uno sulla linea",
-      body:"A fine turno il capolinea ti ferma: uno del reparto ha dato forfait e il sabato è rimasto corto."
+      body:"A fine turno arriva la richiesta: una persona del reparto ha dato forfait e il sabato è rimasto corto."
     }),
     Object.freeze({
       id:"recupero-fermo",
@@ -2276,6 +2276,31 @@ const ADF_FACTORY_OVERTIME_SCENARIOS = Object.freeze({
   ])
 });
 
+const ADF_FACTORY_OVERTIME_ROLE_CONTEXT = Object.freeze({
+  operaio:Object.freeze({
+    asker:"Il capolinea",
+    duty:"coprire una postazione in linea"
+  }),
+  operaio_esperto:Object.freeze({
+    asker:"Il capolinea",
+    duty:"entrare come riferimento esperto sulla linea"
+  }),
+  capolinea:Object.freeze({
+    asker:"Il capoturno",
+    duty:"coordinare la linea nel turno extra"
+  }),
+  capoturno:Object.freeze({
+    asker:"Il responsabile di produzione",
+    duty:"coordinare i reparti nel turno extra"
+  })
+});
+
+function adfFactoryOvertimeRoleContext(){
+  const id=G.job && typeof lavoroLuogo==="function" && lavoroLuogo(G.job)==="fabbrica"
+    ? G.job.id : "operaio";
+  return Object.assign({roleId:id},ADF_FACTORY_OVERTIME_ROLE_CONTEXT[id]||ADF_FACTORY_OVERTIME_ROLE_CONTEXT.operaio);
+}
+
 function adfFactoryOvertimeScenario(offerta){
   if(!offerta) return null;
   const key=offerta.tipo==="domenica" ? "domenica" : "sesto-giorno";
@@ -2287,13 +2312,16 @@ function adfFactoryOvertimeScenario(offerta){
     ? s.runtime.factoryOvertimeRecent
     : (s.runtime.factoryOvertimeRecent=[]);
   const candidati=pool.filter(x=>!recent.includes(x.id));
-  const scelta=(candidati.length?candidati:pool)[Math.floor(Math.random()*(candidati.length?candidati.length:pool.length))];
+  const sceltaBase=(candidati.length?candidati:pool)[Math.floor(Math.random()*(candidati.length?candidati.length:pool.length))];
+  const ruolo=adfFactoryOvertimeRoleContext();
+  const scelta=Object.assign({},sceltaBase,{roleId:ruolo.roleId,asker:ruolo.asker,duty:ruolo.duty});
 
   recent.unshift(scelta.id);
   if(recent.length>3) recent.length=3;
 
   offerta.scenarioId=scelta.id;
   offerta.scenarioLabel=scelta.label;
+  offerta.scenarioRoleId=scelta.roleId;
 
   /* L'offerta restituita da actions.js è una copia. Aggiorniamo anche quella
      persistente, così il motivo resta visibile dopo l'accettazione nella
@@ -2303,6 +2331,7 @@ function adfFactoryOvertimeScenario(offerta){
     if(overtime&&overtime.pendingOffer){
       overtime.pendingOffer.scenarioId=scelta.id;
       overtime.pendingOffer.scenarioLabel=scelta.label;
+      overtime.pendingOffer.scenarioRoleId=scelta.roleId;
     }
   }
   return scelta;
@@ -2338,6 +2367,8 @@ function adfWorkOvertimeAfterShift(){
   const fabbrica=luogo==="fabbrica";
   const domenica=offerta.tipo==="domenica";
   const scenario=fabbrica ? adfFactoryOvertimeScenario(offerta) : null;
+  const ruoloStraordinario=fabbrica
+    ? (scenario||adfFactoryOvertimeRoleContext()) : null;
   const nome=fabbrica?"Fabbrica":"Pizzeria";
   const titolo=fabbrica
     ? (scenario ? scenario.title : (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?"))
@@ -2347,8 +2378,9 @@ function adfWorkOvertimeAfterShift(){
         ? scenario.body
         : (domenica
           ? "Domani la Fabbrica sarebbe chiusa per il tuo contratto, ma manca personale."
-          : "Hai già coperto i cinque giorni del contratto. Domani manca una persona sulla linea.")) +
-      "<br><br>Il capo ti chiede se puoi entrare <b>"+giorno+"</b>.")
+          : "Hai già coperto i cinque giorni del contratto. Domani serve una copertura extra in stabilimento.")) +
+      "<br><br>"+ruoloStraordinario.asker+" ti chiede se puoi entrare <b>"+giorno+
+      "</b> per "+ruoloStraordinario.duty+".")
     : ("Hai già coperto i quattro servizi del contratto. Nel weekend la sala è piena e manca una persona in cucina." +
       "<br><br>Il titolare ti chiede se puoi coprire anche <b>"+giorno+"</b>.");
 
