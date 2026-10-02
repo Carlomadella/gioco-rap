@@ -6,6 +6,48 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:21ca4050 -->
+## 02/10/26, 17:16 — fix/pizzeria-audit-chiusura → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `21ca4050`
+
+### Cosa è entrato
+
+- `7ba40290` — test(pizzeria): allinea il playtest alla UI carriera reale — **mycolbraga**
+- `09052f97` — test(lavoro): include i contatti normali Pizzeria — **mycolbraga**
+- `b0e5b996` — feat(pizzeria): etichetta i contatti normali nel telefono — **mycolbraga**
+- `0b4f5179` — test(pizzeria): aggiunge playtest browser su 24 servizi — **mycolbraga**
+- `c9e08341` — docs(famepedia): allinea la Pizzeria al gameplay attuale — **mycolbraga**
+- `69241ac3` — test(pizzeria): blocca rete troppo musicale e farming per persona — **mycolbraga**
+- `053a0830` — balance(pizzeria): rende decrescente la rete da dialoghi e autopromo — **mycolbraga**
+- `c91996a3` — balance(pizzeria): limita la rete dai reincontri post-turno — **mycolbraga**
+- `c35ff8f5` — balance(pizzeria): limita la rete farmabile dalla stessa persona — **mycolbraga**
+- `4e8bbf38` — feat(pizzeria): descrive i nuovi contatti sociali — **mycolbraga**
+- `0658fefe` — feat(pizzeria): porta i contatti normali nelle chat persistenti — **mycolbraga**
+- `1d4e1dfc` — feat(pizzeria): aggiunge contatti normali persistenti — **mycolbraga**
+- `998b6b54` — balance(pizzeria): rende la rete soprattutto sociale, non musicale — **mycolbraga**
+- `166adb88` — test(pizzeria): blocca regressione sul contatto più recente — **mycolbraga**
+- `81977bd7` — fix(pizzeria): mostra l'ultimo contatto nel riepilogo turno — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/chat.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Aggiunto:** `frontend/test/e2e/pizzeria-workflow.spec.js`
+- **Modificato:** `frontend/test/unit/lavori-contatti.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-identita.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-ui.test.js`
+
+**File interessati in questa categoria:** 11
+
+---
+
 <!-- merge:e460a62b -->
 ## 02/10/26, 14:31 — task/pizzeria-bilanciamento-playtest → main
 
