@@ -34,6 +34,10 @@ const START = () => ({
   promoSaturation:{key:"", baseFans:0, pctUsed:0},
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
+    /* Punto Strada 12: rep resta il valore globale legacy/compatibile.
+       Lo storico globale vive qui; la fiducia personale resta invece dentro
+       ogni persona (p.strada.fiducia) e non viene duplicata. */
+    repStato:{history:[]},
     protezioneStato:{providerPersonId:null,providerName:null,level:0,source:null,prepaidWeekKey:null,history:[]},
     avvocatoStato:{personId:null,name:null,retained:false,source:null,prepaidWeekKey:null,history:[]},
     ferroStato:{sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]},
