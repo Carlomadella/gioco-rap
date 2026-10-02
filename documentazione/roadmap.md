@@ -334,10 +334,14 @@ entra nel calcolo del pezzo — che è anche un pezzo della TRACK.
 
 ### G · L'interfaccia sul telefono _(cominciata)_
 
-La plancia è disegnata a 1536×1024 e rimpicciolita tutta insieme: sul monitor va bene, sul
-telefono in verticale no. Serve una disposizione sua (profilo, mappa e telefono uno sotto
-l'altro), aree da toccare di almeno 44 punti, niente `hover`, testi leggibili senza zoom.
-Sono i CSS e un pezzo di `hub.js`, ma è il lavoro più lungo dei cinque per uscire.
+La plancia è disegnata a 1536×1024 e sul telefono richiede una disposizione sua.
+**Decisione aggiornata il 02/10/2026:** la vecchia impostazione «mobile in verticale» non è
+più il riferimento del progetto. Il gioco mobile supporta portrait e landscape, ma il
+**landscape è la modalità di riferimento e consigliata** per conservare composizione,
+sfondi, mappa e informazioni senza impoverire l'esperienza. Il portrait resta supportato,
+leggibile e utilizzabile senza rotazione forzata, ma non deve imporre tagli o sostituzioni
+grafiche. Restano obbligatori bersagli da almeno 44 punti, niente `hover` indispensabili e
+testi leggibili senza zoom. Il giro mobile copre 844×390, 390×844 e 360×640.
 
 *«Responsività di tutto il gioco»* — **il giro sugli `:hover` è fatto (08/09/2026)**: tutte
 le regole `:hover` dei 24 fogli che ne avevano stanno dentro a `@media (hover:hover)`, e un
@@ -407,7 +411,7 @@ desktop, **Capacitor** per iOS e Android.
 | **Il build** — bundle minificato con l'impronta nel nome, server di sviluppo, controlli | ✅ **fatto (31/08/2026)** |
 | **I salvataggi** — file vero sul dispositivo, Steam Cloud, cloud nostro | 🔶 **metà (01/09/2026)**: il cloud c'è, ma `save()` scrive ancora solo nel `localStorage` |
 | **Gli account** — ospite o mail, sessioni, cancellazione, verifica Steam/Apple/Google | ✅ **fatto (01/09/2026)** — dei tre negozi mancano solo le chiavi |
-| **L'interfaccia sul telefono** — verticale, a tocchi, leggibile | ⬜ da fare: è la tappa G |
+| **L'interfaccia sul telefono** — landscape di riferimento, portrait supportato, a tocchi e leggibile | ⬜ da fare: è la tappa G |
 | **Il database vero** — SQLite adesso, PostgreSQL il giorno dell'uscita | ✅ **fatto (01/09/2026)** per SQLite; PostgreSQL è scritto e si prova con `npm run prova-pg` |
 
 Il file unico (`frontend/strumenti/build-artifact.py`) resta la demo da far girare, non il
