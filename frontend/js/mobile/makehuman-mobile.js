@@ -3,13 +3,20 @@
    touch stretto, prima che il creator apra il suo editor locale, cambiamo la
    sorgente del solo iframe MakeHuman con il relay mobile.
 
+   Il watchdog mobile vive QUI, nel documento principale visibile. Non usa
+   timer dentro al creator/MakeHuman nascosti, che sui browser mobili possono
+   essere rallentati o sospesi.
+
    Desktop: questo file termina senza toccare ADF_RPG_V24.
 */
 "use strict";
 
 (function(){
   const MOBILE_QUERY="(max-width: 1180px) and (pointer: coarse)";
-  const MOBILE_MAKEHUMAN_BASE="../makehuman-mobile-v1/index.html?v=2";
+  const MOBILE_MAKEHUMAN_SRC="../makehuman-mobile-v1/index.html?v=3";
+  const QUICK=new URLSearchParams(window.location.search).get("nuova")==="rapido";
+  const HEARTBEAT_MS=10000;
+  const QUICK_MAX_MS=360000;
 
   function eMobile(){
     try{
@@ -30,16 +37,106 @@
     return;
   }
 
+  let watchdogTimer=null;
+  let watchdogStart=0;
+  let watchdogFrame=null;
+  let ultimaFase="Avvio MakeHuman sul telefono…";
+
+  function fermaWatchdog(){
+    if(watchdogTimer){
+      clearInterval(watchdogTimer);
+      watchdogTimer=null;
+    }
+    watchdogStart=0;
+    watchdogFrame=null;
+  }
+
+  function eventoDalCreator(frame,type,message,extra={}){
+    if(!frame?.contentWindow) return false;
+
+    const ev=new MessageEvent("message",{
+      data:{
+        type,
+        message,
+        mobileHeartbeat:true,
+        ...extra
+      },
+      origin:location.origin,
+      source:frame.contentWindow
+    });
+
+    window.dispatchEvent(ev);
+    return true;
+  }
+
+  function avviaWatchdog(frame){
+    if(!QUICK || watchdogTimer || !frame?.contentWindow) return;
+
+    watchdogFrame=frame;
+    watchdogStart=Date.now();
+
+    watchdogTimer=setInterval(()=>{
+      if(
+        watchdogFrame!==document.getElementById("adf-rpg-v24-frame") ||
+        !watchdogFrame?.contentWindow
+      ){
+        fermaWatchdog();
+        return;
+      }
+
+      if(Date.now()-watchdogStart>=QUICK_MAX_MS){
+        eventoDalCreator(
+          watchdogFrame,
+          "adf-rpg-v24-quick-makehuman-error",
+          "MakeHuman sul telefono non ha completato l'avvio entro sei minuti."
+        );
+        fermaWatchdog();
+        return;
+      }
+
+      eventoDalCreator(
+        watchdogFrame,
+        "adf-rpg-v24-quick-makehuman-progress",
+        ultimaFase+" · caricamento ancora in corso"
+      );
+    },HEARTBEAT_MS);
+  }
+
+  window.addEventListener("message",e=>{
+    if(!QUICK || !watchdogFrame?.contentWindow || e.source!==watchdogFrame.contentWindow) return;
+
+    const msg=e.data||{};
+
+    if(
+      msg.type==="adf-rpg-v24-quick-makehuman-progress" &&
+      !msg.mobileHeartbeat
+    ){
+      const testo=String(msg.message||"").trim();
+      if(testo) ultimaFase=testo;
+      return;
+    }
+
+    if(
+      msg.type==="adf-rpg-v24-quick-makehuman-ready" ||
+      msg.type==="adf-rpg-v24-quick-makehuman-error"
+    ){
+      fermaWatchdog();
+    }
+  });
+
   function applicaSorgenteMobile(frame){
     try{
       const doc=frame && frame.contentDocument;
       const editor=doc && doc.getElementById("localEditorFrame");
       if(!editor) return false;
 
-      const rapido=new URLSearchParams(window.location.search).get("nuova")==="rapido";
-      editor.dataset.makehumanSrc=MOBILE_MAKEHUMAN_BASE+(rapido?"&quick=1":"");
+      editor.dataset.makehumanSrc=MOBILE_MAKEHUMAN_SRC;
       editor.dataset.makehumanMobile="1";
-      editor.dataset.makehumanMobileQuick=rapido?"1":"0";
+      editor.dataset.makehumanMobileQuick=QUICK?"1":"0";
+
+      /* Il timer e' nel documento principale, quindi resta attivo anche se
+         gioco-ingresso nasconde il creator con visibility:hidden. */
+      avviaWatchdog(frame);
       return true;
     }catch(e){
       return false;
@@ -65,9 +162,6 @@
         return;
       }
 
-      /* gioco-ingresso controlla il creator ogni 50 ms. Noi partiamo prima di
-         quel controllo e cerchiamo l'iframe locale ogni 10 ms, così la sorgente
-         mobile viene fissata prima che l'avvio rapido possa aprire MakeHuman. */
       tentativi+=1;
       if(tentativi<1000) setTimeout(prova,10);
     };
@@ -89,8 +183,12 @@
     bridge.openAppearance=avvolgi(bridge.openAppearance);
   }
 
+  window.addEventListener("pagehide",fermaWatchdog,{once:true});
+
   window.ADF_MAKEHUMAN_MOBILE={
     attivo:true,
-    source:MOBILE_MAKEHUMAN_BASE
+    quick:QUICK,
+    source:MOBILE_MAKEHUMAN_SRC,
+    watchdog:"top-level-v3"
   };
 })();
