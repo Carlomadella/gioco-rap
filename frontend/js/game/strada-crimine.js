@@ -423,6 +423,56 @@ function stradaDescriviOpportunita(p){
   return parti.join(" · ");
 }
 
+function stradaPresentazioneDopoSuccesso(persona,roll,variantRoll){
+  if(!persona || persona.via || stradaRivalitaAttiva(persona)) return null;
+  const st=stradaPersonaMeta(persona);
+  if(stradaFiduciaValore(persona)<45) return null;
+  const oggi=stradaAbsDay();
+  if(st.lastReferralAbsoluteDay!=null &&
+     oggi-Number(st.lastReferralAbsoluteDay)<35) return null;
+
+  const r=Number.isFinite(Number(roll))
+    ? Math.max(0,Math.min(.999999,Number(roll)))
+    : Math.random();
+  if(r>=.25) return null;
+
+  const candidati=STRADA_OPPORTUNITA.filter(o=>{
+    if(stradaReputazioneGlobale()<Number(o.minRep||0)) return false;
+    if(o.persona===persona.n) return false;
+    const key=o.contactKey||stradaContattoKey(o.persona);
+    const existing=(G.gente||[]).find(p=>p && !p.via &&
+      ((p.strada&&p.strada.key===key) || p.n===o.persona));
+    return !existing || !existing.strada || !existing.strada.known;
+  });
+  if(!candidati.length) return null;
+
+  const rv=Number.isFinite(Number(variantRoll))
+    ? Math.max(0,Math.min(.999999,Number(variantRoll)))
+    : Math.random();
+  const variante=candidati[Math.floor(rv*candidati.length)]||candidati[0];
+  const nuovo=stradaCreaContatto(
+    variante.persona,
+    variante.contactKey||stradaContattoKey(variante.persona),
+    {
+      source:"referral-after-success",
+      opportunityId:variante.id,
+      introducedByPersonId:persona.id,
+      story:"Te l'ha presentato "+persona.n+" dopo un colpo chiuso bene."
+    }
+  );
+  if(!nuovo) return null;
+
+  st.lastReferralAbsoluteDay=oggi;
+  stradaModificaFiducia(nuovo,3,"presentazione-da-"+persona.id);
+  stradaRegistraConseguenzaPersona(persona,"introduced-contact",{
+    personId:nuovo.id,personName:nuovo.n
+  });
+  stradaRegistraConseguenzaPersona(nuovo,"introduced-by",{
+    personId:persona.id,personName:persona.n
+  });
+  return {persona,nuovo,variante};
+}
+
 /* ==================== LA SCENA IN CORSO ====================
    Come modal.js, ma tutta dentro alla schermata: showEvent (z-index 60) finirebbe
    sotto ai pannelli come questo (z-index 93, stessa famiglia di posto/negozio),
