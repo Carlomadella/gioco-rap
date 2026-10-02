@@ -187,6 +187,8 @@ const ADF_LAVORO_CONTRATTI = Object.freeze({
     domenicaRiposo:false,
     bonusSestoGiornoPct:20,
     bonusDomenicaPct:0,
+    ferieGiorniPerCiclo:1,
+    ferieAnticipoMinimoGiorni:1,
     cicloSettimane:4
   })
 });
@@ -634,7 +636,7 @@ function lavoroFerieRichiedi(luogo,targetAbsoluteDay){
 
   const ciclo=lavoroCicloDaGiornoAssoluto(target);
   if(lavoroFerieDisponibili(luogo,ciclo)<=0)
-    return {ok:false,reason:"Hai già usato i 2 giorni di ferie di quel ciclo"};
+    return {ok:false,reason:"Hai già usato " + max + (max===1 ? " giorno" : " giorni") + " di ferie di quel ciclo"};
 
   const stato=lavoroFerieStato(luogo);
   const richiesta={
