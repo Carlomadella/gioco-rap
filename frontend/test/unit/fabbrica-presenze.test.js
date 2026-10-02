@@ -1594,7 +1594,9 @@ describe("cartellino presenze Fabbrica", () => {
     const css = leggi("css/luoghi-foto.css");
 
     expect(luoghi).toContain("function lfFabbricaCarriera()");
-    expect(luoghi).toContain('lavoroProgressoCarriera("fabbrica")');
+    expect(luoghi).toContain('function lfCarrieraLavoro(luogo)');
+    expect(luoghi).toContain('lavoroProgressoCarriera(luogo)');
+    expect(luoghi).toContain('function lfFabbricaCarriera(){ return lfCarrieraLavoro("fabbrica"); }');
     expect(luoghi).toContain('lfPan("Carriera", lfFabbricaCarriera(), "spunta")');
     expect(luoghi).toContain("Prossimo ruolo");
     expect(luoghi).toContain("Grado massimo raggiunto");
