@@ -2490,7 +2490,7 @@ function stToast(t){
 
 /* Le tre città: la provincia si gioca, le altre due si guardano. */
 const STRADA_CITTA = [
-  {id:"provincia", n:"Provincia", d:"4 colpi disponibili", req:null},
+  {id:"provincia", n:"Provincia", d:"4 offerte oggi", req:null},
   {id:"milano", n:"Milano", d:"4 colpi · livello 10", req:"Livello 10 · fama 50 · hype 40",
    colpi:STRADA_COLPI_MILANO},
   {id:"la", n:"Los Angeles", d:"3 colpi · da GOAT", req:"Si apre da GOAT",
