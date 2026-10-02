@@ -463,7 +463,10 @@ describe("famiglie eventi lavoro", () => {
       G:{
         year:1,week:10,day:3,
         job:{id:"capoturno",place:"fabbrica",n:"Capoturno",pay:330,e:28},
-        workplaces:{},gente:[],skills:{rete:0},wellbeing:70,lucidita:60,shifts:2,
+        workplaces:{fabbrica:{workEvents:{
+          lastFamilyDay:{},history:[],musicLead:null,crimeLead:null,
+          incidentalRecent:[],incidentalCursor:2
+        }}},gente:[],skills:{rete:0},wellbeing:70,lucidita:60,shifts:2,
         strada:{giroAvviato:false}
       },
       extra:{
@@ -830,7 +833,7 @@ describe("famiglie eventi lavoro", () => {
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(strada).toContain('"Dritta " + lead.sourceLabel');
     expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
-    expect(html).toContain('js/game/lavoro-eventi.js?v=7');
+    expect(html).toContain('js/game/lavoro-eventi.js?v=8');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
 });
