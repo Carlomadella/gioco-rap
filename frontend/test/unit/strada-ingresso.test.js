@@ -215,6 +215,8 @@ describe("Strada · ingresso nascosto",()=>{
     expect(strada).toContain('stradaBonusFiduciaSquadra(personaSquadra)');
     expect(strada).not.toContain('if(approccio.serveUomo && s.uomini <= 0)');
     expect(strada).not.toContain('s.uomini--');
+    expect(strada).toContain("const fidati=stradaPersoneSquadra()");
+    expect(strada).toContain("Chiami "+chiamabile.n");
     expect(strada).toContain("Persone del giro (");
     expect(strada).toContain("Non puoi comprare la fiducia di qualcuno");
   });
