@@ -6,6 +6,31 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:aa17b9b0 -->
+## 02/10/26, 23:06 — feature/strada-punto9-tempo-colpi → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `aa17b9b0`
+
+### Cosa è entrato
+
+- `c652ef7b` — test(audit): ancora il dado al tentativo del colpo — **mycolbraga**
+- `3878a7c4` — chore(frontend): aggiorna cache Strada punto 9 — **mycolbraga**
+- `31ad4f47` — test(audit): verifica tempo reale colpi punto 9 — **mycolbraga**
+- `d9541d75` — test(strada): copri tempo reale e bilanciamento Pizzeria — **mycolbraga**
+- `7fa227d3` — feat(strada): fai consumare tempo reale ai colpi — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Aggiunto:** `frontend/test/unit/strada-tempo-colpi.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:d2867ebf -->
 ## 02/10/26, 22:56 — feature/strada-punto8-preparazione-v2 → main
 
