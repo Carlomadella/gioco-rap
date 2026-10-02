@@ -6,6 +6,32 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:20bcf021 -->
+## 02/10/26, 13:27 — task/pizzeria-ui-carriera-turno-v2 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `20bcf021`
+
+### Cosa è entrato
+
+- `fe133c1e` — fix(test): usa una settimana reale per il cooldown Pizzeria — **mycolbraga**
+- `5c4f91bb` — test(lavoro): allinea carriera Fabbrica al renderer comune — **mycolbraga**
+- `eb4f0d9c` — fix(pizzeria): usa la rete della sede prima del ruolo legacy — **mycolbraga**
+- `5fa9990c` — test(pizzeria): copre carriera e riepilogo servizio — **mycolbraga**
+- `147b52c1` — feat(pizzeria): mostra carriera e riepilogo servizio — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-identita.test.js`
+- **Aggiunto:** `frontend/test/unit/pizzeria-ui.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:244add3b -->
 ## 02/10/26, 12:59 — task/pizzeria-identita-gameplay → main
 
