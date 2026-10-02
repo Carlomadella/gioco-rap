@@ -1616,6 +1616,11 @@ const STRADA_CITTA = [
 let ST_CITTA = "provincia";
 
 function apriStrada(){
+  if(!stradaAttivitaSbloccate()){
+    if(typeof pushLog==="function")
+      pushLog("La Strada non è ancora un posto a cui sai accedere.", "");
+    return;
+  }
   hubTap();
   STRADA_SCENA = null;
   ST_CITTA = "provincia";
