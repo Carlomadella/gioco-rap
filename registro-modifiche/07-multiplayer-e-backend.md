@@ -6,6 +6,38 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:b7d67809 -->
+## 02/10/26, 23:52 — feature/strada-punto12-reputazione-separata → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `b7d67809`
+
+### Cosa è entrato
+
+- `0fda33e3` — test(strada): inietta reputazione globale nel runtime capacità — **mycolbraga**
+- `d4ab3c3b` — test(strada): inietta reputazione globale nel runtime pool — **mycolbraga**
+- `ba4ee8db` — test(strada): aggiorna terminologia nome nel giro — **mycolbraga**
+- `fb395bdb` — test(audit): verifica separazione reputazione e fiducia punto 12 — **mycolbraga**
+- `8b990da2` — test(strada): prova indipendenza tra nome globale e fiducia personale — **mycolbraga**
+- `e0aaefce` — feat(ui): distingue nome nel giro dalla fiducia personale — **mycolbraga**
+- `dd4ca876` — fix(strada): usa esplicitamente il valore globale nei gate e nella UI — **mycolbraga**
+- `d7e834a1` — feat(strada): separa API e linguaggio di reputazione globale e fiducia — **mycolbraga**
+- `77604feb` — feat(state): separa storico reputazione globale dalla fiducia personale — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Modificato:** `frontend/test/unit/strada-colpi-pool.test.js`
+- **Modificato:** `frontend/test/unit/strada-peso-capacita.test.js`
+- **Aggiunto:** `frontend/test/unit/strada-reputazione-separata.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:2c67b9c -->
 ## 01/10/26, 12:43 — task/studio-cursori-e-linguette → main
 
