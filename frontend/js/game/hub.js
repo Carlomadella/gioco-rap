@@ -482,8 +482,9 @@ function contrattoPostoLavoro(def){
         '<span class="wc-clause"><b>' + extraTitolo + '</b><span>' + extraTesto + '</span></span>' +
         '<span class="wc-clause"><b>Assenze e disciplina</b><span>' + assenzeTesto + ' ' + disciplinaTesto + '</span></span>' +
         '<span class="wc-clause"><b>Recupero del richiamo</b><span>' + recuperoTesto + '</span></span>' +
-        '<span class="wc-clause wc-career"><b>Carriera interna</b><span>Presenze, anzianità e storico restano legati alla ' +
-          nome + ' anche se cambi mansione.</span></span>' +
+        '<span class="wc-clause wc-career"><b>Carriera interna</b><span>Presenze e progressione restano legate alla ' +
+          nome + ' mentre sei dipendente, anche se cambi mansione. Dimissioni o licenziamento chiudono la carriera interna: ' +
+          'un eventuale rientro riparte dalla mansione e dalla paga iniziali.</span></span>' +
         '<span class="wc-signatures">' +
           '<span><small>Datore di lavoro</small><strong>' + nome + '</strong></span>' +
           '<span><small>Firma del lavoratore</small><i>________________________</i></span>' +
