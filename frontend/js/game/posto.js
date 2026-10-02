@@ -427,6 +427,63 @@ const DIALOGHI = {
   ]
 };
 
+
+/* Persone nate fuori dal circuito musicale (lavoro, quartiere, Strada).
+   Prima del punto 3 potevano esistere in G.gente ma, una volta rese visibili
+   al Circolo, parlaCon() non aveva dialoghi per loro. Questi sono dialoghi
+   sociali normali: fanno crescere il rapporto personale, NON la futura
+   fiducia criminale del punto 4. */
+const DIALOGHI_VITA = Object.freeze([
+  Object.freeze({
+    t:"Ti fa un cenno e resta appoggiato al bancone. «Com'è che gira, ultimamente?»",
+    o:[
+      ["Gli racconti una cosa vera della tua settimana",2,"aperto"],
+      ["Gli chiedi prima come sta lui",2,"diffidente"],
+      ["Gli dici che va tutto alla grande",1,"gasato"]
+    ]
+  }),
+  Object.freeze({
+    t:"Per un attimo finite a parlare della gente che passa sempre dagli stessi posti.",
+    o:[
+      ["Ascolti più di quanto parli",2,"diffidente"],
+      ["Racconti chi hai incontrato tu",2,"aperto"],
+      ["Tagli corto: non ti interessa",0,"pratico"]
+    ]
+  }),
+  Object.freeze({
+    t:"«La provincia è piccola. Prima o poi le facce tornano tutte.»",
+    o:[
+      ["Gli chiedi quali facce vede più spesso",2,"pratico"],
+      ["Gli dici che è proprio quello il bello",1,"aperto"],
+      ["Gli dici che tu non ti fai notare",2,"diffidente"]
+    ]
+  }),
+  Object.freeze({
+    t:"Ti chiede cosa stai combinando fuori dalla musica.",
+    o:[
+      ["Gli rispondi senza raccontargli tutta la tua vita",2,"diffidente"],
+      ["Gli racconti davvero come stai messo",2,"aperto"],
+      ["Gli dici che ti fai i fatti tuoi",1,"pratico"]
+    ]
+  }),
+  Object.freeze({
+    t:"Si mette a parlare di orari, soldi e gente che promette più di quanto mantiene.",
+    o:[
+      ["Gli dici che guardi soprattutto chi mantiene la parola",2,"pratico"],
+      ["Gli racconti di una promessa andata male",2,"aperto"],
+      ["Gli dici che basta saper comandare",1,"gasato"]
+    ]
+  }),
+  Object.freeze({
+    t:"La conversazione si ferma per qualche secondo. Nessuno dei due sembra avere fretta di riempire il silenzio.",
+    o:[
+      ["Resti lì senza forzare il discorso",2,"diffidente"],
+      ["Gli fai una domanda personale ma semplice",2,"aperto"],
+      ["Tiri fuori il telefono e cambi aria",0,null]
+    ]
+  })
+]);
+
 /* ==================== LA GENTE ==================== */
 function relNome(p){ return REL_NOMI[clamp(p.rel, 0, 5)]; }
 function relSoglia(p){ return 3 + p.rel; }         /* più sali, più costa salire */
@@ -566,7 +623,12 @@ function postoSoloLavoro(p){
    in meno alla Sala, magari il videomaker o il giornalista
    (problemi-riscontrati, 15/09; chiuso il 21/09). */
 function genteDellaSala(){
-  return (G.gente || []).filter(p => p && !p.rivale && !postoSoloLavoro(p));
+  /* I contatti della Strada possono frequentare il Circolo, ma non devono
+     mangiare gli slot con cui sistemaGente() garantisce il cast musicale
+     minimo della Sala. */
+  return (G.gente || []).filter(p =>
+    p && !p.rivale && !(p.strada && p.strada.known) && !postoSoloLavoro(p)
+  );
 }
 function sistemaGente(){
   if(!G.gente) G.gente = [];
@@ -597,8 +659,12 @@ function presentiOggi(quanti){
   const ord = vivi.slice().sort((a, b) => {
     const ka = (a.id.charCodeAt(1) * 31 + sett * 17) % 97;
     const kb = (b.id.charCodeAt(1) * 31 + sett * 17) % 97;
-    /* chi conosci meglio è più facile trovarlo: il giro è quello */
-    return (kb + b.rel * 12) - (ka + a.rel * 12);
+    /* Chi conosci meglio è più facile trovarlo. Un contatto della Strada che
+       hai già scoperto riceve solo un piccolo peso in più: può ricomparire,
+       non diventa una presenza fissa ogni sera. */
+    const sa = a.strada && a.strada.known ? 8 : 0;
+    const sb = b.strada && b.strada.known ? 8 : 0;
+    return (kb + b.rel * 12 + sb) - (ka + a.rel * 12 + sa);
   });
   return ord.slice(0, quanti || 3);
 }
@@ -753,7 +819,7 @@ function parlaCon(id){
   if(poTempoBlocca("parla")) return;
   G.energy -= PO_COSTO.parla;
   poTempoAvanza("parla");
-  const pool = DIALOGHI[p.ruolo];
+  const pool = DIALOGHI[p.ruolo] || DIALOGHI_VITA;
   POSTO_PARLA = {p:p, sit:pick(pool)};
   SFX.tap(); save(); renderPosto();
   if(typeof renderHub === "function") renderHub();
