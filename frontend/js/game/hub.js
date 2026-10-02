@@ -439,6 +439,8 @@ function contrattoPostoLavoro(def){
   const blocco = Math.max(0, Number(disciplina.bloccoRiassunzioneSettimane || 0));
   const recupero = Math.max(1, Number(disciplina.recuperoRichiamoCicliPerfetti || 1));
   const bonusExtra = Math.max(0, Number(cfg.bonusSestoGiornoPct || 0));
+  const ferieMax = Math.max(0, Number(cfg.ferieGiorniPerCiclo || 0));
+  const ferieAnticipo = Math.max(1, Number(cfg.ferieAnticipoMinimoGiorni || 1));
 
   const tipoContratto = luogo === "pizzeria"
     ? "Ristorazione · contratto a turni"
@@ -457,6 +459,10 @@ function contrattoPostoLavoro(def){
   const recuperoTesto = recupero +
     (recupero === 1 ? " ciclo perfetto cancella" : " cicli perfetti consecutivi cancellano") +
     " un richiamo.";
+  const ferieTesto = ferieMax
+    ? ferieMax + " giorni ogni ciclo di 4 settimane. Vanno richiesti almeno " +
+      ferieAnticipo + (ferieAnticipo === 1 ? " giorno prima." : " giorni prima.")
+    : "";
 
   showEvent({
     k:nome,
@@ -480,6 +486,7 @@ function contrattoPostoLavoro(def){
           '<span class="wc-field"><small>Riposo</small><strong>' + riposo + '</strong></span>' +
         '</span>' +
         '<span class="wc-clause"><b>' + extraTitolo + '</b><span>' + extraTesto + '</span></span>' +
+        (ferieTesto ? '<span class="wc-clause"><b>Ferie</b><span>' + ferieTesto + '</span></span>' : '') +
         '<span class="wc-clause"><b>Assenze e disciplina</b><span>' + assenzeTesto + ' ' + disciplinaTesto + '</span></span>' +
         '<span class="wc-clause"><b>Recupero del richiamo</b><span>' + recuperoTesto + '</span></span>' +
         '<span class="wc-clause wc-career"><b>Carriera interna</b><span>Presenze e progressione restano legate alla ' +

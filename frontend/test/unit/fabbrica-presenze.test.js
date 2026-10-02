@@ -214,6 +214,167 @@ describe("cartellino presenze Fabbrica", () => {
     expect(contratto.cicloSettimane).toBe(4);
   });
 
+  it("prevede due giorni di ferie per ciclo, richiesti almeno il giorno prima", () => {
+    const ctx = {
+      G:{
+        year:1,week:1,day:1,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{fabbrica:{contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"}}}
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const def=vm.runInContext('lavoroContrattoDef("fabbrica")',ctx);
+    expect(def.ferieGiorniPerCiclo).toBe(2);
+    expect(def.ferieAnticipoMinimoGiorni).toBe(1);
+
+    expect(vm.runInContext('lavoroFerieRichiedi("fabbrica",1).ok',ctx)).toBe(false);
+    expect(vm.runInContext('lavoroFerieRichiedi("fabbrica",2).ok',ctx)).toBe(true);
+    expect(vm.runInContext('lavoroFerieRichiedi("fabbrica",3).ok',ctx)).toBe(true);
+
+    const terza=vm.runInContext('lavoroFerieRichiedi("fabbrica",4)',ctx);
+    expect(terza.ok).toBe(false);
+    expect(terza.reason).toContain("2 giorni");
+    expect(vm.runInContext('lavoroFerieDisponibili("fabbrica",0)',ctx)).toBe(0);
+  });
+
+  it("la quota ferie appartiene al ciclo di destinazione anche oltre il cambio mese", () => {
+    const ctx = {
+      G:{
+        year:1,week:4,day:7,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{fabbrica:{contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"}}}
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const lunediProssimoCiclo=29;
+    const out=vm.runInContext('lavoroFerieRichiedi("fabbrica",29)',ctx);
+    expect(out.ok).toBe(true);
+    expect(out.richiesta.cycle).toBe(1);
+    expect(vm.runInContext('lavoroFerieDisponibili("fabbrica",0)',ctx)).toBe(2);
+    expect(vm.runInContext('lavoroFerieDisponibili("fabbrica",1)',ctx)).toBe(1);
+  });
+
+  it("un giorno di ferie copre la presenza senza creare un turno o una paga", () => {
+    const ctx = {
+      G:{
+        year:1,week:1,day:4,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2,3]}
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    expect(vm.runInContext('lavoroFerieRichiedi("fabbrica",5).ok',ctx)).toBe(true);
+    ctx.G.day=5;
+
+    const stato=vm.runInContext('lavoroTurnoConsentitoOggi("fabbrica")',ctx);
+    expect(stato.ok).toBe(false);
+    expect(stato.phase).toBe("vacation");
+
+    ctx.G.day=7;
+    const out=vm.runInContext(
+      'lavoroValutaDisciplinaSettimana("fabbrica",1,0,0,G.workplaces.fabbrica.attendance.turni,{silent:true})',
+      ctx
+    );
+    expect(out.workedDays).toBe(4);
+    expect(out.vacationDays).toBe(1);
+    expect(out.coveredDays).toBe(5);
+    expect(out.absences).toBe(0);
+    expect(out.reliabilityDelta).toBe(0);
+  });
+
+  it("le ferie approvate possono mantenere perfetto il ciclo senza inventare presenze", () => {
+    const ctx = {
+      G:{
+        year:1,week:4,day:7,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[
+              0,1,2,3,
+              7,8,9,10,11,
+              14,15,16,17,18,
+              21,22,23,24,25
+            ]},
+            leave:{requests:[{targetAbsoluteDay:5,requestedAbsoluteDay:4,cycle:0,status:"approved"}]}
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const out=vm.runInContext('lavoroValutaCiclo("fabbrica",0,G.workplaces.fabbrica.attendance.turni)',ctx);
+    expect(out.fullWeeks).toBe(4);
+    expect(out.absences).toBe(0);
+    expect(out.perfect).toBe(true);
+    expect(out.settimane[0].giorni).toBe(4);
+    expect(out.settimane[0].ferie).toBe(1);
+    expect(out.settimane[0].coperti).toBe(5);
+  });
+
+  it("ferie e straordinario non possono occupare lo stesso giorno", () => {
+    const ctx = {
+      G:{
+        year:1,week:1,day:5,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:0,turni:[0,1,2,3,4]}
+          }
+        }
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    expect(vm.runInContext('lavoroFerieRichiedi("fabbrica",6).ok',ctx)).toBe(true);
+    expect(vm.runInContext('lavoroCandidatoStraordinario("fabbrica")',ctx)).toBeNull();
+
+    ctx.G.workplaces.fabbrica.leave={requests:[]};
+    vm.runInContext('lavoroTentaRichiestaStraordinario("fabbrica",0)',ctx);
+    const ferie=vm.runInContext('lavoroFerieRichiedi("fabbrica",6)',ctx);
+    expect(ferie.ok).toBe(false);
+    expect(ferie.reason).toContain("straordinario");
+  });
+
+  it("la schermata Fabbrica espone ferie, cartellino e regola del giorno prima", () => {
+    const luoghi=leggi("js/game/luoghi-foto.js");
+    const hub=leggi("js/game/hub.js");
+    const css=leggi("css/luoghi-foto.css");
+
+    expect(luoghi).toContain('lfPan("Ferie", lfFabbricaFerie(), "orologio")');
+    expect(luoghi).toContain('data-ferie-select="fabbrica"');
+    expect(luoghi).toContain('data-ferie-request="fabbrica"');
+    expect(luoghi).toContain('const inFerie = feriePosizioni.has(pos) && !n;');
+    expect(luoghi).toContain('il giorno stesso non si recupera');
+    expect(hub).toContain('<b>Ferie</b>');
+    expect(hub).toContain('ferieAnticipoMinimoGiorni');
+    expect(css).toContain(".lfpres-day.ferie{");
+  });
+
   it("conta per la quota settimanale i giorni distinti, non i doppi turni", () => {
     const ctx = { G:{year:1,week:1,day:1}, Number, Math, Array, Object, Set };
     ctx.totalWeeks = () => (ctx.G.year - 1) * 52 + ctx.G.week;
@@ -1317,7 +1478,8 @@ describe("cartellino presenze Fabbrica", () => {
        e la classe «domenica» resta solo alla Fabbrica */
     expect(luoghi).toContain("const giornoRiposo = riposo === numeroGiorno;");
     expect(luoghi).toContain("const settimanaConclusa = settimana < (cart.settimana - 1);");
-    expect(luoghi).toContain("const nonLavorato = settimanaConclusa && giornoOrdinario && !giornoRiposo && n === 0;");
+    expect(luoghi).toContain("const inFerie = feriePosizioni.has(pos) && !n;");
+    expect(luoghi).toContain("const nonLavorato = settimanaConclusa && giornoOrdinario && !giornoRiposo && n === 0 && !inFerie;");
     expect(luoghi).toContain('(luogo === "fabbrica" && numeroGiorno === 7 ? " domenica" : "")');
     expect(luoghi).toContain('(nonLavorato ? " non-lavorato" : "")');
 
