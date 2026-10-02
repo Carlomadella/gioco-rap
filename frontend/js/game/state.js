@@ -37,6 +37,7 @@ const START = () => ({
     protezioneStato:{providerPersonId:null,providerName:null,level:0,source:null,prepaidWeekKey:null,history:[]},
     avvocatoStato:{personId:null,name:null,retained:false,source:null,prepaidWeekKey:null,history:[]},
     ferroStato:{sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]},
+    offerteColpi:{absoluteDay:null,ids:[],previousIds:[]},
     attivita:{}, precedenti:0, arresto:null, giroAvviato:false,
     /* Punto Strada 1: il mondo criminale nasce nascosto. La "strana proposta"
        apre una fase introduttiva di due lavoretti protetti; solo dopo compare
