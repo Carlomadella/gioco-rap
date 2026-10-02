@@ -28,7 +28,7 @@
        soltanto la cosa che uno era venuto a fare. Gli altri posti gli orari
        li tengono — è la differenza fra il tuo mestiere e il resto della città. */
     studio:    {allDay:true},
-    pizzeria:  {open:"16:00", close:"02:00"},
+    pizzeria:  {open:"17:00", close:"02:00"},
     /* Il Circolo (js/game/circolo.js): di pomeriggio il retro, la sera il
        palco, fino alle tre. Le fasce dentro stanno in CIRCOLO_FASCE. */
     beat:      {open:"13:00", close:"03:00"},
