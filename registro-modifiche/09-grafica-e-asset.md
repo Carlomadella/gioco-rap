@@ -6,6 +6,33 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:58261118 -->
+## 02/10/26, 09:11 — task/fabbrica-ferie → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `58261118`
+
+### Cosa è entrato
+
+- `07df673b` — Merge pull request #40 from Carlomadella/main — **mycolbraga**
+- `d30431d3` — test(fabbrica): allinea il cartellino ai giorni di ferie — **mycolbraga**
+- `50674d7c` — chore(cache): invalida ferie Fabbrica — **mycolbraga**
+- `e4bebae3` — docs(fabbrica): documenta ferie e anticipo minimo — **mycolbraga**
+- `4c4b4368` — test(fabbrica): copre ferie, anticipo e collisioni — **mycolbraga**
+- `a434d232` — style(fabbrica): distingue ferie e richiesta nel cartellino — **mycolbraga**
+- `21ca3a10` — ui(fabbrica): permette di richiedere due giorni di ferie — **mycolbraga**
+- `d267dca7` — ui(fabbrica): documenta le ferie nel contratto — **mycolbraga**
+- `6c0efcb9` — feat(fabbrica): integra ferie con presenze e straordinari — **mycolbraga**
+- `b0f5f197` — feat(fabbrica): aggiunge ferie richieste in anticipo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/luoghi-foto.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:f672163c -->
 ## 02/10/26, 00:53 — task/fabbrica-progressione-carriera-ui → main
 
