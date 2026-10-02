@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MakeHuman mobile bridge</title>
+<style>
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#050609}
+iframe{display:block;width:100%;height:100%;border:0;background:#050609}
+</style>
+</head>
+<body>
+<iframe id="makehuman-mobile-inner"
+        src="../makehuman-camerino-v1/index.html?v=mobile-1"
+        title="Editor MakeHuman personaggio"></iframe>
+<script>
+"use strict";
+(()=>{
+  const inner=document.getElementById("makehuman-mobile-inner");
+  const TARGET_HEARTBEAT_MS=10000;
+  const TARGET_MAX_MS=360000;
+
+  let innerCaricato=false;
+  let targetHeartbeat=null;
+  let targetInizio=0;
+  const coda=[];
+
+  const manda=(type,extra={})=>{
+    try{ parent.postMessage({type,...extra},"*"); }catch(e){}
+  };
+
+  const fermaTargetHeartbeat=()=>{
+    if(targetHeartbeat){
+      clearInterval(targetHeartbeat);
+      targetHeartbeat=null;
+    }
+    targetInizio=0;
+  };
+
+  const avviaTargetHeartbeat=()=>{
+    if(targetHeartbeat) return;
+
+    targetInizio=Date.now();
+    targetHeartbeat=setInterval(()=>{
+      if(Date.now()-targetInizio>=TARGET_MAX_MS){
+        fermaTargetHeartbeat();
+        /* Nel creator normale questo messaggio viene ignorato. Nell'avvio
+           rapido chiude invece un caricamento che sul telefono non ha finito
+           neppure dopo sei minuti. */
+        manda("adf-makehuman-quick-preset-error",{
+          message:"MakeHuman sul telefono non ha completato il modello entro sei minuti."
+        });
+        return;
+      }
+
+      /* Non fingiamo una percentuale: diciamo solo che il caricamento del
+         blocco da ~145 MB e' ancora vivo. Il gioco usa le notizie ricevute
+         come watchdog di silenzio. */
+      manda("adf-makehuman-progress",{
+        message:"Carico il modello MakeHuman sul telefono…"
+      });
+    },TARGET_HEARTBEAT_MS);
+  };
+
+  /* Sul telefono il solo bootstrap puo' superare i 20 s del desktop. Questo
+     primo segnale sposta l'avvio rapido sul watchdog lungo senza modificare
+     nessun timeout o runtime della versione PC. */
+  manda("adf-makehuman-progress",{
+    message:"Avvio MakeHuman sul telefono…"
+  });
+
+  inner.addEventListener("load",()=>{
+    innerCaricato=true;
+    while(coda.length){
+      try{ inner.contentWindow.postMessage(coda.shift(),"*"); }catch(e){}
+    }
+  });
+
+  window.addEventListener("message",event=>{
+    if(event.source===parent){
+      if(innerCaricato){
+        try{ inner.contentWindow.postMessage(event.data,"*"); }catch(e){}
+      }else{
+        coda.push(event.data);
+      }
+      return;
+    }
+
+    if(event.source!==inner.contentWindow) return;
+
+    const msg=event.data||{};
+    if(msg.type==="adf-makehuman-progress"){
+      const testo=String(msg.message||"");
+      if(/targets\.bin/i.test(testo) && !/(caricato|pronto)/i.test(testo)){
+        avviaTargetHeartbeat();
+      }else{
+        fermaTargetHeartbeat();
+      }
+    }else if(
+      msg.type==="adf-makehuman-ready" ||
+      msg.type==="adf-makehuman-quick-preset-result" ||
+      msg.type==="adf-makehuman-quick-preset-error"
+    ){
+      fermaTargetHeartbeat();
+    }
+
+    try{ parent.postMessage(msg,"*"); }catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

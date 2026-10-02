@@ -362,11 +362,13 @@ finivano coi puntini, adesso vanno a capo fino a tre righe. Sta in
 `implementazioni/02-interfaccia-e-telefono.md`, «Le tre del Marketing».
 
 **La prova su un telefono vero è iniziata (02/10/2026).** Il trascinamento delle pagine
-funziona sul dispositivo reale; il primo caricamento MakeHuman può invece ancora andare in
-timeout ed è un problema separato. Da questo test è stata fissata anche la regola
-architetturale: **desktop e mobile condividono il gioco, ma un problema solo mobile non si
-corregge modificando ciò che già funziona su PC**. Restano da completare il bootstrap
-mobile dell'avatar e il resto del giro reale sulle schermate prima di chiudere la tappa.
+funziona sul dispositivo reale. **FATTO in parte (02/10/2026) — bootstrap MakeHuman
+mobile isolato**: il telefono passa da `js/mobile/makehuman-mobile.js` e dal relay
+`media/makehuman-mobile-v1/index.html`; durante il caricamento silenzioso di
+`targets.bin` (~145 MB) il relay tiene vivo il watchdog ogni 10 s, con un tetto di sei
+minuti. Il percorso desktop (`gioco-ingresso.js`, creator e runtime MakeHuman) non è stato
+modificato. Resta da rifare il primo avvio sul telefono reale e completare il resto del
+giro sulle schermate prima di chiudere la tappa.
 
 ### H · Los Angeles _(da fare)_
 

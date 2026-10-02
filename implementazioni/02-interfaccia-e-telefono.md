@@ -2964,3 +2964,24 @@ specifico senza divergere nelle regole del gioco.
 Il timeout del primo caricamento MakeHuman resta invece un problema distinto da risolvere
 nel percorso mobile senza cambiare il comportamento desktop che già funziona.
 
+---
+
+## Mobile · Punto 1 — il primo caricamento MakeHuman non deve andare in timeout
+
+**FATTO in parte (02/10/2026)** — il fix è stato costruito senza cambiare il percorso PC.
+
+Il desktop continua ad aprire direttamente `media/makehuman-camerino-v1/index.html` con
+gli stessi `gioco-ingresso.js`, creator e runtime di prima. Solo su schermo touch stretto
+`frontend/js/mobile/makehuman-mobile.js` sostituisce la sorgente dell'iframe MakeHuman
+con `media/makehuman-mobile-v1/index.html`.
+
+Il file mobile è un relay: mostra lo stesso camerino e inoltra gli stessi messaggi, ma
+quando il runtime entra nella fase lunga `targets.bin` (~145 MB) manda al gioco un
+heartbeat ogni 10 secondi. Non inventa percentuali. Dopo sei minuti senza aver completato
+quella fase l'avvio rapido fallisce invece di poter restare appeso per sempre. Il primo
+segnale mobile evita inoltre il limite iniziale da 20 secondi pensato per il desktop.
+
+**Da verificare sul dispositivo reale:** nuova partita rapida da cache vuota attraverso il
+tunnel. Il punto si chiude solo quando il personaggio arriva al creator senza timeout; il
+test automatico copre separazione PC/mobile, sorgente del relay e contratto heartbeat.
+
