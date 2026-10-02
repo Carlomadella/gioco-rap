@@ -766,6 +766,18 @@
   .stab i{font-size:12px}
 }
 
+/* Mobile landscape: 844×390 è gameplay supportato. Sul telefono la riga
+   desktop testo|controllo comprime il testo contro slider/segmenti; la stessa
+   composizione verticale che usavamo sotto 620 deve valere fino a 900, ma
+   soltanto con puntatore touch, così una finestra desktop stretta non cambia. */
+@media (pointer:coarse) and (max-width:900px){
+  .srow{flex-direction:column;align-items:flex-start;gap:10px}
+  .srow .sctl{width:100%}
+  .sld{width:100%}
+  .sld input[type=range]{width:100%;flex:1}
+  .sw2row{max-width:none;justify-content:flex-start}
+}
+
 @media (max-width:620px){
   .setts{padding:0}
   .swrap{border-radius:0;min-height:100%}
