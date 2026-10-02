@@ -113,6 +113,16 @@ test("CI usa npm ci con Node 22 e cache del lockfile frontend",
   ciWorkflow.includes("node-version: 22") &&
   ciWorkflow.includes("run: npm ci") &&
   ciWorkflow.includes("frontend/package-lock.json"));
+
+/* Dal 02/10/2026 il gameplay mobile e' landscape-only. In portrait la CI
+   controlla solo l'avviso di rotazione, non un secondo layout di gioco. */
+test("la CI copre gameplay landscape e avviso portrait",
+  leggi("test/e2e/mobile-landscape.spec.js").includes("viewport: { width: 844, height: 390 }") &&
+  leggi("test/e2e/mobile-landscape.spec.js").includes("isMobile: true") &&
+  leggi("test/e2e/mobile-landscape.spec.js").includes("hasTouch: true") &&
+  leggi("test/e2e/mobile-touch.spec.js").includes("viewport: { width: 390, height: 844 }") &&
+  leggi("test/e2e/mobile-touch.spec.js").includes("ruota il telefono in orizzontale") &&
+  fs.readFileSync(path.resolve(ROOT,"..",".claude","agents","prova-sul-telefono.md"),"utf8").includes("non eseguire il gameplay in portrait"));
 /* Il gate CI verifica il flusso Avvio rapido fino all'hub senza affidare
    l'esito alle prestazioni di targets.bin sul runner headless. La prova
    MakeHuman completa non sparisce: resta esplicita e manuale. */

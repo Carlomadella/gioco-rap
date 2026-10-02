@@ -40,8 +40,12 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    3. **account veri** (Steam, Sign in with Apple, Google Play Games) al posto della chiave
       nel browser — e la **cancellazione dell'account dentro al gioco**, che Apple e Google
       pretendono;
-   4. **l'interfaccia per il telefono**: la plancia è disegnata a 1536×1024 e scalata, in
-      verticale non ci sta. È il lavoro più lungo di tutta la lista;
+   4. **l'interfaccia per il telefono**: dal 02/10/2026 il **gameplay mobile è supportato
+      in landscape**. La vecchia scelta portrait-first era intenzionale e valida per il
+      gioco del 31/08, ma il progetto nel frattempo è cresciuto: più informazioni, sfondi,
+      cinematiche e schermate ricche rendono il verticale inadatto come layout di gameplay.
+      In portrait si mostra soltanto l'invito a ruotare il dispositivo. È il lavoro più
+      lungo di tutta la lista;
    5. **un database vero**: SQLite appena c'è l'account, PostgreSQL dal primo giorno di
       vendita. Con account e salvataggi in cloud, perdere il database vuol dire perdere le
       carriere della gente.
@@ -142,10 +146,13 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
      ritrovata**. Poi la cancellazione dell'account, e col server spento il gioco che tira
      dritto senza un errore in console.
 
-36. L'interfaccia sul telefono: la plancia e' disegnata a 1536x1024 e scalata, in verticale non ci sta. Disposizione sua, aree da toccare da 44 punti, niente hover, testi leggibili senza zoom. E' il lavoro piu' lungo dei cinque.
+36. L'interfaccia sul telefono: **gameplay mobile supportato in landscape; portrait solo come stato di rotazione**. La vecchia regola portrait-first del 31/08/2026 era una scelta intenzionale per il gioco di allora, ma il progetto è cambiato: schermate più dense, sfondi, cinematiche e più informazioni rendono il verticale inadatto come layout di gameplay. Restano obbligatori aree da toccare da 44 punti, niente hover indispensabili e testi leggibili senza zoom. Non si forza la rotazione a livello di sistema: in portrait si mostra l'invito a ruotare il dispositivo.
 
-   **FATTO in parte (01/09/2026).** La disposizione e le aree da toccare ci
-   sono; restano il tocco vero e il negozio.
+   **FATTO in parte (01/09/2026), decisione di orientamento aggiornata il 02/10/2026.**
+   La responsive storica era stata costruita soprattutto su misure portrait e per soglie
+   di larghezza; non è più il riferimento del layout. Da ora il giro di gameplay mobile
+   copre **844×390 landscape**. A **390×844 portrait** si verifica soltanto che compaia
+   correttamente l'invito a ruotare il dispositivo.
    - **Disposizione sua**: la plancia non è più scalata, è una griglia che si
      impila sotto i 900 px. Da 360 a 2560 px non scorre mai di lato.
    - **Aree da toccare da 44 punti**: `css/tocco.css`, dove si tocca
@@ -157,7 +164,8 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
    - **Niente hover**: fatto l'08/09/2026, riconosciuto qui il 15/09. Tutte le
      regole `:hover` stanno in `@media (hover:hover)`, sul dito non partono, e
      l'audit lo controlla.
-   - **Da fare**: provarlo su un telefono vero, non solo dentro al riquadro.
+   - **Da fare**: provare il gameplay su un telefono vero in landscape; in portrait si
+     controlla soltanto che l'avviso di rotazione compaia correttamente.
    Il dettaglio sta in [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md),
    in fondo.
 
