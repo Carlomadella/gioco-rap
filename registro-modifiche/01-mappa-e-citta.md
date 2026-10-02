@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f6b291e5 -->
+## 02/10/26, 01:25 — task/docs-dimissioni-lavoro → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `f6b291e5`
+
+### Cosa è entrato
+
+- `ac9e7543` — docs: allinea dimissioni e licenziamento al gameplay attuale — **mycolbraga**
+- `e19c7099` — docs: rinomina il punto lavoro su dimissioni e licenziamento — **mycolbraga**
+- `0c168de6` — docs: aggiorna la roadmap sulle dimissioni dai lavori — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:4cb22db3 -->
 ## 02/10/26, 00:39 — task/bancone-neon → main
 
