@@ -2138,7 +2138,8 @@ function stradaRifiutaOpportunita(){
   while(st.history.length>30) st.history.shift();
   st.pending=null;
   st.pendingChoices=[];
-  return proposte.map(x=>Object.assign({},x,{status:"declined",declinedAbsoluteDay:oggi}));
+  const chiuse=proposte.map(x=>Object.assign({},x,{status:"declined",declinedAbsoluteDay:oggi}));
+  return chiuse.length===1 ? chiuse[0] : chiuse;
 }
 function stradaRifiutaPropostaFabbrica(){ return stradaRifiutaOpportunita(); }
 
@@ -2163,7 +2164,8 @@ function stradaIgnoraOpportunita(){
   while(st.history.length>30) st.history.shift();
   st.pending=null;
   st.pendingChoices=[];
-  return proposte.map(x=>Object.assign({},x,{status:"ignored",ignoredAbsoluteDay:oggi}));
+  const ignorate=proposte.map(x=>Object.assign({},x,{status:"ignored",ignoredAbsoluteDay:oggi}));
+  return ignorate.length===1 ? ignorate[0] : ignorate;
 }
 function stradaIgnoraPropostaFabbrica(){ return stradaIgnoraOpportunita(); }
 
