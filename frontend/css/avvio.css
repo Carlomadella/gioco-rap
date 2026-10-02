@@ -25,6 +25,7 @@
 @keyframes avvStepIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
 .land.avvio-aperto .land-giu{opacity:0;pointer-events:none}.land-giu{transition:opacity .22s ease}
 
+.avv-close-mobile{display:none}
 .avv-testa{margin-bottom:17px;max-width:680px}
 .avv-kicker,.avv-back{display:inline-flex;align-items:center;gap:8px;color:#cbbfae;font-size:11px;font-weight:800;
   letter-spacing:.18em;text-transform:uppercase}
