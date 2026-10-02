@@ -376,8 +376,10 @@ non visibile. Il timer ora vive nel documento principale visibile
 (`js/mobile/makehuman-mobile.js`) e genera ogni 10 s lo stesso messaggio che il watchdog
 condiviso riceve dal creator; il relay MakeHuman è tornato a essere solo un ponte senza
 timer. Tetto mobile sempre a sei minuti. Il percorso desktop (`gioco-ingresso.js`, creator
-e runtime MakeHuman) resta invariato. Resta la nuova prova su telefono reale prima di
-chiudere il punto.
+e runtime MakeHuman) resta invariato. In più c'è ora un test Playwright su Chromium
+touch 390×844 che verifica nel browser reale che `ADF_MAKEHUMAN_MOBILE` sia attivo e che
+il creator richieda davvero `media/makehuman-mobile-v1/index.html?v=3`, senza scaricare i
+145 MB. Resta la nuova prova su telefono reale prima di chiudere il punto.
 
 ### H · Los Angeles _(da fare)_
 
