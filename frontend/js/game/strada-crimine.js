@@ -86,7 +86,8 @@ const STRADA_PROT = [
 ];
 
 const STRADA_UOMO_COSTO = 500, STRADA_UOMO_UPKEEP = 140, STRADA_UOMO_MAX = 5;
-const STRADA_FERRO_COSTO = 900, STRADA_AVVOCATO_COSTO = 320;
+const STRADA_FERRO_COSTO = 1200, STRADA_AVVOCATO_COSTO = 320;
+const STRADA_FERRO_REP_MIN = 20, STRADA_FERRO_FIDUCIA_MIN = 50;
 
 /* La Fabbrica è soltanto UNO dei punti in cui una persona della Strada può
    intercettarti. L'offerta non è "un crimine da Fabbrica": pesca da un pool
@@ -526,6 +527,99 @@ function stradaPersonaSquadra(id){
 function stradaBonusFiduciaSquadra(p){
   if(!p) return 0;
   return clamp(stradaFiduciaValore(p)/100*.10,.03,.10);
+}
+
+function stradaFerroStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.ferroStato || typeof s.ferroStato!=="object"){
+    s.ferroStato={
+      sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,
+      lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]
+    };
+  }
+  const st=s.ferroStato;
+  if(!Array.isArray(st.history)) st.history=[];
+  /* Legacy: prima del punto 5 il ferro non aveva provenienza. Non lo togliamo
+     a chi lo possiede già: lo marchiamo come legacy e basta. */
+  if(s.ferro && !st.source){
+    st.source="legacy";
+    st.acquiredAbsoluteDay=st.acquiredAbsoluteDay||stradaAbsDay();
+  }
+  return st;
+}
+
+function stradaPersonaFerro(){
+  return (G.gente||[])
+    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+      stradaFiduciaValore(p)>=STRADA_FERRO_FIDUCIA_MIN)
+    .sort((a,b)=>
+      stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
+      Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0)
+    )[0] || null;
+}
+
+function stradaTentaPropostaFerro(roll){
+  const s=G.strada||{}, st=stradaFerroStato();
+  if(!stradaGiroAvviato() || s.arresto || s.ferro || st.pending) return null;
+  if(Number(s.rep||0)<STRADA_FERRO_REP_MIN) return null;
+  if(typeof stradaHaTrapPhone==="function" && !stradaHaTrapPhone()) return null;
+
+  const persona=stradaPersonaFerro();
+  if(!persona) return null;
+
+  const oggi=stradaAbsDay();
+  if(Number(st.lastCheckAbsoluteDay)===oggi) return null;
+  if(st.nextOfferAbsoluteDay!=null && oggi<Number(st.nextOfferAbsoluteDay)) return null;
+  st.lastCheckAbsoluteDay=oggi;
+
+  const r=roll==null?Math.random():Number(roll);
+  if(!Number.isFinite(r) || r>=.08) return null;
+
+  st.pending={
+    personId:persona.id,
+    persona:persona.n,
+    costo:STRADA_FERRO_COSTO,
+    createdAbsoluteDay:oggi
+  };
+  return Object.assign({},st.pending);
+}
+
+function stradaRifiutaFerro(){
+  const st=stradaFerroStato();
+  if(!st.pending) return null;
+  st.history.push(Object.assign({},st.pending,{status:"declined",closedAbsoluteDay:stradaAbsDay()}));
+  if(st.history.length>12) st.history.shift();
+  st.pending=null;
+  st.nextOfferAbsoluteDay=stradaAbsDay()+14;
+  if(typeof save==="function") save();
+  return true;
+}
+
+function stradaAccettaFerro(){
+  const s=G.strada, st=stradaFerroStato(), p=st.pending;
+  if(!p) return {ok:false,reason:"Non c'è nessuna proposta aperta."};
+  if(G.money<Number(p.costo||STRADA_FERRO_COSTO))
+    return {ok:false,reason:"Ti servono "+fmt(p.costo||STRADA_FERRO_COSTO)+" € per chiudere il favore."};
+
+  G.money-=Number(p.costo||STRADA_FERRO_COSTO);
+  s.ferro=true;
+  st.sourcePersonId=p.personId||null;
+  st.sourceName=p.persona||null;
+  st.acquiredAbsoluteDay=stradaAbsDay();
+  st.source="trusted-contact";
+  st.history.push(Object.assign({},p,{status:"acquired",closedAbsoluteDay:stradaAbsDay()}));
+  if(st.history.length>12) st.history.shift();
+  st.pending=null;
+  st.nextOfferAbsoluteDay=null;
+
+  const persona=stradaPersonaDaId(st.sourcePersonId);
+  if(persona) stradaModificaFiducia(persona,4,"ferro-procurato");
+
+  pushLog("<b>"+(st.sourceName||"Un contatto")+" ti ha procurato il ferro.</b> Da questo momento averlo addosso o in casa cambia davvero il rischio.", "bad");
+  if(typeof save==="function") save();
+  if(typeof renderStrada==="function") renderStrada();
+  if(typeof renderGioco==="function") renderGioco();
+  return {ok:true,persona:st.sourceName,costo:Number(p.costo||STRADA_FERRO_COSTO)};
 }
 
 function stradaSegnaPersona(p,meta){
@@ -1318,13 +1412,14 @@ function stImpostaProtezione(livello){
     : "Protezione: " + p.n.toLowerCase() + ", " + fmt(p.costo) + " €/sett.";
 }
 function stCompraFerro(){
-  const s = G.strada;
-  if(s.ferro) return "Il ferro ce l'hai già.";
-  if(G.money < STRADA_FERRO_COSTO) return "Non hai " + fmt(STRADA_FERRO_COSTO) + " €.";
-  G.money -= STRADA_FERRO_COSTO; s.ferro = true;
-  pushLog("Hai preso il ferro. Cambia i conti, in bene e in male.", "");
-  save(); renderStrada(); renderGioco();
-  return "Hai preso il ferro. Cambia i conti, in bene e in male.";
+  if(G.strada.ferro) return "Il ferro ce l'hai già.";
+  const st=stradaFerroStato();
+  if(st.pending) return "Non lo compri da questa schermata: devi rispondere alla proposta di "+(st.pending.persona||"un contatto")+".";
+  const p=stradaPersonaFerro();
+  if(!p) return "Non hai ancora nessuno che si fidi abbastanza da procurartelo.";
+  if(Number(G.strada.rep||0)<STRADA_FERRO_REP_MIN)
+    return "Il contatto c'è, ma il tuo nome non gira ancora abbastanza perché si prenda quel rischio.";
+  return "Non è merce da scaffale. Se "+p.n+" decide di aprirti quella porta, la proposta arriverà sul TrapPhone.";
 }
 function stToggleAvvocato(){
   G.strada.avvocato = !G.strada.avvocato;
@@ -1795,13 +1890,26 @@ function stradaSettimana(){
     s.rep = clamp(s.rep + salita * .5, 0, 100);
   }
 
-  /* il controllo delle sei del mattino, oltre i 50 di attenzione */
-  if(s.heat > 50 && Math.random() < .15){
+  /* Punto 5: possedere il ferro è già un rischio. Senza ferro i controlli
+     seri restano legati a heat > 50; col ferro possono partire prima e la
+     probabilità cresce con attenzione e precedenti. */
+  const rischioControllo=s.ferro
+    ? clamp(.03 + Math.max(0,Number(s.heat||0)-20)/100*.18 + Number(s.precedenti||0)*.02 - Number(s.prot||0)*.01,.03,.28)
+    : (s.heat>50?.15:0);
+  if(rischioControllo>0 && Math.random()<rischioControllo){
     if(s.ferro){
-      s.ferro = false;
+      const ferroSt=stradaFerroStato();
+      s.ferro=false;
+      ferroSt.history.push({
+        status:"seized",
+        sourcePersonId:ferroSt.sourcePersonId||null,
+        sourceName:ferroSt.sourceName||null,
+        closedAbsoluteDay:stradaAbsDay()
+      });
+      if(ferroSt.history.length>12) ferroSt.history.shift();
       const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
       s.precedenti++; s.arresto = {settimane:settimane, colpo:"perquisizione"};
-      pushLog("<b>Controllo alle sei del mattino.</b> Il ferro in casa non si spiega da solo.", "bad");
+      pushLog("<b>Controllo alle sei del mattino.</b> Trovano il ferro: viene sequestrato e la situazione diventa penale.", "bad");
     }else pushLog("Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.", "");
   }
 
@@ -2102,9 +2210,11 @@ function renderStCopre(){
       '<div class="pills"><button class="pill' + (s.prot > 0 ? " on" : "") + '" data-stprot>' + prot.n + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Il ferro</strong>' +
-      '<span>Più riuscita. Se ti trovano, la pena raddoppia.</span></div>' +
-      '<div class="pills"><button class="pill danger' + (s.ferro ? " on" : G.money < STRADA_FERRO_COSTO ? " no" : "") + '" data-stferro>' +
-      (s.ferro ? "Ce l'hai" : fmt(STRADA_FERRO_COSTO) + " €") + '</button></div></div>' +
+      '<span>' + (s.ferro
+        ? 'Lo possiedi. Più riuscita, ma un controllo può diventare carcere.'
+        : 'Non si compra qui: serve un contatto molto fidato che si prenda il rischio di procurartelo.') + '</span></div>' +
+      '<div class="pills"><button class="pill danger' + (s.ferro ? " on" : "") + '" data-stferro>' +
+      (s.ferro ? "Ce l\'hai" : "Serve un contatto") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Avvocato</strong>' +
       '<span>' + fmt(STRADA_AVVOCATO_COSTO) + ' €/sett. · l\'attenzione cala più in fretta.</span></div>' +
