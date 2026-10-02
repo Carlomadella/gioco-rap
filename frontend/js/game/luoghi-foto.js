@@ -540,11 +540,11 @@ function lfSegnoTurno(v,unita){
   return (n>0?"+":n<0?"−":"")+Math.abs(n)+(unita||"");
 }
 
-function lfFabbricaEsitoTurno(){
+function lfEsitoTurnoLavoro(luogo){
   const e=LUOGO.esito||{};
   const p=LUOGO.prima||{};
   const out=typeof lavoroUltimoEsitoTurno==="function"
-    ? lavoroUltimoEsitoTurno("fabbrica")
+    ? lavoroUltimoEsitoTurno(luogo)
     : null;
   const pay=out&&out.pay ? out.pay : {};
   const presenza=out&&out.attendance ? out.attendance : null;
@@ -585,6 +585,9 @@ function lfFabbricaEsitoTurno(){
     '</div>';
 }
 
+function lfFabbricaEsitoTurno(){ return lfEsitoTurnoLavoro("fabbrica"); }
+function lfPizzeriaEsitoTurno(){ return lfEsitoTurnoLavoro("pizzeria"); }
+
 function lfCarrieraSegno(v){
   const n=Number(v||0);
   return (n>0?"+":n<0?"−":"")+Math.abs(n);
@@ -602,9 +605,9 @@ function lfCarrieraReq(label,req,suffisso){
   '</div>';
 }
 
-function lfFabbricaCarriera(){
+function lfCarrieraLavoro(luogo){
   const p=typeof lavoroProgressoCarriera==="function"
-    ? lavoroProgressoCarriera("fabbrica")
+    ? lavoroProgressoCarriera(luogo)
     : null;
   if(!p) return '<div class="stvuoto">Progressione non disponibile.</div>';
 
@@ -655,6 +658,9 @@ function lfFabbricaCarriera(){
     '<p class="lfcareer-note">Le soglie aprono una <b>candidatura</b>: aumento e promozione arrivano come proposta di carriera dopo un turno, non automaticamente.</p>'+
   '</div>';
 }
+
+function lfFabbricaCarriera(){ return lfCarrieraLavoro("fabbrica"); }
+function lfPizzeriaCarriera(){ return lfCarrieraLavoro("pizzeria"); }
 
 function lfFabbrica(){
   const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
@@ -820,6 +826,10 @@ function lfPizzeria(){
     e:G.job.e,
     d:G.job.d || baseDef.d
   } : baseDef;
+  const effettiRuolo = mio && typeof lavoroEffettiTurno === "function"
+    ? lavoroEffettiTurno("pizzeria", G.job)
+    : null;
+  const energiaTurno = effettiRuolo ? Number(effettiRuolo.energia || def.e) : def.e;
 
   let stato = {ok:true, perche:""};
   let orario = "Turno serale";
@@ -849,12 +859,20 @@ function lfPizzeria(){
   else if(bloccoRiassunzione.active)
     stato = {ok:false, perche:"Riassunzione bloccata · " + bloccoRiassunzione.weeksRemaining +
       (bloccoRiassunzione.weeksRemaining === 1 ? " settimana" : " settimane")};
-  else if(stato.ok && G.energy < def.e) stato = {ok:false, perche:"Serve energia"};
+  else if(stato.ok && G.energy < energiaTurno) stato = {ok:false, perche:"Serve energia"};
+
+  const caricoRuolo = effettiRuolo
+    ? (lfSegnoTurno(Number(effettiRuolo.benessere || 0)) + " benessere · " +
+       lfSegnoTurno(Number(effettiRuolo.lucidita || 0)) + " lucidità" +
+       (effettiRuolo.fisico ? " · fisico " + lfEsc(effettiRuolo.fisico) : "") +
+       (effettiRuolo.stress ? " · stress " + lfEsc(effettiRuolo.stress) : ""))
+    : null;
 
   const sx = lfPan("La cucina",
     lfRiga("Mansione", def.n) +
     lfRiga("Paga", fmt(def.pay) + " €", "oro") +
-    lfRiga("Costo", "−" + def.e + " energia") +
+    lfRiga("Costo", "−" + energiaTurno + " energia") +
+    (caricoRuolo ? lfRiga("Impatto servizio", caricoRuolo) : "") +
     '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>' +
     (mio
       ? '<button type="button" class="lfdimissioni" data-dimissioni="pizzeria">Dai le dimissioni</button>'
@@ -884,7 +902,7 @@ function lfPizzeria(){
     on:true,
     n:mio ? "Il tuo servizio" : "Posto da lavapiatti",
     d:orario + (quota ? " · " + quota + " turni/settimana" : ""),
-    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + def.e + " energia") : stato.perche,
+    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + energiaTurno + " energia") : stato.perche,
     vCls:stato.ok ? "" : "calmo"
   });
 
@@ -895,7 +913,9 @@ function lfPizzeria(){
       : "Leggi e firma il contratto";
   const azioneLavoro = mio ? ' data-vai="turno"' : ' data-lavoro="' + baseDef.id + '"';
 
-  const mid = lfPan(mio ? "Prima del servizio" : "Vuoi lavorare qui?",
+  const mid = LUOGO.esito && LUOGO.esito.a === "turno" && mio
+    ? lfPan("Servizio completato", lfPizzeriaEsitoTurno(), "spunta")
+    : lfPan(mio ? "Prima del servizio" : "Vuoi lavorare qui?",
     '<p class="stnota">' +
       (mio
         ? (straordinarioOggi
@@ -917,11 +937,12 @@ function lfPizzeria(){
       (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
       ' · +' + fmt(pagaTurno.totale) + ' €' +
       (pagaTurno.percentuale ? ' (+' + pagaTurno.percentuale + '%)' : '') +
-      ' · −' + def.e + ' energia</button></div>' +
+      ' · −' + energiaTurno + ' energia</button></div>' +
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 
-  const dx = lfPan("Settimane in cucina", lfPizzeriaCartellino(), "orologio");
+  const dx = lfPan("Settimane in cucina", lfPizzeriaCartellino(), "orologio") +
+    (mio ? lfPan("Carriera", lfPizzeriaCarriera(), "spunta") : "");
 
   return {sx:sx, mid:mid, dx:dx};
 }

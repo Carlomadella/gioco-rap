@@ -125,7 +125,8 @@ describe("identità gameplay Pizzeria", () => {
     expect(G.skills.rete).toBeCloseTo(.10);
     expect(G.workplaces.pizzeria.network.history[0].networkBonus).toBeCloseTo(.10);
 
-    G.day=8;
+    G.week=2;
+    G.day=3;
     ctx.postoContattoLavoroCandidato=()=>persone[0];
     const ripreso = vm.runInContext('lavoroTentaIncontroContatto("pizzeria",0,G.job)',ctx);
     expect(ripreso.id).toBe(nuovo.id);
