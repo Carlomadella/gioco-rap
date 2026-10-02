@@ -1,3 +1,5 @@
+.land-mobile-copy{display:none}
+
 /* MOBILE LANDSCAPE — 02/10/2026
    Gameplay mobile supportato in orizzontale.
    Questo foglio viene caricato per ultimo e non modifica desktop o portrait. */
@@ -81,6 +83,7 @@
   /* Mobile: la landing finisce qui; niente teaser/copyright lungo sotto. */
   #s-menu > .menu{display:none}
   .land-mobile-copy{
+    display:block;
     position:absolute;
     right:12px;
     bottom:3px;
