@@ -208,7 +208,8 @@ function ccSala(f){
           '<ul><li>' + ccIco("info") + 'Città di provincia</li>' +
             (gen ? '<li>' + ccIco("nota") + ccEsc(gen) + '</li>' : "") +
             '<li>' + ccIco("gente") + (p.fama >= 30 ? "Conosce molti nella scena locale" : "Gira nel giro da poco") + '</li>' +
-            (p.strada && p.strada.known ? '<li>' + ccIco("rischio") + 'Sai che è collegato alla Strada</li>' : "") +
+            (p.strada && p.strada.known ? '<li>' + ccIco("rischio") + 'Sai che è collegato alla Strada' +
+              (typeof stradaFiduciaEtichetta==="function" ? ' · fiducia: ' + stradaFiduciaEtichetta(p) : '') + '</li>' : "") +
             (p.scoperto ? '<li>' + ccIco("faccia") + 'Carattere: ' + (CIRCOLO_CARATTERE[p.car] || p.car) + '</li>' : "") +
           '</ul></div>' +
         '<div class="cc-shfoto">' + ccFaccia(p) + '</div>' +
