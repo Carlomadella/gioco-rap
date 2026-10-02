@@ -6,6 +6,39 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f442a416 -->
+## 02/10/26, 07:53 — task/reset-carriera-fine-contratto → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `f442a416`
+
+### Cosa è entrato
+
+- `3bd41177` — test(regressioni): allinea il gate al reset carriera — **mycolbraga**
+- `3b85784c` — chore(cache): invalida chiusura contratto nei luoghi — **mycolbraga**
+- `669d9c71` — refactor(lavoro): usa chiusura contratto atomica nel licenziamento — **mycolbraga**
+- `2f8eb696` — refactor(lavoro): lascia la chiusura job al contratto — **mycolbraga**
+- `04af1fb9` — fix(lavoro): rende atomica la chiusura del contratto — **mycolbraga**
+- `f2733d72` — docs(lavoro): allinea roadmap al reset carriera — **mycolbraga**
+- `1eaf3c49` — chore(cache): invalida reset carriera lavoro — **mycolbraga**
+- `c20b42b6` — docs(lavoro): documenta il reset carriera alla chiusura — **mycolbraga**
+- `0661561a` — ui(lavoro): chiarisce il reset carriera nel contratto — **mycolbraga**
+- `e8787060` — test(lavoro): copre reset carriera su uscita e riassunzione — **mycolbraga**
+- `002458b2` — fix(lavoro): azzera la carriera alla fine del contratto — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:f672163c -->
 ## 02/10/26, 00:53 — task/fabbrica-progressione-carriera-ui → main
 
