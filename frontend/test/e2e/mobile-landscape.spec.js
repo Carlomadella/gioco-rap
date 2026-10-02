@@ -188,7 +188,7 @@ test("landscape mobile: scelta Avaturn/MakeHuman si ridimensiona e scorre davver
   /* Regressione reale: su un viewport landscape piu' basso il contenuto deve
      poter scorrere con un gesto touch nativo dentro l'iframe, non solo con
      scrollTop assegnato da JavaScript. */
-  await page.setViewportSize({ width: 740, height: 320 });
+  await page.setViewportSize({ width: 740, height: 260 });
   await expect(area).toBeVisible();
 
   const prima = await area.evaluate(el => ({
