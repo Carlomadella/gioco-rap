@@ -747,6 +747,8 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
     : Math.random();
 
   let pulito=0,sporco=0,multa=0;
+  if(personaIngresso)
+    stradaModificaFiducia(personaIngresso,successo?8:2,"intro-"+step+(successo?"-success":"-failure"));
   if(successo){
     const min=Number(STRADA_INGRESSO.min[step-1]||120);
     const max=Number(STRADA_INGRESSO.max[step-1]||240);
@@ -1059,9 +1061,9 @@ function stradaConsumaPropostaFabbrica(colpoId,successo){
   return stradaConsumaOpportunita(colpoId,successo);
 }
 
-function stradaChanceConOpportunita(colpo,approccio,lead){
+function stradaChanceConOpportunita(colpo,approccio,lead,personaSquadra){
   return clamp(
-    stradaChance(colpo,approccio)+Number(lead&&lead.chanceDelta||0),
+    stradaChance(colpo,approccio,personaSquadra)+Number(lead&&lead.chanceDelta||0),
     .06,.93
   );
 }
@@ -1082,11 +1084,12 @@ function stradaEffettiOpportunita(lead,successo){
   };
 }
 
-function stradaChance(colpo, approccio){
+function stradaChance(colpo, approccio, personaSquadra){
   const s = G.strada;
   let p = .62 - colpo.difficolta * .34;
   p += s.rep/100 * .20;
-  p += Math.min(s.uomini, 5) * .025;
+  if(approccio && approccio.id==="squadra" && personaSquadra)
+    p += stradaBonusFiduciaSquadra(personaSquadra);
   p += s.prot * .045;
   p -= s.heat/100 * .30;
   p -= s.precedenti * .035;
