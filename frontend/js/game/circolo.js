@@ -178,7 +178,9 @@ const CC_ICO = {
   persona:"M10 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2.5 18c0-3.7 3.4-5.8 7.5-5.8s7.5 2.1 7.5 5.8z",
   spunta:"M7.8 13.6 3.9 9.7 2.5 11.1l5.3 5.3L17.5 6.7l-1.4-1.4z",
   cuore:"M10 17.5s-7.5-4.4-7.5-9.6A4.3 4.3 0 0 1 10 5.1a4.3 4.3 0 0 1 7.5 2.8c0 5.2-7.5 9.6-7.5 9.6z",
-  rischio:"M10 1.5 19 17.5H1zM9 7v5h2V7zm0 6.5v2h2v-2z"
+  rischio:"M10 1.5 19 17.5H1zM9 7v5h2V7zm0 6.5v2h2v-2z",
+  /* le briciole del Bancone (02/10/2026) */
+  spillo:"M10 1.5a6 6 0 0 1 6 6c0 4.4-6 11-6 11s-6-6.6-6-11a6 6 0 0 1 6-6zm0 3.6a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8z"
 };
 function ccIco(n){
   return '<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="' + (CC_ICO[n] || "") + '"/></svg>';

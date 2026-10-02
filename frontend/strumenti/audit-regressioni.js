@@ -2924,7 +2924,7 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
   const incontri = leggi("js/game/circolo-incontri.js");
   test("le quattro targhette sulla foto aprono ognuna la sua stanza, e i quattro riquadri di sotto non ci sono più",
     ["bancone", "palco", "sala", "backstage"].every(id => circolo.includes('cart("' + id + '"')) &&
-    ["bancone", "sala", "palco", "backstage"].every(id => stanze.includes(id + ':') && stanze.includes('ccBriciole("' + id + '")')) &&
+    ["bancone", "sala", "palco", "backstage"].every(id => stanze.includes(id + ':') && stanze.includes('ccBriciole("' + id + '"')) &&
     circolo.includes('CIRCOLO.stanza = dove;') && !circolo.includes("function ccPannello(") &&
     !circolo.includes('class="cc-giu"') && !leggi("css/circolo.css").includes(".cc-giu{") &&
     !circolo.includes("Statistiche") && !circolo.includes("Inventario"));
@@ -2932,6 +2932,16 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     index.indexOf('<script src="js/game/circolo-incontri.js') > index.indexOf('<script src="js/game/circolo.js') &&
     index.indexOf('<script src="js/game/circolo-stanze.js') > index.indexOf('<script src="js/game/circolo.js') &&
     index.indexOf('href="css/circolo-stanze.css') > index.indexOf('href="css/circolo.css'));
+  /* CARLO, 02/10/2026: «usa la nuova foto per aggiornare la pagina bancone,
+     creala uguale identica alla foto» — le quattro mosse come card con la foto
+     ritagliata dal riferimento, il foglio suo dopo quello delle stanze, e la
+     fascia in alto rifatta solo dentro al Bancone. */
+  test("il Bancone è sul riferimento nuovo: quattro card con la foto, il suo foglio, la fascia solo lì",
+    stanze.includes("function ccCartaBancone(m){") && stanze.includes("circoloBanconeMosse(p).map(ccCartaBancone)") &&
+    ["attacca", "bevi", "ascolta", "presentati"].every(id => stanze.includes(id + ':"bancone-' + id + '.jpg"') &&
+      fs.existsSync(path.join(ROOT, "media/photo/circolo/stanze/bancone-" + id + ".jpg"))) &&
+    index.indexOf('href="css/circolo-bancone.css') > index.indexOf('href="css/circolo-stanze.css') &&
+    /@media \(min-width:1181px\)\{[^}]*#luogo:has\(\.cc-in\[data-stanza="bancone"\]\)/.test(leggi("css/circolo-bancone.css")));
   test("chi chiedeva un riquadro di prima (l'agenda: «passa dalla Sala») finisce nella stanza giusta",
     circolo.includes('const CC_STANZA_DI = {gente:"sala", palco:"palco", momenti:"palco", serata:"backstage",') &&
     leggi("js/game/posto.js").includes('apriLuogo("circolo", {pannello:"gente"})'));

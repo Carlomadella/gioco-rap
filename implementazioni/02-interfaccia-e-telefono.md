@@ -2985,3 +2985,28 @@ segnale mobile evita inoltre il limite iniziale da 20 secondi pensato per il des
 tunnel. Il punto si chiude solo quando il personaggio arriva al creator senza timeout; il
 test automatico copre separazione PC/mobile, sorgente del relay e contratto heartbeat.
 
+## Il Bancone uguale al riferimento nuovo
+
+CARLO, 02/10/2026: «usa la nuova foto per aggiornare la pagina bancone, creala uguale identica
+alla foto».
+
+**FATTO (02/10/2026)** — branch `task/bancone-neon`. La foto nuova («Interfaccia neon del bancone
+di un club») ha preso il posto del vecchio riferimento
+`media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/bancone.png`; il vecchio resta nella
+storia di git. In `frontend/js/game/circolo-stanze.js` le quattro mosse sono card come nel
+riferimento: la foto ritagliata dal riferimento (`media/photo/circolo/stanze/bancone-*.jpg`),
+l'icona gialla, il nome, cosa fa, l'orologio col prezzo e il tasto tondo. Le briciole hanno lo
+spillo, sotto «Azioni disponibili» c'è «Cosa vuoi fare?», e «Possibili risultati» e la descrizione
+lunga non ci sono più (nel riferimento non ci sono). Il foglio nuovo `frontend/css/circolo-bancone.css`:
+colonne 60/40, righe della gente alte col ruolo in una pastiglia viola e l'umore dietro una riga,
+l'atmosfera viola, il Roboto Condensed del riferimento, e la fascia in alto rifatta (tasto «Mappa»
+con la cartina, «Il Circolo» come linguetta accesa, energia e soldi in una fascia sola) — solo
+dentro al Bancone e sopra i 1180 punti, così le altre stanze e gli altri posti restano come sono.
+Due cose del riferimento non le ho copiate: «connessi» e «Il pasto della scena locale» sono
+refusi, restano «conosci» e «il posto». Provato a 1774 × 887 (la misura del riferimento), 1920,
+1366, 1280, 1024 e sul telefono: niente scroll di lato, il clic su «Offri da bere» va. Un
+controllo nuovo nell'audit.
+
+Con la regola del 02/10 «mobile isolato dal desktop», arrivata mentre la pagina si faceva, quello che
+serve solo al telefono (sotto i 760 punti: card una per riga, titolo e atmosfera in pila) sta nel modulo
+mobile `frontend/css/circolo-bancone-mobile.css`, non nel foglio condiviso.

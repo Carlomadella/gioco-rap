@@ -1,0 +1,169 @@
+/* IL CIRCOLO — il Bancone sul riferimento nuovo (02/10/2026),
+   `media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/bancone.png`.
+   Sta dopo circolo-stanze.css e ne cambia solo il Bancone: la foto a
+   sinistra con le quattro mosse come card sotto, a destra il titolo con
+   l'atmosfera e la gente al bancone, righe alte col ruolo in una pastiglia.
+   Il carattere è il Roboto Condensed del riferimento, non l'Archivo Black.
+   In fondo la fascia in alto del riferimento: tasto «Mappa» in un riquadro,
+   «Il Circolo» come linguetta accesa, energia e soldi in una fascia sola —
+   solo quando la stanza aperta è il Bancone, e solo sopra i 1180 punti. */
+
+.cc-bancone{--cbOro:#F5C451;--cbViola:#8B5CF6;--cbRiga:rgba(255,255,255,.13);
+  font-family:"Roboto Condensed",Arial,sans-serif;background:#08080A}
+/* le colonne del riferimento solo sopra i 1180: sotto le mette in pila circolo-stanze.css */
+@media (min-width:1181px){.cc-bancone{grid-template-columns:minmax(0,60.5fr) minmax(0,39.5fr)}}
+.cc-bancone .cc-bsx{border-right:0}
+.cc-bancone .cc-bfoto{padding:18px 20px}
+
+/* le briciole: lo spillo, «Il Circolo», «BANCONE», in un riquadro solo */
+.cc-briciole.spillo{display:inline-flex;gap:0;padding:0;border-radius:10px;
+  background:rgba(10,10,11,.78);border:1px solid rgba(255,255,255,.2)}
+.cc-briciole.spillo .cc-indietro{gap:10px;padding:10px 14px 10px 14px;border:0;background:none}
+.cc-briciole.spillo .cc-indietro s{width:24px;height:24px;transform:none;color:#fff}
+.cc-briciole.spillo .cc-indietro b{font-family:"Roboto Condensed",Arial,sans-serif;font-weight:700;font-size:20px}
+.cc-briciole.spillo i{padding:0 18px 0 20px;font-size:16px;font-weight:600;letter-spacing:.03em;color:#fff}
+
+/* le mosse */
+.cc-bancone .cc-bpan{padding:12px 20px 16px;background:#08080A;border-top:0}
+.cc-bancone .cc-bpan > .cc-h{margin:4px 4px 12px;font-family:"Roboto Condensed",Arial,sans-serif;font-weight:700;
+  font-size:clamp(17px,1.15vw,21px);letter-spacing:.04em}
+.cc-bancone .cc-bpan > .cc-h small{margin-left:14px;font-size:clamp(13px,.9vw,16px);color:#C9C4BB}
+.cc-bancone .cc-bgriglia{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.cc-bcarta{position:relative;display:flex;flex-direction:column;align-items:flex-start;min-width:0;overflow:hidden;
+  padding:clamp(12px,1vw,18px) clamp(12px,1vw,18px) clamp(10px,.8vw,14px);text-align:left;border-radius:10px;
+  background:#0E0E11;border:1px solid var(--cbRiga);color:#fff}
+/* la foto sta in alto a destra e sfuma nel nero verso l'icona e verso il testo */
+.cc-bcfoto{position:absolute;top:0;right:0;width:80%;height:50%;background-size:cover;background-position:center;
+  pointer-events:none}
+.cc-bcfoto::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,#0E0E11 0%,rgba(14,14,17,.55) 22%,rgba(14,14,17,0) 50%),
+    linear-gradient(180deg,rgba(14,14,17,0) 55%,#0E0E11 100%)}
+.cc-bcarta > :not(.cc-bcfoto){position:relative;flex-shrink:0}
+.cc-bcarta > i{width:clamp(28px,2.2vw,40px);height:clamp(28px,2.2vw,40px);color:var(--cbOro);margin:4px 0 clamp(18px,1.9vw,34px) 4px}
+.cc-bcarta > b{font-size:clamp(15px,1.1vw,20px);font-weight:700;line-height:1.1}
+.cc-bcarta > em{margin-top:6px;font-style:normal;font-size:clamp(12px,.84vw,15px);line-height:1.3;color:#D9D4CB}
+.cc-bcpiede{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin-top:auto;padding-top:12px}
+.cc-bcpiede u{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:clamp(13px,.95vw,17px);
+  font-weight:700;color:var(--cbOro);min-width:0}
+.cc-bcpiede u svg{flex:none;width:clamp(17px,1.2vw,22px);height:clamp(17px,1.2vw,22px)}
+.cc-bcpiede s{flex:none;display:grid;place-items:center;width:clamp(30px,2.1vw,38px);aspect-ratio:1;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,.7);color:#fff}
+.cc-bcpiede s svg{width:45%;height:45%}
+.cc-bcarta.no{opacity:.62}
+.cc-bcarta.no .cc-bcpiede u{font-weight:500;font-size:clamp(12px,.82vw,14px);color:#E9A0A2}
+.cc-bancone .cc-detto{margin-top:10px}
+.cc-bancone .cc-dialogo2 p{font-size:17px}
+.cc-bancone .cc-risp{font-size:15px}
+
+/* a destra: il titolo con l'atmosfera, poi la gente */
+.cc-bancone .cc-bdx{padding:12px 18px 14px 6px;gap:12px;background:#08080A}
+.cc-bancone .cc-bhead{grid-template-columns:minmax(0,1fr) minmax(190px,44%);gap:14px;align-items:stretch;
+  padding:10px 10px 10px 22px;border-radius:12px;border:1px solid var(--cbRiga);background:#0B0B0E}
+.cc-bancone .cc-stit{align-self:start;margin-top:14px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:18px}
+.cc-bancone .cc-stit > div{display:contents}
+.cc-bancone .cc-stit p{grid-column:1 / -1;margin-top:8px}
+.cc-bancone .cc-stit > i{width:clamp(34px,2.4vw,44px);height:clamp(34px,2.4vw,44px);color:#F3E6CF}
+.cc-bancone .cc-stit h2{font-family:"Roboto Condensed",Arial,sans-serif;font-weight:900;letter-spacing:.02em;
+  font-size:clamp(26px,2.9vw,54px)}
+.cc-bancone .cc-stit p{font-size:clamp(14px,.98vw,17px);color:#E4DFD6}
+.cc-bancone .cc-atm{padding:12px 6px 6px 8px;border:0;background:none}
+.cc-bancone .cc-atm h4{font-family:"Roboto Condensed",Arial,sans-serif;font-size:clamp(14px,.95vw,17px);letter-spacing:.02em;margin-bottom:12px}
+.cc-bancone .cc-atmbar{width:60%;height:12px;border-radius:6px}
+.cc-bancone .cc-atmbar span{background:linear-gradient(90deg,#7C3AED,#C4B5FD)}
+.cc-bancone .cc-atm > em{margin-left:24px;font-size:clamp(13px,.9vw,16px)}
+.cc-bancone .cc-atm p{gap:14px;margin:14px 0 0;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#111115}
+.cc-bancone .cc-atm p span{font-size:clamp(12px,.82vw,14.5px)}
+.cc-bancone .cc-atm p b{font-size:clamp(14px,.95vw,16.5px);margin-bottom:2px}
+
+.cc-bancone .cc-lista2{padding:14px 14px 12px;border-radius:12px;border:1px solid var(--cbRiga);background:#0B0B0E}
+.cc-bancone .cc-lista2 > .cc-h{margin:2px 4px 14px;font-family:"Roboto Condensed",Arial,sans-serif;font-weight:700;
+  font-size:clamp(17px,1.15vw,21px);letter-spacing:.04em}
+.cc-bancone .cc-lista2 .cc-conta{margin-left:6px;font-size:clamp(16px,1.05vw,19px)}
+.cc-bancone .cc-h small.cc-agg{font-size:clamp(13px,.88vw,15.5px);color:#D6D1C8}
+.cc-bancone .cc-h small.cc-agg svg{width:18px;height:18px}
+.cc-bancone .cc-scorri{gap:10px}
+.cc-bancone .cc-pers{gap:16px;padding:10px 14px 10px 10px;border-radius:9px;background:#111115;border:1px solid rgba(255,255,255,.08)}
+.cc-bancone .cc-pers.on{border:2px solid var(--cbOro);box-shadow:none;padding:9px 13px 9px 9px}
+.cc-bancone .cc-pfoto{width:clamp(70px,5.4vw,96px);aspect-ratio:96/88;border-radius:6px;border:0}
+.cc-bancone .cc-ptx{gap:5px}
+.cc-bancone .cc-ptx b{font-size:clamp(18px,1.3vw,23px)}
+.cc-bancone .cc-ptx em{align-self:flex-start;padding:2px 12px;border-radius:999px;font-size:clamp(11.5px,.78vw,13.5px);
+  font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#E2D7FF;
+  background:rgba(139,92,246,.2);border:1.5px solid var(--cbViola)}
+.cc-bancone .cc-ptx i{font-size:clamp(13px,.9vw,15.5px);line-height:1.3;color:#D6D1C8;-webkit-line-clamp:2}
+.cc-bancone .cc-umore{min-width:clamp(110px,8vw,150px);align-self:stretch;gap:10px;padding-left:16px;
+  font-size:clamp(14px,.98vw,17px);color:#fff;border-left:1px solid rgba(255,255,255,.12)}
+.cc-bancone .cc-umore i{width:clamp(22px,1.5vw,27px);height:clamp(22px,1.5vw,27px)}
+.cc-bancone .cc-umore.giallo{color:var(--cbOro)}
+.cc-bancone .cc-pers > s{width:20px;height:20px;color:#fff}
+
+@media (hover:hover){
+  .cc-bcarta:hover:not(:disabled){border-color:rgba(245,196,81,.55)}
+  .cc-bcarta:hover:not(:disabled) .cc-bcpiede s{border-color:var(--cbOro);color:var(--cbOro)}
+}
+
+/* gli schermi bassi (1366 × 768, 1280 × 720): le card si stringono */
+@media (min-width:1181px) and (max-height:800px){
+  .cc-bcarta > i{margin-bottom:14px}
+  .cc-bcarta > em{-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .cc-bancone .cc-ptx i{-webkit-line-clamp:2}
+  .cc-bancone .cc-pfoto{width:64px}
+  .cc-bancone .cc-pers{padding-top:7px;padding-bottom:7px}
+}
+
+/* sotto i 1180 le colonne vanno in pila (circolo-stanze.css): le card due per riga.
+   Quello che serve solo al telefono (sotto i 760) sta in circolo-bancone-mobile.css. */
+@media (max-width:1180px){
+  .cc-bancone .cc-bgriglia{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cc-bancone .cc-bdx{padding:12px 16px 16px}
+  .cc-bcarta{min-height:180px}
+}
+/* ==================== LA FASCIA IN ALTO, NEL BANCONE ==================== */
+@media (min-width:1181px){
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead{gap:0;font-family:"Roboto Condensed",Arial,sans-serif}
+  /* «Mappa»: la cartina in un riquadro, al posto di «← torna alla» */
+  /* «Mappa»: la cartina in un riquadro, al posto di «← torna alla». Il menu
+     globale (menu-sistema.css) scrive tutto con !important: qui lo stesso. */
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead.adf-system-host-v7 > .adf-global-nav > .adf-global-map{align-self:center!important;width:auto!important;min-width:0!important;height:46px!important;
+    margin:0 0 0 14px!important;padding:0 22px!important;gap:12px!important;border:1px solid rgba(255,255,255,.18)!important;
+    border-radius:10px!important;background:rgba(255,255,255,.03)!important}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead.adf-system-host-v7 > .adf-global-nav > .adf-global-map > span:first-child{width:24px!important;height:24px!important;flex:0 0 24px!important;font-size:0!important;
+    color:transparent!important;background:#E9E6E0!important;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M1 4.5 6.5 2l7 2.5L19 2v13.5L13.5 18l-7-2.5L1 18zm6.3-.2v10.8l5.4 1.9V6.2z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M1 4.5 6.5 2l7 2.5L19 2v13.5L13.5 18l-7-2.5L1 18zm6.3-.2v10.8l5.4 1.9V6.2z'/%3E%3C/svg%3E") center/contain no-repeat}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead.adf-system-host-v7 > .adf-global-nav > .adf-global-map > span:last-child{padding-top:0!important;font-size:16px;font-weight:600;letter-spacing:.04em;color:#F2EFEA}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead.adf-system-host-v7 > .adf-global-nav > .adf-global-map > span:last-child::before{content:none!important}
+
+  /* «Il Circolo», «Networking» e le risorse in una fascia sola */
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .lfk,
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .stnome,
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .strisorse{align-self:stretch;display:flex;align-items:center;
+    margin-top:8px;margin-bottom:8px;border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.025)}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .lfk{position:relative;gap:12px;margin-left:306px!important;
+    padding:0 26px 0 18px;border-left:1px solid rgba(255,255,255,.14);border-radius:10px 0 0 10px;
+    font-family:"Roboto Condensed",Arial,sans-serif;font-weight:700;font-size:20px;letter-spacing:.04em;text-transform:uppercase;color:#F5C451;
+    background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02))}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .lfk::before{content:"";width:28px;height:28px;background:#F5C451;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M7 9.5a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zM1.5 16c0-2.9 2.4-5 5.5-5s5.5 2.1 5.5 5v1h-11zM14 9.5a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 0 0 0 4.8zm.6 1.6c2.3.3 4 2 4 4.3v1.6H14V16c0-1.9-.8-3.6-2-4.7.8-.2 1.7-.3 2.6-.2z'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M7 9.5a2.8 2.8 0 1 0 0-5.6 2.8 2.8 0 0 0 0 5.6zM1.5 16c0-2.9 2.4-5 5.5-5s5.5 2.1 5.5 5v1h-11zM14 9.5a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 0 0 0 4.8zm.6 1.6c2.3.3 4 2 4 4.3v1.6H14V16c0-1.9-.8-3.6-2-4.7.8-.2 1.7-.3 2.6-.2z'/%3E%3C/svg%3E") center/contain no-repeat}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .lfk::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:4px;
+    border-radius:2px;background:#F5C451}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .stsep{display:none}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .stnome{flex:1 1 auto;min-width:0;gap:0;padding-left:30px;
+    font-family:"Roboto Condensed",Arial,sans-serif;font-weight:700;font-size:20px;letter-spacing:.06em;text-transform:uppercase;color:#F2EFEA}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .stnome i{margin-left:30px;font-family:"Roboto Condensed",Arial,sans-serif;
+    font-weight:400;font-size:17px;letter-spacing:0;text-transform:none;color:#B9B4AA}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .stnome i .stpunto{display:none}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .stnome i::before{content:"// ";color:#8E8A83}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .strisorse{gap:40px;margin-right:16px;padding:0 24px 0 10px;
+    border-right:1px solid rgba(255,255,255,.14);border-radius:0 10px 10px 0}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .strisorse > .stpunto{display:none}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .strisorse span{gap:8px;font-family:"Roboto Condensed",Arial,sans-serif;font-size:20px}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .strisorse svg{width:26px;height:26px}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .strisorse i{font-style:normal;font-size:17px;color:#60A5FA}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .strisorse b{font-weight:700;color:#fff}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .strisorse b.oro{color:#F5C451}
+}
+@media (min-width:1181px) and (max-width:1500px){
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .stnome i{display:none}
+  #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead > .strisorse{gap:22px}
+}

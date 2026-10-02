@@ -154,7 +154,9 @@ non resta niente.
   cartelli: Bancone, Sala, Palco (solo il live, coi momenti) e Backstage (con l'artista della
   serata e i tuoi fan) sono pagine loro sui riferimenti, i riquadri di sotto non ci sono più e
   gli orari si aprono col mouse sopra («Il Circolo a stanze: Bancone, Sala, Palco,
-  Backstage» in `implementazioni/02-interfaccia-e-telefono.md`). Restano lo Shop e la Strada
+  Backstage» in `implementazioni/02-interfaccia-e-telefono.md`). **FATTO (02/10/2026)** — il
+  Bancone rifatto uguale al riferimento nuovo, con le mosse come card con la foto («Il Bancone
+  uguale al riferimento nuovo»). Restano lo Shop e la Strada
   senza foto e il fondale pulito del Circolo (oggi è ritagliato dal riferimento).
 - **FATTO (19/09/2026)** — il primo minuto di chi prova il gioco: l'avvio rapido non è più
   nove secondi di nero ma la schermata «Preparo il tuo artista», con le fasi vere del
@@ -310,6 +312,9 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
 - la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no.
   Il simulatore di bilanciamento (29/09) aggiunge che non rende: con un colpo al giorno
   l'anno finisce in carcere e in rosso (voce 65 di `problemi-riscontrati.md`);
+  **FATTO in parte (02/10/2026)** — le opportunità criminali hanno un pool generale, un dialogo con la
+  decisione e conseguenze vere, e arrivano anche fuori dalla Fabbrica (pull request #30 di Carletto,
+  segnata dal push degli altri; `frontend/js/game/strada-crimine.js`). Il bilanciamento resta da fare;
 - i dialoghi tanti e diversi, e gli scenari uguali nella forma e diversi nelle circostanze:
   tutti e due a metà.
 

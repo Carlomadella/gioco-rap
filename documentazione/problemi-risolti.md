@@ -6782,3 +6782,32 @@ ho letto il codice cambiato rispetto a `origin/main` e chi lo chiama. Guardato e
 - **quanto pesa** — da sistemare con calma.
 
 **RISOLTO (02/10/2026)** — branch `task/mappa-shop-casa`: la sagoma dello Shop non ha più lo spigolo in alto a destra (x 42,2–44,5% solo da y 28,4% in giù). Misurato da 1024 × 768 a 1920 × 1080: il cartello del Circolo non copre più niente dello Shop, e i due cartelli non si toccano (5–8 px in verticale ai monitor medi).
+
+## Giro del 02/10/2026 — il Bancone sul riferimento nuovo
+
+### 92. Fra 1181 e circa 1230 punti di larghezza la parola «BANCONE» va addosso all'atmosfera
+- **dove** — `frontend/css/circolo-bancone.css:60` (la colonna dell'atmosfera non scende sotto
+  i 220 punti) e `:66` (il titolo non scende sotto i 34).
+- **cosa succede** — a 1181 di larghezza la scritta «BANCONE» esce di 21 punti dalla sua
+  colonna e tocca «ATMOSFERA DEL LOCALE», senza spazio in mezzo; a 1220 ancora quasi si
+  toccano, da 1280 in su è a posto. Prima del lavoro, a 1181, fra le due restavano 60 punti
+  liberi.
+- **come si vede** — finestra larga 1181–1220, Il Circolo, Bancone: guarda il titolo in alto a destra.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (02/10/2026)** — branch `task/bancone-neon`: il titolo scende fino a 26 punti e l'atmosfera fino a 190 (`circolo-bancone.css`). Misurato: fra «BANCONE» e l'atmosfera restano 21 punti a 1181, 33 a 1230, 75 a 1774.
+
+
+### 93. Nota: le card spente hanno ancora il tasto tondo, e sopra c'è «Cosa vuoi fare?» anche a Circolo chiuso
+- **dove** — `frontend/js/game/circolo-stanze.js:102` (il tasto tondo c'è sempre),
+  `frontend/css/circolo-bancone.css:52` (la card spenta è solo un po' più trasparente),
+  `frontend/js/game/circolo-stanze.js:124` («Cosa vuoi fare?» c'è sempre, tranne nel dialogo).
+- **cosa succede** — quando il Circolo è chiuso o sei lontano, tutte e quattro le card hanno
+  ancora il cerchio bianco con la freccia, che sembra da toccare; e sopra le quattro card spente
+  c'è scritto «Cosa vuoi fare?», con la lista della gente vuota a fianco. Il perché scritto in
+  rosso c'è e si legge, quindi non inganna nessuno. **È una scelta, non un errore**: il
+  riferimento mostra solo il Bancone aperto, e va deciso come deve apparire quello chiuso.
+- **come si vede** — alle 9 di mattina apri il Bancone dal Circolo.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (02/10/2026)** — branch `task/bancone-neon`: le card spente non hanno più il tasto tondo (`ccCartaBancone`), e «Cosa vuoi fare?» c'è solo a Circolo aperto e quando ci sei.

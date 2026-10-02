@@ -983,7 +983,7 @@
    ogni tasto del Circolo ha una presa da 44.
    ============================================================ */
 @media (pointer:coarse){
-  .cc-cart,.cc-porta,.cc-linguetta,.cc-indietro,.cc-chip,.cc-pers,.cc-mossa2,.cc-risp,.cc-srow,.cc-opz,.cc-bsrow,.cc-sface{min-height:44px}
+  .cc-cart,.cc-porta,.cc-linguetta,.cc-indietro,.cc-chip,.cc-pers,.cc-bcarta,.cc-risp,.cc-srow,.cc-opz,.cc-bsrow,.cc-sface{min-height:44px}
   .cc-beat button{min-width:44px;height:44px}
 }
 
