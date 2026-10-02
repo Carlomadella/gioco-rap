@@ -536,7 +536,11 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
     Number(b.rel||0)-Number(a.rel||0) ||
     Number(b.pt||0)-Number(a.pt||0)
   );
-  return candidati[0] || null;
+  const p=candidati[0] || null;
+  return p ? stradaSegnaPersona(p,{
+    source:"factory-opportunity",
+    opportunityId:variante.id
+  }) : null;
 }
 
 function stradaCollegaLeadPersona(lead,trigger,legacy){
