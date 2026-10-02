@@ -436,6 +436,72 @@ function stradaAbsDay(){
   );
 }
 
+function stradaOfferteColpiStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.offerteColpi || typeof s.offerteColpi!=="object")
+    s.offerteColpi={absoluteDay:null,ids:[],previousIds:[]};
+  if(!Array.isArray(s.offerteColpi.ids)) s.offerteColpi.ids=[];
+  if(!Array.isArray(s.offerteColpi.previousIds)) s.offerteColpi.previousIds=[];
+  return s.offerteColpi;
+}
+
+function stradaRngDeterministico(seed){
+  let x=(Number(seed)||1)>>>0;
+  return function(){
+    x^=x<<13;x^=x>>>17;x^=x<<5;
+    return (x>>>0)/4294967296;
+  };
+}
+
+function stradaGeneraOfferteColpi(seed,rep,previousIds){
+  rep=Math.max(0,Number(rep||0));
+  previousIds=Array.isArray(previousIds)?previousIds:[];
+  const pool=STRADA_COLPI.filter(c=>
+    rep>=Number(c.minRep||0) &&
+    (c.maxRep==null || rep<=Number(c.maxRep))
+  );
+  if(pool.length<=4) return pool.slice();
+
+  const rndLocal=stradaRngDeterministico(seed);
+  const scored=pool.map(c=>({
+    c,
+    /* Il giorno precedente è solo penalizzato, non vietato: così una dritta
+       o un pool piccolo possono far ricomparire un lavoro senza creare cicli
+       artificiosi. Nessun bonus per diversità categoria: i duplicati sono
+       intenzionali. */
+    score:rndLocal()+(previousIds.includes(c.id)?.55:0)
+  })).sort((a,b)=>a.score-b.score);
+
+  return scored.slice(0,4).map(x=>x.c);
+}
+
+function stradaColpiDisponibili(){
+  const st=stradaOfferteColpiStato();
+  const oggi=stradaAbsDay();
+  const rep=Math.max(0,Number(G.strada&&G.strada.rep||0));
+
+  if(Number(st.absoluteDay)!==oggi || !st.ids.length){
+    const prev=st.ids.filter(id=>STRADA_COLPI.some(c=>c.id===id));
+    const seed=((oggi*2654435761) ^ (Math.floor(rep/5)*2246822519) ^
+      (Number(G.strada&&G.strada.precedenti||0)*3266489917))>>>0;
+    const offerte=stradaGeneraOfferteColpi(seed,rep,prev);
+    st.previousIds=prev.slice(0,4);
+    st.ids=offerte.map(c=>c.id);
+    st.absoluteDay=oggi;
+  }
+
+  /* Una dritta attiva non può puntare a un colpo invisibile. Se il target non
+     è nelle quattro offerte, entra sostituendo l'ultimo slot e resta visibile
+     fino al cambio giornata anche dopo che la dritta è stata consumata. */
+  const lead=typeof stradaOpportunitaAttiva==="function" ? stradaOpportunitaAttiva() : null;
+  if(lead&&lead.colpoId&&STRADA_COLPI.some(c=>c.id===lead.colpoId) &&
+     !st.ids.includes(lead.colpoId)){
+    st.ids=st.ids.slice(0,3).concat(lead.colpoId);
+  }
+
+  return st.ids.map(id=>STRADA_COLPI.find(c=>c.id===id)).filter(Boolean);
+}
+
 
 /* ==================== INGRESSO NELLA STRADA ====================
    Punto 1 della revisione 02/10/2026.
