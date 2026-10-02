@@ -2552,8 +2552,8 @@ function adfStreetIntroDecision(proposta){
         if(out.unlocked){
           return {
             t:out.success
-              ? "Il favore va a buon fine. <b>Adesso sai dove andare e con chi parlare: Attività criminali è comparso sulla mappa.</b>"
-              : "Il favore salta e ti costa, ma non finisci dentro. <b>Ormai però sei entrato abbastanza nel giro: Attività criminali è comparso sulla mappa.</b>",
+              ? "Il favore va a buon fine. <b>"+(out.persona||"Il contatto")+" ti mette in mano un TrapPhone</b>: da ora le cose che non passano faccia a faccia arrivano lì. <b>Attività criminali è comparso sulla mappa.</b>"
+              : "Il favore salta e ti costa, ma non finisci dentro. <b>"+(out.persona||"Il contatto")+" ti consegna comunque un TrapPhone</b>: ormai sei dentro abbastanza da ricevere le dritta. <b>Attività criminali è comparso sulla mappa.</b>",
             c:out.success?"good":"bad"
           };
         }
@@ -2670,7 +2670,7 @@ function adfStreetOpportunityAfterAction(a){
   afterClear(()=>showEvent({
     k:"Strada",
     t:(proposta.persona||"Qualcuno")+" si fa vivo",
-    d:"Più tardi, mentre sei fuori, ti arriva un messaggio corto da una persona del giro."+
+    d:"Più tardi vibra il <b>TrapPhone</b>: è il canale che ti hanno dato proprio per queste cose."+
       "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
       (proposta.intro||"«Ho una cosa da proporti.»"),
     annulla(){
