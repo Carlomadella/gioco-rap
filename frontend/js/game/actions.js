@@ -946,7 +946,6 @@ function lavoroLicenzia(luogo, motivo){
   if(c.warningHistory.length > 24) c.warningHistory.shift();
 
   lavoroTerminaContratto(luogo, "licenziamento");
-  if(G.job && lavoroLuogo(G.job) === luogo) G.job = null;
   G._lastJobLossReason = luogo === "fabbrica" ? "factory_absences" : luogo + "_absences";
 
   return {
