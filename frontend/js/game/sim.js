@@ -141,8 +141,9 @@ function advanceWeek(){
   G.money += gross - costs;
 
   // Il lavoro non è una tassa automatica sul resto della vita. Una settimana
-  // ordinaria fino a 5 turni è già pagata in tempo/energia; dal 6° turno in poi
-  // pesa subito, mentre settimane piene ripetute lasciano fatica persistente.
+  // ordinaria fino a 5 turni è già pagata in tempo/energia e la fatica si assesta
+  // sotto la soglia globale; dal 6° turno in poi il sovraccarico supera il recupero
+  // settimanale e può trascinarsi anche quando torni a un ritmo normale.
   const caricoLavoro = typeof lavoroAggiornaFaticaSettimanale === "function"
     ? lavoroAggiornaFaticaSettimanale(G.shifts||0)
     : {turni:Number(G.shifts||0),prima:0,dopo:0,delta:0};
