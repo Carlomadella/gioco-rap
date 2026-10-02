@@ -1033,6 +1033,42 @@ const FACTORY_ROLE_EVENT_LOAD = Object.freeze({
   })
 });
 
+
+const PIZZERIA_ROLE_EVENT_LOAD = Object.freeze({
+  lavapiatti:Object.freeze({
+    physicalPenalty:.7,
+    mentalPenalty:.5,
+    recovery:Object.freeze({wellbeing:2,lucidita:1}),
+    push:Object.freeze({wellbeing:-2,lucidita:-1}),
+    fatigueTitle:"Il servizio oggi ti è rimasto un po' addosso",
+    fatigueText:"Il turno è corto, ma il retro può comunque pesare. Fermarti protegge il resto della serata; tirare ancora costa poco, non quanto una giornata in Fabbrica."
+  }),
+  aiuto_cucina:Object.freeze({
+    physicalPenalty:.6,
+    mentalPenalty:.6,
+    recovery:Object.freeze({wellbeing:2,lucidita:1}),
+    push:Object.freeze({wellbeing:-2,lucidita:-1}),
+    fatigueTitle:"Il rush ti ha lasciato addosso un po' di stanchezza",
+    fatigueText:"Tra prep e servizio hai corso più del solito. È ancora un part-time: il punto è decidere se conservare energie per quello che viene dopo."
+  }),
+  aiuto_pizzaiolo:Object.freeze({
+    physicalPenalty:.5,
+    mentalPenalty:.7,
+    recovery:Object.freeze({wellbeing:1,lucidita:2}),
+    push:Object.freeze({wellbeing:-1,lucidita:-1}),
+    fatigueTitle:"Il forno oggi ti è rimasto in testa",
+    fatigueText:"Il peso fisico è contenuto, ma tempi e precisione possono lasciarti acceso anche dopo il servizio."
+  }),
+  pizzaiolo:Object.freeze({
+    physicalPenalty:.4,
+    mentalPenalty:.8,
+    recovery:Object.freeze({wellbeing:1,lucidita:2}),
+    push:Object.freeze({wellbeing:-1,lucidita:-2}),
+    fatigueTitle:"Hai chiuso il servizio, ma stai ancora facendo conti",
+    fatigueText:"Da pizzaiolo pesa più la responsabilità del servizio che il corpo. Anche qui, però, il part-time deve lasciarti margine per la tua vita."
+  })
+});
+
 const DEFAULT_WORK_EVENT_LOAD = Object.freeze({
   recovery:Object.freeze({wellbeing:3,lucidita:2}),
   push:Object.freeze({wellbeing:-4,lucidita:-3}),
@@ -1040,10 +1076,16 @@ const DEFAULT_WORK_EVENT_LOAD = Object.freeze({
   fatigueText:"Non è solo una frase: hai già accumulato parecchi turni o una delle tue risorse sta scendendo troppo. Come chiudi la giornata cambia davvero come stai."
 });
 
+function workRoleEventLoad(job){
+  if(!job) return null;
+  const key=workKey(job);
+  if(key==="fabbrica") return FACTORY_ROLE_EVENT_LOAD[job.id] || null;
+  if(key==="pizzeria") return PIZZERIA_ROLE_EVENT_LOAD[job.id] || null;
+  return null;
+}
+
 function factoryRoleEventLoad(job){
-  return job && workKey(job)==="fabbrica"
-    ? (FACTORY_ROLE_EVENT_LOAD[job.id] || null)
-    : null;
+  return workKey(job)==="fabbrica" ? workRoleEventLoad(job) : null;
 }
 
 function scaleNegative(v,factor){
@@ -1052,9 +1094,9 @@ function scaleNegative(v,factor){
   return -Math.max(1,Math.round(Math.abs(n)*Number(factor||1)));
 }
 
-function factoryFloorFx(job,opt){
+function workplaceFloorFx(job,opt){
   const fx=Object.assign({},opt&&opt.fx||{});
-  const profile=factoryRoleEventLoad(job);
+  const profile=workRoleEventLoad(job);
   if(!profile || !opt || !opt.load) return fx;
 
   if(opt.load==="physical" && Number(fx.wellbeing)<0)
@@ -1063,6 +1105,8 @@ function factoryFloorFx(job,opt){
     fx.lucidita=scaleNegative(fx.lucidita,profile.mentalPenalty);
   return fx;
 }
+
+function factoryFloorFx(job,opt){ return workplaceFloorFx(job,opt); }
 
 function effectNumber(v){
   const n=Number(v||0);
@@ -1090,14 +1134,20 @@ function workReliability(luogo,delta){
   return c.reliability-prima;
 }
 
-function applyFactoryRoleFx(fx){
+function applyWorkRoleFx(job,fx){
   fx=fx||{};
   const out={wellbeing:0,lucidita:0,rete:0,reliability:0};
   if(fx.wellbeing){ addWellbeing(fx.wellbeing); out.wellbeing=Number(fx.wellbeing); }
   if(fx.lucidita){ addLucidity(fx.lucidita); out.lucidita=Number(fx.lucidita); }
   if(fx.rete){ addNetwork(fx.rete); out.rete=Number(fx.rete); }
-  if(fx.reliability) out.reliability=workReliability("fabbrica",fx.reliability);
+  const luogo=workKey(job);
+  if(fx.reliability && (luogo==="fabbrica" || luogo==="pizzeria"))
+    out.reliability=workReliability(luogo,fx.reliability);
   return out;
+}
+
+function applyFactoryRoleFx(fx){
+  return applyWorkRoleFx({id:"operaio",place:"fabbrica"},fx);
 }
 
 function showFactoryRole(job,s,roll){
