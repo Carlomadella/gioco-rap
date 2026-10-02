@@ -879,6 +879,20 @@ function stradaConsegnaTrapPhone(personId,personName,source){
    criminale: qui costruiamo soltanto identità e continuità. */
 const STRADA_FIDUCIA_SQUADRA = 25;
 
+/* Punto 10: una relazione criminale non perde un punto a settimana.
+   Può invece cambiare stato quando il giocatore sparisce davvero oppure
+   ignora ripetutamente la stessa persona. Il personaggio resta sempre in
+   G.gente: è il suo rapporto col giro a diventare inattivo/non raggiungibile. */
+const STRADA_RELAZIONI = Object.freeze({
+  ignoredLimit:3,
+  inactiveAfterDays:84,
+  unreachableAfterDays:168,
+  strongTrust:50,
+  strongJobs:2,
+  coldReturnAfterDays:84,
+  coldTrustLoss:15
+});
+
 function stradaPersonaMeta(p){
   if(!p) return null;
   if(!p.strada || typeof p.strada!=="object"){
@@ -893,16 +907,34 @@ function stradaPersonaMeta(p){
       fiduciaEventi:[],
       favori:0,
       favoriEventi:[],
-      colpiInsieme:0
+      colpiInsieme:0,
+      streetStatus:"active",
+      lastPlayerStreetInteractionAbsoluteDay:null,
+      lastStreetContactAttemptAbsoluteDay:null,
+      ignoredStreetOffers:0,
+      inactiveSinceAbsoluteDay:null,
+      unreachableSinceAbsoluteDay:null,
+      returnAfterAbsoluteDay:null,
+      streetStatusReason:null,
+      streetStatusHistory:[]
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
   if(!Array.isArray(p.strada.opportunityIds)) p.strada.opportunityIds=[];
   if(!Array.isArray(p.strada.fiduciaEventi)) p.strada.fiduciaEventi=[];
   if(!Array.isArray(p.strada.favoriEventi)) p.strada.favoriEventi=[];
+  if(!Array.isArray(p.strada.streetStatusHistory)) p.strada.streetStatusHistory=[];
   if(!Number.isFinite(Number(p.strada.favori))) p.strada.favori=0;
   p.strada.favori=Math.max(0,Math.min(3,Math.floor(Number(p.strada.favori)||0)));
   if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
+  if(!["active","inactive","unreachable","cold"].includes(p.strada.streetStatus))
+    p.strada.streetStatus="active";
+  if(!Number.isFinite(Number(p.strada.ignoredStreetOffers))) p.strada.ignoredStreetOffers=0;
+  p.strada.ignoredStreetOffers=Math.max(0,Math.floor(Number(p.strada.ignoredStreetOffers)||0));
+  /* I salvataggi precedenti al punto 10 non vengono puniti retroattivamente:
+     il loro contatore di assenza parte dal primo caricamento col nuovo sistema. */
+  if(p.strada.known && !Number.isFinite(Number(p.strada.lastPlayerStreetInteractionAbsoluteDay)))
+    p.strada.lastPlayerStreetInteractionAbsoluteDay=stradaAbsDay();
   if(!Number.isFinite(Number(p.strada.fiducia))){
     let base=p.strada.known?10:0;
     if(p.strada.sources.includes("intro")) base+=10;
@@ -910,6 +942,127 @@ function stradaPersonaMeta(p){
     p.strada.fiducia=clamp(base,0,40);
   }else p.strada.fiducia=clamp(Number(p.strada.fiducia)||0,0,100);
   return p.strada;
+}
+
+function stradaRelazioneForte(p){
+  const st=stradaPersonaMeta(p);
+  if(!st) return false;
+  return Number(st.fiducia||0)>=STRADA_RELAZIONI.strongTrust ||
+    Number(st.colpiInsieme||0)>=STRADA_RELAZIONI.strongJobs ||
+    Number(st.favori||0)>0;
+}
+
+function stradaRelazioneDisponibile(p){
+  if(!p || p.via || !p.strada || !p.strada.known) return false;
+  const st=stradaPersonaMeta(p);
+  return st.streetStatus==="active" || st.streetStatus==="cold";
+}
+
+function stradaRelazioneTransizione(p,status,reason,oggi){
+  if(!p) return null;
+  const st=stradaPersonaMeta(p);
+  oggi=Number.isFinite(Number(oggi))?Number(oggi):stradaAbsDay();
+  if(st.streetStatus===status) return st;
+
+  const from=st.streetStatus||"active";
+  st.streetStatus=status;
+  st.streetStatusReason=String(reason||"street");
+  st.streetStatusHistory.push({from,to:status,absoluteDay:oggi,reason:st.streetStatusReason});
+  if(st.streetStatusHistory.length>12) st.streetStatusHistory.shift();
+
+  if(status==="inactive"){
+    st.inactiveSinceAbsoluteDay=oggi;
+  }else if(status==="unreachable"){
+    st.unreachableSinceAbsoluteDay=oggi;
+    st.returnAfterAbsoluteDay=stradaRelazioneForte(p)
+      ? oggi+STRADA_RELAZIONI.coldReturnAfterDays
+      : null;
+  }else if(status==="cold"){
+    st.inactiveSinceAbsoluteDay=null;
+    st.unreachableSinceAbsoluteDay=null;
+    st.returnAfterAbsoluteDay=null;
+    st.ignoredStreetOffers=0;
+    st.fiducia=clamp(Number(st.fiducia||0)-STRADA_RELAZIONI.coldTrustLoss,5,100);
+  }else if(status==="active"){
+    st.inactiveSinceAbsoluteDay=null;
+    st.unreachableSinceAbsoluteDay=null;
+    st.returnAfterAbsoluteDay=null;
+  }
+  return st;
+}
+
+function stradaRegistraInterazione(p,reason){
+  if(!p || p.via) return null;
+  const st=stradaPersonaMeta(p);
+  const oggi=stradaAbsDay();
+  st.lastPlayerStreetInteractionAbsoluteDay=oggi;
+  st.ignoredStreetOffers=0;
+  if(st.streetStatus!=="active")
+    stradaRelazioneTransizione(p,"active",reason||"player-interaction",oggi);
+  return st;
+}
+
+function stradaRegistraTentativoContatto(p,reason){
+  if(!p || p.via) return null;
+  const st=stradaPersonaMeta(p);
+  st.lastStreetContactAttemptAbsoluteDay=stradaAbsDay();
+  if(reason) st.lastStreetContactReason=String(reason);
+  return st;
+}
+
+function stradaIgnoraContatto(p,reason){
+  if(!p || p.via) return null;
+  const st=stradaPersonaMeta(p);
+  const oggi=stradaAbsDay();
+  st.lastStreetContactAttemptAbsoluteDay=oggi;
+  st.ignoredStreetOffers=Math.max(0,Number(st.ignoredStreetOffers||0))+1;
+  if(st.ignoredStreetOffers>=STRADA_RELAZIONI.ignoredLimit)
+    stradaRelazioneTransizione(p,"inactive",reason||"ignored-three-times",oggi);
+  return st;
+}
+
+function stradaAggiornaRelazioniCriminali(silent){
+  const oggi=stradaAbsDay();
+  const cambi=[];
+  for(const p of (G.gente||[])){
+    if(!p || p.via || !p.strada || !p.strada.known) continue;
+    const st=stradaPersonaMeta(p);
+    const last=Number(st.lastPlayerStreetInteractionAbsoluteDay);
+    const giorni=Number.isFinite(last)?Math.max(0,oggi-last):0;
+
+    if((st.streetStatus==="active" || st.streetStatus==="cold") &&
+       st.ignoredStreetOffers>=STRADA_RELAZIONI.ignoredLimit){
+      stradaRelazioneTransizione(p,"inactive","ignored-three-times",oggi);
+      cambi.push({p,status:"inactive"});
+    }else if((st.streetStatus==="active" || st.streetStatus==="cold") &&
+             giorni>=STRADA_RELAZIONI.inactiveAfterDays){
+      stradaRelazioneTransizione(p,"inactive","long-silence",oggi);
+      cambi.push({p,status:"inactive"});
+    }
+
+    if(st.streetStatus==="inactive" && giorni>=STRADA_RELAZIONI.unreachableAfterDays){
+      stradaRelazioneTransizione(p,"unreachable","six-months-away",oggi);
+      cambi.push({p,status:"unreachable"});
+    }else if(st.streetStatus==="unreachable" &&
+             Number.isFinite(Number(st.returnAfterAbsoluteDay)) &&
+             oggi>=Number(st.returnAfterAbsoluteDay)){
+      stradaRelazioneTransizione(p,"cold","old-history-resurfaces",oggi);
+      st.lastPlayerStreetInteractionAbsoluteDay=oggi;
+      cambi.push({p,status:"cold"});
+    }
+  }
+
+  if(!silent && typeof pushLog==="function"){
+    for(const c of cambi){
+      if(c.status==="inactive")
+        pushLog("<b>"+c.p.n+" si è raffreddato.</b> È da troppo che non vi incrociate davvero nel giro.", "");
+      else if(c.status==="unreachable")
+        pushLog("<b>"+c.p.n+" non è più raggiungibile nel giro.</b> La persona resta nel tuo mondo, ma quella porta si è chiusa.", "bad");
+      else if(c.status==="cold")
+        pushLog("<b>"+c.p.n+" è ricomparso.</b> La storia comune pesa ancora, ma il rapporto è molto più freddo.", "");
+    }
+  }
+  return cambi;
 }
 
 function stradaFiduciaValore(p){
@@ -929,6 +1082,7 @@ function stradaFiduciaEtichetta(p){
 function stradaModificaFiducia(p,delta,motivo){
   if(!p || p.via || !delta) return p;
   const st=stradaPersonaMeta(p);
+  stradaRegistraInterazione(p,motivo||"fiducia");
   st.fiducia=clamp(Number(st.fiducia||0)+Number(delta||0),0,100);
   st.fiduciaEventi.push({absoluteDay:stradaAbsDay(),delta:Number(delta||0),reason:String(motivo||"street")});
   if(st.fiduciaEventi.length>12) st.fiduciaEventi.shift();
