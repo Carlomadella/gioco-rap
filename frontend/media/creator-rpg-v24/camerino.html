@@ -2250,7 +2250,7 @@ $('openAvaturn').onclick=()=>{
     if(mobileAvaturnTopLevelEnabled()){
       /* Questa chiamata avviene direttamente dentro l'handler del tap.
          Niente bridge intermedio: il browser vede chiaramente la user activation. */
-      const url=new URL('avaturn-mobile.html?v=2',location.href).href;
+      const url=new URL('avaturn-mobile.html?v=3',location.href).href;
       let win=null;
       try{
         win=window.open(url,'adf-avaturn-mobile');
