@@ -1332,6 +1332,39 @@ test("punto 10: ghosting, rifiuto e cancellazione tecnica sono distinti",
   ev.includes('typeof stradaIgnoraPropostaFabbrica==="function"') &&
   ev.includes('typeof stradaRifiutaPropostaFabbrica==="function"') &&
   crime.includes("Cancellazione tecnica"));
+test("punto 11: crescita criminale per capacità e non per grado",
+  crime.includes("const STRADA_CAPACITA_RETE") &&
+  crime.includes("function stradaCapacitaRete()") &&
+  crime.includes("piuChiamate") &&
+  crime.includes("sceltaOpportunita") &&
+  crime.includes("richiestaNome") &&
+  crime.includes("creaPonte") &&
+  !crime.includes("livelloCriminale") &&
+  !crime.includes("gradoCriminale"));
+test("punto 11: il peso nel giro aumenta davvero la frequenza delle chiamate",
+  crime.includes("function stradaOpportunitaTriggerConfig") &&
+  crime.includes("chance+=.035") &&
+  crime.includes("cooldown=Math.max(7,cooldown-2)") &&
+  crime.includes('trigger==="mondo" && cap.piuChiamate'));
+test("punto 11: con abbastanza rete si sceglie tra due opportunità reali",
+  crime.includes("pendingChoices") &&
+  crime.includes("function stradaSelezionaOpportunita") &&
+  crime.includes('type:"not-selected"') &&
+  ev.includes("Più di una persona si fa viva") &&
+  ev.includes("Guarda le proposte"));
+test("punto 11: gli altri possono chiedere un nome e il giocatore può fare da ponte",
+  crime.includes("function stradaTentaEventoRete") &&
+  crime.includes('mode==="ask-name"') &&
+  crime.includes('mode==="bridge"') &&
+  crime.includes('type:"name-given"') &&
+  crime.includes('type:"bridge-made"') &&
+  ev.includes("ti chiede un nome") &&
+  ev.includes("Questa volta il ponte sei tu"));
+test("punto 11: rete avanzata usa persone e favori reali, non una valuta-rango",
+  crime.includes('stradaModificaFiducia(requester,2,"rete-nome-dato")') &&
+  crime.includes('stradaAggiungiFavore(requester,1,"rete-nome-dato")') &&
+  crime.includes('stradaAggiungiFavore(a,1,"rete-ponte")') &&
+  crime.includes('stradaAggiungiFavore(b,1,"rete-ponte")'));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&

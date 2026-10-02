@@ -295,6 +295,32 @@ const STRADA_OPPORTUNITA_TRIGGER = Object.freeze({
   })
 });
 
+function stradaOpportunitaTriggerConfig(trigger){
+  const base=STRADA_OPPORTUNITA_TRIGGER[trigger];
+  if(!base) return null;
+  const cap=stradaCapacitaRete();
+  let chance=Number(base.chance||0);
+  let cooldown=Math.max(1,Number(base.cooldownGiorni||1));
+
+  /* Più persone ti conoscono e il tuo nome gira, più spesso qualcuno prova a
+     coinvolgerti. Non esiste alcun "livello": cambia soltanto il mondo. */
+  if(trigger==="mondo" && cap.piuChiamate){
+    chance+=.035;
+    cooldown=Math.max(7,cooldown-2);
+  }
+  if(trigger==="mondo" && cap.richiestaNome){
+    chance+=.015;
+    cooldown=Math.max(6,cooldown-1);
+  }
+
+  return {
+    chance:Math.min(.16,chance),
+    cooldownGiorni:cooldown,
+    durataGiorni:Number(base.durataGiorni||7),
+    trigger
+  };
+}
+
 /* Pool di opportunità criminali. Non aggiunge nuovi metodi operativi nel mondo
    reale: varia i quattro colpi già esistenti sul piano di gameplay.
    Ogni offerta modifica davvero ricompensa, probabilità, attenzione e
@@ -958,6 +984,39 @@ function stradaRelazioneDisponibile(p){
   if(!p || p.via || !p.strada || !p.strada.known) return false;
   const st=stradaPersonaMeta(p);
   return st.streetStatus==="active" || st.streetStatus==="cold";
+}
+
+/* Punto 11: nessun grado criminale. Queste non sono "promozioni": sono
+   capacità derivate da quello che il personaggio ha davvero costruito nel
+   giro. Non vengono mostrate come livelli o titoli. */
+const STRADA_CAPACITA_RETE = Object.freeze({
+  chiamate:Object.freeze({rep:12,contatti:2}),
+  scelta:Object.freeze({rep:25,contatti:3}),
+  nome:Object.freeze({rep:40,contatti:4,fidati:1}),
+  ponte:Object.freeze({rep:60,contatti:5,fidati:2})
+});
+
+function stradaContattiAttivi(){
+  stradaAggiornaRelazioniCriminali(true);
+  return (G.gente||[]).filter(stradaRelazioneDisponibile);
+}
+
+function stradaCapacitaRete(){
+  const rep=Math.max(0,Number(G.strada&&G.strada.rep||0));
+  const attivi=stradaContattiAttivi();
+  const fidati=attivi.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const ok=req=>rep>=Number(req.rep||0) &&
+    attivi.length>=Number(req.contatti||0) &&
+    fidati.length>=Number(req.fidati||0);
+  return {
+    rep,
+    contatti:attivi.length,
+    fidati:fidati.length,
+    piuChiamate:ok(STRADA_CAPACITA_RETE.chiamate),
+    sceltaOpportunita:ok(STRADA_CAPACITA_RETE.scelta),
+    richiestaNome:ok(STRADA_CAPACITA_RETE.nome),
+    creaPonte:ok(STRADA_CAPACITA_RETE.ponte)
+  };
 }
 
 function stradaRelazioneTransizione(p,status,reason,oggi){
@@ -1805,6 +1864,7 @@ function stradaOpportunitaStato(){
   const st=s.crimeOpportunity;
   if(!Array.isArray(st.history)) st.history=[];
   if(!Array.isArray(st.recentIds)) st.recentIds=[];
+  if(!Array.isArray(st.pendingChoices)) st.pendingChoices=[];
   if(!st.lastCheckByTrigger || typeof st.lastCheckByTrigger!=="object")
     st.lastCheckByTrigger={};
   /* Migrazione UNA SOLA VOLTA del vecchio contatore giornaliero. Prima veniva
@@ -1860,26 +1920,92 @@ function stradaOpportunitaAttiva(colpoId){
 }
 function stradaFabbricaLeadAttivo(colpoId){ return stradaOpportunitaAttiva(colpoId); }
 
-function stradaScegliOpportunita(roll){
+function stradaPoolOpportunita(escludi){
   const st=stradaOpportunitaStato();
   const rep=Math.max(0,Number((G.strada&&G.strada.rep)||0));
+  const skip=new Set(Array.isArray(escludi)?escludi:[]);
   let pool=STRADA_OPPORTUNITA.filter(x=>
     rep>=Number(x.minRep||0) &&
     (x.maxRep==null || rep<=Number(x.maxRep)) &&
-    !st.recentIds.includes(x.id)
+    !st.recentIds.includes(x.id) &&
+    !skip.has(x.id)
   );
   if(!pool.length)
     pool=STRADA_OPPORTUNITA.filter(x=>
-      rep>=Number(x.minRep||0) && (x.maxRep==null || rep<=Number(x.maxRep))
+      rep>=Number(x.minRep||0) &&
+      (x.maxRep==null || rep<=Number(x.maxRep)) &&
+      !skip.has(x.id)
     );
-  if(!pool.length) return null;
+  return pool;
+}
 
+function stradaScegliOpportunita(roll,escludi){
+  const pool=stradaPoolOpportunita(escludi);
+  if(!pool.length) return null;
   const r=Number.isFinite(Number(roll))
     ? Math.max(0,Math.min(.999999,Number(roll)))
     : Math.random();
   return Object.assign({},pool[Math.floor(r*pool.length)]);
 }
 function stradaFabbricaLeadVariante(roll){ return stradaScegliOpportunita(roll); }
+
+function stradaPreparaPropostaOpportunita(variante,trigger,cfg,oggi){
+  if(!variante) return null;
+  const persona=stradaRisolviContattoOpportunita(variante,trigger,false);
+  if(!persona) return null;
+  const proposta=Object.assign({
+    source:"street-opportunity",
+    sourceLabel:"Incontro della Strada",
+    trigger:trigger||"unknown",
+    status:"offered",
+    offeredAbsoluteDay:oggi,
+    durataGiorni:Number(cfg.durataGiorni||7)
+  },variante,{
+    personId:persona.id,
+    persona:persona.n,
+    contactKey:(persona.strada&&persona.strada.key)||stradaContattoKey(persona.n)
+  });
+  stradaRegistraTentativoContatto(persona,"opportunity:"+String(variante.id||""));
+  return proposta;
+}
+
+function stradaOpportunitaPendenti(){
+  const st=stradaOpportunitaStato();
+  if(Array.isArray(st.pendingChoices) && st.pendingChoices.length)
+    return st.pendingChoices.map(x=>Object.assign({},x));
+  return st.pending ? [Object.assign({},st.pending)] : [];
+}
+
+function stradaSelezionaOpportunita(opportunityId){
+  const st=stradaOpportunitaStato();
+  const scelte=stradaOpportunitaPendenti();
+  if(!scelte.length) return null;
+  const scelta=opportunityId
+    ? scelte.find(x=>x.id===opportunityId)
+    : scelte[0];
+  if(!scelta) return null;
+
+  /* Le altre proposte sono state viste e scartate, non ignorate: nessun
+     ghosting artificiale quando il giocatore esercita la nuova capacità di
+     scegliere tra due occasioni. */
+  for(const altra of scelte){
+    if(altra.id===scelta.id) continue;
+    const p=stradaPersonaDaId(altra.personId);
+    if(p) stradaRegistraInterazione(p,"opportunity-not-selected");
+    st.history.push({
+      type:"not-selected",
+      absoluteDay:stradaAbsDay(),
+      opportunityId:altra.id,
+      trigger:altra.trigger||null,
+      colpoId:altra.colpoId,
+      personId:altra.personId||null
+    });
+  }
+  while(st.history.length>30) st.history.shift();
+  st.pending=Object.assign({},scelta);
+  st.pendingChoices=[];
+  return st.pending;
+}
 
 function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
@@ -1890,10 +2016,10 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
 
   const st=stradaOpportunitaStato();
   stradaAggiornaOpportunita(true);
-  if(st.active || st.pending) return null;
+  if(st.active || st.pending || (st.pendingChoices&&st.pendingChoices.length)) return null;
 
   const oggi=stradaAbsDay();
-  const cfg=STRADA_OPPORTUNITA_TRIGGER[trigger];
+  const cfg=stradaOpportunitaTriggerConfig(trigger);
   if(!cfg) return null;
 
   /* Ogni contesto può controllare una volta al giorno: fallire il roll del
@@ -1908,29 +2034,43 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
   const r=roll==null ? Math.random() : Number(roll);
   if(!Number.isFinite(r) || r>=Number(cfg.chance||0)) return null;
 
-  const variante=stradaScegliOpportunita(variantRoll);
-  if(!variante) return null;
+  const cap=stradaCapacitaRete();
+  const prima=stradaScegliOpportunita(variantRoll);
+  const proposte=[];
+  const p1=stradaPreparaPropostaOpportunita(prima,trigger,cfg,oggi);
+  if(p1) proposte.push(p1);
 
-  const persona=stradaRisolviContattoOpportunita(variante,trigger,false);
-  if(!persona) return null;
-  variante.personId=persona.id;
-  variante.persona=persona.n;
-  variante.contactKey=(persona.strada&&persona.strada.key)||stradaContattoKey(persona.n);
-  stradaRegistraTentativoContatto(persona,"opportunity:"+String(variante.id||""));
+  /* Solo le chiamate dal mondo diventano una scelta simultanea. La Fabbrica
+     resta un incontro faccia a faccia con una persona concreta. */
+  if(trigger==="mondo" && cap.sceltaOpportunita && proposte.length){
+    const r2=Number.isFinite(Number(variantRoll))
+      ? (Math.max(0,Math.min(.999999,Number(variantRoll)))+.47)%1
+      : Math.random();
+    const seconda=stradaScegliOpportunita(r2,[proposte[0].id]);
+    const p2=stradaPreparaPropostaOpportunita(seconda,trigger,cfg,oggi);
+    if(p2 && p2.id!==proposte[0].id) proposte.push(p2);
+  }
+
+  if(!proposte.length) return null;
 
   st.lastOfferAbsoluteDay=oggi;
   st.nextOfferAbsoluteDay=oggi+Number(cfg.cooldownGiorni||10);
-  st.recentIds.unshift(variante.id);
-  if(st.recentIds.length>4) st.recentIds.length=4;
+  for(const proposta of proposte){
+    st.recentIds.unshift(proposta.id);
+  }
+  st.recentIds=[...new Set(st.recentIds)].slice(0,4);
 
-  st.pending=Object.assign({
-    source:"street-opportunity",
-    sourceLabel:"Incontro della Strada",
-    trigger:trigger||"unknown",
-    status:"offered",
-    offeredAbsoluteDay:oggi,
-    durataGiorni:Number(cfg.durataGiorni||7)
-  },variante);
+  if(proposte.length>1){
+    st.pendingChoices=proposte.map(x=>Object.assign({},x));
+    st.pending=null;
+    return Object.assign({},proposte[0],{
+      multi:true,
+      choices:st.pendingChoices.map(x=>Object.assign({},x))
+    });
+  }
+
+  st.pending=Object.assign({},proposte[0]);
+  st.pendingChoices=[];
   return Object.assign({},st.pending);
 }
 
@@ -1941,9 +2081,12 @@ function stradaTentaPropostaFabbrica(roll,variantRoll){
   return stradaTentaOpportunita("fabbrica",roll,variantRoll);
 }
 
-function stradaAccettaOpportunita(){
+function stradaAccettaOpportunita(opportunityId){
   const st=stradaOpportunitaStato();
+  if((st.pendingChoices&&st.pendingChoices.length) || opportunityId)
+    stradaSelezionaOpportunita(opportunityId);
   if(!st.pending) return null;
+
   const persona=stradaPersonaDaId(st.pending.personId);
   if(persona) stradaRegistraInterazione(persona,"opportunity-accepted");
   const oggi=stradaAbsDay();
@@ -1953,6 +2096,7 @@ function stradaAccettaOpportunita(){
     expiresAbsoluteDay:oggi+Math.max(1,Number(st.pending.durataGiorni||7))
   });
   st.pending=null;
+  st.pendingChoices=[];
   st.active=lead;
   st.history.push({
     type:"accepted",
@@ -1971,44 +2115,57 @@ function stradaAccettaOpportunita(){
   if(st.history.length>30) st.history.shift();
   return Object.assign({},lead);
 }
-function stradaAccettaPropostaFabbrica(){ return stradaAccettaOpportunita(); }
+function stradaAccettaPropostaFabbrica(opportunityId){ return stradaAccettaOpportunita(opportunityId); }
 
 function stradaRifiutaOpportunita(){
   const st=stradaOpportunitaStato();
-  if(!st.pending) return null;
-  const persona=stradaPersonaDaId(st.pending.personId);
-  if(persona) stradaRegistraInterazione(persona,"opportunity-declined");
-  const proposta=Object.assign({},st.pending,{status:"declined",declinedAbsoluteDay:stradaAbsDay()});
+  const proposte=stradaOpportunitaPendenti();
+  if(!proposte.length) return null;
+
+  const oggi=stradaAbsDay();
+  for(const proposta of proposte){
+    const persona=stradaPersonaDaId(proposta.personId);
+    if(persona) stradaRegistraInterazione(persona,"opportunity-declined");
+    st.history.push({
+      type:"declined",
+      absoluteDay:oggi,
+      opportunityId:proposta.id,
+      trigger:proposta.trigger||null,
+      colpoId:proposta.colpoId,
+      personId:proposta.personId||null
+    });
+  }
+  while(st.history.length>30) st.history.shift();
   st.pending=null;
-  st.history.push({
-    type:"declined",
-    absoluteDay:stradaAbsDay(),
-    opportunityId:proposta.id,
-    trigger:proposta.trigger||null,
-    colpoId:proposta.colpoId
-  });
-  if(st.history.length>30) st.history.shift();
-  return proposta;
+  st.pendingChoices=[];
+  const chiuse=proposte.map(x=>Object.assign({},x,{status:"declined",declinedAbsoluteDay:oggi}));
+  return chiuse.length===1 ? chiuse[0] : chiuse;
 }
 function stradaRifiutaPropostaFabbrica(){ return stradaRifiutaOpportunita(); }
 
 function stradaIgnoraOpportunita(){
   const st=stradaOpportunitaStato();
-  if(!st.pending) return null;
-  const proposta=Object.assign({},st.pending,{status:"ignored",ignoredAbsoluteDay:stradaAbsDay()});
-  const persona=stradaPersonaDaId(proposta.personId);
-  if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
+  const proposte=stradaOpportunitaPendenti();
+  if(!proposte.length) return null;
+
+  const oggi=stradaAbsDay();
+  for(const proposta of proposte){
+    const persona=stradaPersonaDaId(proposta.personId);
+    if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
+    st.history.push({
+      type:"ignored",
+      absoluteDay:oggi,
+      opportunityId:proposta.id,
+      trigger:proposta.trigger||null,
+      colpoId:proposta.colpoId,
+      personId:proposta.personId||null
+    });
+  }
+  while(st.history.length>30) st.history.shift();
   st.pending=null;
-  st.history.push({
-    type:"ignored",
-    absoluteDay:stradaAbsDay(),
-    opportunityId:proposta.id,
-    trigger:proposta.trigger||null,
-    colpoId:proposta.colpoId,
-    personId:proposta.personId||null
-  });
-  if(st.history.length>30) st.history.shift();
-  return proposta;
+  st.pendingChoices=[];
+  const ignorate=proposte.map(x=>Object.assign({},x,{status:"ignored",ignoredAbsoluteDay:oggi}));
+  return ignorate.length===1 ? ignorate[0] : ignorate;
 }
 function stradaIgnoraPropostaFabbrica(){ return stradaIgnoraOpportunita(); }
 
@@ -2016,16 +2173,20 @@ function stradaIgnoraPropostaFabbrica(){ return stradaIgnoraOpportunita(); }
    giocatore non ha visto né ignorato nessuno, quindi la relazione non cambia. */
 function stradaAnnullaOpportunita(){
   const st=stradaOpportunitaStato();
-  if(!st.pending) return null;
-  const proposta=st.pending;
+  const proposte=stradaOpportunitaPendenti();
+  if(!proposte.length) return null;
+
+  const offeredDay=proposte[0].offeredAbsoluteDay;
   st.pending=null;
-  if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay)){
+  st.pendingChoices=[];
+  if(Number(st.lastOfferAbsoluteDay)===Number(offeredDay)){
     st.lastOfferAbsoluteDay=null;
     st.nextOfferAbsoluteDay=null;
-    if(Array.isArray(st.recentIds) && st.recentIds[0]===proposta.id)
-      st.recentIds.shift();
+    const ids=new Set(proposte.map(x=>x.id));
+    if(Array.isArray(st.recentIds))
+      st.recentIds=st.recentIds.filter(id=>!ids.has(id));
   }
-  return proposta;
+  return proposte.length===1 ? proposte[0] : proposte;
 }
 function stradaAnnullaPropostaFabbrica(){ return stradaAnnullaOpportunita(); }
 
@@ -2057,6 +2218,174 @@ function stradaConsumaOpportunita(colpoId,successo){
 }
 function stradaConsumaPropostaFabbrica(colpoId,successo){
   return stradaConsumaOpportunita(colpoId,successo);
+}
+
+/* Punto 11: quando la rete pesa davvero, il giocatore smette di essere solo
+   destinatario di lavori. Prima gli chiedono "hai un nome?"; più avanti può
+   essere lui a far incontrare due persone. Anche qui nessun grado formale. */
+const STRADA_EVENTI_RETE = Object.freeze({
+  nome:Object.freeze({chance:.06,cooldownGiorni:21}),
+  ponte:Object.freeze({chance:.045,cooldownGiorni:28})
+});
+
+function stradaEventoReteStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.reteInfluenza || typeof s.reteInfluenza!=="object"){
+    s.reteInfluenza={
+      lastCheckAbsoluteDay:null,
+      nextEventAbsoluteDay:null,
+      pending:null,
+      history:[],
+      connectionsMade:0
+    };
+  }
+  const st=s.reteInfluenza;
+  if(!Array.isArray(st.history)) st.history=[];
+  if(!Number.isFinite(Number(st.connectionsMade))) st.connectionsMade=0;
+  st.connectionsMade=Math.max(0,Math.floor(Number(st.connectionsMade)||0));
+  return st;
+}
+
+function stradaReteRoll(roll){
+  return Number.isFinite(Number(roll))
+    ? Math.max(0,Math.min(.999999,Number(roll)))
+    : Math.random();
+}
+
+function stradaTentaEventoRete(roll,variantRoll){
+  if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
+  if(typeof stradaHaTrapPhone==="function" && !stradaHaTrapPhone()) return null;
+
+  const opp=stradaOpportunitaStato();
+  stradaAggiornaOpportunita(true);
+  if(opp.active || opp.pending || (opp.pendingChoices&&opp.pendingChoices.length)) return null;
+  const ferro=typeof stradaFerroStato==="function" ? stradaFerroStato() : null;
+  if(ferro&&ferro.pending) return null;
+
+  const cap=stradaCapacitaRete();
+  const mode=cap.creaPonte ? "bridge" : cap.richiestaNome ? "ask-name" : null;
+  if(!mode) return null;
+
+  const st=stradaEventoReteStato();
+  if(st.pending) return null;
+  const oggi=stradaAbsDay();
+  if(Number(st.lastCheckAbsoluteDay)===oggi) return null;
+  if(st.nextEventAbsoluteDay!=null && oggi<Number(st.nextEventAbsoluteDay)) return null;
+  st.lastCheckAbsoluteDay=oggi;
+
+  const cfg=mode==="bridge" ? STRADA_EVENTI_RETE.ponte : STRADA_EVENTI_RETE.nome;
+  if(stradaReteRoll(roll)>=Number(cfg.chance||0)) return null;
+
+  const attivi=stradaContattiAttivi().slice().sort((a,b)=>
+    stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
+    Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0)
+  );
+  const rv=stradaReteRoll(variantRoll);
+
+  if(mode==="ask-name"){
+    if(attivi.length<3) return null;
+    const requester=attivi[Math.floor(rv*attivi.length)] || attivi[0];
+    const candidati=attivi.filter(p=>p.id!==requester.id)
+      .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a))
+      .slice(0,3);
+    if(candidati.length<2) return null;
+    st.pending={
+      mode,
+      requesterId:requester.id,
+      requesterName:requester.n,
+      candidateIds:candidati.map(p=>p.id),
+      candidateNames:candidati.map(p=>p.n),
+      createdAbsoluteDay:oggi
+    };
+  }else{
+    const fidati=attivi.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+    if(fidati.length<2) return null;
+    const primo=Math.floor(rv*fidati.length);
+    const a=fidati[primo] || fidati[0];
+    const b=fidati[(primo+1)%fidati.length];
+    if(!a || !b || a.id===b.id) return null;
+    st.pending={
+      mode,
+      personAId:a.id,personAName:a.n,
+      personBId:b.id,personBName:b.n,
+      createdAbsoluteDay:oggi
+    };
+  }
+
+  st.nextEventAbsoluteDay=oggi+Number(cfg.cooldownGiorni||21);
+  return Object.assign({},st.pending);
+}
+
+function stradaRisolviEventoRete(personId){
+  const st=stradaEventoReteStato();
+  const p=st.pending;
+  if(!p) return {ok:false,reason:"Non c'è nessuna richiesta di rete aperta."};
+  const oggi=stradaAbsDay();
+
+  if(p.mode==="ask-name"){
+    const requester=stradaPersonaDaId(p.requesterId);
+    const candidato=(p.candidateIds||[]).includes(personId)
+      ? stradaPersonaDaId(personId)
+      : null;
+    if(!stradaRelazioneDisponibile(requester) || !stradaRelazioneDisponibile(candidato))
+      return {ok:false,reason:"La rete è cambiata prima che riuscissi a fare il nome."};
+
+    stradaModificaFiducia(requester,2,"rete-nome-dato");
+    stradaModificaFiducia(candidato,2,"rete-presentato");
+    stradaAggiungiFavore(requester,1,"rete-nome-dato");
+    st.connectionsMade++;
+    st.history.push({
+      type:"name-given",absoluteDay:oggi,
+      requesterId:requester.id,personId:candidato.id
+    });
+    st.pending=null;
+    if(st.history.length>20) st.history.shift();
+    return {ok:true,mode:p.mode,requester:requester.n,persona:candidato.n};
+  }
+
+  if(p.mode==="bridge"){
+    const a=stradaPersonaDaId(p.personAId), b=stradaPersonaDaId(p.personBId);
+    if(!stradaRelazioneDisponibile(a) || !stradaRelazioneDisponibile(b))
+      return {ok:false,reason:"Uno dei due contatti non è più raggiungibile."};
+
+    stradaModificaFiducia(a,3,"rete-ponte");
+    stradaModificaFiducia(b,3,"rete-ponte");
+    stradaAggiungiFavore(a,1,"rete-ponte");
+    stradaAggiungiFavore(b,1,"rete-ponte");
+    st.connectionsMade++;
+    st.history.push({
+      type:"bridge-made",absoluteDay:oggi,
+      personAId:a.id,personBId:b.id
+    });
+    st.pending=null;
+    if(st.history.length>20) st.history.shift();
+    return {ok:true,mode:p.mode,personaA:a.n,personaB:b.n};
+  }
+
+  return {ok:false,reason:"Richiesta di rete non riconosciuta."};
+}
+
+function stradaRifiutaEventoRete(){
+  const st=stradaEventoReteStato();
+  if(!st.pending) return null;
+  const p=Object.assign({},st.pending,{status:"declined",closedAbsoluteDay:stradaAbsDay()});
+  st.history.push({
+    type:"declined",mode:p.mode,absoluteDay:stradaAbsDay(),
+    requesterId:p.requesterId||null,
+    personAId:p.personAId||null,personBId:p.personBId||null
+  });
+  if(st.history.length>20) st.history.shift();
+  st.pending=null;
+  return p;
+}
+
+function stradaAnnullaEventoRete(){
+  const st=stradaEventoReteStato();
+  if(!st.pending) return null;
+  const p=st.pending;
+  st.pending=null;
+  st.nextEventAbsoluteDay=null;
+  return p;
 }
 
 function stradaChanceConOpportunita(colpo,approccio,lead,personaSquadra,preparazione){

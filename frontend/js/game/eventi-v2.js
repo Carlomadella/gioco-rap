@@ -2609,15 +2609,76 @@ function adfStreetIntroAfterAction(a){
 
 function adfStreetOpportunityDecision(proposta){
   if(!proposta) return;
-  const termini=typeof stradaDescriviOpportunita==="function"
-    ? stradaDescriviOpportunita(proposta)
+  const pendenti=typeof stradaOpportunitaPendenti==="function"
+    ? stradaOpportunitaPendenti()
+    : [proposta];
+  const scelte=pendenti.length ? pendenti : [proposta];
+
+  const terminiDi=p=>typeof stradaDescriviOpportunita==="function"
+    ? stradaDescriviOpportunita(p)
     : "";
+  const risultatoLead=lead=>{
+    if(!lead) return {t:"La proposta non è più disponibile.",c:""};
+    let colpo=lead.colpoId||"indicato";
+    try{
+      if(typeof STRADA_COLPI!=="undefined"){
+        const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
+        if(c) colpo=c.n;
+      }
+    }catch(_){}
+    return {
+      t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
+        colpo+"</b> nella Strada finché non la usi o scade.",
+      c:"good"
+    };
+  };
+
+  if(scelte.length>1){
+    const righe=scelte.map(p=>{
+      const termini=terminiDi(p);
+      return "<b>"+(p.persona||"Un contatto")+" · "+(p.titolo||"Proposta")+"</b><br>"+
+        (p.pitch||"Ti spiega cosa vuole.")+
+        (termini ? "<br><span>"+termini+"</span>" : "");
+    }).join("<br><br>");
+
+    showEvent({
+      k:"Strada · Più porte aperte",
+      t:"Adesso puoi scegliere chi ascoltare",
+      d:"Non è una promozione e nessuno ti ha dato un titolo. Semplicemente, ormai più di una persona pensa a te quando c'è qualcosa da fare.<br><br>"+
+        righe+
+        "<br><br>Puoi prenderne <b>una sola</b>: scegliere una proposta equivale a rispondere alle altre, non a ignorarle.",
+      annulla(){
+        if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
+      },
+      opts:[
+        ...scelte.map(p=>({
+          n:"Accetta · "+(p.persona||p.titolo||"Proposta"),
+          d:(p.titolo||"Proposta")+" · "+terminiDi(p),
+          run(){
+            const lead=typeof stradaAccettaPropostaFabbrica==="function"
+              ? stradaAccettaPropostaFabbrica(p.id)
+              : null;
+            return risultatoLead(lead);
+          }
+        })),
+        {n:"Rifiuta entrambe",d:"Rispondi no: nessun ghosting verso i contatti",run(){
+          if(typeof stradaRifiutaPropostaFabbrica==="function")
+            stradaRifiutaPropostaFabbrica();
+          return {t:"Hai risposto a entrambe le proposte e hai lasciato perdere.",c:""};
+        }}
+      ]
+    });
+    return;
+  }
+
+  const singola=scelte[0]||proposta;
+  const termini=terminiDi(singola);
   showEvent({
     k:"Strada · Proposta",
-    t:proposta.titolo||"Una proposta",
-    d:"<b>"+(proposta.persona||"La persona")+":</b> "+(proposta.pitch||"Ti spiega cosa vuole.")+
+    t:singola.titolo||"Una proposta",
+    d:"<b>"+(singola.persona||"La persona")+":</b> "+(singola.pitch||"Ti spiega cosa vuole.")+
       (termini ? "<br><br><b>Se accetti:</b> "+termini+"." : "")+
-      "<br><br>L'offerta resta valida per <b>"+Number(proposta.durataGiorni||7)+" giorni</b>.",
+      "<br><br>L'offerta resta valida per <b>"+Number(singola.durataGiorni||7)+" giorni</b>.",
     annulla(){
       if(typeof stradaIgnoraPropostaFabbrica==="function")
         stradaIgnoraPropostaFabbrica();
@@ -2625,21 +2686,9 @@ function adfStreetOpportunityDecision(proposta){
     opts:[
       {n:"Accetta",d:termini||"Ti prendi il rischio e l'occasione",run(){
         const lead=typeof stradaAccettaPropostaFabbrica==="function"
-          ? stradaAccettaPropostaFabbrica()
+          ? stradaAccettaPropostaFabbrica(singola.id)
           : null;
-        if(!lead) return {t:"La proposta non è più disponibile.",c:""};
-        let colpo=lead.colpoId||"indicato";
-        try{
-          if(typeof STRADA_COLPI!=="undefined"){
-            const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
-            if(c) colpo=c.n;
-          }
-        }catch(_){}
-        return {
-          t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
-            colpo+"</b> nella Strada finché non la usi o scade.",
-          c:"good"
-        };
+        return risultatoLead(lead);
       }},
       {n:"Rifiuta",d:"Nessun effetto: lasci perdere l'occasione",run(){
         if(typeof stradaRifiutaPropostaFabbrica==="function")
@@ -2703,6 +2752,113 @@ function adfStreetFerroAfterAction(a){
   return true;
 }
 
+function adfStreetNetworkAfterAction(a){
+  if(!a || a.id==="turno" || typeof stradaTentaEventoRete!=="function") return false;
+
+  const stato=st();
+  if(stato.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaEventoRete(Math.random(),Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-network")){
+    if(typeof stradaAnnullaEventoRete==="function") stradaAnnullaEventoRete();
+    return false;
+  }
+
+  stato.lastHookEventDay=absDay();
+
+  if(proposta.mode==="ask-name"){
+    const nomi=Array.isArray(proposta.candidateNames)?proposta.candidateNames:[];
+    try{
+      if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+        TRAPHONE16.receiveStorySms({
+          id:"network-name-"+String(absDay()),
+          family:"street-network",
+          voice:"contact",
+          from:proposta.requesterName||"SCONOSCIUTO",
+          text:"Mi serve una persona affidabile. Tu chi chiameresti?",
+          tags:["street","network"]
+        });
+      }
+    }catch(_){}
+
+    afterClear(()=>showEvent({
+      k:"Strada · Rete",
+      t:(proposta.requesterName||"Un contatto")+" ti chiede un nome",
+      d:"Non ti sta offrendo un lavoro. Ti sta chiedendo <b>chi chiameresti tu</b>. È il tipo di domanda che arriva solo quando gli altri iniziano a considerare utile la tua rete.",
+      annulla(){
+        if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+      },
+      opts:[
+        ...nomi.map((nome,i)=>({
+          n:"Fai il nome di "+nome,
+          d:"Metti in gioco la tua credibilità fra due persone reali",
+          run(){
+            const id=(proposta.candidateIds||[])[i];
+            const out=typeof stradaRisolviEventoRete==="function"
+              ? stradaRisolviEventoRete(id)
+              : null;
+            if(!out || out.ok===false)
+              return {t:(out&&out.reason)||"La presentazione non si chiude.",c:"bad"};
+            return {t:"Hai fatto il nome di <b>"+out.persona+"</b> a <b>"+out.requester+
+              "</b>. Adesso entrambi sanno che la presentazione è passata da te.",c:"good"};
+          }
+        })),
+        {n:"Non fare nomi",d:"Non metti nessuno della tua rete in mezzo",run(){
+          if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+          return {t:"Hai tenuto fuori i tuoi contatti. Nessuna relazione cambia.",c:""};
+        }}
+      ]
+    }),80);
+    return true;
+  }
+
+  if(proposta.mode==="bridge"){
+    try{
+      if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+        TRAPHONE16.receiveStorySms({
+          id:"network-bridge-"+String(absDay()),
+          family:"street-network",
+          voice:"contact",
+          from:"RETE",
+          text:"Due persone del giro potrebbero servirsi a vicenda. La presentazione dipende da te.",
+          tags:["street","network"]
+        });
+      }
+    }catch(_){}
+
+    afterClear(()=>showEvent({
+      k:"Strada · Rete",
+      t:"Questa volta il ponte sei tu",
+      d:"<b>"+(proposta.personAName||"Un contatto")+"</b> e <b>"+
+        (proposta.personBName||"un altro contatto")+
+        "</b> non si stanno cercando tramite un capo o una gerarchia. Sei tu ad avere abbastanza rapporti da capire che vale la pena farli incontrare.",
+      annulla(){
+        if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+      },
+      opts:[
+        {n:"Mettili in contatto",d:"La relazione nasce perché fai tu la presentazione",run(){
+          const out=typeof stradaRisolviEventoRete==="function"
+            ? stradaRisolviEventoRete()
+            : null;
+          if(!out || out.ok===false)
+            return {t:(out&&out.reason)||"Il ponte non si chiude.",c:"bad"};
+          return {t:"Hai messo in contatto <b>"+out.personaA+"</b> e <b>"+out.personaB+
+            "</b>. Ora entrambi ti devono qualcosa per aver aperto quella porta.",c:"good"};
+        }},
+        {n:"Non immischiarti",d:"Lasci che si arrangino senza usare la tua rete",run(){
+          if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+          return {t:"Hai lasciato correre. Nessuna relazione cambia.",c:""};
+        }}
+      ]
+    }),80);
+    return true;
+  }
+
+  if(typeof stradaAnnullaEventoRete==="function") stradaAnnullaEventoRete();
+  return false;
+}
+
 function adfStreetOpportunityAfterAction(a){
   if(!a || a.id==="turno") return false;
   if(typeof stradaTentaOpportunita!=="function") return false;
@@ -2720,35 +2876,49 @@ function adfStreetOpportunityAfterAction(a){
   }
 
   s.lastHookEventDay=absDay();
+  const scelte=Array.isArray(proposta.choices)&&proposta.choices.length
+    ? proposta.choices
+    : [proposta];
   try{
     if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
-      TRAPHONE16.receiveStorySms({
-        id:"opportunity-"+String(proposta.id||proposta.colpoId||"street")+"-"+String(absDay()),
-        family:"street-opportunity",
-        voice:"contact",
-        from:proposta.persona||"SCONOSCIUTO",
-        text:proposta.intro||"Ho una cosa da proporti.",
-        tags:["street","deal"]
-      });
+      for(const p of scelte){
+        TRAPHONE16.receiveStorySms({
+          id:"opportunity-"+String(p.id||p.colpoId||"street")+"-"+String(absDay()),
+          family:"street-opportunity",
+          voice:"contact",
+          from:p.persona||"SCONOSCIUTO",
+          text:p.intro||"Ho una cosa da proporti.",
+          tags:["street","deal"]
+        });
+      }
     }
   }catch(_){}
+
+  const multipla=scelte.length>1;
+  const corpo=multipla
+    ? "Il <b>TrapPhone</b> vibra più di una volta. Non hai ricevuto un grado nuovo: semplicemente, ormai più persone pensano a te.<br><br>"+
+      scelte.map(p=>"<b>"+(p.persona||"Un contatto")+":</b> "+(p.intro||"«Ho una cosa da proporti.»")).join("<br><br>")
+    : "Più tardi vibra il <b>TrapPhone</b>: è il canale che ti hanno dato proprio per queste cose."+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»");
+
   afterClear(()=>showEvent({
     k:"Strada",
-    t:(proposta.persona||"Qualcuno")+" si fa vivo",
-    d:"Più tardi vibra il <b>TrapPhone</b>: è il canale che ti hanno dato proprio per queste cose."+
-      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
-      (proposta.intro||"«Ho una cosa da proporti.»"),
+    t:multipla ? "Più di una persona si fa viva" : (proposta.persona||"Qualcuno")+" si fa vivo",
+    d:corpo,
     annulla(){
       if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
     },
     opts:[
-      {n:"Sentiamo",d:"Ti fai spiegare la proposta",run(){
+      {n:multipla?"Guarda le proposte":"Sentiamo",d:multipla?"Confronta le due occasioni prima di sceglierne una":"Ti fai spiegare la proposta",run(){
         afterClear(()=>adfStreetOpportunityDecision(proposta),60);
         return null;
       }},
-      {n:"Ignora",d:"Non rispondi: se succede spesso, smetteranno di cercarti",run(){
+      {n:"Ignora",d:multipla?"Non rispondi a nessuno dei due contatti":"Non rispondi: se succede spesso, smetteranno di cercarti",run(){
         if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
-        return {t:"Hai lasciato cadere il messaggio. Il contatto se lo ricorda.",c:""};
+        return {t:multipla
+          ? "Hai lasciato cadere entrambi i messaggi. Tutti e due i contatti se lo ricordano."
+          : "Hai lasciato cadere il messaggio. Il contatto se lo ricorda.",c:""};
       }}
     ]
   }),80);
@@ -3346,7 +3516,10 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   const ferroShown = a.id!=="turno" && !introShown
     ? adfStreetFerroAfterAction(a)
     : false;
-  const streetOpportunityShown = a.id!=="turno" && !introShown && !ferroShown
+  const networkShown = a.id!=="turno" && !introShown && !ferroShown
+    ? adfStreetNetworkAfterAction(a)
+    : false;
+  const streetOpportunityShown = a.id!=="turno" && !introShown && !ferroShown && !networkShown
     ? adfStreetOpportunityAfterAction(a)
     : false;
 
@@ -3360,7 +3533,7 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !streetOpportunityShown)
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !networkShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
   if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown)
     emitHook("after_job_shift",shiftPayload || {
