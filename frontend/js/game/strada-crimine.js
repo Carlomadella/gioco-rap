@@ -1046,6 +1046,7 @@ function stradaAggiornaRelazioniCriminali(silent){
       stradaRelazioneTransizione(p,"unreachable","six-months-away",oggi);
       cambi.push({p,status:"unreachable"});
     }else if(st.streetStatus==="unreachable" &&
+             st.returnAfterAbsoluteDay!=null &&
              Number.isFinite(Number(st.returnAfterAbsoluteDay)) &&
              oggi>=Number(st.returnAfterAbsoluteDay)){
       stradaRelazioneTransizione(p,"cold","old-history-resurfaces",oggi);
@@ -1549,7 +1550,9 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
      post-turno può esistere solo se in quel posto c'è già una persona reale
      che il giocatore ha scoperto essere collegata alla Strada. */
   const candidati=stradaContattiLuogo("fabbrica")
-    .filter(stradaRelazioneDisponibile)
+    /* Un collega reale che non ha ancora rivelato il lato Strada resta
+       eleggibile: il decadimento vale solo per rapporti criminali già noti. */
+    .filter(p=>!p.strada || !p.strada.known || stradaRelazioneDisponibile(p))
     .sort((a,b)=>{
     const ak=a.strada&&a.strada.known?1:0;
     const bk=b.strada&&b.strada.known?1:0;
