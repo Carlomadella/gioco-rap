@@ -1659,6 +1659,28 @@ body::before{
 .local-editor-overlay.on{display:block}
 .local-editor-overlay iframe{width:100%;height:100%;border:0;background:#050609;display:block}
 .creator-exit-game{position:fixed;left:18px;bottom:18px;z-index:130000;border:1px solid rgba(255,255,255,.16);background:rgba(7,8,10,.72);color:#f1eadb;border-radius:999px;padding:10px 14px;font:700 11px/1 Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(10px)}
+/* Mobile landscape: il camerino deve avere sempre una via d'uscita visibile.
+   Desktop resta identico: questa regola scatta solo su touch in orizzontale. */
+@media (pointer:coarse) and (orientation:landscape) and (max-width:1180px){
+  .creator-exit-game{
+    left:max(10px,env(safe-area-inset-left,0px));
+    top:max(10px,env(safe-area-inset-top,0px));
+    bottom:auto;
+    min-width:96px;
+    min-height:44px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:8px 13px;
+    font-size:0
+  }
+  .creator-exit-game::after{
+    content:"← Indietro";
+    font:800 11px/1 Inter,Arial,sans-serif;
+    letter-spacing:.08em;
+    text-transform:uppercase
+  }
+}
 
 /* ADF_RESPONSIVE_HEIGHT_V1 */
 
