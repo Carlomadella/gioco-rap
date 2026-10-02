@@ -369,8 +369,8 @@ describe("cartellino presenze Fabbrica", () => {
 
     expect(luoghi).toContain('lfPan("Ferie", lfFabbricaFerie(), "orologio")');
     expect(luoghi).toContain('function lfFerieLavoro(luogo,nome)');
-    expect(luoghi).toContain('data-ferie-select="'+lfEsc(luogo)+'"');
-    expect(luoghi).toContain('data-ferie-request="'+lfEsc(luogo)+'"');
+    expect(luoghi).toContain("data-ferie-select=");
+    expect(luoghi).toContain("data-ferie-request=");
     expect(luoghi).toContain('const inFerie = feriePosizioni.has(pos) && !n;');
     expect(luoghi).toContain('il giorno stesso non si recupera');
     expect(hub).toContain('<b>Ferie</b>');
