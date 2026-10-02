@@ -46,6 +46,10 @@ const START = () => ({
     ingressoLastOfferAbsoluteDay:null,
     ingressoNextOfferAbsoluteDay:null,
     ingressoLastShownAbsoluteDay:null,
+    /* Punto Strada 2: gli sblocchi devono esistere nel mondo. Il TrapPhone
+       non è più un oggetto sempre disponibile: conserva chi l'ha consegnato
+       e quando è entrato davvero nella vita del personaggio. */
+    traphone:{owned:false,sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null},
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
@@ -108,7 +112,7 @@ const CHIAVE_PARTITA = () => (typeof slotKey === "function" ? slotKey(SAVE_KEY) 
    `strada.giroAvviato` mancante è un salvataggio di prima del flag, e
    stradaGiroAvviato() lo ricava dalle prove (precedenti, ferro, attività).
    Messo a false da qui, una carriera criminale vecchia tornava «pulita». */
-const NON_COMPLETARE = {strada:["giroAvviato","badgeSbloccato"]};
+const NON_COMPLETARE = {strada:["giroAvviato","badgeSbloccato","traphone"]};
 function partitaDaSalvataggio(dati){
   const base = START(), g = Object.assign(base, dati || {});
   const iniziali = START();
