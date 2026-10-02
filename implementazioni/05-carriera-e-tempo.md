@@ -391,6 +391,27 @@ un'eventuale riassunzione riparte da zero; il licenziamento aggiunge anche il bl
 riassunzione**. I testi e la documentazione non devono più
 riproporre la vecchia frase *«da un lavoro non ci si licenzia»*.
 
+## Ferie in Fabbrica
+
+**FATTO (02/10/2026)** — il contratto Fabbrica prevede **2 giorni di ferie ogni ciclo di
+4 settimane**. La richiesta deve essere registrata **almeno il giorno prima**: non esiste
+una giustificazione retroattiva il giorno stesso per salvare un evento concomitante.
+
+Le ferie approvate:
+
+- liberano davvero quel giorno dal turno: la Fabbrica risulta non lavorabile e non viene
+  generata paga;
+- coprono la quota contrattuale della settimana senza trasformarsi in una presenza finta
+  (es. 4 turni + 1 ferie = 5/5 coperti);
+- non producono malus di affidabilità, assenze o richiami;
+- possono mantenere perfetto un ciclo quando il resto delle presenze è completo;
+- non possono sovrapporsi a uno straordinario già accettato o pendente, e una richiesta
+  straordinaria non viene proposta su un giorno già segnato come ferie;
+- vengono azzerate insieme al rapporto di lavoro in caso di dimissioni o licenziamento.
+
+La schermata Fabbrica mostra i giorni approvati con **F** nel cartellino e un pannello
+**Ferie** per richiedere i giorni futuri disponibili.
+
 ## L'attesa lunga non si trascina
 
 CARLO, «quando skippi tante ore ci mette troppo a simulare».
