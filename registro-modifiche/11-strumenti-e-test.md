@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e460a62b -->
+## 02/10/26, 14:31 — task/pizzeria-bilanciamento-playtest → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e460a62b`
+
+### Cosa è entrato
+
+- `bbbf1087` — chore(pizzeria): aggiunge comando bilanciamento dedicato — **mycolbraga**
+- `26f85365` — test(pizzeria): copre bilanciamento annuale e convivenza con la musica — **mycolbraga**
+- `e013c5a4` — test(pizzeria): aggiunge stress test economico sociale e doppia vita — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/package.json`
+- **Aggiunto:** `frontend/strumenti/bilanciamento/pizzeria.js`
+- **Aggiunto:** `frontend/test/unit/pizzeria-bilanciamento.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:93c76aae -->
 ## 02/10/26, 14:20 — task/pizzeria-coperture-narrative → main
 
