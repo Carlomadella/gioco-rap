@@ -1557,7 +1557,11 @@ function showColleague(job,s,roll){
       annulla(){},
       opts:[
         {n:"Dagli una mano",d:"+rapporto · +rete · un po' di fatica",run(){
-          relation(p,2); addNetwork(.4); addWellbeing(-1);
+          relation(p,2);
+          if(workKey(job)==="pizzeria" && typeof lavoroBonusRetePersona==="function")
+            lavoroBonusRetePersona(p,"pizzeria-colleague-help",.4,2);
+          else addNetwork(.4);
+          addWellbeing(-1);
           record(s,"colleague",{status:"helped",personId:p.id});
           return {t:"Hai coperto <b>"+p.n+"</b>. Il rapporto sul lavoro si è fatto più solido.",c:"good"};
         }},
@@ -1901,7 +1905,10 @@ function showMusic(job,s,roll){
           acceptedAbsoluteDay:absDay(),
           expiresAbsoluteDay:absDay()+7
         };
-        relation(p,1); addNetwork(.5);
+        relation(p,1);
+        if(workKey(job)==="pizzeria" && typeof lavoroBonusRetePersona==="function")
+          lavoroBonusRetePersona(p,"pizzeria-music-lead",.5,2);
+        else addNetwork(.5);
         record(s,"music",{status:"accepted",personId:p.id,kind:"live",
           multiplier:mult,expiresAbsoluteDay:s.musicLead.expiresAbsoluteDay});
         return {t:"Occasione aperta: la prossima serata live entro 7 giorni avrà una spinta da <b>"+p.n+"</b>.",c:"good"};
