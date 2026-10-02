@@ -336,12 +336,11 @@ entra nel calcolo del pezzo — che è anche un pezzo della TRACK.
 
 La plancia è disegnata a 1536×1024 e sul telefono richiede una disposizione sua.
 **Decisione aggiornata il 02/10/2026:** la vecchia impostazione «mobile in verticale» non è
-più il riferimento del progetto. Il gioco mobile supporta portrait e landscape, ma il
-**landscape è la modalità di riferimento e consigliata** per conservare composizione,
-sfondi, mappa e informazioni senza impoverire l'esperienza. Il portrait resta supportato,
-leggibile e utilizzabile senza rotazione forzata, ma non deve imporre tagli o sostituzioni
-grafiche. Restano obbligatori bersagli da almeno 44 punti, niente `hover` indispensabili e
-testi leggibili senza zoom. Il giro mobile copre 844×390, 390×844 e 360×640.
+più il riferimento del progetto. Il gioco mobile usa il **landscape come unico layout di gameplay supportato** per conservare
+composizione, sfondi, mappa e informazioni senza impoverire l'esperienza. Il portrait non
+è una seconda disposizione del gioco: mostra l'invito a ruotare il dispositivo, senza forzare
+la rotazione a livello di sistema. Restano obbligatori bersagli da almeno 44 punti, niente `hover` indispensabili e
+testi leggibili senza zoom. Il giro mobile di gameplay copre 844×390; in portrait si controlla soltanto l'avviso di rotazione.
 
 *«Responsività di tutto il gioco»* — **il giro sugli `:hover` è fatto (08/09/2026)**: tutte
 le regole `:hover` dei 24 fogli che ne avevano stanno dentro a `@media (hover:hover)`, e un
@@ -411,7 +410,7 @@ desktop, **Capacitor** per iOS e Android.
 | **Il build** — bundle minificato con l'impronta nel nome, server di sviluppo, controlli | ✅ **fatto (31/08/2026)** |
 | **I salvataggi** — file vero sul dispositivo, Steam Cloud, cloud nostro | 🔶 **metà (01/09/2026)**: il cloud c'è, ma `save()` scrive ancora solo nel `localStorage` |
 | **Gli account** — ospite o mail, sessioni, cancellazione, verifica Steam/Apple/Google | ✅ **fatto (01/09/2026)** — dei tre negozi mancano solo le chiavi |
-| **L'interfaccia sul telefono** — landscape di riferimento, portrait supportato, a tocchi e leggibile | ⬜ da fare: è la tappa G |
+| **L'interfaccia sul telefono** — gameplay landscape, portrait solo avviso di rotazione, a tocchi e leggibile | ⬜ da fare: è la tappa G |
 | **Il database vero** — SQLite adesso, PostgreSQL il giorno dell'uscita | ✅ **fatto (01/09/2026)** per SQLite; PostgreSQL è scritto e si prova con `npm run prova-pg` |
 
 Il file unico (`frontend/strumenti/build-artifact.py`) resta la demo da far girare, non il
