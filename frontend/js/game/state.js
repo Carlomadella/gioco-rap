@@ -45,6 +45,7 @@ const START = () => ({
     ingressoTentativi:0,
     ingressoLastOfferAbsoluteDay:null,
     ingressoNextOfferAbsoluteDay:null,
+    ingressoLastShownAbsoluteDay:null,
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
