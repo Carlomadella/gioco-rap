@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:40f251c0 -->
+## 02/10/26, 17:00 — fix/mobile-creator-avatar-scroll → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `40f251c0`
+
+### Cosa è entrato
+
+- `62b2c2ed` — test(mobile): copre scroll selezione avatar — **mycolbraga**
+- `75058ec5` — fix(mobile): abilita scroll scelta Avaturn MakeHuman — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:599ba725 -->
 ## 02/10/26, 16:43 — fix/mobile-avvio-full-height → main
 
