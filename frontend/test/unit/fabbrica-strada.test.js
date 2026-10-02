@@ -11,7 +11,7 @@ const leggi = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 function helperStradaFabbrica(){
   const source = leggi("js/game/strada-crimine.js");
 
-  const colpiStart = source.indexOf("const STRADA_COLPI = [");
+  const colpiStart = source.indexOf("const STRADA_CATEGORIE_COLPO");
   const colpiEnd = source.indexOf("const STRADA_COLPI_MILANO", colpiStart);
   const cfgStart = source.indexOf("const STRADA_FABBRICA_LEAD");
   const cfgEnd = source.indexOf("/* ==================== LA SCENA IN CORSO", cfgStart);

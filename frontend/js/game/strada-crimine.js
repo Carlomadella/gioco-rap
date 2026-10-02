@@ -30,20 +30,124 @@
    Guadagni ed energia sono quelli del documento dov'era scritto un numero; dove
    il documento non fissava un valore esatto (energia, pena base) ho messo una
    stima ragionevole, da tarare quando si gioca davvero. */
+const STRADA_CATEGORIE_COLPO = Object.freeze({
+  trasporto:Object.freeze({
+    n:"Trasporto", tag:"meno resa · meno attenzione",
+    guadagno:.94, chance:.05, heat:.82, sporco:.56, rep:.90
+  }),
+  merce:Object.freeze({
+    n:"Merce", tag:"equilibrato · più soldi sporchi",
+    guadagno:1.02, chance:.01, heat:.96, sporco:.64, rep:1
+  }),
+  furto:Object.freeze({
+    n:"Furto", tag:"resa alta · rischio più alto",
+    guadagno:1.10, chance:-.02, heat:1.10, sporco:.66, rep:1.08
+  }),
+  veicoli:Object.freeze({
+    n:"Veicoli", tag:"resa molto alta · molta attenzione",
+    guadagno:1.16, chance:-.035, heat:1.16, sporco:.68, rep:1.12
+  }),
+  incassi:Object.freeze({
+    n:"Recuperi", tag:"reputazione alta · situazione rumorosa",
+    guadagno:1.08, chance:-.015, heat:1.20, sporco:.60, rep:1.15
+  })
+});
+
+/* Punto 7: la Provincia non è più composta da quattro pulsanti eterni.
+   Questo è il pool: il giocatore ne vede solo quattro per giornata. Non
+   imponiamo una categoria per slot, quindi due offerte della stessa famiglia
+   possono convivere e un'altra famiglia può non comparire affatto. minRep
+   non crea una gerarchia esplicita: fa semplicemente arrivare lavori più
+   pesanti quando il nome del personaggio ha iniziato a girare davvero. */
 const STRADA_COLPI = [
-  {id:"consegne", n:"Consegne che non chiedi", energia:15, difficolta:.15, pena:2,
-   d:"Porti un pacco da un posto a un altro. Meglio non sapere cosa c'è dentro.",
-   min:120, max:280},
-  {id:"scotta", n:"Roba che scotta", energia:20, difficolta:.30, pena:3,
-   d:"È arrivata da poco e scotta: va fatta sparire in fretta.",
-   min:220, max:480},
-  {id:"cassa", n:"La cassa del bar", energia:28, difficolta:.50, pena:5,
-   d:"Il bar chiude tardi, e la cassa resta lì fino al mattino.",
-   min:420, max:950},
-  {id:"macchina", n:"La macchina giusta", energia:35, difficolta:.68, pena:8,
-   d:"Sai già dov'è parcheggiata, e chi non se ne accorgerà.",
-   min:600, max:1350}
-];
+  {id:"consegne",categoria:"trasporto",minRep:0,n:"Consegne che non chiedi",energia:15,difficolta:.15,pena:2,min:120,max:280,
+   d:"Porti qualcosa da un punto all'altro. Meno domande fai, meglio è."},
+  {id:"busta-chiusa",categoria:"trasporto",minRep:0,n:"La busta chiusa",energia:16,difficolta:.20,pena:2,min:140,max:300,
+   d:"Un passaggio breve, una consegna precisa e nessun motivo per curiosare."},
+  {id:"passaggio-rapido",categoria:"trasporto",minRep:0,n:"Passaggio rapido",energia:18,difficolta:.26,pena:2,min:170,max:360,
+   d:"Deve cambiare mano in fretta. Il valore sta soprattutto nel non perdere tempo."},
+  {id:"giro-notturno",categoria:"trasporto",minRep:5,n:"Il giro notturno",energia:21,difficolta:.34,pena:3,min:230,max:460,
+   d:"Una commissione dopo l'orario giusto, quando in giro resta meno gente."},
+  {id:"pacco-fuori-zona",categoria:"trasporto",minRep:10,n:"Fuori zona",energia:24,difficolta:.42,pena:4,min:300,max:620,
+   d:"La destinazione è più lontana e chi ti manda vuole qualcuno che non faccia storie."},
+  {id:"tratta-corta",categoria:"trasporto",minRep:16,n:"Tratta corta",energia:26,difficolta:.50,pena:5,min:360,max:760,
+   d:"Pochi chilometri, ma abbastanza valore perché un errore faccia rumore."},
+  {id:"consegna-sensibile",categoria:"trasporto",minRep:24,n:"Consegna sensibile",energia:29,difficolta:.58,pena:6,min:480,max:900,
+   d:"Non è una commissione da affidare al primo che passa. Ti chiamano perché ormai il nome gira."},
+
+  {id:"scotta",categoria:"merce",minRep:0,n:"Roba che scotta",energia:20,difficolta:.30,pena:3,min:220,max:480,
+   d:"È arrivata da poco e va fatta sparire dal giro in fretta."},
+  {id:"scatole-senza-marchio",categoria:"merce",minRep:0,n:"Scatole senza marchio",energia:21,difficolta:.34,pena:3,min:240,max:520,
+   d:"Nessuna etichetta, nessuna ricevuta. Qualcuno vuole solo liberare spazio."},
+  {id:"stock-sparito",categoria:"merce",minRep:6,n:"Lo stock sparito",energia:23,difficolta:.40,pena:4,min:300,max:620,
+   d:"Una partita è sparita dai conti ufficiali e adesso deve cambiare mani."},
+  {id:"merce-rientro",categoria:"merce",minRep:12,n:"Merce di rientro",energia:25,difficolta:.47,pena:4,min:350,max:720,
+   d:"Doveva essere già fuori dal giro. È tornata indietro e qualcuno deve sistemare il problema."},
+  {id:"deposito-caldo",categoria:"merce",minRep:20,n:"Deposito caldo",energia:28,difficolta:.56,pena:6,min:460,max:920,
+   d:"Troppa roba ferma nello stesso posto. Se resta lì ancora, iniziano le domande."},
+  {id:"partita-sbagliata",categoria:"merce",minRep:30,n:"La partita sbagliata",energia:31,difficolta:.64,pena:7,min:560,max:1100,
+   d:"È finita alle persone sbagliate. Rimetterla in movimento paga bene, ma attira occhi."},
+
+  {id:"retrobottega",categoria:"furto",minRep:0,n:"Il retrobottega",energia:24,difficolta:.38,pena:4,min:320,max:650,
+   d:"Dietro la serranda resta più valore di quanto sembri da fuori."},
+  {id:"cassa",categoria:"furto",minRep:4,n:"La cassa del bar",energia:28,difficolta:.50,pena:5,min:420,max:950,
+   d:"Il locale chiude tardi e l'incasso non sparisce insieme alle luci."},
+  {id:"serranda-abbassata",categoria:"furto",minRep:8,n:"Serranda abbassata",energia:27,difficolta:.46,pena:5,min:390,max:800,
+   d:"Da fuori sembra tutto spento. Dentro è rimasto qualcosa che interessa a qualcuno."},
+  {id:"ufficio-vuoto",categoria:"furto",minRep:16,n:"L'ufficio vuoto",energia:30,difficolta:.55,pena:6,min:480,max:960,
+   d:"Nel fine settimana resta chiuso, ma non tutto quello che c'è dentro può aspettare lunedì."},
+  {id:"deposito-weekend",categoria:"furto",minRep:24,n:"Deposito del weekend",energia:33,difficolta:.63,pena:7,min:600,max:1200,
+   d:"Un posto che per due giorni nessuno dovrebbe guardare troppo da vicino."},
+  {id:"incasso-notte",categoria:"furto",minRep:34,n:"L'incasso della notte",energia:36,difficolta:.72,pena:9,min:760,max:1500,
+   d:"Più soldi, più occhi, più possibilità che qualcosa vada storto."},
+
+  {id:"scooter",categoria:"veicoli",minRep:0,n:"Lo scooter giusto",energia:22,difficolta:.32,pena:3,min:250,max:520,
+   d:"Serve un mezzo preciso e qualcuno ha già fatto sapere che lo pagherebbe."},
+  {id:"furgone",categoria:"veicoli",minRep:8,n:"Il furgone",energia:27,difficolta:.46,pena:5,min:400,max:780,
+   d:"Non interessa per come appare. Interessa perché è proprio quel mezzo."},
+  {id:"auto-parcheggio",categoria:"veicoli",minRep:15,n:"Parcheggio lungo",energia:30,difficolta:.56,pena:6,min:480,max:980,
+   d:"È lì da abbastanza tempo perché qualcuno abbia iniziato a farci caso."},
+  {id:"macchina",categoria:"veicoli",minRep:22,n:"La macchina giusta",energia:35,difficolta:.68,pena:8,min:600,max:1350,
+   d:"Sai qual è. Anche chi la vuole sa esattamente qual è."},
+  {id:"mezzo-commissione",categoria:"veicoli",minRep:30,n:"Su commissione",energia:34,difficolta:.64,pena:8,min:620,max:1250,
+   d:"Questa volta non cercano un mezzo qualsiasi: il lavoro arriva già con un nome sopra."},
+  {id:"chiavi-giuste",categoria:"veicoli",minRep:42,n:"Le chiavi giuste",energia:38,difficolta:.76,pena:10,min:800,max:1650,
+   d:"Una commissione pesante, riservata a chi ha già dimostrato di reggere la pressione."},
+
+  {id:"conto-aperto",categoria:"incassi",minRep:0,n:"Un conto aperto",energia:20,difficolta:.28,pena:3,min:180,max:420,
+   d:"Qualcuno deve ancora chiudere una questione e preferisce farlo attraverso un intermediario."},
+  {id:"debito-vecchio",categoria:"incassi",minRep:7,n:"Debito vecchio",energia:23,difficolta:.38,pena:4,min:250,max:540,
+   d:"È rimasto lì troppo a lungo. Adesso chi aspetta vuole almeno vedere che la cosa si muove."},
+  {id:"quota-mancante",categoria:"incassi",minRep:14,n:"La quota mancante",energia:27,difficolta:.48,pena:5,min:340,max:720,
+   d:"I conti non tornano e qualcuno vuole capire se è un errore o una scelta."},
+  {id:"favore-da-chiudere",categoria:"incassi",minRep:24,n:"Favore da chiudere",energia:30,difficolta:.58,pena:7,min:440,max:900,
+   d:"Non è solo una questione di soldi: c'è una promessa che qualcuno vuole vedere rispettata."},
+  {id:"conto-pesante",categoria:"incassi",minRep:36,n:"Il conto pesante",energia:35,difficolta:.70,pena:9,min:650,max:1300,
+   d:"Quando la cifra sale, salgono anche le persone che vogliono sapere come va a finire."}
+]
+
+
+function stradaCategoria(colpo){
+  return STRADA_CATEGORIE_COLPO[colpo&&colpo.categoria] || STRADA_CATEGORIE_COLPO.merce;
+}
+
+function stradaEffettiCategoria(colpo){
+  const cat=stradaCategoria(colpo);
+  const scala=.65+clamp(Number(colpo&&colpo.difficolta||0),0,1)*.70;
+  return {
+    categoria:cat,
+    guadagno:1+(Number(cat.guadagno||1)-1)*scala,
+    chance:Number(cat.chance||0)*scala,
+    heat:1+(Number(cat.heat||1)-1)*scala,
+    sporco:clamp(.60+(Number(cat.sporco||.60)-.60)*scala,.48,.76),
+    rep:1+(Number(cat.rep||1)-1)*scala
+  };
+}
+
+function stradaCategoriaLabel(colpo){
+  const cat=stradaCategoria(colpo);
+  return cat.n+" · "+cat.tag;
+}
 
 /* Città chiuse: restano in vista col nome, come chiede il documento — nessun
    numero, perché quelle mappe non esistono ancora. */
@@ -268,7 +372,8 @@ function stScenaApproccio(colpo){
     stats:[
       {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
       {t:colpo.energia + " energia"},
-      {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)}
+      {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)},
+      {t:stradaCategoriaLabel(colpo)}
     ],
     opts:STRADA_APPROCCI.map(a => {
       const riga = stRigaApproccio(a);
@@ -330,6 +435,72 @@ function stradaAbsDay(){
     ((Number(G.year || 1) - 1) * 52 + (Number(G.week || 1) - 1)) * 7 +
     Math.max(1, Math.min(7, Number(G.day || 1)))
   );
+}
+
+function stradaOfferteColpiStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.offerteColpi || typeof s.offerteColpi!=="object")
+    s.offerteColpi={absoluteDay:null,ids:[],previousIds:[]};
+  if(!Array.isArray(s.offerteColpi.ids)) s.offerteColpi.ids=[];
+  if(!Array.isArray(s.offerteColpi.previousIds)) s.offerteColpi.previousIds=[];
+  return s.offerteColpi;
+}
+
+function stradaRngDeterministico(seed){
+  let x=(Number(seed)||1)>>>0;
+  return function(){
+    x^=x<<13;x^=x>>>17;x^=x<<5;
+    return (x>>>0)/4294967296;
+  };
+}
+
+function stradaGeneraOfferteColpi(seed,rep,previousIds){
+  rep=Math.max(0,Number(rep||0));
+  previousIds=Array.isArray(previousIds)?previousIds:[];
+  const pool=STRADA_COLPI.filter(c=>
+    rep>=Number(c.minRep||0) &&
+    (c.maxRep==null || rep<=Number(c.maxRep))
+  );
+  if(pool.length<=4) return pool.slice();
+
+  const rndLocal=stradaRngDeterministico(seed);
+  const scored=pool.map(c=>({
+    c,
+    /* Il giorno precedente è solo penalizzato, non vietato: così una dritta
+       o un pool piccolo possono far ricomparire un lavoro senza creare cicli
+       artificiosi. Nessun bonus per diversità categoria: i duplicati sono
+       intenzionali. */
+    score:rndLocal()+(previousIds.includes(c.id)?.55:0)
+  })).sort((a,b)=>a.score-b.score);
+
+  return scored.slice(0,4).map(x=>x.c);
+}
+
+function stradaColpiDisponibili(){
+  const st=stradaOfferteColpiStato();
+  const oggi=stradaAbsDay();
+  const rep=Math.max(0,Number(G.strada&&G.strada.rep||0));
+
+  if(Number(st.absoluteDay)!==oggi || !st.ids.length){
+    const prev=st.ids.filter(id=>STRADA_COLPI.some(c=>c.id===id));
+    const seed=((oggi*2654435761) ^ (Math.floor(rep/5)*2246822519) ^
+      (Number(G.strada&&G.strada.precedenti||0)*3266489917))>>>0;
+    const offerte=stradaGeneraOfferteColpi(seed,rep,prev);
+    st.previousIds=prev.slice(0,4);
+    st.ids=offerte.map(c=>c.id);
+    st.absoluteDay=oggi;
+  }
+
+  /* Una dritta attiva non può puntare a un colpo invisibile. Se il target non
+     è nelle quattro offerte, entra sostituendo l'ultimo slot e resta visibile
+     fino al cambio giornata anche dopo che la dritta è stata consumata. */
+  const lead=typeof stradaOpportunitaAttiva==="function" ? stradaOpportunitaAttiva() : null;
+  if(lead&&lead.colpoId&&STRADA_COLPI.some(c=>c.id===lead.colpoId) &&
+     !st.ids.includes(lead.colpoId)){
+    st.ids=st.ids.slice(0,3).concat(lead.colpoId);
+  }
+
+  return st.ids.map(id=>STRADA_COLPI.find(c=>c.id===id)).filter(Boolean);
 }
 
 
@@ -1415,7 +1586,9 @@ function stradaEffettiOpportunita(lead,successo){
 
 function stradaChance(colpo, approccio, personaSquadra){
   const s = G.strada;
+  const categoria=stradaEffettiCategoria(colpo);
   let p = .62 - colpo.difficolta * .34;
+  p += categoria.chance;
   p += s.rep/100 * .20;
   if(approccio && approccio.id==="squadra" && personaSquadra)
     p += stradaBonusFiduciaSquadra(personaSquadra);
@@ -1462,7 +1635,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
       : null);
   const effettiLead=stradaEffettiOpportunita(leadUsato,successo);
   const moltiplicatoreLead = 1 + Number(effettiLead.bonusPct||0) / 100;
-  const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
+  const effettiCategoria=stradaEffettiCategoria(colpo);
+  const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore * effettiCategoria.heat, 2, 30);
   const rumoreLead = Number(effettiLead.heatDelta||0);
   const reputazioneLead = Number(effettiLead.repDelta||0);
   const personaLead=leadUsato&&leadUsato.personId?stradaPersonaDaId(leadUsato.personId):null;
@@ -1489,10 +1663,13 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
     ? AGENDA.consumaPeso("colpo") : 1;
 
   if(successo){
-    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso * moltiplicatoreLead;
-    const pulito = Math.round(grezzo * .4), sporco = Math.round(grezzo * .6);
+    const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso *
+      moltiplicatoreLead * effettiCategoria.guadagno;
+    const sporco = Math.round(grezzo * effettiCategoria.sporco);
+    const pulito = Math.round(grezzo - sporco);
     G.money += pulito; s.sporchi += sporco;
-    s.rep = clamp(s.rep + 3 + colpo.difficolta * 6 + reputazioneLead, 0, 100);
+    const repBase=(3 + colpo.difficolta * 6) * effettiCategoria.rep;
+    s.rep = clamp(s.rep + repBase + reputazioneLead, 0, 100);
     s.heat = clamp(s.heat + rumore * .6 + rumoreLead, 0, 100);
     diarioBordo().colpi++;
     const fonteLead = leadUsato && leadUsato.source==="street-opportunity"
@@ -2313,7 +2490,7 @@ function stToast(t){
 
 /* Le tre città: la provincia si gioca, le altre due si guardano. */
 const STRADA_CITTA = [
-  {id:"provincia", n:"Provincia", d:"4 colpi disponibili", req:null},
+  {id:"provincia", n:"Provincia", d:"4 offerte oggi", req:null},
   {id:"milano", n:"Milano", d:"4 colpi · livello 10", req:"Livello 10 · fama 50 · hype 40",
    colpi:STRADA_COLPI_MILANO},
   {id:"la", n:"Los Angeles", d:"3 colpi · da GOAT", req:"Si apre da GOAT",
@@ -2340,11 +2517,17 @@ function chiudiStrada(){
 }
 
 /* ==================== QUELLO CHE CAMBIA ==================== */
+function stradaRischioValore(colpo){
+  const eff=stradaEffettiCategoria(colpo);
+  return clamp(Number(colpo.difficolta||0)-eff.chance*.55+(eff.heat-1)*.32,0,1);
+}
 function stRischio(colpo){
-  return colpo.difficolta <= .2 ? "Basso" : colpo.difficolta <= .45 ? "Medio" : "Alto";
+  const r=stradaRischioValore(colpo);
+  return r <= .2 ? "Basso" : r <= .45 ? "Medio" : "Alto";
 }
 function stClasseRischio(colpo){
-  return colpo.difficolta <= .2 ? "risk-low" : colpo.difficolta <= .45 ? "risk-mid" : "risk-high";
+  const r=stradaRischioValore(colpo);
+  return r <= .2 ? "risk-low" : r <= .45 ? "risk-mid" : "risk-high";
 }
 function stOcchiAddosso(){
   const h = G.strada.heat;
@@ -2417,12 +2600,13 @@ function renderStColpi(){
   }
 
   centro.classList.remove("locked");
+  const offerte = stradaColpiDisponibili();
   const leadIncontro = stradaOpportunitaAttiva();
   const leadLavoro = window.ADF_WORK_EVENTS &&
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
-  griglia.innerHTML = STRADA_COLPI.map((c, i) => {
+  griglia.innerHTML = offerte.map((c, i) => {
     const senzaEnergia = G.energy < c.energia;
     const leadIncontroQui = leadIncontro && leadIncontro.colpoId === c.id ? leadIncontro : null;
     /* L'opportunità dell'incontro vale solo per il colpo indicato; sugli altri
@@ -2437,6 +2621,7 @@ function renderStColpi(){
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
       '<div class="stchips">' +
+        '<span class="stchip">' + stradaCategoria(c).n + '</span>' +
         '<span class="stchip money">' + fmt(c.min) + '–' + fmt(c.max) + ' €</span>' +
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +

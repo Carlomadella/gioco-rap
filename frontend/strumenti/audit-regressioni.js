@@ -1255,6 +1255,21 @@ test("riciclaggio costa 45 minuti",
   crime.includes('GAME_TIME.advance(minuti, "crime:launder")'));
 test("riciclaggio non parte se manca tempo prima delle 04:00",
   crime.includes("GAME_TIME.remaining() < minuti"));
+test("la Provincia usa un pool ampio e quattro offerte giornaliere non vincolate alle categorie",
+  crime.includes("const STRADA_CATEGORIE_COLPO") &&
+  crime.includes("function stradaGeneraOfferteColpi") &&
+  crime.includes("function stradaColpiDisponibili") &&
+  crime.includes("const offerte = stradaColpiDisponibili()") &&
+  crime.includes("griglia.innerHTML = offerte.map") &&
+  crime.includes("Nessun bonus per diversità categoria") &&
+  (crime.match(/categoria:"/g)||[]).length>=30);
+test("le categorie dei colpi modificano davvero chance, resa, sporco, attenzione e reputazione",
+  crime.includes("categoria.chance") &&
+  crime.includes("effettiCategoria.guadagno") &&
+  crime.includes("effettiCategoria.sporco") &&
+  crime.includes("effettiCategoria.heat") &&
+  crime.includes("effettiCategoria.rep"));
+
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
   !crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)") &&
