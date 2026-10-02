@@ -6,6 +6,36 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:7c60f0f2 -->
+## 02/10/26, 22:00 — feature/strada-punto5-ferro → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `7c60f0f2`
+
+### Cosa è entrato
+
+- `dfda5d04` — fix(test): passa le costanti ferro al contesto VM — **mycolbraga**
+- `63d64858` — chore(frontend): aggiorna cache per progressione del ferro — **mycolbraga**
+- `cdbd9573` — test(strada): verifica sequestro e cooldown del ferro — **mycolbraga**
+- `f08c0ce2` — fix(strada): sequestra il ferro negli arresti e rallenta il riacquisto — **mycolbraga**
+- `89fd70d2` — test(strada): copri accesso, provenienza e rischio del ferro — **mycolbraga**
+- `26b90075` — feat(strada): fai arrivare il ferro da un contatto via TrapPhone — **mycolbraga**
+- `9c57ee7f` — fix(strada): consenti annullamento tecnico della proposta ferro — **mycolbraga**
+- `6c31c371` — feat(strada): rendi il ferro raro, tracciato e pericoloso da possedere — **mycolbraga**
+- `bc18123c` — feat(strada): aggiungi stato persistente di provenienza del ferro — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:3393dad5 -->
 ## 02/10/26, 21:44 — feature/strada-punto4-fiducia → main
 
