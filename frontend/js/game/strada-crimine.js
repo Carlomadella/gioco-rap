@@ -1540,7 +1540,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
-          (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
+          (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
         s.precedenti++;
         if(approccio.id==="ferro" && s.ferro){
           const ferroSt=stradaFerroStato();
@@ -1773,7 +1773,7 @@ const CARCERE_EVENTI = [
      {n:"Contesti il rapporto",d:"Se reggi la versione eviti la sanzione, altrimenti peggiora",
       run(){const p=(G.skills&&Number(G.skills.presenza))||0;if(p>=35||Math.random()<.42){carcereLuc(1);return {t:"Il rapporto non regge abbastanza per toglierti il cortile. Lucidità +1.",c:"good"};}const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+4;G.wellbeing=clamp(G.wellbeing-3,0,100);return {t:"Hai contestato e non è servito: quattro giorni senza ora d'aria, benessere -3.",c:"bad"};}},
      {n:"Fai intervenire il legale",d:"Il legale riduce il danno amministrativo",
-      when:()=>!!G.strada.avvocato,
+      when:()=>stradaHaAvvocatoPrivato(),
       run(){const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+1;carcereLuc(2);return {t:"Il legale riduce la sanzione a un giorno senza ora d'aria. Lucidità +2.",c:"good"};}}
    ]},
   {id:"jail_high_quando_esci",n:"Ti aspettano quando esci",cat:"high",tier:"high",weight:1,minDays:21,minRep:35,minWeeks:3,once:true,
@@ -1820,7 +1820,7 @@ function carcereCtx(){
   const c=carcereStato(),s=G.strada,a=s&&s.arresto;
   return {state:c,street:s,arrest:a,day:carcereSerialeGiorno(),days:c?Math.max(0,carcereSerialeGiorno()-c.startedDay):0,
     weeks:a?Math.max(0,Number(a.settimane)||0):0,rep:s?Number(s.rep)||0:0,precedents:s?Number(s.precedenti)||0:0,
-    fans:Number(G.fans)||0,lawyer:!!(s&&s.avvocato)};
+    fans:Number(G.fans)||0,lawyer:stradaHaAvvocatoPrivato()};
 }
 function carcereEligible(e,ctx){
   if(e.minDays!=null&&ctx.days<e.minDays)return false;
@@ -1945,7 +1945,8 @@ function carcereAzioni(){
   const s=G.strada,a=s.arresto,pending=!!c.pendingHigh;
   let rem=9999;try{if(typeof GAME_TIME!=="undefined")rem=GAME_TIME.remaining();}catch(_){}
   const airDays=carcereAirDays(c),ariaUsata=!!c.daily.aria,giroUsato=!!c.weekly.giro;
-  const legaleNoSoldi=!s.avvocato&&Number(G.money)<STRADA_AVVOCATO_COSTO,legaleFine=(Number(a.settimane)||0)<=1;
+  const privato=stradaHaAvvocatoPrivato(),avvSt=stradaAvvocatoStato();
+  const legaleFine=(Number(a.settimane)||0)<=1;
   return [
     {id:"aria",n:"Ora d'aria",d:"60 min · recuperi un po' di testa e benessere",
      disabled:pending||airDays>0||ariaUsata||rem<60,
@@ -1953,10 +1954,12 @@ function carcereAzioni(){
     {id:"giro",n:"Parla con il giro",d:"45 min · una volta a settimana · reputazione di strada",
      disabled:pending||giroUsato||rem<45,
      reason:pending?"Decisione in sospeso":giroUsato?"Già fatto questa settimana":rem<45?"Troppo tardi oggi":""},
-    {id:"avvocato",n:s.avvocato?"Parla con l'avvocato":"Chiama un avvocato",
-     d:(s.avvocato?"30 min · ricorso incluso nell'incarico":"30 min · 320 € per incaricarlo")+" · può togliere 1 settimana",
-     disabled:pending||!!c.ricorsoUsato||legaleNoSoldi||legaleFine||rem<30,
-     reason:pending?"Decisione in sospeso":c.ricorsoUsato?"Ricorso già usato in questa detenzione":legaleNoSoldi?"Non hai 320 €":legaleFine?"Ti resta solo 1 settimana":rem<30?"Troppo tardi oggi":""}
+    {id:"avvocato",n:privato?"Parla con "+(avvSt.name||"il tuo avvocato"):"Parla col difensore d'ufficio",
+     d:privato
+       ?"30 min · il tuo legale prova il ricorso · esito affidabile"
+       :"30 min · gratuito · può tentare un riesame, ma senza garanzie",
+     disabled:pending||!!c.ricorsoUsato||legaleFine||rem<30,
+     reason:pending?"Decisione in sospeso":c.ricorsoUsato?"Ricorso già usato in questa detenzione":legaleFine?"Ti resta solo 1 settimana":rem<30?"Troppo tardi oggi":""}
   ];
 }
 function carcereAzione(id){
@@ -1982,14 +1985,23 @@ function carcereAzione(id){
   if(id==="avvocato"){
     if(c.ricorsoUsato)return {ok:false,t:"Hai già usato il ricorso in questa detenzione."};
     if((Number(a.settimane)||0)<=1)return {ok:false,t:"Con una sola settimana residua non c'è più margine per il ricorso."};
-    if(!s.avvocato&&Number(G.money)<STRADA_AVVOCATO_COSTO)return {ok:false,t:"Ti servono "+STRADA_AVVOCATO_COSTO+" € per incaricare l'avvocato."};
     const tempo=carcereTempo(30,id);if(!tempo.ok)return tempo;
-    if(!s.avvocato){G.money-=STRADA_AVVOCATO_COSTO;s.avvocato=true;}
-    a.settimane=Math.max(1,(Number(a.settimane)||1)-1);c.ricorsoUsato=true;carcereLuc(2);
-    const t="Il legale ottiene una revisione: 1 settimana in meno sulla pena residua. Lucidità +2.";
-    carcereRegistra("azione_avvocato","Parla con l'avvocato",t,"azione");
-    if(typeof pushLog==="function")pushLog("<b>Dal carcere: ricorso accolto.</b> Una settimana in meno.","good");
-    carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"good"};
+    const privato=stradaHaAvvocatoPrivato(),avvSt=stradaAvvocatoStato();
+    const accolto=privato || Math.random()<.35;
+    c.ricorsoUsato=true;
+    if(accolto){
+      a.settimane=Math.max(1,(Number(a.settimane)||1)-1);carcereLuc(privato?2:1);
+      const t=privato
+        ? (avvSt.name||"Il tuo avvocato")+" ottiene una revisione: 1 settimana in meno sulla pena residua. Lucidità +2."
+        : "Il difensore d'ufficio riesce a ottenere il riesame: 1 settimana in meno. Lucidità +1.";
+      carcereRegistra("azione_avvocato",privato?"Avvocato privato":"Difensore d'ufficio",t,"azione");
+      if(typeof pushLog==="function")pushLog("<b>Dal carcere: ricorso accolto.</b> Una settimana in meno.","good");
+      carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"good"};
+    }
+    carcereLuc(-1);
+    const t="Il difensore d'ufficio presenta il riesame, ma viene respinto. La pena non cambia. Lucidità -1.";
+    carcereRegistra("azione_avvocato","Difensore d'ufficio",t,"azione");
+    carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"bad"};
   }
   return {ok:false,t:"Azione carcere sconosciuta."};
 }
@@ -2112,7 +2124,7 @@ function stradaSettimana(){
       });
       if(ferroSt.history.length>12) ferroSt.history.shift();
       ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
-      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
+      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
       s.precedenti++; s.arresto = {settimane:settimane, colpo:"perquisizione"};
       pushLog("<b>Controllo alle sei del mattino.</b> Trovano il ferro: viene sequestrato e la situazione diventa penale.", "bad");
     }else pushLog("Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.", "");
