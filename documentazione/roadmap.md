@@ -197,6 +197,8 @@ fatica solo sul carico lungo, il conflitto fra turno e musica leggibile, e la re
 separata per ruolo (`frontend/js/game/lavoro-eventi.js`, `actions.js`, `posto.js`).
 Con la pull request #43 (stesso giorno, segnata dal push degli altri) gli eventi per ruolo sono
 di più, quelli di linea non capitano più ai ruoli alti e anche gli straordinari seguono il ruolo.
+Con la #62 anche la Pizzeria ha la sua faccia: è il lavoro part-time, con la rete dei contatti
+che cresce per ruolo (segnata dal push degli altri).
 **FATTO (02/10/2026)** — **il recap di fine giornata**: chiusa la giornata, una finestra coi
 numeri del giorno (soldi, fan, hype, benessere, energia spesa), le mosse e gli highlights
 del diario scelti per peso; non il settimo giorno (c'è il rapporto della settimana), né sui
