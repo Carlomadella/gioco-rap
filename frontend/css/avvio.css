@@ -113,4 +113,9 @@
    non deve comparire sotto al pannello (vale anche in portrait). */
 @media (pointer:coarse) and (max-width:1180px){
   .land.avvio-aperto + .menu{display:none}
+
+  /* Quando il pannello Inizia è aperto, il controllo musica della topnav
+     rimarrebbe visibile sotto al tasto CHIUDI in alto a sinistra. Non è parte
+     del pannello: lo nascondiamo solo durante l'avvio e ricompare alla chiusura. */
+  body.su-menu:has(.land.avvio-aperto) .brand-mute{display:none}
 }
