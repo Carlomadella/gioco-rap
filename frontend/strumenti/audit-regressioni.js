@@ -2499,15 +2499,17 @@ test("la fascia si legge sulla card del beat, nello Studio",
   beatsJs.includes("const fasciaBeat = b =>"));
 test("si parte con tutti i parametri a 1",
   state.includes("skills:{scrittura:1, flow:1, presenza:1, rete:1}"));
-test("le dimissioni dai posti strutturati chiudono il contratto senza perdere lo storico",
+test("le dimissioni chiudono il rapporto, archiviano la vecchia carriera e resettano la progressione",
   luoghiFoto.includes("function lfDimissioniLavoro(luogo, nome)") &&
   luoghiFoto.includes('data-dimissioni="fabbrica"') &&
   luoghiFoto.includes('data-dimissioni="pizzeria"') &&
   luoghiFoto.includes('lavoroTerminaContratto(luogo, "dimissioni")') &&
   luoghiFoto.includes('function lfDimissioniFabbrica(){ return lfDimissioniLavoro("fabbrica", "Fabbrica"); }') &&
-  luoghiFoto.includes("G.job = null;") &&
   actions.includes("function lavoroTerminaContratto(luogo, motivo)") &&
-  actions.includes("sede.contractHistory.push(Object.assign({}, contratto"));
+  actions.includes("careerAtEnd:careerAtEnd") &&
+  actions.includes("function lavoroResetCarriera(luogo,opts)") &&
+  actions.includes('if(G.job && lavoroLuogo(G.job)===luogo) G.job=null;') &&
+  actions.includes('lavoroResetCarriera(luogo,{preserveBlock:motivo==="licenziamento"})'));
 
 test("Centro per l'impiego e Cerca lavoro non sono più ingressi di gameplay",
   !hub.includes('{id:"impiego"') &&

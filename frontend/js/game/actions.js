@@ -479,14 +479,6 @@ function lavoroFirmaContratto(luogo, job){
   if(cfgCarriera){
     const carriera = lavoroCarriera(luogo);
     if(carriera){
-      /* Le dimissioni non cancellano i richiami. Dopo un vero licenziamento,
-         invece, il rientro a blocco scaduto riparte senza richiami attivi. */
-      const storico = Array.isArray(sede.contractHistory) ? sede.contractHistory : [];
-      const ultimaChiusura = storico.length ? storico[storico.length - 1] : null;
-      if(ultimaChiusura && ultimaChiusura.endReason === "licenziamento" &&
-         !(lavoroBloccoRiassunzione(luogo).active)){
-        carriera.warnings = 0;
-      }
       carriera.cyclesInRole = 0;
       carriera.perfectCyclesInRole = 0;
       carriera.perfectStreak = 0;
@@ -507,12 +499,16 @@ function lavoroTerminaContratto(luogo, motivo){
   if(!sede) return null;
 
   const contratto = sede.contract;
+  const careerAtEnd = sede.career && typeof sede.career==="object"
+    ? lavoroCarrieraSnapshot(luogo)
+    : null;
   if(contratto && typeof contratto === "object"){
     if(!Array.isArray(sede.contractHistory)) sede.contractHistory = [];
     sede.contractHistory.push(Object.assign({}, contratto, {
       signed:false,
       endedAbsoluteDay:lavoroGiornoAssoluto(),
-      endReason:motivo || "chiuso"
+      endReason:motivo || "chiuso",
+      careerAtEnd:careerAtEnd
     }));
     if(sede.contractHistory.length > 12) sede.contractHistory.shift();
   }
@@ -536,6 +532,27 @@ function lavoroTerminaContratto(luogo, motivo){
   }
 
   delete sede.sundayPermitAbsoluteDay;
+
+  /* Dimissioni e licenziamento chiudono anche la progressione interna:
+     una futura riassunzione riparte dalla mansione/paga base e da affidabilità
+     iniziale. Il licenziamento conserva solo il blocco temporale necessario
+     a impedire la riassunzione immediata; lo storico del rapporto appena
+     chiuso resta in contractHistory.careerAtEnd. */
+  if(motivo==="dimissioni" || motivo==="licenziamento"){
+    /* La chiusura deve essere atomica: finché G.job resta agganciato alla sede,
+       lavoroCarriera() può ricostruire roleId dal vecchio ruolo e vanificare
+       il reset. Il contratto chiuso non deve lasciare un dipendente attivo
+       nemmeno per un tick. */
+    if(G.job && lavoroLuogo(G.job)===luogo) G.job=null;
+    lavoroResetCarriera(luogo,{preserveBlock:motivo==="licenziamento"});
+    if(sede.attendance && typeof sede.attendance==="object"){
+      sede.attendance={
+        ciclo:lavoroCicloCorrente(),
+        turni:[]
+      };
+    }
+  }
+
   return contratto || null;
 }
 
@@ -561,32 +578,72 @@ function lavoroDomenicaAutorizzata(luogo){
   return !!(sede && Number(sede.sundayPermitAbsoluteDay) === lavoroGiornoAssoluto());
 }
 
+function lavoroCarrieraBase(storia){
+  storia=storia||{};
+  return {
+    reliability:50,
+    cyclesCompleted:0,
+    perfectCycles:0,
+    perfectStreak:0,
+    cyclesInRole:0,
+    perfectCyclesInRole:0,
+    roleId:null,
+    roleLevel:0,
+    raisesByRole:{},
+    payHistory:[],
+    roleHistory:[],
+    warnings:0,
+    warningHistory:[],
+    weeklyEvaluations:[],
+    /* Non è progressione corrente: serve soltanto a ricordare quante volte
+       sei stato licenziato e ad applicare l'eventuale blocco di riassunzione. */
+    dismissals:Math.max(0,Number(storia.dismissals||0)),
+    blockedUntilWeek:storia.blockedUntilWeek==null ? null : Number(storia.blockedUntilWeek),
+    lastEvaluatedCycle:null,
+    lastEvaluation:null,
+    evaluations:[]
+  };
+}
+
+function lavoroCarrieraSnapshot(luogo){
+  const c=lavoroCarriera(luogo);
+  if(!c) return null;
+  const job=G.job&&lavoroLuogo(G.job)===luogo ? G.job : null;
+  return {
+    roleId:c.roleId||job&&job.id||null,
+    roleLevel:Number(c.roleLevel||0),
+    pay:job ? Number(job.pay||0) : null,
+    reliability:Number(c.reliability||0),
+    cyclesCompleted:Number(c.cyclesCompleted||0),
+    perfectCycles:Number(c.perfectCycles||0),
+    cyclesInRole:Number(c.cyclesInRole||0),
+    perfectCyclesInRole:Number(c.perfectCyclesInRole||0),
+    raisesByRole:Object.assign({},c.raisesByRole||{}),
+    warnings:Number(c.warnings||0),
+    dismissals:Number(c.dismissals||0)
+  };
+}
+
+function lavoroResetCarriera(luogo,opts){
+  opts=opts||{};
+  const sede=lavoroSede(luogo);
+  if(!sede) return null;
+  const precedente=sede.career&&typeof sede.career==="object" ? sede.career : {};
+  const blocco=opts.preserveBlock ? precedente.blockedUntilWeek : null;
+  const dismissals=Math.max(0,Number(precedente.dismissals||0));
+  sede.career=lavoroCarrieraBase({
+    dismissals:dismissals,
+    blockedUntilWeek:blocco
+  });
+  return sede.career;
+}
+
 function lavoroCarriera(luogo){
   const sede = lavoroSede(luogo);
   if(!sede) return null;
   const cfg = lavoroCarrieraDef(luogo);
   if(!sede.career || typeof sede.career !== "object"){
-    sede.career = {
-      reliability:50,
-      cyclesCompleted:0,
-      perfectCycles:0,
-      perfectStreak:0,
-      cyclesInRole:0,
-      perfectCyclesInRole:0,
-      roleId:null,
-      roleLevel:0,
-      raisesByRole:{},
-      payHistory:[],
-      roleHistory:[],
-      warnings:0,
-      warningHistory:[],
-      weeklyEvaluations:[],
-      dismissals:0,
-      blockedUntilWeek:null,
-      lastEvaluatedCycle:null,
-      lastEvaluation:null,
-      evaluations:[]
-    };
+    sede.career = lavoroCarrieraBase();
   }
 
   const c = sede.career;
@@ -889,7 +946,6 @@ function lavoroLicenzia(luogo, motivo){
   if(c.warningHistory.length > 24) c.warningHistory.shift();
 
   lavoroTerminaContratto(luogo, "licenziamento");
-  if(G.job && lavoroLuogo(G.job) === luogo) G.job = null;
   G._lastJobLossReason = luogo === "fabbrica" ? "factory_absences" : luogo + "_absences";
 
   return {
