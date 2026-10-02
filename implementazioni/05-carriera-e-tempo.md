@@ -454,3 +454,15 @@ giocatore invece di limitarsi a cambiare il titolo del popup.
 
 Le probabilità globali degli eventi non sono state aumentate: la modifica amplia varietà
 e coerenza, senza trasformare il lavoro in una sequenza più frequente di popup.
+
+## Maggiorazioni esplicite nel contratto Fabbrica
+
+**FATTO (02/10/2026)** — il testo del contratto Fabbrica dichiara ora anche le
+maggiorazioni già applicate dal motore economico:
+
+- **+30%** sul **6° giorno distinto** lavorato nella stessa settimana;
+- **+75%** sulla **domenica straordinaria** proposta e autorizzata dall'azienda.
+
+La UI non duplica questi numeri: legge `bonusSestoGiornoPct` e `bonusDomenicaPct`
+da `ADF_LAVORO_CONTRATTI.fabbrica`, la stessa configurazione usata da
+`lavoroPagaTurno()`. La regola resta visibile anche dopo la firma del contratto.
