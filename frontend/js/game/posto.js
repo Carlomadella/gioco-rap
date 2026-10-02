@@ -145,6 +145,12 @@ const POSTO_RUOLI = {
      al Circolo: sono contatti persistenti della vita fuori dalla Sala. */
   promoter: {n:"Promoter", k:"#FB7185",
     d:"Lavora con serate e locali. Può farti arrivare occasioni che al Circolo non passano."},
+  cliente: {n:"Cliente abituale", k:"#D6B98C",
+    d:"Una faccia che torna spesso. Non è dentro alla musica per definizione: è semplicemente parte del giro del locale."},
+  fornitore: {n:"Fornitore", k:"#A7B5C6",
+    d:"Passa per consegne e rifornimenti. Conosce persone e posti, ma non è una scorciatoia musicale."},
+  rider: {n:"Rider", k:"#8FD3C8",
+    d:"Incrocia la Pizzeria durante i ritiri. È una conoscenza del quartiere, non un contatto professionale della musica."},
   collega: {n:"Collega", k:"#94A3B8",
     d:"Una persona conosciuta sul posto di lavoro. Non è per forza dentro alla musica."},
   strada: {n:"Conoscenza della Strada", k:"#F97316",
@@ -158,6 +164,9 @@ const POSTO_NOMI = {
   giornalista: ["Marta", "Dario", "Elisa", "Toni"],
   videomaker: ["Ciro", "Vale", "Manu", "Bea", "Tommy", "Zeta"],
   promoter: ["Riky", "Mauri", "Simo", "Vale P.", "Dado", "Nina"],
+  cliente: ["Giulia", "Davide", "Elena", "Mattia", "Irene", "Pietro", "Chiara", "Lorenzo"],
+  fornitore: ["Stefano", "Mauro", "Claudia", "Fabio", "Enzo", "Lucia"],
+  rider: ["Leo", "Sam", "Noemi", "Teo", "Miki", "Ari"],
   collega: ["Luca", "Marco", "Simo", "Vale", "Ale", "Marta", "Nico", "Sara"],
   strada: ["Cobra", "Lupo", "Moro", "Zero", "Nox", "Rami"]
 };
