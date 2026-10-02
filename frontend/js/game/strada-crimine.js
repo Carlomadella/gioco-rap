@@ -594,7 +594,7 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
     if(sbloccato){
       const nome=proposta.persona||s.ingressoPersonaNome||"Il contatto";
       pushLog("<b>Attività criminali sbloccate.</b> Adesso sai dove andare e con chi parlare.", "big");
-      pushLog("<b>"+nome+" ti consegna un TrapPhone.</b> Da ora le dritta che non passano faccia a faccia possono arrivare lì.", "good");
+      pushLog("<b>"+nome+" ti consegna un TrapPhone.</b> Da ora le dritte che non passano faccia a faccia possono arrivare lì.", "good");
     }
   }
   if(typeof save==="function") save();
@@ -706,7 +706,7 @@ function stradaFabbricaLeadVariante(roll){ return stradaScegliOpportunita(roll);
 
 function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
-  /* Le dritta "dal mondo" viaggiano sul TrapPhone. Gli incontri Fabbrica
+  /* Le dritte "dal mondo" viaggiano sul TrapPhone. Gli incontri Fabbrica
      restano faccia a faccia e non dipendono dal dispositivo. */
   if(trigger==="mondo" && !stradaHaTrapPhone()) return null;
 
