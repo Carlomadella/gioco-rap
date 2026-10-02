@@ -268,6 +268,10 @@ function installaBot(){
 
   function foto(){
     const s = G.strada || {};
+    const luogoLavoro=G.job && typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : null;
+    const carrieraLavoro=luogoLavoro && typeof lavoroCarriera==="function"
+      ? lavoroCarriera(luogoLavoro)
+      : null;
     return {
       y: G.year, w: G.week, d: G.day,
       fan: Math.round(G.fans), soldi: Math.round(G.money), hype: Math.round(G.hype),
@@ -277,7 +281,15 @@ function installaBot(){
       /* 99 è il valore di partenza (state.js): vuol dire mai entrato in classifica */
       classifica: G.best && G.best.chart < 99 ? G.best.chart : null,
       abilita: Object.fromEntries(Object.entries(G.skills).map(([k, v]) => [k, Math.round(v * 10) / 10])),
-      lavoro: G.job ? G.job.id : null, carcere: !!s.arresto, rep: Math.round(s.rep || 0), calore: Math.round(s.heat || 0),
+      lavoro: G.job ? G.job.id : null,
+      ruoloLavoro:G.job ? G.job.id : null,
+      pagaLavoro:G.job ? Math.round(Number(G.job.pay||0)) : null,
+      faticaLavoro:Math.round(Number(G.workFatigue||0)),
+      affidabilitaLavoro:carrieraLavoro ? Math.round(Number(carrieraLavoro.reliability||0)) : null,
+      cicliRuoloLavoro:carrieraLavoro ? Math.round(Number(carrieraLavoro.cyclesInRole||0)) : null,
+      perfettiRuoloLavoro:carrieraLavoro ? Math.round(Number(carrieraLavoro.perfectCyclesInRole||0)) : null,
+      richiamiLavoro:carrieraLavoro ? Math.round(Number(carrieraLavoro.warnings||0)) : null,
+      carcere: !!s.arresto, rep: Math.round(s.rep || 0), calore: Math.round(s.heat || 0),
       sporchi: Math.round(s.sporchi || 0), contratto: !!G.contract, finita: !!G.ended
     };
   }
