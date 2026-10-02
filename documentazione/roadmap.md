@@ -359,6 +359,8 @@ testi leggibili senza zoom. Il giro mobile di gameplay copre 844×390; in portra
 **FATTO (02/10/2026)** — il layout orizzontale ha un foglio suo, `css/mobile-landscape.css`,
 con le prove su scala e viewport (pull request #41), e le Impostazioni in orizzontale si
 impilano e restano leggibili (#42): segnati dal push degli altri.
+Dal 02/10/2026 l'agente `prova-sul-telefono` e il suo promemoria non ci sono più (Carlo): il
+giro sul telefono lo coprono le e2e in orizzontale, e quello su un telefono vero si fa a mano.
 
 *«Responsività di tutto il gioco»* — **il giro sugli `:hover` è fatto (08/09/2026)**: tutte
 le regole `:hover` dei 24 fogli che ne avevano stanno dentro a `@media (hover:hover)`, e un

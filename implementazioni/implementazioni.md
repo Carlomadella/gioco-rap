@@ -69,8 +69,8 @@ viene.
 
 1. **Il giro su un telefono vero** — la coda della responsività (CARLO, «Responsività»,
    chiusa l'08/09). Le misure sono state prese nel browser a sedici misure, dal 360 al
-   1920: in mano, mai. Si fa con `prova-sul-telefono` sull'estensione, o con un telefono
-   collegato; finché non passa, la tappa della responsività non è chiusa (lo dice anche la
+   1920: in mano, mai. Si fa a mano, col telefono in mano o collegato al PC (l'agente
+   che lo faceva è tolto dal 02/10); finché non passa, la tappa della responsività non è chiusa (lo dice anche la
    roadmap).
 
 **Pesa nel pacchetto o blocca una partita**
@@ -413,7 +413,7 @@ punti non si impilava e sul telefono non si giocava. Il racconto per esteso sta 
 [`02-interfaccia-e-telefono.md`](02-interfaccia-e-telefono.md), sotto «La responsività:
 lo Studio, la Strada e l'hover al tocco».
 
-Resta da fare: il giro su un telefono vero con `prova-sul-telefono` — le misure sono
+Resta da fare: il giro su un telefono vero, a mano — le misure sono
 state lette nel CSS, le schermate non sono state rifatte. Il 15/09 il giro a misura di
 telefono (390 × 844) è stato fatto nel browser, chiudendo «Il telefono quando lo schermo
 è un telefono»; il telefono vero, in mano, ancora no. Il 20/09 il giro su tutte le

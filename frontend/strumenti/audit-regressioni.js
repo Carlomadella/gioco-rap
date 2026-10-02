@@ -122,7 +122,10 @@ test("la CI copre gameplay landscape e avviso portrait",
   leggi("test/e2e/mobile-landscape.spec.js").includes("hasTouch: true") &&
   leggi("test/e2e/mobile-touch.spec.js").includes("viewport: { width: 390, height: 844 }") &&
   leggi("test/e2e/mobile-touch.spec.js").includes("ruota il telefono in orizzontale") &&
-  fs.readFileSync(path.resolve(ROOT,"..",".claude","agents","prova-sul-telefono.md"),"utf8").includes("non eseguire il gameplay in portrait"));
+  /* l'agente prova-sul-telefono è stato tolto il 02/10/2026 (Carlo): non
+     torna, e con lui il suo promemoria */
+  !fs.existsSync(path.resolve(ROOT,"..",".claude","agents","prova-sul-telefono.md")) &&
+  !fs.existsSync(path.resolve(ROOT,"..","scripts","promemoria-telefono.js")));
 /* Il gate CI verifica il flusso Avvio rapido fino all'hub senza affidare
    l'esito alle prestazioni di targets.bin sul runner headless. La prova
    MakeHuman completa non sparisce: resta esplicita e manuale. */

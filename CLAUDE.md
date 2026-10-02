@@ -57,6 +57,3 @@ qui, cambiala anche lì.
    Quello che trovano si sistema adesso, non dopo il push. Dopo il commit un hook te lo
    ricorda da solo.
 4. Poi push, e il merge in `main`.
-
-`prova-sul-telefono` è il terzo agente: non è da ogni task, si lancia quando si sono
-toccate schermate, CSS o card.
