@@ -243,6 +243,31 @@ test("landscape mobile: Avaturn e MakeHuman si aprono direttamente al tap", asyn
   await expect(page.locator("#pageDressingRoom")).toHaveClass(/on/);
 });
 
+test("landscape mobile: camerino parte su Volto e Centra non torna a Intero", async ({ page }) => {
+  await page.goto("/media/creator-rpg-v24/camerino.html");
+
+  const volto=page.locator('[data-view="face"]');
+  const intero=page.locator('[data-view="full"]');
+
+  await expect(volto).toHaveClass(/on/);
+  await expect(intero).not.toHaveClass(/on/);
+
+  await page.locator("#resetCamera").tap();
+
+  await expect(volto).toHaveClass(/on/);
+  await expect(intero).not.toHaveClass(/on/);
+
+  const viewer=await page.locator("#viewer").evaluate(el=>{
+    const cs=getComputedStyle(el);
+    const r=el.getBoundingClientRect();
+    return {transform:cs.transform,left:r.left,width:r.width,vw:innerWidth};
+  });
+
+  expect(viewer.transform).toBe("none");
+  expect(viewer.left).toBeLessThanOrEqual(1);
+  expect(viewer.width).toBeLessThan(viewer.vw*.65);
+});
+
 test("landscape mobile: camerino Avaturn usa tutto lo schermo e apre l'editor senza scroll", async ({ page }) => {
   await page.goto("/pagine/gioco.html");
   await page.waitForFunction(() => window.ADF_RPG_V24);
