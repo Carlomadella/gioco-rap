@@ -45,6 +45,17 @@ describe("stress test annuale Fabbrica", () => {
     expect(out.storia.filter(x=>x.evento&&x.evento.tipo==="aumento")).toHaveLength(4);
   });
 
+  it("la paga cresce ma non rende gratuito il lifestyle massimo", () => {
+    const out=esegui();
+
+    expect(out.economia.pagaIngressoSettimana).toBe(1100);
+    expect(out.economia.pagaTopSettimana).toBe(2280);
+    expect(out.economia.costoMinimoSettimanaleMassimo).toBe(2845);
+    expect(out.economia.pagaTopSettimana).toBeLessThan(out.economia.costoMinimoSettimanaleMassimo);
+    expect(out.economia.pagaTopSestoGiorno).toBe(2873);
+    expect(out.economia.pagaTopSestoGiorno).toBeGreaterThanOrEqual(out.economia.costoMinimoSettimanaleMassimo);
+  });
+
   it("il pacchetto di guardrail del punto 16 passa interamente", () => {
     const out=esegui();
     expect(out.ok).toBe(true);
