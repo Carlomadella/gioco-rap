@@ -2438,9 +2438,12 @@ function renderStColpi(){
 function renderStCopre(){
   const s = G.strada;
   const prot = STRADA_PROT[s.prot];
+  const protSt=stradaProtezioneStato();
+  const avvSt=stradaAvvocatoStato();
   const contatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
   const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const avvConosciuti=stradaAvvocatiConosciuti();
   $("st-tab-copre").innerHTML =
     '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ')</strong>' +
       '<span>' + (fidati.length
@@ -2454,8 +2457,11 @@ function renderStCopre(){
       '</div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
-      '<span>Riduce il rischio quando la zona si scalda.</span></div>' +
-      '<div class="pills"><button class="pill' + (s.prot > 0 ? " on" : "") + '" data-stprot>' + prot.n + '</button></div></div>' +
+      '<span>' + (s.prot>0
+        ? (protSt.providerName ? protSt.providerName+' garantisce per te · ' : '') + fmt(prot.costo) + ' €/sett.'
+        : 'Non si attiva da sola: serve qualcuno del giro disposto a metterci il proprio nome.') + '</span></div>' +
+      '<div class="pills"><button class="pill' + (s.prot > 0 ? " on" : "") + '" data-stprot>' +
+      (s.prot>0 ? prot.n : "Gestisci") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Il ferro</strong>' +
       '<span>' + (s.ferro
@@ -2465,15 +2471,19 @@ function renderStCopre(){
       (s.ferro ? "Ce l\'hai" : "Serve un contatto") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Avvocato</strong>' +
-      '<span>' + fmt(STRADA_AVVOCATO_COSTO) + ' €/sett. · l\'attenzione cala più in fretta.</span></div>' +
-      '<div class="pills"><button class="pill' + (s.avvocato ? " on" : "") + '" data-stavvocato>' +
-      (s.avvocato ? "Ce l'hai" : "Prendilo") + '</button></div></div>' +
+      '<span>' + (avvSt.retained
+        ? (avvSt.name||"Avvocato privato") + ' · ' + fmt(STRADA_AVVOCATO_COSTO) + ' €/sett.'
+        : avvConosciuti.length
+          ? 'Conosci un legale abbastanza bene da potergli affidare l\'incarico.'
+          : 'Di base hai solo la difesa d\'ufficio. Un legale privato va prima conosciuto nel mondo.') + '</span></div>' +
+      '<div class="pills"><button class="pill' + (avvSt.retained ? " on" : "") + '" data-stavvocato>' +
+      (avvSt.retained ? "Gestisci" : avvConosciuti.length ? "Incarica" : "Serve un contatto") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Costo copertura</strong>' +
-      '<span>Quello che ti esce di tasca ogni settimana.</span></div>' +
+      '<span>Quello che ti esce di tasca ogni settimana per gli accordi attivi.</span></div>' +
       '<div class="pills"><span class="pill on">' + fmt(stCopertura()) + ' €/sett.</span></div></div>' +
 
-    '<div class="street-note">Nel giro non compri sicurezza. Compri solo qualche minuto in più prima che qualcosa vada storto.</div>';
+    '<div class="street-note">Nel giro non compri sicurezza. Compri relazioni, favori e persone disposte a esporsi per te.</div>';
 }
 
 function renderStAttivita(){
@@ -2564,10 +2574,12 @@ $("st-tab-copre").addEventListener("click", ev => {
   const uomo = ev.target.closest("[data-stuomo]");
   if(uomo){ hubTap(); stToast(uomo.dataset.stuomo === "piu" ? stAssumiUomo() : stLicenziaUomo()); return; }
   if(ev.target.closest("[data-stprot]")){
-    hubTap(); stToast(stImpostaProtezione((G.strada.prot + 1) % STRADA_PROT.length)); return;
+    hubTap(); STRADA_SCENA=stScenaProtezione(); renderStScheda(); return;
   }
   if(ev.target.closest("[data-stferro]")){ hubTap(); stToast(stCompraFerro()); return; }
-  if(ev.target.closest("[data-stavvocato]")){ hubTap(); stToast(stToggleAvvocato()); return; }
+  if(ev.target.closest("[data-stavvocato]")){
+    hubTap(); STRADA_SCENA=stScenaAvvocato(); renderStScheda(); return;
+  }
 });
 
 $("st-tab-attivita").addEventListener("click", ev => {
