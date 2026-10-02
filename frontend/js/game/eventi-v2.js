@@ -3130,7 +3130,7 @@ function adfShiftOutcomeEvent(luogo,jobBefore,flags){
   }else if(flags.contact){
     const sede=G.workplaces && G.workplaces[luogo];
     const row=sede && sede.network && Array.isArray(sede.network.history)
-      ? sede.network.history[0] : null;
+      ? sede.network.history[sede.network.history.length-1] : null;
     const p=row && (G.gente||[]).find(x=>x && x.id===row.personId);
     event={
       type:"contact",
