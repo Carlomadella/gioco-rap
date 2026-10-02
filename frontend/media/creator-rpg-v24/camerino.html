@@ -2247,6 +2247,21 @@ $('openAvaturn').onclick=()=>{
   }
   if(currentSource==='avaturn'){
     if(mobileAvaturnTopLevelEnabled()){
+      /* Same-origin: chiamiamo il top-level durante lo stesso tap per non
+         perdere la user activation richiesta dai browser mobili. */
+      try{
+        const topBridge=window.top?.ADF_RPG_V24;
+        if(
+          topBridge &&
+          typeof topBridge.openAvaturnMobileWindow==='function' &&
+          topBridge.openAvaturnMobileWindow()
+        ){
+          return;
+        }
+      }catch(e){}
+
+      /* Fallback: se il browser blocca la finestra dedicata, resta disponibile
+         il portal della #83 nella pagina corrente. */
       window.parent.postMessage({type:'adf-avatar-room-avaturn-mobile-open'},'*');
       return;
     }
