@@ -1299,8 +1299,8 @@ test("punto 9: il tempo viene impegnato prima di energia, dado e consumo opportu
   crime.indexOf("const tempoColpo=stradaSpendiTempoColpo(colpo);") <
   crime.indexOf("G.energy -= colpo.energia;") &&
   crime.indexOf("G.energy -= colpo.energia;") <
-  crime.indexOf("const successo = Math.random()") &&
-  crime.indexOf("const successo = Math.random()") <
+  crime.indexOf("const successo = Math.random() < stradaChanceConOpportunita") &&
+  crime.indexOf("const successo = Math.random() < stradaChanceConOpportunita") <
   crime.indexOf("stradaConsumaOpportunita(colpoId, successo)"));
 test("punto 9: durata visibile prima di scegliere e range compatibile con la Pizzeria",
   crime.includes('stradaDurataColpoLabel(colpo)+" di tempo"') &&
