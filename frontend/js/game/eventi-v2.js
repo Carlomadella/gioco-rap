@@ -2699,6 +2699,12 @@ function adfWorkContactAfterShift(){
     dettaglio="Gira tra serate e locali e conosce parecchie persone del giro.";
   else if(p.ruolo==="collega")
     dettaglio="È una persona che lavori accanto abbastanza spesso da poterci costruire un rapporto vero.";
+  else if(p.ruolo==="cliente")
+    dettaglio="È una faccia che torna spesso: vi riconoscete ormai anche fuori dalla comanda.";
+  else if(p.ruolo==="fornitore")
+    dettaglio="Passa per rifornimenti e consegne: a forza di incrociarvi avete iniziato a parlare.";
+  else if(p.ruolo==="rider")
+    dettaglio="Lo incroci spesso durante i ritiri: ormai non è più soltanto una faccia di passaggio.";
   else if(p.ruolo==="strada")
     dettaglio="Lo riconosci come una persona che frequenta lo stesso giro della Strada.";
 
