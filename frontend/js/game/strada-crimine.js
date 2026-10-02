@@ -399,12 +399,16 @@ function stradaTentaIngresso(roll,variantRoll){
   const s=stradaIngressoStato();
   if(s.badgeSbloccato || s.arresto) return null;
 
-  /* Una proposta già comparsa resta la stessa finché il giocatore non decide:
-     non rigeneriamo persona e testo a ogni render/azione. */
-  if(s.ingressoPending && typeof s.ingressoPending==="object")
-    return Object.assign({},s.ingressoPending);
-
   const oggi=stradaAbsDay();
+
+  /* Una proposta già comparsa resta la stessa finché il giocatore non decide.
+     Se oggi l'ha già vista non la ripetiamo dopo ogni azione: torna dal giorno
+     successivo, utile anche quando manca energia per accettarla. */
+  if(s.ingressoPending && typeof s.ingressoPending==="object"){
+    if(Number(s.ingressoLastShownAbsoluteDay)===oggi) return null;
+    s.ingressoLastShownAbsoluteDay=oggi;
+    return Object.assign({},s.ingressoPending);
+  }
   if(s.ingressoNextOfferAbsoluteDay!=null &&
      oggi<Number(s.ingressoNextOfferAbsoluteDay)) return null;
   if(Number(s.ingressoLastCheckAbsoluteDay)===oggi) return null;
@@ -442,6 +446,7 @@ function stradaTentaIngresso(roll,variantRoll){
   s.ingressoPersonaNome=persona.n;
   s.ingressoFase="offered";
   s.ingressoPending=Object.assign({},proposta);
+  s.ingressoLastShownAbsoluteDay=oggi;
   return Object.assign({},proposta);
 }
 
@@ -450,6 +455,7 @@ function stradaRifiutaIngresso(){
   if(!s.ingressoPending) return null;
   const out=Object.assign({},s.ingressoPending,{status:"declined"});
   s.ingressoPending=null;
+  s.ingressoLastShownAbsoluteDay=null;
   s.ingressoFase=s.ingressoTentativi>0?"contact":"locked";
   s.ingressoNextOfferAbsoluteDay=stradaAbsDay()+STRADA_INGRESSO.cooldownRifiutoGiorni;
   if(typeof save==="function") save();
@@ -502,6 +508,7 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
 
   s.ingressoTentativi=Math.max(Number(s.ingressoTentativi||0),step);
   s.ingressoPending=null;
+  s.ingressoLastShownAbsoluteDay=null;
   const sbloccato=s.ingressoTentativi>=STRADA_INGRESSO.colpiRichiesti;
   if(sbloccato){
     s.badgeSbloccato=true;
