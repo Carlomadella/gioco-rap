@@ -89,6 +89,8 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.gente[0].ruolo).toBe("rider");
     expect(G.gente[0].strada.known).toBe(true);
     expect(G.gente[0].strada.sources).toContain("intro");
+    expect(G.gente[0].strada.fiducia).toBe(13);
+    expect(vm.runInContext("stradaFiduciaEtichetta(G.gente[0])",ctx)).toBe("ti conosce");
     expect(G.gente[0].circoloSbloccato).toBe(true);
     expect(G.strada.badgeSbloccato).toBe(false);
     expect(G.strada.arresto).toBeNull();
@@ -105,6 +107,7 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.traphone.sourcePersonId).toBe("p1");
     expect(G.strada.traphone.sourceName).toBe("Milo");
     expect(G.strada.traphone.source).toBe("intro");
+    expect(G.gente[0].strada.fiducia).toBe(10);
     expect(G.strada.arresto).toBeNull();
     expect(G.strada.precedenti).toBe(0);
   });
@@ -165,6 +168,30 @@ describe("Strada · ingresso nascosto",()=>{
     expect(p.circoloSbloccato).toBe(true);
   });
 
+  it("amicizia e fiducia criminale restano separate",()=>{
+    const {ctx,G}=contesto({
+      gente:[
+        {id:"social",n:"Amico",ruolo:"collega",rel:5,pt:99,via:false,
+          strada:{known:true,key:"street:social",sources:["opportunity"],opportunityIds:[],fiducia:8}},
+        {id:"trusted",n:"Fidato",ruolo:"strada",rel:0,pt:0,via:false,
+          strada:{known:true,key:"street:trusted",sources:["opportunity"],opportunityIds:[],fiducia:25}}
+      ]
+    });
+    const ids=vm.runInContext("stradaPersoneSquadra().map(p=>p.id)",ctx);
+    expect(ids).toEqual(["trusted"]);
+    expect(vm.runInContext("stradaFiduciaEtichetta(G.gente[0])",ctx)).toBe("appena entrati in contatto");
+    expect(vm.runInContext("stradaFiduciaEtichetta(G.gente[1])",ctx)).toBe("si fida");
+  });
+
+  it("i contatti legacy migrano la fiducia solo da fatti criminali già salvati",()=>{
+    const {ctx,G}=contesto({
+      gente:[{id:"old",n:"Old",ruolo:"strada",rel:5,pt:99,via:false,
+        strada:{known:true,key:"street:old",sources:["intro"],opportunityIds:["a","b"]}}]
+    });
+    expect(vm.runInContext("stradaFiduciaValore(G.gente[0])",ctx)).toBe(30);
+    expect(G.gente[0].strada.fiduciaEventi).toEqual([]);
+  });
+
   it("il TrapPhone e la sua UI rispettano il possesso reale",()=>{
     const ui=leggi("js/game/strada-crimine-ui.js");
     const trap=leggi("js/game/traphone16.js");
@@ -177,6 +204,28 @@ describe("Strada · ingresso nascosto",()=>{
     expect(trap).toContain("receiveStorySms,");
     expect(trap).toContain("acquire,");
     expect(leggi("js/game/eventi-v2.js")).toContain("TRAPHONE16.receiveStorySms");
+  });
+
+  it("l'approccio di squadra usa persone reali e non il vecchio contatore uomini",()=>{
+    const strada=leggi("js/game/strada-crimine.js");
+    expect(strada).toContain("function stScenaPersonaSquadra(colpo)");
+    expect(strada).toContain('personaSquadraId');
+    expect(strada).toContain('nessuno si fida abbastanza');
+    expect(strada).toContain('stradaPersonaSquadra(personaSquadraId)');
+    expect(strada).toContain('stradaBonusFiduciaSquadra(personaSquadra)');
+    expect(strada).not.toContain('if(approccio.serveUomo && s.uomini <= 0)');
+    expect(strada).not.toContain('s.uomini--');
+    expect(strada).toContain("const fidati=stradaPersoneSquadra()");
+    expect(strada).toContain('"Chiami "+chiamabile.n');
+    expect(strada).toContain("Persone del giro (");
+    expect(strada).toContain("Non puoi comprare la fiducia di qualcuno");
+  });
+
+  it("gli uomini legacy non danno piu bonus ne costi invisibili",()=>{
+    const strada=leggi("js/game/strada-crimine.js");
+    expect(strada).not.toContain("p += Math.min(s.uomini, 5) * .025");
+    expect(strada).not.toContain("return s.uomini * STRADA_UOMO_UPKEEP");
+    expect(strada).toContain("Gli uomini numerici sono solo compatibilità legacy");
   });
 
   it("hub e colpo rapido rispettano lo stesso gate",()=>{

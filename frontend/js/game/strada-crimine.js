@@ -233,12 +233,36 @@ function stRigaApproccio(a){
   const delta = Math.round((a.guadagno - 1) * 100);
   return {
     sx:(delta > 0 ? "+" : "−") + Math.abs(delta) + "% guadagno",
-    dx:a.serveFerro ? "pena ×2,2" : a.serveUomo ? "serve un uomo" : "rischio ↓"
+    dx:a.serveFerro ? "pena ×2,2" : a.serveUomo ? "serve una persona fidata" : "rischio ↓"
+  };
+}
+
+function stScenaPersonaSquadra(colpo){
+  const persone=stradaPersoneSquadra();
+  return {
+    k:"Con chi ti muovi?",
+    titolo:colpo.n,
+    testo:"Per questo approccio non basta pagare qualcuno: serve una persona che si fidi abbastanza da metterci la faccia con te.",
+    stats:[
+      {t:persone.length+" "+(persone.length===1?"persona disponibile":"persone disponibili")},
+      {t:"Fiducia costruita facendo cose insieme"}
+    ],
+    opts:[
+      ...persone.map(p=>({
+        n:p.n,
+        d:"Fiducia nel giro: "+stradaFiduciaEtichetta(p),
+        sx:"+"+Math.round(stradaBonusFiduciaSquadra(p)*100)+"% riuscita",
+        dx:String(p.ruolo||"contatto"),
+        run(){ stradaTenta(colpo.id,"squadra",p.id); }
+      })),
+      {n:"Torna indietro",d:"Scegli un altro approccio",run(){STRADA_SCENA=stScenaApproccio(colpo);}}
+    ]
   };
 }
 
 function stScenaApproccio(colpo){
   const s = G.strada;
+  const personeSquadra=stradaPersoneSquadra();
   return {k:"Come vuoi muoverti?", titolo:colpo.n, testo:colpo.d, approcci:true,
     stats:[
       {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
@@ -247,9 +271,18 @@ function stScenaApproccio(colpo){
     ],
     opts:STRADA_APPROCCI.map(a => {
       const riga = stRigaApproccio(a);
-      return {n:a.n, d:a.d, sx:riga.sx, dx:riga.dx, hot:a.id === "ferro",
-        no:(a.serveUomo && s.uomini <= 0) || (a.serveFerro && !s.ferro) || G.energy < colpo.energia,
-        run(){ stradaTenta(colpo.id, a.id); }};
+      const squadra=a.id==="squadra";
+      const dx=squadra
+        ? (personeSquadra.length
+          ? personeSquadra.length+" "+(personeSquadra.length===1?"persona fidata":"persone fidate")
+          : "nessuno si fida abbastanza")
+        : riga.dx;
+      return {n:a.n, d:a.d, sx:riga.sx, dx, hot:a.id === "ferro",
+        no:(squadra && !personeSquadra.length) || (a.serveFerro && !s.ferro) || G.energy < colpo.energia,
+        run(){
+          if(squadra){ STRADA_SCENA=stScenaPersonaSquadra(colpo); return; }
+          stradaTenta(colpo.id, a.id);
+        }};
     })};
 }
 
@@ -423,6 +456,8 @@ function stradaConsegnaTrapPhone(personId,personName,source){
    Ogni contatto vive in G.gente, conserva la propria identità/origine e può
    ricomparire nei sistemi sociali esistenti. Il punto 4 aggiungerà la fiducia
    criminale: qui costruiamo soltanto identità e continuità. */
+const STRADA_FIDUCIA_SQUADRA = 25;
+
 function stradaPersonaMeta(p){
   if(!p) return null;
   if(!p.strada || typeof p.strada!=="object"){
@@ -432,19 +467,74 @@ function stradaPersonaMeta(p){
       firstLinkedAbsoluteDay:null,
       sources:[],
       opportunityIds:[],
-      introducedByPersonId:null
+      introducedByPersonId:null,
+      fiducia:0,
+      fiduciaEventi:[],
+      colpiInsieme:0
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
   if(!Array.isArray(p.strada.opportunityIds)) p.strada.opportunityIds=[];
+  if(!Array.isArray(p.strada.fiduciaEventi)) p.strada.fiduciaEventi=[];
+  if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
+  if(!Number.isFinite(Number(p.strada.fiducia))){
+    let base=p.strada.known?10:0;
+    if(p.strada.sources.includes("intro")) base+=10;
+    base+=Math.min(3,p.strada.opportunityIds.length)*5;
+    p.strada.fiducia=clamp(base,0,40);
+  }else p.strada.fiducia=clamp(Number(p.strada.fiducia)||0,0,100);
   return p.strada;
+}
+
+function stradaFiduciaValore(p){
+  const st=stradaPersonaMeta(p);
+  return st?Number(st.fiducia||0):0;
+}
+
+function stradaFiduciaEtichetta(p){
+  const v=stradaFiduciaValore(p);
+  if(v>=75) return "si gioca la faccia";
+  if(v>=50) return "fidato";
+  if(v>=STRADA_FIDUCIA_SQUADRA) return "si fida";
+  if(v>=10) return "ti conosce";
+  return "appena entrati in contatto";
+}
+
+function stradaModificaFiducia(p,delta,motivo){
+  if(!p || p.via || !delta) return p;
+  const st=stradaPersonaMeta(p);
+  st.fiducia=clamp(Number(st.fiducia||0)+Number(delta||0),0,100);
+  st.fiduciaEventi.push({absoluteDay:stradaAbsDay(),delta:Number(delta||0),reason:String(motivo||"street")});
+  if(st.fiduciaEventi.length>12) st.fiduciaEventi.shift();
+  return p;
+}
+
+function stradaPersoneSquadra(){
+  return (G.gente||[])
+    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+      stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)
+    .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) || Number(b.rel||0)-Number(a.rel||0));
+}
+
+function stradaPersonaSquadra(id){
+  if(!id) return null;
+  const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via) || null;
+  if(!p || !p.strada || !p.strada.known) return null;
+  return stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA ? p : null;
+}
+
+function stradaBonusFiduciaSquadra(p){
+  if(!p) return 0;
+  return clamp(stradaFiduciaValore(p)/100*.10,.03,.10);
 }
 
 function stradaSegnaPersona(p,meta){
   if(!p || p.via) return null;
   meta=meta||{};
   const st=stradaPersonaMeta(p);
+  const eraConosciuto=!!st.known;
   st.known=true;
+  if(!eraConosciuto && stradaFiduciaValore(p)<5) st.fiducia=5;
   if(!st.key && meta.key) st.key=String(meta.key);
   if(st.firstLinkedAbsoluteDay==null) st.firstLinkedAbsoluteDay=stradaAbsDay();
   if(meta.source && !st.sources.includes(meta.source)) st.sources.push(meta.source);
@@ -690,6 +780,8 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
     : Math.random();
 
   let pulito=0,sporco=0,multa=0;
+  if(personaIngresso)
+    stradaModificaFiducia(personaIngresso,successo?8:-3,"intro-"+step+(successo?"-success":"-failure"));
   if(successo){
     const min=Number(STRADA_INGRESSO.min[step-1]||120);
     const max=Number(STRADA_INGRESSO.max[step-1]||240);
@@ -1002,9 +1094,9 @@ function stradaConsumaPropostaFabbrica(colpoId,successo){
   return stradaConsumaOpportunita(colpoId,successo);
 }
 
-function stradaChanceConOpportunita(colpo,approccio,lead){
+function stradaChanceConOpportunita(colpo,approccio,lead,personaSquadra){
   return clamp(
-    stradaChance(colpo,approccio)+Number(lead&&lead.chanceDelta||0),
+    stradaChance(colpo,approccio,personaSquadra)+Number(lead&&lead.chanceDelta||0),
     .06,.93
   );
 }
@@ -1025,11 +1117,12 @@ function stradaEffettiOpportunita(lead,successo){
   };
 }
 
-function stradaChance(colpo, approccio){
+function stradaChance(colpo, approccio, personaSquadra){
   const s = G.strada;
   let p = .62 - colpo.difficolta * .34;
   p += s.rep/100 * .20;
-  p += Math.min(s.uomini, 5) * .025;
+  if(approccio && approccio.id==="squadra" && personaSquadra)
+    p += stradaBonusFiduciaSquadra(personaSquadra);
   p += s.prot * .045;
   p -= s.heat/100 * .30;
   p -= s.precedenti * .035;
@@ -1044,14 +1137,18 @@ function stradaLavaggioStato(){
   return s.lavaggio;
 }
 
-function stradaTenta(colpoId, approccioId){
+function stradaTenta(colpoId, approccioId, personaSquadraId){
   const colpo = STRADA_COLPI.find(c => c.id === colpoId);
   const approccio = STRADA_APPROCCI.find(a => a.id === approccioId);
   if(!colpo || !approccio) return;
   const s = G.strada;
 
   if(G.energy < colpo.energia){ STRADA_SCENA = stScenaAvviso(colpo, "Non hai abbastanza energia per questo colpo (serve " + colpo.energia + ")."); return; }
-  if(approccio.serveUomo && s.uomini <= 0){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve avere almeno un uomo con te."); return; }
+  const personaSquadra=approccio.id==="squadra" ? stradaPersonaSquadra(personaSquadraId) : null;
+  if(approccio.serveUomo && !personaSquadra){
+    STRADA_SCENA = stScenaAvviso(colpo, "Per muoverti con il giro ti serve una persona reale che si fidi abbastanza di te.");
+    return;
+  }
   if(approccio.serveFerro && !s.ferro){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve il ferro, e non ce l'hai ancora."); return; }
 
   if(stradaAttivitaSbloccate()) s.giroAvviato=true;
@@ -1061,7 +1158,7 @@ function stradaTenta(colpoId, approccioId){
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
-  const successo = Math.random() < stradaChanceConOpportunita(colpo,approccio,opportunita);
+  const successo = Math.random() < stradaChanceConOpportunita(colpo,approccio,opportunita,personaSquadra);
   const leadUsato = opportunita
     ? stradaConsumaOpportunita(colpoId, successo)
     : (leadLavoro && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeCrimeLead === "function"
@@ -1072,6 +1169,21 @@ function stradaTenta(colpoId, approccioId){
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
   const rumoreLead = Number(effettiLead.heatDelta||0);
   const reputazioneLead = Number(effettiLead.repDelta||0);
+  const personaLead=leadUsato&&leadUsato.personId?stradaPersonaDaId(leadUsato.personId):null;
+
+  if(personaSquadra){
+    const stessa=personaLead&&personaLead.id===personaSquadra.id;
+    stradaModificaFiducia(
+      personaSquadra,
+      successo?(stessa?10:7):(stessa?-8:-6),
+      successo?"colpo-insieme-success":"colpo-insieme-failure"
+    );
+    stradaPersonaMeta(personaSquadra).colpiInsieme++;
+  }
+  if(personaLead && (!personaSquadra || personaLead.id!==personaSquadra.id))
+    stradaModificaFiducia(personaLead,successo?8:-5,
+      successo?"opportunita-success":"opportunita-failure");
+
   /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
      il suo peso — è il più rischioso dei sei eventi della settimana, e
      deve rendere in proporzione quando capita davvero quel giorno lì.
@@ -1111,10 +1223,9 @@ function stradaTenta(colpoId, approccioId){
             (reputazioneLead ? ", reputazione " + stradaSegno(reputazioneLead) : "") + ".</b>"
           : " La dritta arrivata dal lavoro è bruciata.")
       : "";
-    if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
-      s.uomini--;
-      STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. Uno dei tuoi ci è rimasto sotto: " +
-          "tu sei rientrato pulito, lui no. Un uomo in meno." + notaLeadFallita,
+    if(approccio.id === "squadra" && personaSquadra && Math.random() < .5){
+      STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. <b>" +
+          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." + notaLeadFallita,
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
       const ingressoProtetto = !stradaAttivitaSbloccate();
@@ -1194,20 +1305,10 @@ function stradaRipulisci(){
 
 /* ==================== CHI TI COPRE ==================== */
 function stAssumiUomo(){
-  const s = G.strada;
-  if(s.uomini >= STRADA_UOMO_MAX) return "Hai già cinque uomini: di più non se ne tengono.";
-  if(G.money < STRADA_UOMO_COSTO) return "Non hai " + fmt(STRADA_UOMO_COSTO) + " € per prenderne un altro.";
-  G.money -= STRADA_UOMO_COSTO; s.uomini++;
-  pushLog("Hai preso un uomo in più: ora sono " + s.uomini + ".", "");
-  save(); renderStrada(); renderGioco();
-  return "Uno dei tuoi si è unito al giro: ora siete in " + s.uomini + ".";
+  return "Non puoi comprare la fiducia di qualcuno: per portarlo a un colpo devi costruire un rapporto nel giro.";
 }
 function stLicenziaUomo(){
-  const s = G.strada;
-  if(s.uomini <= 0) return "Non hai nessuno da mandare via.";
-  s.uomini--;
-  save(); renderStrada(); renderGioco();
-  return "Uno se n'è andato. Ne restano " + s.uomini + ".";
+  return "Le persone del giro non sono un organico da licenziare: i rapporti cambiano attraverso quello che succede fra voi.";
 }
 function stImpostaProtezione(livello){
   G.strada.prot = clamp(livello, 0, STRADA_PROT.length - 1);
@@ -1661,19 +1762,9 @@ function stradaSettimana(){
     s.sporchi += Math.round(a.resa * .55);
   }
 
-  /* Blocco 4: le coperture non sono credito infinito.
-     A fine settimana resta attivo solo ciò che puoi davvero pagare. */
-  if(s.uomini > 0){
-    const prima = s.uomini;
-    const pagabili = Math.min(prima, Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP));
-    if(pagabili < prima){
-      s.uomini = pagabili;
-      pushLog((prima - pagabili === 1 ? "Un uomo se n'è andato" :
-        (prima - pagabili) + " uomini se ne sono andati") +
-        ": non entrava abbastanza per tenerli.", "");
-    }
-    G.money -= s.uomini * STRADA_UOMO_UPKEEP;
-  }
+  /* Dal punto 4 gli uomini numerici non vengono più comprati/usati come crew.
+     Restano nel save solo per compatibilità fino al punto 6 e non costano più.
+     Protezione e avvocato mantengono invece la loro logica attuale. */
   if(s.prot > 0){
     const costoProt = STRADA_PROT[s.prot].costo;
     if(G.money >= costoProt) G.money -= costoProt;
@@ -1722,6 +1813,8 @@ function stradaSettimana(){
 
 function stradaOpp(){
   const s = G.strada;
+  const fidati=stradaPersoneSquadra();
+  const chiamabile=fidati[0]||null;
   showEvent({k:"Fuori programma", t:"Ti aspettano", d:"Non te l'aspettavi: qualcuno ti sta aspettando sotto casa.",
     annulla(){},
     opts:[
@@ -1731,17 +1824,24 @@ function stradaOpp(){
         return {t:"Sei scappato. Ti hanno preso " + fmt(perso) + " €, e in giro si è visto.", c:"bad"};
       }},
       {n:"Li affronti", d:"Rischi, ma se vinci sali", run(){
-        const vinci = Math.random() < clamp(.4 + s.rep/200 + Math.min(s.uomini,5) * .05, .15, .85);
+        const vinci = Math.random() < clamp(.4 + s.rep/200, .15, .85);
         if(vinci){ s.rep = clamp(s.rep + 6, 0, 100); G.hype = clamp(G.hype + 4, 0, (typeof hypeCap==="function"?hypeCap():100));
           return {t:"Li hai affrontati e hai vinto. La cosa gira.", c:"good"}; }
         G.wellbeing = clamp(G.wellbeing - 15, 0, 100);
         return {t:"Li hai affrontati e sei rimasto male. Settimana da dimenticare.", c:"bad"};
       }},
-      {n:"Chiami i tuoi", d:"Serve avere qualcuno da chiamare", run(){
-        if(s.uomini <= 0) return {t:"Non avevi nessuno da chiamare. Te la sei vista brutta da solo.", c:"bad"};
-        if(Math.random() < .72) return {t:"I tuoi sono arrivati in tempo. Liscia.", c:"good"};
-        s.uomini--; G.wellbeing = clamp(G.wellbeing - 10, 0, 100);
-        return {t:"Uno dei tuoi ci è rimasto sotto per te.", c:"bad"};
+      {n:chiamabile ? "Chiami "+chiamabile.n : "Chiami qualcuno",
+       d:chiamabile ? "Fiducia: "+stradaFiduciaEtichetta(chiamabile) : "Nessuno si fida abbastanza da arrivare per te",
+       run(){
+        if(!chiamabile) return {t:"Non avevi nessuno che si fidasse abbastanza da arrivare per te.", c:"bad"};
+        const chance=clamp(.55+stradaFiduciaValore(chiamabile)/250,.55,.90);
+        if(Math.random()<chance){
+          stradaModificaFiducia(chiamabile,3,"opp-aiuto-success");
+          return {t:"<b>"+chiamabile.n+"</b> arriva in tempo. Stavolta ne uscite puliti.", c:"good"};
+        }
+        stradaModificaFiducia(chiamabile,-6,"opp-aiuto-failure");
+        G.wellbeing = clamp(G.wellbeing - 10, 0, 100);
+        return {t:"<b>"+chiamabile.n+"</b> prova a coprirti, ma la situazione si mette male per entrambi.", c:"bad"};
       }}
     ]});
 }
@@ -1878,7 +1978,9 @@ function stOcchiAddosso(){
 }
 function stCopertura(){
   const s = G.strada;
-  return s.uomini * STRADA_UOMO_UPKEEP + STRADA_PROT[s.prot].costo + (s.avvocato ? STRADA_AVVOCATO_COSTO : 0);
+  /* Gli uomini numerici sono solo compatibilità legacy fino al punto 6:
+     non sono più una copertura acquistabile né un costo invisibile. */
+  return STRADA_PROT[s.prot].costo + (s.avvocato ? STRADA_AVVOCATO_COSTO : 0);
 }
 
 /* ---- la testata e la colonna di sinistra ---- */
@@ -1980,12 +2082,20 @@ function renderStColpi(){
 function renderStCopre(){
   const s = G.strada;
   const prot = STRADA_PROT[s.prot];
-  const pieno = s.uomini >= STRADA_UOMO_MAX, caro = G.money < STRADA_UOMO_COSTO;
+  const contatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via)
+    .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
   $("st-tab-copre").innerHTML =
-    '<div class="cover-row"><div class="t"><strong>Uomini (' + s.uomini + '/' + STRADA_UOMO_MAX + ')</strong>' +
-      '<span>' + fmt(STRADA_UOMO_COSTO) + ' € all\'ingresso · ' + fmt(STRADA_UOMO_UPKEEP) + ' €/sett.</span></div>' +
-      '<div class="pills"><button class="pill' + (pieno || caro ? " no" : "") + '" data-stuomo="piu">+ Prendi</button>' +
-      (s.uomini > 0 ? '<button class="pill" data-stuomo="meno">Manda via</button>' : '') + '</div></div>' +
+    '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ')</strong>' +
+      '<span>' + (fidati.length
+        ? fidati.length + ' ' + (fidati.length===1?'si fida':'si fidano') + ' abbastanza da muoversi con te.'
+        : 'Conosci gente, ma nessuno si fida ancora abbastanza da venire a un colpo con te.') + '</span></div>' +
+      '<div class="pills">' +
+        (contatti.slice(0,3).map(p=>'<span class="pill' +
+          (stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
+          p.n + ' · ' + stradaFiduciaEtichetta(p) + '</span>').join('') ||
+          '<span class="pill no">Nessun contatto</span>') +
+      '</div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
       '<span>Riduce il rischio quando la zona si scalda.</span></div>' +

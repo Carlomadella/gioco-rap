@@ -1255,8 +1255,14 @@ test("riciclaggio costa 45 minuti",
   crime.includes('GAME_TIME.advance(minuti, "crime:launder")'));
 test("riciclaggio non parte se manca tempo prima delle 04:00",
   crime.includes("GAME_TIME.remaining() < minuti"));
-test("uomini vengono ridotti al numero realmente pagabile",
-  crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)"));
+test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
+  crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
+  !crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)") &&
+  !crime.includes("p += Math.min(s.uomini, 5) * .025") &&
+  !crime.includes("s.uomini--") &&
+  crime.includes("function stradaPersoneSquadra()") &&
+  crime.includes("stradaPersonaSquadra(personaSquadraId)") &&
+  crime.includes("Non puoi comprare la fiducia di qualcuno"));
 test("protezione decade se non pagabile",
   crime.includes("s.prot = 0") &&
   crime.includes("Protezione saltata."));
