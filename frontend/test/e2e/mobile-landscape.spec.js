@@ -71,6 +71,15 @@ test("landscape mobile: parte alta scorre e barra 01-06 resta fissa", async ({ p
   expect(continuaBox.y + continuaBox.height).toBeLessThanOrEqual(dockBox.y + 1);
 });
 
+test("portrait mobile: Inizia nasconde la coda FAMEpedia", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/pagine/landing.html");
+  await page.evaluate(() => document.querySelector("#m-play").click());
+
+  await expect(page.locator("#mhero")).toHaveClass(/avvio-aperto/);
+  await expect(page.locator("#s-menu > .menu")).toBeHidden();
+});
+
 test("landscape mobile: il suggerimento di rotazione non copre il gioco", async ({ page }) => {
   await page.goto("/pagine/landing.html");
   await page.waitForFunction(() => window.ADF_MOBILE_ORIENTATION_HINT);
@@ -80,6 +89,25 @@ test("landscape mobile: il suggerimento di rotazione non copre il gioco", async 
   await expect(page.locator("#m-play")).toBeVisible();
 });
 
+
+test("landscape mobile: Inizia mostra tutte le voci senza blocco nero", async ({ page }) => {
+  await page.goto("/pagine/landing.html");
+  await page.locator("#m-play").tap();
+
+  const pannello = page.locator(".land-avvio");
+  await expect(pannello).toBeVisible();
+  await expect(pannello).toHaveCSS("transform", "none");
+  await expect(pannello.getByText("Nuova partita", { exact: true })).toBeVisible();
+  await expect(pannello.getByText("Avvio rapido", { exact: true })).toBeVisible();
+  await expect(pannello.getByText("Carica partita", { exact: true })).toBeVisible();
+  await expect(pannello.getByText("Importa partita", { exact: true })).toBeVisible();
+
+  const box = await pannello.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box.y).toBeGreaterThanOrEqual(-1);
+  const vh = await page.evaluate(() => innerHeight);
+  expect(box.y + box.height).toBeLessThanOrEqual(vh + 1);
+});
 
 test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", async ({ page }) => {
   await page.goto("/pagine/landing.html");

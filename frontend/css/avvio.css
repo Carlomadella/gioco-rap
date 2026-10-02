@@ -106,3 +106,11 @@
   .land-avvio,.land-kick,.land-hero h1,.land-sub,.land-hero .mrow.big,.land-dock,.avv-diff-card{transition:none!important}
   .land-avvio.step-in > *{animation:none!important}
 }
+
+
+/* ADF_MOBILE_AVVIO_HIDE_TAIL_V1
+   Su telefono, quando Inizia e' aperto, la coda editoriale della landing
+   non deve comparire sotto al pannello (vale anche in portrait). */
+@media (pointer:coarse) and (max-width:1180px){
+  .land.avvio-aperto + .menu{display:none}
+}

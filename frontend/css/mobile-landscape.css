@@ -129,12 +129,15 @@
 
   /* avvio/slot: in landscape usa la larghezza, non una colonna lunga */
   .land-avvio{
-    top:56px;
-    bottom:8px;
-    width:min(860px,calc(100% - 24px));
-    max-height:calc(100dvh - 64px);
-    overflow:auto
+    top:0;
+    bottom:0;
+    left:5vw;
+    width:min(860px,calc(95% - 12px));
+    max-height:none;
+    overflow:auto;
+    transform:none
   }
+  .land.avvio-aperto .land-avvio{transform:none}
   .avv-testa{margin-bottom:8px}
   .avv-testa h2{font-size:clamp(24px,8vh,36px)}
   .avv-testa p{font-size:11px}
