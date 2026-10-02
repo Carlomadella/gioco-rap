@@ -368,12 +368,13 @@ finivano coi puntini, adesso vanno a capo fino a tre righe. Sta in
 
 **La prova su un telefono vero è iniziata (02/10/2026).** Il trascinamento delle pagine
 funziona sul dispositivo reale. **FATTO in parte (02/10/2026) — bootstrap MakeHuman
-mobile isolato**: il telefono passa da `js/mobile/makehuman-mobile.js` e dal relay
-`media/makehuman-mobile-v1/index.html`; durante il caricamento silenzioso di
-`targets.bin` (~145 MB) il relay tiene vivo il watchdog ogni 10 s, con un tetto di sei
-minuti. Il percorso desktop (`gioco-ingresso.js`, creator e runtime MakeHuman) non è stato
-modificato. Resta da rifare il primo avvio sul telefono reale e completare il resto del
-giro sulle schermate prima di chiudere la tappa.
+mobile isolato, secondo giro**: il primo test della PR #29 ha ancora chiuso a 2:01 perché
+l'heartbeat partiva solo quando compariva `targets.bin`; sul telefono può invece restare
+silenziosa per oltre due minuti anche una fase precedente (`body`, resources o cataloghi).
+Il relay mobile ora tiene vivo **l'intero avvio rapido** ogni 10 s, dalla sua apertura fino
+al risultato del preset, con tetto a sei minuti. Il percorso desktop
+(`gioco-ingresso.js`, creator e runtime MakeHuman) resta invariato. Resta la nuova prova
+su telefono reale con cache vuota prima di chiudere il punto.
 
 ### H · Los Angeles _(da fare)_
 
