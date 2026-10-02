@@ -37,7 +37,8 @@ function contesto(overrides={}){
     fmt:v=>String(Math.round(Number(v)||0)),
     diarioBordo:()=>G.diario,
     pushLog:(msg,cls)=>logs.push({msg,cls}),
-    save:()=>{}
+    save:()=>{},
+    window:{}
   };
   vm.createContext(ctx);
   vm.runInContext(helperIngresso(),ctx);
@@ -95,6 +96,11 @@ describe("Strada · ingresso nascosto",()=>{
     expect(secondo.unlocked).toBe(true);
     expect(G.strada.badgeSbloccato).toBe(true);
     expect(G.strada.giroAvviato).toBe(true);
+    expect(secondo.trapPhoneAcquired).toBe(true);
+    expect(G.strada.traphone.owned).toBe(true);
+    expect(G.strada.traphone.sourcePersonId).toBe("p1");
+    expect(G.strada.traphone.sourceName).toBe("Milo");
+    expect(G.strada.traphone.source).toBe("intro");
     expect(G.strada.arresto).toBeNull();
     expect(G.strada.precedenti).toBe(0);
   });
@@ -114,9 +120,12 @@ describe("Strada · ingresso nascosto",()=>{
   it("migra i salvataggi legacy senza richiudere una carriera gia avviata",()=>{
     const {ctx,G}=contesto();
     delete G.strada.badgeSbloccato;
+    delete G.strada.traphone;
     G.strada.giroAvviato=true;
     expect(vm.runInContext("stradaAttivitaSbloccate()",ctx)).toBe(true);
     expect(G.strada.badgeSbloccato).toBe(true);
+    expect(vm.runInContext("stradaHaTrapPhone()",ctx)).toBe(true);
+    expect(G.strada.traphone.source).toBe("legacy");
   });
 
   it("hub e colpo rapido rispettano lo stesso gate",()=>{
@@ -126,5 +135,6 @@ describe("Strada · ingresso nascosto",()=>{
     expect(hub).toContain('e.id!=="colpo" || hubCrimineSbloccato()');
     expect(strada).toContain("if(!stradaAttivitaSbloccate())");
     expect(strada).toContain("const ingressoProtetto = !stradaAttivitaSbloccate()");
+    expect(strada).toContain('if(trigger==="mondo" && !stradaHaTrapPhone()) return null');
   });
 });
