@@ -9,7 +9,7 @@
 
 (function(){
   const MOBILE_QUERY="(max-width: 1180px) and (pointer: coarse)";
-  const MOBILE_MAKEHUMAN_SRC="../makehuman-mobile-v1/index.html?v=1";
+  const MOBILE_MAKEHUMAN_BASE="../makehuman-mobile-v1/index.html?v=2";
 
   function eMobile(){
     try{
@@ -36,8 +36,10 @@
       const editor=doc && doc.getElementById("localEditorFrame");
       if(!editor) return false;
 
-      editor.dataset.makehumanSrc=MOBILE_MAKEHUMAN_SRC;
+      const rapido=new URLSearchParams(window.location.search).get("nuova")==="rapido";
+      editor.dataset.makehumanSrc=MOBILE_MAKEHUMAN_BASE+(rapido?"&quick=1":"");
       editor.dataset.makehumanMobile="1";
+      editor.dataset.makehumanMobileQuick=rapido?"1":"0";
       return true;
     }catch(e){
       return false;
@@ -89,6 +91,6 @@
 
   window.ADF_MAKEHUMAN_MOBILE={
     attivo:true,
-    source:MOBILE_MAKEHUMAN_SRC
+    source:MOBILE_MAKEHUMAN_BASE
   };
 })();
