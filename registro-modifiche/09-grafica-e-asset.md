@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f672163c -->
+## 02/10/26, 00:53 — task/fabbrica-progressione-carriera-ui → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `f672163c`
+
+### Cosa è entrato
+
+- `2a364939` — chore(cache): invalida pannello carriera Fabbrica — **mycolbraga**
+- `25dca817` — test(fabbrica): copre progressione carriera visibile — **mycolbraga**
+- `2c4267c5` — style(fabbrica): aggiunge percorso carriera compatto — **mycolbraga**
+- `bb094459` — feat(fabbrica): mostra requisiti e prossimo ruolo in scena — **mycolbraga**
+- `1c83de30` — feat(fabbrica): espone progressione carriera leggibile — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/luoghi-foto.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:4cb22db3 -->
 ## 02/10/26, 00:39 — task/bancone-neon → main
 
