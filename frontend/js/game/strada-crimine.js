@@ -933,7 +933,9 @@ function stradaPersonaMeta(p){
   p.strada.ignoredStreetOffers=Math.max(0,Math.floor(Number(p.strada.ignoredStreetOffers)||0));
   /* I salvataggi precedenti al punto 10 non vengono puniti retroattivamente:
      il loro contatore di assenza parte dal primo caricamento col nuovo sistema. */
-  if(p.strada.known && !Number.isFinite(Number(p.strada.lastPlayerStreetInteractionAbsoluteDay)))
+  if(p.strada.known &&
+     (p.strada.lastPlayerStreetInteractionAbsoluteDay==null ||
+      !Number.isFinite(Number(p.strada.lastPlayerStreetInteractionAbsoluteDay))))
     p.strada.lastPlayerStreetInteractionAbsoluteDay=stradaAbsDay();
   if(!Number.isFinite(Number(p.strada.fiducia))){
     let base=p.strada.known?10:0;
@@ -1120,15 +1122,17 @@ function stradaConsumaFavore(p,motivo){
 }
 
 function stradaPersoneConFavore(){
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known && stradaFavoriValore(p)>0)
+    .filter(p=>stradaRelazioneDisponibile(p) && stradaFavoriValore(p)>0)
     .sort((a,b)=>stradaFavoriValore(b)-stradaFavoriValore(a) ||
       stradaFiduciaValore(b)-stradaFiduciaValore(a));
 }
 
 function stradaPersoneSquadra(){
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+    .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) || Number(b.rel||0)-Number(a.rel||0));
 }
@@ -1136,7 +1140,7 @@ function stradaPersoneSquadra(){
 function stradaPersonaSquadra(id){
   if(!id) return null;
   const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via) || null;
-  if(!p || !p.strada || !p.strada.known) return null;
+  if(!stradaRelazioneDisponibile(p)) return null;
   return stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA ? p : null;
 }
 
@@ -1178,8 +1182,9 @@ function stradaProtezioneStato(){
 function stradaProtezioneProvider(livello){
   const req=STRADA_PROTEZIONE_REQ[livello];
   if(!req || livello<=0 || Number(G.strada&&G.strada.rep||0)<req.rep) return null;
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+    .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=req.fiducia)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
       Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0))[0] || null;
@@ -1190,7 +1195,7 @@ function stradaProtezioneDisponibile(livello,personId){
   if(!req || livello<=0) return null;
   if(Number(G.strada&&G.strada.rep||0)<req.rep) return null;
   const p=personId ? stradaPersonaDaId(personId) : stradaProtezioneProvider(livello);
-  if(!p || !p.strada || !p.strada.known || stradaFiduciaValore(p)<req.fiducia) return null;
+  if(!stradaRelazioneDisponibile(p) || stradaFiduciaValore(p)<req.fiducia) return null;
   return p;
 }
 
@@ -1361,8 +1366,9 @@ function stradaFerroStato(){
 }
 
 function stradaPersonaFerro(){
+  stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+    .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=STRADA_FERRO_FIDUCIA_MIN)
     .sort((a,b)=>
       stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
