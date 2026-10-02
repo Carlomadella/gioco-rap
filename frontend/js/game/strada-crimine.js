@@ -418,7 +418,7 @@ function stradaDescriviOpportunita(p){
     (Number(p.bonusPct||0)>=0?"+":"")+Number(p.bonusPct||0)+"% guadagno",
     stradaSegnoPct(p.chanceDelta)+" riuscita",
     "attenzione "+stradaSegno(successoHeat)+" se riesce / "+stradaSegno(fallimentoHeat)+" se fallisce",
-    "reputazione "+stradaSegno(p.successRep)+" / "+stradaSegno(p.failureRep)
+    "nome nel giro "+stradaSegno(p.successRep)+" / "+stradaSegno(p.failureRep)
   ];
   return parti.join(" · ");
 }
@@ -754,7 +754,7 @@ function stradaGeneraOfferteColpi(seed,rep,previousIds){
 function stradaColpiDisponibili(){
   const st=stradaOfferteColpiStato();
   const oggi=stradaAbsDay();
-  const rep=Math.max(0,Number(G.strada&&G.strada.rep||0));
+  const rep=stradaReputazioneGlobale();
 
   if(Number(st.absoluteDay)!==oggi || !st.ids.length){
     const prev=st.ids.filter(id=>STRADA_COLPI.some(c=>c.id===id));
@@ -1002,7 +1002,7 @@ function stradaContattiAttivi(){
 }
 
 function stradaCapacitaRete(){
-  const rep=Math.max(0,Number(G.strada&&G.strada.rep||0));
+  const rep=stradaReputazioneGlobale();
   const attivi=stradaContattiAttivi();
   const fidati=attivi.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
   const ok=req=>rep>=Number(req.rep||0) &&
@@ -1125,6 +1125,39 @@ function stradaAggiornaRelazioniCriminali(silent){
     }
   }
   return cambi;
+}
+
+/* Punto 12: "quanto gira il tuo nome" e "cosa pensa questa persona di te"
+   sono due assi diversi. rep resta il valore globale compatibile con i vecchi
+   salvataggi; la fiducia continua a vivere esclusivamente sulla persona. */
+function stradaReputazioneStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.repStato || typeof s.repStato!=="object") s.repStato={history:[]};
+  if(!Array.isArray(s.repStato.history)) s.repStato.history=[];
+  return s.repStato;
+}
+
+function stradaReputazioneGlobale(){
+  return clamp(Number(G.strada&&G.strada.rep||0),0,100);
+}
+
+function stradaModificaReputazione(delta,motivo,meta){
+  const s=G.strada||(G.strada={});
+  const prima=stradaReputazioneGlobale();
+  const dopo=clamp(prima+Number(delta||0),0,100);
+  s.rep=dopo;
+  const reale=dopo-prima;
+  if(reale){
+    const st=stradaReputazioneStato();
+    st.history.push({
+      absoluteDay:stradaAbsDay(),
+      delta:reale,
+      reason:String(motivo||"street-global-reputation"),
+      meta:meta&&typeof meta==="object"?Object.assign({},meta):null
+    });
+    if(st.history.length>30) st.history.shift();
+  }
+  return dopo;
 }
 
 function stradaFiduciaValore(p){
@@ -1784,7 +1817,7 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
     sporco=grezzo-pulito;
     G.money=Number(G.money||0)+pulito;
     s.sporchi=Number(s.sporchi||0)+sporco;
-    s.rep=clamp(Number(s.rep||0)+(step===1?1:2),0,100);
+    stradaModificaReputazione(step===1?1:2,"intro-success",{step});
     s.heat=clamp(Number(s.heat||0)+Number(STRADA_INGRESSO.heatSuccesso[step-1]||2),0,100);
   }else{
     multa=Math.round(Number(STRADA_INGRESSO.min[step-1]||120)*.45);
@@ -1922,7 +1955,7 @@ function stradaFabbricaLeadAttivo(colpoId){ return stradaOpportunitaAttiva(colpo
 
 function stradaPoolOpportunita(escludi){
   const st=stradaOpportunitaStato();
-  const rep=Math.max(0,Number((G.strada&&G.strada.rep)||0));
+  const rep=stradaReputazioneGlobale();
   const skip=new Set(Array.isArray(escludi)?escludi:[]);
   let pool=STRADA_OPPORTUNITA.filter(x=>
     rep>=Number(x.minRep||0) &&
@@ -2418,7 +2451,7 @@ function stradaChance(colpo, approccio, personaSquadra, preparazione){
   let p = .62 - colpo.difficolta * .34;
   p += categoria.chance;
   p += prep.chance;
-  p += s.rep/100 * .20;
+  p += stradaReputazioneGlobale()/100 * .20;
   if(approccio && approccio.id==="squadra" && personaSquadra)
     p += stradaBonusFiduciaSquadra(personaSquadra);
   p += s.prot * .045;
@@ -2512,7 +2545,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
     const pulito = Math.round(grezzo - sporco);
     G.money += pulito; s.sporchi += sporco;
     const repBase=(3 + colpo.difficolta * 6) * effettiCategoria.rep;
-    s.rep = clamp(s.rep + repBase + reputazioneLead, 0, 100);
+    stradaModificaReputazione(repBase+reputazioneLead,"crime-success",{colpoId:colpo.id});
     s.heat = clamp(s.heat + rumore * .6 + rumoreLead, 0, 100);
     diarioBordo().colpi++;
     const fonteLead = leadUsato && leadUsato.source==="street-opportunity"
@@ -2524,14 +2557,14 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       ? " <b>" + fonteLead + ": " +
         (Number(leadUsato.bonusPct||0)>=0?"+":"") + Number(leadUsato.bonusPct||0) +
         "% guadagno, attenzione " + stradaSegno(rumoreLead) +
-        (reputazioneLead ? ", reputazione " + stradaSegno(reputazioneLead) : "") + ".</b>"
+        (reputazioneLead ? ", nome nel giro " + stradaSegno(reputazioneLead) : "") + ".</b>"
       : "";
     STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
         fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne." + notaLead,
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
     s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
-    if(reputazioneLead) s.rep=clamp(s.rep+reputazioneLead,0,100);
+    if(reputazioneLead) stradaModificaReputazione(reputazioneLead,"crime-failure",{colpoId:colpo.id});
     const notaLeadFallita = leadUsato
       ? (leadUsato.source==="street-opportunity"
           ? " <b>L'opportunità «" + (leadUsato.titolo||"senza nome") + "» è bruciata: attenzione " +
@@ -3517,7 +3550,7 @@ function renderStCopre(){
       '<div class="pills">' +
         (contatti.slice(0,3).map(p=>'<span class="pill' +
           (stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
-          p.n + ' · ' + stradaFiduciaEtichetta(p) + '</span>').join('') ||
+          p.n + ' · Fiducia: ' + stradaFiduciaEtichetta(p) + '</span>').join('') ||
           '<span class="pill no">Nessun contatto attivo</span>') +
         (dormienti.length ? '<span class="pill no">' + dormienti.length + ' non raggiungibili</span>' : '') +
       '</div></div>' +
