@@ -456,7 +456,7 @@ function stradaConsegnaTrapPhone(personId,personName,source){
    Ogni contatto vive in G.gente, conserva la propria identità/origine e può
    ricomparire nei sistemi sociali esistenti. Il punto 4 aggiungerà la fiducia
    criminale: qui costruiamo soltanto identità e continuità. */
-const STRADA_FIDUCIA_SQUADRA = 30;
+const STRADA_FIDUCIA_SQUADRA = 25;
 
 function stradaPersonaMeta(p){
   if(!p) return null;
@@ -781,7 +781,7 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
 
   let pulito=0,sporco=0,multa=0;
   if(personaIngresso)
-    stradaModificaFiducia(personaIngresso,successo?8:2,"intro-"+step+(successo?"-success":"-failure"));
+    stradaModificaFiducia(personaIngresso,successo?8:-3,"intro-"+step+(successo?"-success":"-failure"));
   if(successo){
     const min=Number(STRADA_INGRESSO.min[step-1]||120);
     const max=Number(STRADA_INGRESSO.max[step-1]||240);
