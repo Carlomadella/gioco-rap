@@ -2938,11 +2938,16 @@ function adfShiftOutcomeEvent(luogo,jobBefore,flags){
         : "Turno extra proposto a fine turno"
     };
   }else if(flags.street){
-    const p=G.strada && G.strada.fabbricaLead && G.strada.fabbricaLead.pending;
+    const p=G.strada && (
+      (G.strada.crimeOpportunity && G.strada.crimeOpportunity.pending) ||
+      (G.strada.fabbricaLead && G.strada.fabbricaLead.pending)
+    );
     event={
       type:"street",
-      title:"Dritta fuori dalla Fabbrica",
-      detail:p && p.label ? p.label : "Una proposta ti aspetta fuori dal cancello"
+      title:"Incontro della Strada",
+      detail:p
+        ? ((p.persona ? p.persona+" · " : "")+(p.titolo||"Una proposta"))
+        : "Una persona del giro ti ha fermato fuori dal cancello"
     };
   }else if(flags.workFamily){
     event=adfWorkFamilyShiftSummary(G.job||jobBefore);
