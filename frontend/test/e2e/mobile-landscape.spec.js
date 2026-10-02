@@ -306,10 +306,20 @@ test("landscape mobile: camerino Avaturn usa tutto lo schermo e apre l'editor se
   await expect.poll(async () => room.locator("body").evaluate(() => window.__adfOpenedAvaturn)).not.toBeNull();
 
   const opened=await room.locator("body").evaluate(() => window.__adfOpenedAvaturn);
-  expect(opened.url).toContain("/media/creator-rpg-v24/avaturn-mobile.html?v=2");
+  expect(opened.url).toContain("/media/creator-rpg-v24/avaturn-mobile.html?v=3");
   expect(opened.name).toBe("adf-avaturn-mobile");
   await expect(room.locator("#avaturnOverlay")).not.toHaveClass(/open/);
   await expect(page.locator("#adf-rpg-v24-avaturn-mobile-host")).toHaveCount(0);
+});
+
+test("Avaturn mobile: in orizzontale mostra l'avviso verticale e non ha Conferma custom", async ({ page }) => {
+  await page.goto("/media/creator-rpg-v24/avaturn-mobile.html?v=3");
+
+  const gate=page.locator("#orientationGate");
+  await expect(gate).toBeVisible();
+  await expect(gate).toContainText("Ruota il telefono in verticale");
+  await expect(page.locator("#confirm")).toHaveCount(0);
+  await expect(page.locator("#loading")).toBeHidden();
 });
 
 test("landscape mobile: popup Avaturn bloccato non ricade nel vecchio portal", async ({ page }) => {
