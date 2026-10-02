@@ -6,6 +6,31 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:244add3b -->
+## 02/10/26, 12:59 — task/pizzeria-identita-gameplay → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `244add3b`
+
+### Cosa è entrato
+
+- `a86f5285` — fix(test): rimuove escape letterale nel test Pizzeria — **mycolbraga**
+- `a991daa0` — test(pizzeria): allinea soglia promozione alla nuova carriera — **mycolbraga**
+- `b2ea5831` — fix(test): corregge parsing test identita Pizzeria — **mycolbraga**
+- `83bb3e81` — test(pizzeria): corregge verifica storico rete — **mycolbraga**
+- `8df13bab` — test(pizzeria): copre identita part-time e crescita sociale — **mycolbraga**
+- `ba38a102` — feat(pizzeria): definisce identita part-time e rete per ruolo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Aggiunto:** `frontend/test/unit/pizzeria-identita.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:3b581dea -->
 ## 02/10/26, 11:28 — fix/pizzeria-hours-badge → main
 
