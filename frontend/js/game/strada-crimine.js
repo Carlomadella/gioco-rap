@@ -88,14 +88,116 @@ const STRADA_PROT = [
 const STRADA_UOMO_COSTO = 500, STRADA_UOMO_UPKEEP = 140, STRADA_UOMO_MAX = 5;
 const STRADA_FERRO_COSTO = 900, STRADA_AVVOCATO_COSTO = 320;
 
-/* Proposte nate FUORI dalla Fabbrica: non aprono il giro criminale a chi è
-   pulito. Premiano invece chi ha già una storia nella Strada con una singola
-   opportunità più remunerativa ma un po' più rumorosa. */
+/* La Fabbrica è soltanto UNO dei punti in cui una persona della Strada può
+   intercettarti. L'offerta non è "un crimine da Fabbrica": pesca da un pool
+   generale della carriera criminale e resta utilizzabile anche da altri
+   trigger futuri (bar, Circolo, contatti, telefono...) senza duplicare logica. */
 const STRADA_FABBRICA_LEAD = Object.freeze({
   chance:.12,
   cooldownGiorni:14,
-  durataGiorni:7
+  durataGiorni:7,
+  trigger:"fabbrica"
 });
+
+/* Pool di opportunità criminali. Non aggiunge nuovi metodi operativi nel mondo
+   reale: varia i quattro colpi già esistenti sul piano di gameplay.
+   Ogni offerta modifica davvero ricompensa, probabilità, attenzione e
+   reputazione su successo/fallimento. */
+const STRADA_OPPORTUNITA = Object.freeze([
+  Object.freeze({
+    id:"giro-breve", minRep:0, colpoId:"consegne",
+    persona:"Rami", titolo:"Un giro breve",
+    intro:"«Hai cinque minuti? Ho una cosa piccola che non voglio lasciare in mano al primo che passa.»",
+    pitch:"È un incarico corto: paga un po' meglio del solito e, se va storto, non dovrebbe trascinarsi troppo.",
+    bonusPct:15, chanceDelta:.08, successHeat:1, failureHeat:2, successRep:1, failureRep:-1
+  }),
+  Object.freeze({
+    id:"prova-fiducia", minRep:8, colpoId:"consegne",
+    persona:"Moro", titolo:"Una prova di fiducia",
+    intro:"«Soldi grossi no. Però se questa la chiudi bene, la gente giusta se lo ricorda.»",
+    pitch:"Qui il premio vero è la reputazione: il guadagno non cambia quasi, ma riuscire ti apre credito nel giro.",
+    bonusPct:0, chanceDelta:.05, successHeat:1, failureHeat:3, successRep:6, failureRep:-4
+  }),
+  Object.freeze({
+    id:"pagamento-alto", minRep:24, colpoId:"consegne",
+    persona:"Dado", titolo:"Pagano troppo per essere tranquilli",
+    intro:"«Mi hanno dato un numero che non mi piace. Proprio per questo sto chiedendo a te.»",
+    pitch:"Ricompensa alta, margine peggiore: se la prendi guadagni molto di più, ma la riuscita scende e il rumore sale.",
+    bonusPct:35, chanceDelta:-.06, successHeat:3, failureHeat:5, successRep:2, failureRep:-2
+  }),
+  Object.freeze({
+    id:"merce-urgente", minRep:0, colpoId:"scotta",
+    persona:"Nina", titolo:"Deve muoversi adesso",
+    intro:"«Non è roba mia e non voglio sapere di chi è. So solo che deve sparire dal tavolo in fretta.»",
+    pitch:"È urgente ma organizzata decentemente: premio sopra la media, con un piccolo vantaggio sulla riuscita.",
+    bonusPct:25, chanceDelta:.04, successHeat:2, failureHeat:4, successRep:2, failureRep:-1
+  }),
+  Object.freeze({
+    id:"nessuno-la-vuole", minRep:20, colpoId:"scotta",
+    persona:"Toni", titolo:"Nessuno vuole prenderla",
+    intro:"«Ho già sentito due persone. Tutti hanno trovato una scusa. Tu almeno dimmi sì o no in faccia.»",
+    pitch:"Il compenso è molto alto perché il rischio è peggiore: meno probabilità di riuscita, più attenzione e più reputazione se la chiudi.",
+    bonusPct:45, chanceDelta:-.08, successHeat:5, failureHeat:7, successRep:4, failureRep:-3
+  }),
+  Object.freeze({
+    id:"occasione-facile", minRep:0, colpoId:"cassa",
+    persona:"Vale", titolo:"Un'occasione più pulita del solito",
+    intro:"«Non ti sto vendendo il colpo del secolo. Ti sto dicendo che, per una volta, il quadro è meno sporco del solito.»",
+    pitch:"Paga poco più del normale ma aumenta molto la riuscita e può perfino ridurre leggermente l'attenzione se va bene.",
+    bonusPct:10, chanceDelta:.10, successHeat:-1, failureHeat:2, successRep:1, failureRep:-1
+  }),
+  Object.freeze({
+    id:"serata-grossa", minRep:25, colpoId:"cassa",
+    persona:"Mauri", titolo:"Stasera gira più del normale",
+    intro:"«Se vuoi fare soldi veri, questa è una di quelle sere. Però non venirmi a dire dopo che non te l'avevo detto.»",
+    pitch:"Guadagno alto e pressione alta: la riuscita peggiora, il rumore cresce e il fallimento costa reputazione.",
+    bonusPct:40, chanceDelta:-.06, successHeat:4, failureHeat:7, successRep:4, failureRep:-3
+  }),
+  Object.freeze({
+    id:"nome-da-farsi", minRep:40, colpoId:"cassa",
+    persona:"Ciro", titolo:"Qui conta più il nome dei soldi",
+    intro:"«Se la chiudi, non ti pagano solo in euro. Ti pagano col fatto che domani il tuo nome gira.»",
+    pitch:"Bonus economico moderato ma reputazione molto alta sul successo. Fallire davanti alla gente giusta pesa parecchio.",
+    bonusPct:15, chanceDelta:.02, successHeat:2, failureHeat:3, successRep:7, failureRep:-5
+  }),
+  Object.freeze({
+    id:"auto-richiesta", minRep:0, colpoId:"macchina",
+    persona:"Nico", titolo:"Ne cercano proprio una così",
+    intro:"«C'è richiesta. Non generica: proprio per quella roba lì. Se la prendi, non resta ferma.»",
+    pitch:"La richiesta precisa migliora il margine e rende il colpo un po' più favorevole, ma porta comunque attenzione.",
+    bonusPct:20, chanceDelta:.08, successHeat:2, failureHeat:4, successRep:2, failureRep:-1
+  }),
+  Object.freeze({
+    id:"auto-scomoda", minRep:30, colpoId:"macchina",
+    persona:"Zeta", titolo:"La vogliono, ma nessuno la vuole fare",
+    intro:"«È una di quelle occasioni in cui tutti vogliono la percentuale e nessuno vuole stare davanti.»",
+    pitch:"Molto denaro, meno probabilità di riuscita e conseguenze più rumorose. Se va bene, però, la reputazione sale forte.",
+    bonusPct:50, chanceDelta:-.10, successHeat:6, failureHeat:9, successRep:5, failureRep:-4
+  })
+]);
+
+function stradaSegnoPct(v){
+  const n=Math.round(Number(v||0)*100);
+  return (n>0?"+":"") + n + "%";
+}
+
+function stradaSegno(v){
+  const n=Number(v||0);
+  return (n>0?"+":"") + n;
+}
+
+function stradaDescriviOpportunita(p){
+  if(!p) return "";
+  const successoHeat=Number(p.successHeat||0);
+  const fallimentoHeat=Number(p.failureHeat||0);
+  const parti=[
+    (Number(p.bonusPct||0)>=0?"+":"")+Number(p.bonusPct||0)+"% guadagno",
+    stradaSegnoPct(p.chanceDelta)+" riuscita",
+    "attenzione "+stradaSegno(successoHeat)+" se riesce / "+stradaSegno(fallimentoHeat)+" se fallisce",
+    "reputazione "+stradaSegno(p.successRep)+" / "+stradaSegno(p.failureRep)
+  ];
+  return parti.join(" · ");
+}
 
 /* ==================== LA SCENA IN CORSO ====================
    Come modal.js, ma tutta dentro alla schermata: showEvent (z-index 60) finirebbe
@@ -184,24 +286,34 @@ function stradaAbsDay(){
   );
 }
 
-function stradaFabbricaLeadStato(){
+function stradaOpportunitaStato(){
   const s=G.strada||(G.strada={});
-  if(!s.fabbricaLead || typeof s.fabbricaLead!=="object"){
-    s.fabbricaLead={
-      lastCheckAbsoluteDay:null,
-      lastOfferAbsoluteDay:null,
-      pending:null,
-      active:null,
-      history:[]
-    };
+  if(!s.crimeOpportunity || typeof s.crimeOpportunity!=="object"){
+    /* Migrazione trasparente: il vecchio fabbricaLead diventa lo stesso stato
+       generico. I salvataggi già esistenti non perdono offerte o storico. */
+    s.crimeOpportunity=(s.fabbricaLead && typeof s.fabbricaLead==="object")
+      ? s.fabbricaLead
+      : {
+          lastCheckAbsoluteDay:null,
+          lastOfferAbsoluteDay:null,
+          pending:null,
+          active:null,
+          history:[]
+        };
   }
-  const st=s.fabbricaLead;
+  const st=s.crimeOpportunity;
   if(!Array.isArray(st.history)) st.history=[];
+  if(!Array.isArray(st.recentIds)) st.recentIds=[];
+  /* alias legacy finché tutti i salvataggi non sono passati dal nuovo runtime */
+  s.fabbricaLead=st;
   return st;
 }
 
-function stradaAggiornaPropostaFabbrica(silent){
-  const st=stradaFabbricaLeadStato();
+/* Nome legacy mantenuto perché altri moduli già caricati lo usano. */
+function stradaFabbricaLeadStato(){ return stradaOpportunitaStato(); }
+
+function stradaAggiornaOpportunita(silent){
+  const st=stradaOpportunitaStato();
   if(!st.active) return null;
 
   const oggi=stradaAbsDay();
@@ -209,115 +321,139 @@ function stradaAggiornaPropostaFabbrica(silent){
 
   const scaduta=Object.assign({},st.active,{status:"expired",expiredAbsoluteDay:oggi});
   st.history.push(scaduta);
-  if(st.history.length>20) st.history.shift();
+  if(st.history.length>30) st.history.shift();
   st.active=null;
 
   if(!silent && typeof pushLog==="function"){
-    pushLog("<b>La proposta fuori dalla Fabbrica è scaduta.</b> La dritta non è più valida.", "");
+    pushLog("<b>L'opportunità della Strada è scaduta.</b> Quella proposta non è più disponibile.", "");
   }
   return null;
 }
+function stradaAggiornaPropostaFabbrica(silent){ return stradaAggiornaOpportunita(silent); }
 
-function stradaFabbricaLeadAttivo(colpoId){
-  const st=stradaFabbricaLeadStato();
-  stradaAggiornaPropostaFabbrica(true);
+function stradaOpportunitaAttiva(colpoId){
+  const st=stradaOpportunitaStato();
+  stradaAggiornaOpportunita(true);
   if(!st.active) return null;
   if(colpoId && st.active.colpoId!==colpoId) return null;
   return st.active;
 }
+function stradaFabbricaLeadAttivo(colpoId){ return stradaOpportunitaAttiva(colpoId); }
 
-function stradaFabbricaLeadVariante(roll){
+function stradaScegliOpportunita(roll){
+  const st=stradaOpportunitaStato();
   const rep=Math.max(0,Number((G.strada&&G.strada.rep)||0));
-  let pool;
-  if(rep>=45){
-    pool=[
-      {colpoId:"scotta",bonusPct:25,extraHeat:3,label:"Roba che scotta"},
-      {colpoId:"cassa",bonusPct:30,extraHeat:4,label:"La cassa del bar"}
-    ];
-  }else if(rep>=18){
-    pool=[
-      {colpoId:"consegne",bonusPct:20,extraHeat:2,label:"Consegne che non chiedi"},
-      {colpoId:"scotta",bonusPct:25,extraHeat:3,label:"Roba che scotta"}
-    ];
-  }else{
-    pool=[{colpoId:"consegne",bonusPct:20,extraHeat:2,label:"Consegne che non chiedi"}];
-  }
+  let pool=STRADA_OPPORTUNITA.filter(x=>
+    rep>=Number(x.minRep||0) &&
+    (x.maxRep==null || rep<=Number(x.maxRep)) &&
+    !st.recentIds.includes(x.id)
+  );
+  if(!pool.length)
+    pool=STRADA_OPPORTUNITA.filter(x=>
+      rep>=Number(x.minRep||0) && (x.maxRep==null || rep<=Number(x.maxRep))
+    );
+  if(!pool.length) return null;
 
-  const r=Number.isFinite(Number(roll)) ? Math.max(0,Math.min(.999999,Number(roll))) : Math.random();
+  const r=Number.isFinite(Number(roll))
+    ? Math.max(0,Math.min(.999999,Number(roll)))
+    : Math.random();
   return Object.assign({},pool[Math.floor(r*pool.length)]);
 }
+function stradaFabbricaLeadVariante(roll){ return stradaScegliOpportunita(roll); }
 
-function stradaTentaPropostaFabbrica(roll,variantRoll){
-  if(!G.job) return null;
-  const luogo=typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null);
-  if(luogo!=="fabbrica") return null;
+function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
 
-  const st=stradaFabbricaLeadStato();
-  stradaAggiornaPropostaFabbrica(true);
+  const st=stradaOpportunitaStato();
+  stradaAggiornaOpportunita(true);
   if(st.active || st.pending) return null;
 
   const oggi=stradaAbsDay();
   if(Number(st.lastCheckAbsoluteDay)===oggi) return null;
   st.lastCheckAbsoluteDay=oggi;
 
+  const cfg=trigger==="fabbrica" ? STRADA_FABBRICA_LEAD : STRADA_FABBRICA_LEAD;
   if(st.lastOfferAbsoluteDay!=null &&
-     oggi-Number(st.lastOfferAbsoluteDay)<STRADA_FABBRICA_LEAD.cooldownGiorni)
+     oggi-Number(st.lastOfferAbsoluteDay)<Number(cfg.cooldownGiorni||14))
     return null;
 
   const r=roll==null ? Math.random() : Number(roll);
-  if(!Number.isFinite(r) || r>=STRADA_FABBRICA_LEAD.chance) return null;
+  if(!Number.isFinite(r) || r>=Number(cfg.chance||0)) return null;
 
-  const variante=stradaFabbricaLeadVariante(variantRoll);
+  const variante=stradaScegliOpportunita(variantRoll);
+  if(!variante) return null;
+
   st.lastOfferAbsoluteDay=oggi;
+  st.recentIds.unshift(variante.id);
+  if(st.recentIds.length>4) st.recentIds.length=4;
+
   st.pending=Object.assign({
-    source:"fabbrica",
+    source:"street-opportunity",
+    sourceLabel:"Incontro della Strada",
+    trigger:trigger||"unknown",
     status:"offered",
     offeredAbsoluteDay:oggi,
-    durataGiorni:STRADA_FABBRICA_LEAD.durataGiorni
+    durataGiorni:Number(cfg.durataGiorni||7)
   },variante);
   return Object.assign({},st.pending);
 }
 
-function stradaAccettaPropostaFabbrica(){
-  const st=stradaFabbricaLeadStato();
+function stradaTentaPropostaFabbrica(roll,variantRoll){
+  if(!G.job) return null;
+  const luogo=typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null);
+  if(luogo!=="fabbrica") return null;
+  return stradaTentaOpportunita("fabbrica",roll,variantRoll);
+}
+
+function stradaAccettaOpportunita(){
+  const st=stradaOpportunitaStato();
   if(!st.pending) return null;
   const oggi=stradaAbsDay();
   const lead=Object.assign({},st.pending,{
     status:"active",
     acceptedAbsoluteDay:oggi,
-    expiresAbsoluteDay:oggi+Math.max(1,Number(st.pending.durataGiorni||STRADA_FABBRICA_LEAD.durataGiorni))
+    expiresAbsoluteDay:oggi+Math.max(1,Number(st.pending.durataGiorni||7))
   });
   st.pending=null;
   st.active=lead;
   st.history.push({
     type:"accepted",
     absoluteDay:oggi,
+    opportunityId:lead.id,
+    trigger:lead.trigger||null,
     colpoId:lead.colpoId,
-    bonusPct:lead.bonusPct,
+    bonusPct:Number(lead.bonusPct||0),
+    chanceDelta:Number(lead.chanceDelta||0),
+    successHeat:Number(lead.successHeat||0),
+    failureHeat:Number(lead.failureHeat||0),
+    successRep:Number(lead.successRep||0),
+    failureRep:Number(lead.failureRep||0),
     expiresAbsoluteDay:lead.expiresAbsoluteDay
   });
-  if(st.history.length>20) st.history.shift();
+  if(st.history.length>30) st.history.shift();
   return Object.assign({},lead);
 }
+function stradaAccettaPropostaFabbrica(){ return stradaAccettaOpportunita(); }
 
-function stradaRifiutaPropostaFabbrica(){
-  const st=stradaFabbricaLeadStato();
+function stradaRifiutaOpportunita(){
+  const st=stradaOpportunitaStato();
   if(!st.pending) return null;
   const proposta=Object.assign({},st.pending,{status:"declined",declinedAbsoluteDay:stradaAbsDay()});
   st.pending=null;
   st.history.push({
     type:"declined",
     absoluteDay:stradaAbsDay(),
-    colpoId:proposta.colpoId,
-    bonusPct:proposta.bonusPct
+    opportunityId:proposta.id,
+    trigger:proposta.trigger||null,
+    colpoId:proposta.colpoId
   });
-  if(st.history.length>20) st.history.shift();
+  if(st.history.length>30) st.history.shift();
   return proposta;
 }
+function stradaRifiutaPropostaFabbrica(){ return stradaRifiutaOpportunita(); }
 
-function stradaAnnullaPropostaFabbrica(){
-  const st=stradaFabbricaLeadStato();
+function stradaAnnullaOpportunita(){
+  const st=stradaOpportunitaStato();
   if(!st.pending) return null;
   const proposta=st.pending;
   st.pending=null;
@@ -325,10 +461,11 @@ function stradaAnnullaPropostaFabbrica(){
     st.lastOfferAbsoluteDay=null;
   return proposta;
 }
+function stradaAnnullaPropostaFabbrica(){ return stradaAnnullaOpportunita(); }
 
-function stradaConsumaPropostaFabbrica(colpoId,successo){
-  const st=stradaFabbricaLeadStato();
-  const lead=stradaFabbricaLeadAttivo(colpoId);
+function stradaConsumaOpportunita(colpoId,successo){
+  const st=stradaOpportunitaStato();
+  const lead=stradaOpportunitaAttiva(colpoId);
   if(!lead) return null;
   const usata=Object.assign({},lead,{
     status:"consumed",
@@ -339,12 +476,26 @@ function stradaConsumaPropostaFabbrica(colpoId,successo){
   st.history.push({
     type:"consumed",
     absoluteDay:usata.consumedAbsoluteDay,
+    opportunityId:usata.id,
     colpoId:usata.colpoId,
-    bonusPct:usata.bonusPct,
-    success:usata.success
+    success:usata.success,
+    bonusPct:Number(usata.bonusPct||0),
+    chanceDelta:Number(usata.chanceDelta||0),
+    heatDelta:Number(successo?usata.successHeat:usata.failureHeat)||0,
+    repDelta:Number(successo?usata.successRep:usata.failureRep)||0
   });
-  if(st.history.length>20) st.history.shift();
+  if(st.history.length>30) st.history.shift();
   return usata;
+}
+function stradaConsumaPropostaFabbrica(colpoId,successo){
+  return stradaConsumaOpportunita(colpoId,successo);
+}
+
+function stradaChanceConOpportunita(colpo,approccio,lead){
+  return clamp(
+    stradaChance(colpo,approccio)+Number(lead&&lead.chanceDelta||0),
+    .06,.93
+  );
 }
 
 function stradaChance(colpo, approccio){
@@ -378,20 +529,27 @@ function stradaTenta(colpoId, approccioId){
 
   s.giroAvviato=true;
   G.energy -= colpo.energia;
-  const leadFabbrica = stradaFabbricaLeadAttivo(colpoId);
-  const leadLavoro = !leadFabbrica && window.ADF_WORK_EVENTS &&
+  const opportunita = stradaOpportunitaAttiva(colpoId);
+  const leadLavoro = !opportunita && window.ADF_WORK_EVENTS &&
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
-  const successo = Math.random() < stradaChance(colpo, approccio);
-  const leadUsato = leadFabbrica
-    ? stradaConsumaPropostaFabbrica(colpoId, successo)
+  const successo = Math.random() < stradaChanceConOpportunita(colpo,approccio,opportunita);
+  const leadUsato = opportunita
+    ? stradaConsumaOpportunita(colpoId, successo)
     : (leadLavoro && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeCrimeLead === "function"
       ? ADF_WORK_EVENTS.consumeCrimeLead(successo)
       : null);
   const moltiplicatoreLead = leadUsato ? (1 + Number(leadUsato.bonusPct || 0) / 100) : 1;
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
-  const rumoreLead = leadUsato ? Math.max(0, Number(leadUsato.extraHeat || 0)) : 0;
+  const rumoreLead = leadUsato
+    ? Number(leadUsato.source==="street-opportunity"
+        ? (successo ? leadUsato.successHeat : leadUsato.failureHeat)
+        : (leadUsato.extraHeat||0))
+    : 0;
+  const reputazioneLead = leadUsato && leadUsato.source==="street-opportunity"
+    ? Number(successo ? leadUsato.successRep : leadUsato.failureRep)||0
+    : 0;
   /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
      il suo peso — è il più rischioso dei sei eventi della settimana, e
      deve rendere in proporzione quando capita davvero quel giorno lì.
@@ -404,23 +562,32 @@ function stradaTenta(colpoId, approccioId){
     const grezzo = rnd(colpo.min, colpo.max) * approccio.guadagno * peso * moltiplicatoreLead;
     const pulito = Math.round(grezzo * .4), sporco = Math.round(grezzo * .6);
     G.money += pulito; s.sporchi += sporco;
-    s.rep = clamp(s.rep + 3 + colpo.difficolta * 6, 0, 100);
+    s.rep = clamp(s.rep + 3 + colpo.difficolta * 6 + reputazioneLead, 0, 100);
     s.heat = clamp(s.heat + rumore * .6 + rumoreLead, 0, 100);
     diarioBordo().colpi++;
-    const fonteLead = leadUsato && leadUsato.sourceLabel
-      ? "Dritta dal lavoro (" + leadUsato.sourceLabel + ")"
-      : "Dritta fuori dalla Fabbrica";
+    const fonteLead = leadUsato && leadUsato.source==="street-opportunity"
+      ? (leadUsato.titolo||"Opportunità della Strada")
+      : (leadUsato && leadUsato.sourceLabel
+        ? "Dritta dal lavoro (" + leadUsato.sourceLabel + ")"
+        : "Dritta");
     const notaLead = leadUsato
-      ? " <b>" + fonteLead + ": +" + Number(leadUsato.bonusPct || 0) +
-        "% sul guadagno, +" + rumoreLead + " attenzione.</b>"
+      ? " <b>" + fonteLead + ": " +
+        (Number(leadUsato.bonusPct||0)>=0?"+":"") + Number(leadUsato.bonusPct||0) +
+        "% guadagno, attenzione " + stradaSegno(rumoreLead) +
+        (reputazioneLead ? ", reputazione " + stradaSegno(reputazioneLead) : "") + ".</b>"
       : "";
     STRADA_SCENA = {k:"Com'è andata", titolo:"Andata bene", testo:"<b>" + colpo.n + "</b>: " + fmt(pulito) + " € in tasca, " +
         fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne." + notaLead,
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
     s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
+    if(reputazioneLead) s.rep=clamp(s.rep+reputazioneLead,0,100);
     const notaLeadFallita = leadUsato
-      ? " La dritta arrivata " + (leadUsato.sourceLabel ? "dal lavoro" : "fuori dalla Fabbrica") + " è bruciata."
+      ? (leadUsato.source==="street-opportunity"
+          ? " <b>" + (leadUsato.titolo||"L'opportunità") + " è bruciata: attenzione " +
+            stradaSegno(rumoreLead) +
+            (reputazioneLead ? ", reputazione " + stradaSegno(reputazioneLead) : "") + ".</b>"
+          : " La dritta arrivata dal lavoro è bruciata.")
       : "";
     if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
       s.uomini--;
@@ -1240,22 +1407,22 @@ function renderStColpi(){
   }
 
   centro.classList.remove("locked");
-  const leadFabbrica = stradaFabbricaLeadAttivo();
+  const leadIncontro = stradaOpportunitaAttiva();
   const leadLavoro = window.ADF_WORK_EVENTS &&
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
   griglia.innerHTML = STRADA_COLPI.map((c, i) => {
     const senzaEnergia = G.energy < c.energia;
-    const leadFabbricaQui = leadFabbrica && leadFabbrica.colpoId === c.id ? leadFabbrica : null;
-    /* Il runtime usa la dritta Fabbrica solo sul colpo per cui è nata;
-       sugli altri colpi, un eventuale lead da Buttafuori/Fattorino resta valido. */
-    const lead = leadFabbricaQui || leadLavoro;
+    const leadIncontroQui = leadIncontro && leadIncontro.colpoId === c.id ? leadIncontro : null;
+    /* L'opportunità dell'incontro vale solo per il colpo indicato; sugli altri
+       colpi un eventuale lead da Buttafuori/Fattorino continua a funzionare. */
+    const lead = leadIncontroQui || leadLavoro;
     const giorniLead = lead
       ? Math.max(1, Number(lead.expiresAbsoluteDay) - stradaAbsDay())
       : 0;
-    const fonteLead = leadFabbricaQui
-      ? "Dritta Fabbrica"
+    const fonteLead = leadIncontroQui
+      ? (leadIncontroQui.titolo||"Opportunità")
       : (lead && lead.sourceLabel ? "Dritta " + lead.sourceLabel : "Dritta lavoro");
     return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
@@ -1264,8 +1431,12 @@ function renderStColpi(){
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
         (lead
-          ? '<span class="stchip money">' + fonteLead + ' +' + Number(lead.bonusPct || 0) +
-            '% · ' + giorniLead + (giorniLead === 1 ? ' giorno' : ' giorni') + '</span>'
+          ? '<span class="stchip money">' + fonteLead + ' ' +
+            (Number(lead.bonusPct||0)>=0?'+':'') + Number(lead.bonusPct||0) + '% · ' +
+            (lead.source==="street-opportunity"
+              ? stradaSegnoPct(lead.chanceDelta) + ' riuscita · '
+              : '') +
+            giorniLead + (giorniLead === 1 ? ' giorno' : ' giorni') + '</span>'
           : '') +
       '</div><span class="go">→</span></button>';
   }).join("");
