@@ -10,6 +10,7 @@ const vm = require("node:vm");
 
 const ROOT = path.resolve(__dirname, "../..");
 const ACTIONS = path.join(ROOT, "js/game/actions.js");
+const LIFESTYLE = path.join(ROOT, "js/game/lifestyle.js");
 
 function helperLavoro(){
   const source = fs.readFileSync(ACTIONS, "utf8");
@@ -132,12 +133,36 @@ function simulaCarrieraPerfetta(cicli=13){
   return {pagaAnnua,finale:storia[storia.length-1],storia,G,r};
 }
 
+function costoLifestyleMassimo(){
+  const source=fs.readFileSync(LIFESTYLE,"utf8");
+  const start=source.indexOf("const LIFE =");
+  const end=source.indexOf("/* punto 63:",start);
+  if(start<0 || end<0) throw new Error("catalogo lifestyle non trovato");
+  const ctx={
+    G:{life:{casa:4,auto:4,look:3,uscite:3,crew:3}},
+    Number,Math,Array,Object,Set
+  };
+  vm.createContext(ctx);
+  vm.runInContext(source.slice(start,end),ctx);
+  return Number(vm.runInContext("lifeCost()",ctx));
+}
+
 function esegui(){
   const cinque=simulaFatica("5 turni ogni settimana",()=>5);
   const sei=simulaFatica("6 turni ogni settimana",()=>6);
   const sette=simulaFatica("7 turni ogni settimana",()=>7);
   const recupero=simulaFatica("12 settimane da 6, poi 5",w=>w<=12?6:5);
   const carriera=simulaCarrieraPerfetta(13);
+  const lifestyleMax=costoLifestyleMassimo();
+  const pagaTop=Number(carriera.finale.paga||0);
+  const economia={
+    lifestyleMassimoSettimanale:lifestyleMax,
+    costoMinimoSettimanaleMassimo:lifestyleMax+25,
+    pagaIngressoSettimana:220*5,
+    pagaTopSettimana:pagaTop*5,
+    pagaTopSestoGiorno:pagaTop*5+Math.round(pagaTop*1.30),
+    pagaTopSetteGiorniAutorizzati:pagaTop*5+Math.round(pagaTop*1.30)+Math.round(pagaTop*1.75)
+  };
 
   const controlli=[
     {nome:"5/5 non crea malus globale permanente",
@@ -149,7 +174,11 @@ function esegui(){
     {nome:"tornare a 5/5 recupera il sovraccarico",
       ok:recupero.finale.fatica<sei.finale.fatica},
     {nome:"carriera perfetta arriva al grado massimo senza crescita infinita",
-      ok:carriera.finale.ruolo==="capoturno" && carriera.finale.paga===456 && carriera.pagaAnnua===88520}
+      ok:carriera.finale.ruolo==="capoturno" && carriera.finale.paga===456 && carriera.pagaAnnua===88520},
+    {nome:"il 5/5 al grado massimo non finanzia da solo il lifestyle massimo",
+      ok:economia.pagaTopSettimana<economia.costoMinimoSettimanaleMassimo},
+    {nome:"il 6° giorno può colmare il gap ma passa dal sovraccarico",
+      ok:economia.pagaTopSestoGiorno>=economia.costoMinimoSettimanaleMassimo && sei.finale.fatica>=40}
   ];
 
   return {
@@ -165,7 +194,8 @@ function esegui(){
       pagaAnnua:carriera.pagaAnnua,
       finale:carriera.finale,
       tappe:carriera.storia.filter(x=>x.evento)
-    }
+    },
+    economia
   };
 }
 
@@ -181,6 +211,9 @@ function stampa(out){
     " · 7/7="+out.fatica.sette.finale.qualita.toFixed(3));
   console.log("Carriera perfetta: "+out.carriera.finale.ruolo+
     " · "+out.carriera.finale.paga+" €/turno · "+out.carriera.pagaAnnua+" € in 52 settimane");
+  console.log("Economia settimanale: 5/5 top "+out.economia.pagaTopSettimana+
+    " € · 6/7 top "+out.economia.pagaTopSestoGiorno+
+    " € · lifestyle massimo minimo "+out.economia.costoMinimoSettimanaleMassimo+" €");
 }
 
 if(require.main===module){
@@ -189,4 +222,4 @@ if(require.main===module){
   if(!out.ok) process.exitCode=1;
 }
 
-module.exports={simulaFatica,simulaCarrieraPerfetta,esegui,stampa};
+module.exports={simulaFatica,simulaCarrieraPerfetta,costoLifestyleMassimo,esegui,stampa};
