@@ -47,4 +47,12 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
 
   const srcReale = await editor.evaluate(el => el.src);
   expect(srcReale).toContain("/media/makehuman-mobile-v1/index.html?v=3");
+
+  /* Il relay finto non manda alcuna fase: se dopo 10 s compare questa frase,
+     il keepalive del documento principale ha attraversato DAVVERO lo stesso
+     listener usato dal watchdog di gioco-ingresso.js. */
+  await expect(page.locator("#preparo-fase")).toContainText(
+    "caricamento ancora in corso",
+    { timeout: 15000 }
+  );
 });

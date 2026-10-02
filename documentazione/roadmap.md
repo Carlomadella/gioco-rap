@@ -379,7 +379,9 @@ timer. Tetto mobile sempre a sei minuti. Il percorso desktop (`gioco-ingresso.js
 e runtime MakeHuman) resta invariato. In più c'è ora un test Playwright su Chromium
 touch 390×844 che verifica nel browser reale che `ADF_MAKEHUMAN_MOBILE` sia attivo e che
 il creator richieda davvero `media/makehuman-mobile-v1/index.html?v=3`, senza scaricare i
-145 MB. Resta la nuova prova su telefono reale prima di chiudere il punto.
+145 MB; lo stesso test lascia poi il relay muto e verifica che entro 15 s il keepalive
+top-level arrivi fino a «Preparo il tuo artista» con «caricamento ancora in corso». Resta
+la nuova prova su telefono reale prima di chiudere il punto.
 
 ### H · Los Angeles _(da fare)_
 
