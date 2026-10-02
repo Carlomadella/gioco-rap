@@ -61,7 +61,7 @@ test("Pizzeria: la schermata completa resta navigabile in landscape mobile", asy
   expect(layout.width).toBeLessThanOrEqual(layout.viewport+1);
 
   await page.locator(".lfwrap").evaluate(el=>{ el.scrollTop=el.scrollHeight; });
-  await expect(page.getByText("Grado attuale",{exact:true})).toBeVisible();
+  await expect(page.locator(".lfcareer-now span")).toHaveText("Ora");
 });
 
 test("Pizzeria: 24 servizi non diventano una raffica di popup o contatti musicali", async ({ page }) => {
