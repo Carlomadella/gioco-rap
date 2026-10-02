@@ -2081,9 +2081,12 @@ function stradaTentaPropostaFabbrica(roll,variantRoll){
   return stradaTentaOpportunita("fabbrica",roll,variantRoll);
 }
 
-function stradaAccettaOpportunita(){
+function stradaAccettaOpportunita(opportunityId){
   const st=stradaOpportunitaStato();
+  if((st.pendingChoices&&st.pendingChoices.length) || opportunityId)
+    stradaSelezionaOpportunita(opportunityId);
   if(!st.pending) return null;
+
   const persona=stradaPersonaDaId(st.pending.personId);
   if(persona) stradaRegistraInterazione(persona,"opportunity-accepted");
   const oggi=stradaAbsDay();
@@ -2093,6 +2096,7 @@ function stradaAccettaOpportunita(){
     expiresAbsoluteDay:oggi+Math.max(1,Number(st.pending.durataGiorni||7))
   });
   st.pending=null;
+  st.pendingChoices=[];
   st.active=lead;
   st.history.push({
     type:"accepted",
@@ -2111,44 +2115,55 @@ function stradaAccettaOpportunita(){
   if(st.history.length>30) st.history.shift();
   return Object.assign({},lead);
 }
-function stradaAccettaPropostaFabbrica(){ return stradaAccettaOpportunita(); }
+function stradaAccettaPropostaFabbrica(opportunityId){ return stradaAccettaOpportunita(opportunityId); }
 
 function stradaRifiutaOpportunita(){
   const st=stradaOpportunitaStato();
-  if(!st.pending) return null;
-  const persona=stradaPersonaDaId(st.pending.personId);
-  if(persona) stradaRegistraInterazione(persona,"opportunity-declined");
-  const proposta=Object.assign({},st.pending,{status:"declined",declinedAbsoluteDay:stradaAbsDay()});
+  const proposte=stradaOpportunitaPendenti();
+  if(!proposte.length) return null;
+
+  const oggi=stradaAbsDay();
+  for(const proposta of proposte){
+    const persona=stradaPersonaDaId(proposta.personId);
+    if(persona) stradaRegistraInterazione(persona,"opportunity-declined");
+    st.history.push({
+      type:"declined",
+      absoluteDay:oggi,
+      opportunityId:proposta.id,
+      trigger:proposta.trigger||null,
+      colpoId:proposta.colpoId,
+      personId:proposta.personId||null
+    });
+  }
+  while(st.history.length>30) st.history.shift();
   st.pending=null;
-  st.history.push({
-    type:"declined",
-    absoluteDay:stradaAbsDay(),
-    opportunityId:proposta.id,
-    trigger:proposta.trigger||null,
-    colpoId:proposta.colpoId
-  });
-  if(st.history.length>30) st.history.shift();
-  return proposta;
+  st.pendingChoices=[];
+  return proposte.map(x=>Object.assign({},x,{status:"declined",declinedAbsoluteDay:oggi}));
 }
 function stradaRifiutaPropostaFabbrica(){ return stradaRifiutaOpportunita(); }
 
 function stradaIgnoraOpportunita(){
   const st=stradaOpportunitaStato();
-  if(!st.pending) return null;
-  const proposta=Object.assign({},st.pending,{status:"ignored",ignoredAbsoluteDay:stradaAbsDay()});
-  const persona=stradaPersonaDaId(proposta.personId);
-  if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
+  const proposte=stradaOpportunitaPendenti();
+  if(!proposte.length) return null;
+
+  const oggi=stradaAbsDay();
+  for(const proposta of proposte){
+    const persona=stradaPersonaDaId(proposta.personId);
+    if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
+    st.history.push({
+      type:"ignored",
+      absoluteDay:oggi,
+      opportunityId:proposta.id,
+      trigger:proposta.trigger||null,
+      colpoId:proposta.colpoId,
+      personId:proposta.personId||null
+    });
+  }
+  while(st.history.length>30) st.history.shift();
   st.pending=null;
-  st.history.push({
-    type:"ignored",
-    absoluteDay:stradaAbsDay(),
-    opportunityId:proposta.id,
-    trigger:proposta.trigger||null,
-    colpoId:proposta.colpoId,
-    personId:proposta.personId||null
-  });
-  if(st.history.length>30) st.history.shift();
-  return proposta;
+  st.pendingChoices=[];
+  return proposte.map(x=>Object.assign({},x,{status:"ignored",ignoredAbsoluteDay:oggi}));
 }
 function stradaIgnoraPropostaFabbrica(){ return stradaIgnoraOpportunita(); }
 
@@ -2156,16 +2171,20 @@ function stradaIgnoraPropostaFabbrica(){ return stradaIgnoraOpportunita(); }
    giocatore non ha visto né ignorato nessuno, quindi la relazione non cambia. */
 function stradaAnnullaOpportunita(){
   const st=stradaOpportunitaStato();
-  if(!st.pending) return null;
-  const proposta=st.pending;
+  const proposte=stradaOpportunitaPendenti();
+  if(!proposte.length) return null;
+
+  const offeredDay=proposte[0].offeredAbsoluteDay;
   st.pending=null;
-  if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay)){
+  st.pendingChoices=[];
+  if(Number(st.lastOfferAbsoluteDay)===Number(offeredDay)){
     st.lastOfferAbsoluteDay=null;
     st.nextOfferAbsoluteDay=null;
-    if(Array.isArray(st.recentIds) && st.recentIds[0]===proposta.id)
-      st.recentIds.shift();
+    const ids=new Set(proposte.map(x=>x.id));
+    if(Array.isArray(st.recentIds))
+      st.recentIds=st.recentIds.filter(id=>!ids.has(id));
   }
-  return proposta;
+  return proposte.length===1 ? proposte[0] : proposte;
 }
 function stradaAnnullaPropostaFabbrica(){ return stradaAnnullaOpportunita(); }
 
