@@ -137,7 +137,29 @@ describe("Fabbrica × Strada", () => {
     expect(G.strada.fabbricaLead.active.colpoId).toBe("consegne");
   });
 
-  it("la Fabbrica non inventa una faccia criminale se nessun contatto reale del posto è collegato alla Strada",()=>{
+  it("un collega reale puo rivelare il suo lato Strada senza cambiare identita",()=>{
+    const {ctx,G}=contestoStrada({
+      gente:[{
+        id:"pf2",n:"Marco",ruolo:"collega",origine:"lavoro",origineLuogo:"fabbrica",
+        rel:2,pt:1,via:false,circoloSbloccato:false
+      }],
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]}
+      }
+    });
+    const proposta=vm.runInContext("stradaTentaPropostaFabbrica(0,0)",ctx);
+    expect(proposta).not.toBeNull();
+    expect(proposta.personId).toBe("pf2");
+    expect(proposta.persona).toBe("Marco");
+    expect(G.gente).toHaveLength(1);
+    expect(G.gente[0].ruolo).toBe("collega");
+    expect(G.gente[0].strada.known).toBe(true);
+    expect(G.gente[0].circoloSbloccato).toBe(true);
+  });
+
+  it("la Fabbrica non inventa una faccia criminale se nel posto non esiste nessun contatto reale",()=>{
     const {ctx}=contestoStrada({
       gente:[],
       strada:{
