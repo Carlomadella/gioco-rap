@@ -701,19 +701,22 @@ describe("cartellino presenze Fabbrica", () => {
     expect(sim).toContain("due sistemi disciplinari in conflitto");
   });
 
-  it("le dimissioni non azzerano i richiami, il rientro dopo licenziamento sì", () => {
+  it("dimissioni e licenziamento azzerano la progressione, ma il licenziamento conserva il blocco", () => {
     const ctx = {
       G:{
         year:1,week:6,day:1,
-        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        job:{id:"capoturno",place:"fabbrica",n:"Capoturno",pay:456,e:28},
         workplaces:{
           fabbrica:{
             contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
+            attendance:{ciclo:1,turni:[0,1,2,3,4]},
             career:{
-              reliability:55,cyclesCompleted:1,perfectCycles:0,perfectStreak:0,
-              cyclesInRole:1,perfectCyclesInRole:0,roleId:"operaio",roleLevel:0,
-              raisesByRole:{},payHistory:[],roleHistory:[],warnings:2,warningHistory:[],
-              dismissals:0,blockedUntilWeek:null,evaluations:[]
+              reliability:92,cyclesCompleted:8,perfectCycles:6,perfectStreak:3,
+              cyclesInRole:2,perfectCyclesInRole:2,roleId:"capoturno",roleLevel:3,
+              raisesByRole:{operaio:1,operaio_esperto:1,capolinea:1,capoturno:1},
+              payHistory:[{prima:422,dopo:456}],roleHistory:[{from:"capolinea",to:"capoturno"}],
+              warnings:2,warningHistory:[],weeklyEvaluations:[{absoluteWeek:5}],
+              dismissals:0,blockedUntilWeek:null,lastEvaluatedCycle:7,lastEvaluation:{},evaluations:[{}]
             }
           }
         }
@@ -724,13 +727,38 @@ describe("cartellino presenze Fabbrica", () => {
     vm.createContext(ctx);
     vm.runInContext(helperLavoro(), ctx);
 
-    vm.runInContext('lavoroTerminaContratto("fabbrica","dimissioni"); G.job={id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}; lavoroFirmaContratto("fabbrica",G.job);', ctx);
-    expect(vm.runInContext('lavoroCarriera("fabbrica").warnings', ctx)).toBe(2);
+    vm.runInContext('lavoroTerminaContratto("fabbrica","dimissioni")', ctx);
+    let c=vm.runInContext('lavoroCarriera("fabbrica")',ctx);
+    expect(c.reliability).toBe(50);
+    expect(c.cyclesCompleted).toBe(0);
+    expect(c.roleId).toBeNull();
+    expect(c.raisesByRole).toEqual({});
+    expect(c.warnings).toBe(0);
+    expect(ctx.G.workplaces.fabbrica.attendance.turni).toEqual([]);
+    expect(ctx.G.workplaces.fabbrica.contractHistory[0].careerAtEnd.roleId).toBe("capoturno");
+    expect(ctx.G.workplaces.fabbrica.contractHistory[0].careerAtEnd.pay).toBe(456);
 
-    vm.runInContext('lavoroTerminaContratto("fabbrica","licenziamento"); lavoroCarriera("fabbrica").blockedUntilWeek=5;', ctx);
-    ctx.G.week = 6;
-    vm.runInContext('G.job={id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40}; lavoroFirmaContratto("fabbrica",G.job);', ctx);
-    expect(vm.runInContext('lavoroCarriera("fabbrica").warnings', ctx)).toBe(0);
+    ctx.G.job={id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40};
+    vm.runInContext('lavoroFirmaContratto("fabbrica",G.job)',ctx);
+    c=vm.runInContext('lavoroCarriera("fabbrica")',ctx);
+    expect(c.roleId).toBe("operaio");
+    expect(c.raisesByRole).toEqual({});
+    expect(vm.runInContext('lavoroAumentoDisponibile("fabbrica")',ctx)).toBe(false);
+
+    /* Simula un vero licenziamento da una nuova carriera: progressione azzerata,
+       ma il blocco disciplinare deve sopravvivere. */
+    c.reliability=20;
+    c.cyclesCompleted=4;
+    c.raisesByRole={operaio:1};
+    c.warnings=2;
+    vm.runInContext('lavoroLicenzia("fabbrica","assenze ripetute")',ctx);
+    c=vm.runInContext('lavoroCarriera("fabbrica")',ctx);
+    expect(c.reliability).toBe(50);
+    expect(c.cyclesCompleted).toBe(0);
+    expect(c.raisesByRole).toEqual({});
+    expect(c.warnings).toBe(0);
+    expect(c.dismissals).toBe(1);
+    expect(vm.runInContext('lavoroBloccoRiassunzione("fabbrica").active',ctx)).toBe(true);
   });
 
   it("contratto e UI espongono richiami e blocco di riassunzione", () => {
@@ -1182,16 +1210,22 @@ describe("cartellino presenze Fabbrica", () => {
     expect(week).toBeGreaterThan(cycle);
   });
 
-  it("le dimissioni chiudono il contratto ma conservano storico e carriera", () => {
+  it("le dimissioni archiviano la vecchia carriera e ripuliscono il rapporto corrente", () => {
     const ctx = {
       G:{
         year:1,week:2,day:3,
-        job:{id:"operaio",place:"fabbrica"},
+        job:{id:"operaio_esperto",place:"fabbrica",n:"Operaio esperto",pay:275,e:36},
         workplaces:{
           fabbrica:{
             contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"operaio"},
             attendance:{ciclo:0,turni:[0,1,2]},
-            career:{reliability:70,cyclesCompleted:2,perfectCycles:1,perfectStreak:1,evaluations:[]}
+            career:{
+              reliability:70,cyclesCompleted:2,perfectCycles:1,perfectStreak:1,
+              cyclesInRole:1,perfectCyclesInRole:1,roleId:"operaio_esperto",roleLevel:1,
+              raisesByRole:{operaio:1},payHistory:[],roleHistory:[],warnings:1,
+              warningHistory:[],weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,
+              lastEvaluatedCycle:1,lastEvaluation:{},evaluations:[]
+            }
           }
         }
       },
@@ -1203,11 +1237,17 @@ describe("cartellino presenze Fabbrica", () => {
 
     vm.runInContext('lavoroTerminaContratto("fabbrica", "dimissioni")', ctx);
 
-    expect(ctx.G.workplaces.fabbrica.contract).toBeNull();
-    expect(ctx.G.workplaces.fabbrica.contractHistory).toHaveLength(1);
-    expect(ctx.G.workplaces.fabbrica.contractHistory[0].endReason).toBe("dimissioni");
-    expect(ctx.G.workplaces.fabbrica.attendance.turni).toEqual([0,1,2]);
-    expect(ctx.G.workplaces.fabbrica.career.reliability).toBe(70);
+    const sede=ctx.G.workplaces.fabbrica;
+    expect(sede.contract).toBeNull();
+    expect(sede.contractHistory).toHaveLength(1);
+    expect(sede.contractHistory[0].endReason).toBe("dimissioni");
+    expect(sede.contractHistory[0].careerAtEnd.roleId).toBe("operaio_esperto");
+    expect(sede.contractHistory[0].careerAtEnd.pay).toBe(275);
+    expect(sede.attendance.turni).toEqual([]);
+    expect(sede.career.reliability).toBe(50);
+    expect(sede.career.cyclesCompleted).toBe(0);
+    expect(sede.career.raisesByRole).toEqual({});
+    expect(sede.career.warnings).toBe(0);
   });
 
   it("salva un esito strutturato del turno e gli collega l'evento di fine turno", () => {
