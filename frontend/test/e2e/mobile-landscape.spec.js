@@ -35,8 +35,8 @@ test("landscape mobile: landing termina alla barra e mostra copyright minimale",
   await page.goto("/pagine/landing.html");
 
   await expect(page.locator("#s-menu > .menu")).toBeHidden();
-  await expect(page.locator(".land-mobile-copy")).toBeVisible();
-  await expect(page.locator(".land-mobile-copy")).toHaveText("© 2026 La Fame Studio");
+  const copyright = await page.locator(".land-dock").evaluate(el => getComputedStyle(el, "::after").content);
+  expect(copyright).toContain("© 2026 La Fame Studio");
 
   const continua = page.locator("#m-play");
   const dock = page.locator(".land-dock");
