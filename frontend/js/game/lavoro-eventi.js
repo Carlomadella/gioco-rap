@@ -1673,8 +1673,6 @@ function socialPromoReaction(p,song,st,roll){
   let outcome="cold", deltaRel=0, deltaRete=0, text="";
   if(score>=76){
     outcome="good"; deltaRel=2; deltaRete=.2;
-    if(p.ruolo==="promoter")
-      text:"";
     text=p.ruolo==="promoter"
       ? "«<b>"+song.t+"</b>» lo ascolta fino alla fine. «Questa ha senso. Non ti prometto serate, ma questa me la ricordo.»"
       : p.ruolo==="fonico"
