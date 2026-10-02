@@ -2609,15 +2609,76 @@ function adfStreetIntroAfterAction(a){
 
 function adfStreetOpportunityDecision(proposta){
   if(!proposta) return;
-  const termini=typeof stradaDescriviOpportunita==="function"
-    ? stradaDescriviOpportunita(proposta)
+  const pendenti=typeof stradaOpportunitaPendenti==="function"
+    ? stradaOpportunitaPendenti()
+    : [proposta];
+  const scelte=pendenti.length ? pendenti : [proposta];
+
+  const terminiDi=p=>typeof stradaDescriviOpportunita==="function"
+    ? stradaDescriviOpportunita(p)
     : "";
+  const risultatoLead=lead=>{
+    if(!lead) return {t:"La proposta non è più disponibile.",c:""};
+    let colpo=lead.colpoId||"indicato";
+    try{
+      if(typeof STRADA_COLPI!=="undefined"){
+        const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
+        if(c) colpo=c.n;
+      }
+    }catch(_){}
+    return {
+      t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
+        colpo+"</b> nella Strada finché non la usi o scade.",
+      c:"good"
+    };
+  };
+
+  if(scelte.length>1){
+    const righe=scelte.map(p=>{
+      const termini=terminiDi(p);
+      return "<b>"+(p.persona||"Un contatto")+" · "+(p.titolo||"Proposta")+"</b><br>"+
+        (p.pitch||"Ti spiega cosa vuole.")+
+        (termini ? "<br><span>"+termini+"</span>" : "");
+    }).join("<br><br>");
+
+    showEvent({
+      k:"Strada · Più porte aperte",
+      t:"Adesso puoi scegliere chi ascoltare",
+      d:"Non è una promozione e nessuno ti ha dato un titolo. Semplicemente, ormai più di una persona pensa a te quando c'è qualcosa da fare.<br><br>"+
+        righe+
+        "<br><br>Puoi prenderne <b>una sola</b>: scegliere una proposta equivale a rispondere alle altre, non a ignorarle.",
+      annulla(){
+        if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
+      },
+      opts:[
+        ...scelte.map(p=>({
+          n:"Accetta · "+(p.persona||p.titolo||"Proposta"),
+          d:(p.titolo||"Proposta")+" · "+terminiDi(p),
+          run(){
+            const lead=typeof stradaAccettaPropostaFabbrica==="function"
+              ? stradaAccettaPropostaFabbrica(p.id)
+              : null;
+            return risultatoLead(lead);
+          }
+        })),
+        {n:"Rifiuta entrambe",d:"Rispondi no: nessun ghosting verso i contatti",run(){
+          if(typeof stradaRifiutaPropostaFabbrica==="function")
+            stradaRifiutaPropostaFabbrica();
+          return {t:"Hai risposto a entrambe le proposte e hai lasciato perdere.",c:""};
+        }}
+      ]
+    });
+    return;
+  }
+
+  const singola=scelte[0]||proposta;
+  const termini=terminiDi(singola);
   showEvent({
     k:"Strada · Proposta",
-    t:proposta.titolo||"Una proposta",
-    d:"<b>"+(proposta.persona||"La persona")+":</b> "+(proposta.pitch||"Ti spiega cosa vuole.")+
+    t:singola.titolo||"Una proposta",
+    d:"<b>"+(singola.persona||"La persona")+":</b> "+(singola.pitch||"Ti spiega cosa vuole.")+
       (termini ? "<br><br><b>Se accetti:</b> "+termini+"." : "")+
-      "<br><br>L'offerta resta valida per <b>"+Number(proposta.durataGiorni||7)+" giorni</b>.",
+      "<br><br>L'offerta resta valida per <b>"+Number(singola.durataGiorni||7)+" giorni</b>.",
     annulla(){
       if(typeof stradaIgnoraPropostaFabbrica==="function")
         stradaIgnoraPropostaFabbrica();
@@ -2625,21 +2686,9 @@ function adfStreetOpportunityDecision(proposta){
     opts:[
       {n:"Accetta",d:termini||"Ti prendi il rischio e l'occasione",run(){
         const lead=typeof stradaAccettaPropostaFabbrica==="function"
-          ? stradaAccettaPropostaFabbrica()
+          ? stradaAccettaPropostaFabbrica(singola.id)
           : null;
-        if(!lead) return {t:"La proposta non è più disponibile.",c:""};
-        let colpo=lead.colpoId||"indicato";
-        try{
-          if(typeof STRADA_COLPI!=="undefined"){
-            const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
-            if(c) colpo=c.n;
-          }
-        }catch(_){}
-        return {
-          t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
-            colpo+"</b> nella Strada finché non la usi o scade.",
-          c:"good"
-        };
+        return risultatoLead(lead);
       }},
       {n:"Rifiuta",d:"Nessun effetto: lasci perdere l'occasione",run(){
         if(typeof stradaRifiutaPropostaFabbrica==="function")
