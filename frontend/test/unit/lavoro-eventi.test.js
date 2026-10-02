@@ -83,7 +83,7 @@ describe("famiglie eventi lavoro", () => {
   it("espone anche la famiglia di eventi legata alla responsabilità del ruolo", () => {
     const env=ambiente();
     expect(Object.keys(env.ctx.ADF_WORK_EVENTS.families)).toEqual([
-      "discipline","career","overtime","colleague","role","factory",
+      "discipline","career","overtime","colleague","social","role","factory",
       "music","crime","conflict","physical"
     ]);
   });
@@ -142,7 +142,7 @@ describe("famiglie eventi lavoro", () => {
     const s=env.G.workplaces.fabbrica.workEvents;
     const shown=s.history.filter(x =>
       x.status==="shown" &&
-      ["factory","colleague","role","music","physical","crime"].includes(x.family)
+      ["factory","colleague","social","role","music","physical","crime"].includes(x.family)
     );
     const perWeek={};
     for(const row of shown) perWeek[row.week]=(perWeek[row.week]||0)+1;
