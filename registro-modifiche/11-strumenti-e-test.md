@@ -6,6 +6,38 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6890fd99 -->
+## 02/10/26, 22:40 — feature/strada-punto7-pool-colpi → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `6890fd99`
+
+### Cosa è entrato
+
+- `08fe838a` — test(regressioni): proteggi pool e categorie dei colpi — **mycolbraga**
+- `aac2d699` — fix(test): carica le categorie insieme al pool Strada — **mycolbraga**
+- `c1fb9903` — chore(frontend): aggiorna cache per pool colpi dinamico — **mycolbraga**
+- `4a070db3` — chore(strada): chiarisci la rotazione giornaliera in Provincia — **mycolbraga**
+- `e0ace6fa` — test(strada): copri pool categorie e rotazione dei colpi — **mycolbraga**
+- `f7546a50` — feat(strada-ui): mostra quattro offerte giornaliere con categoria — **mycolbraga**
+- `7950eb0d` — feat(strada): applica categorie a rischio, chance, resa e reputazione — **mycolbraga**
+- `6c96372d` — feat(strada): ruota quattro offerte criminali al giorno senza forzare categorie — **mycolbraga**
+- `489162e0` — feat(strada): espandi il pool Provincia e aggiungi categorie di colpo — **mycolbraga**
+- `4820b13b` — feat(strada): aggiungi stato giornaliero delle offerte criminali — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Aggiunto:** `frontend/test/unit/strada-colpi-pool.test.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:7d7fc52e -->
 ## 02/10/26, 22:21 — feature/strada-punto6-coperture → main
 
