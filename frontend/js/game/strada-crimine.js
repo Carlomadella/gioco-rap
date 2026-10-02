@@ -2218,6 +2218,168 @@ function stradaConsumaPropostaFabbrica(colpoId,successo){
   return stradaConsumaOpportunita(colpoId,successo);
 }
 
+/* Punto 11: quando la rete pesa davvero, il giocatore smette di essere solo
+   destinatario di lavori. Prima gli chiedono "hai un nome?"; più avanti può
+   essere lui a far incontrare due persone. Anche qui nessun grado formale. */
+const STRADA_EVENTI_RETE = Object.freeze({
+  nome:Object.freeze({chance:.06,cooldownGiorni:21}),
+  ponte:Object.freeze({chance:.045,cooldownGiorni:28})
+});
+
+function stradaEventoReteStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.reteInfluenza || typeof s.reteInfluenza!=="object"){
+    s.reteInfluenza={
+      lastCheckAbsoluteDay:null,
+      nextEventAbsoluteDay:null,
+      pending:null,
+      history:[],
+      connectionsMade:0
+    };
+  }
+  const st=s.reteInfluenza;
+  if(!Array.isArray(st.history)) st.history=[];
+  if(!Number.isFinite(Number(st.connectionsMade))) st.connectionsMade=0;
+  st.connectionsMade=Math.max(0,Math.floor(Number(st.connectionsMade)||0));
+  return st;
+}
+
+function stradaReteRoll(roll){
+  return Number.isFinite(Number(roll))
+    ? Math.max(0,Math.min(.999999,Number(roll)))
+    : Math.random();
+}
+
+function stradaTentaEventoRete(roll,variantRoll){
+  if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
+  if(typeof stradaHaTrapPhone==="function" && !stradaHaTrapPhone()) return null;
+
+  const cap=stradaCapacitaRete();
+  const mode=cap.creaPonte ? "bridge" : cap.richiestaNome ? "ask-name" : null;
+  if(!mode) return null;
+
+  const st=stradaEventoReteStato();
+  if(st.pending) return null;
+  const oggi=stradaAbsDay();
+  if(Number(st.lastCheckAbsoluteDay)===oggi) return null;
+  if(st.nextEventAbsoluteDay!=null && oggi<Number(st.nextEventAbsoluteDay)) return null;
+  st.lastCheckAbsoluteDay=oggi;
+
+  const cfg=mode==="bridge" ? STRADA_EVENTI_RETE.ponte : STRADA_EVENTI_RETE.nome;
+  if(stradaReteRoll(roll)>=Number(cfg.chance||0)) return null;
+
+  const attivi=stradaContattiAttivi().slice().sort((a,b)=>
+    stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
+    Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0)
+  );
+  const rv=stradaReteRoll(variantRoll);
+
+  if(mode==="ask-name"){
+    if(attivi.length<3) return null;
+    const requester=attivi[Math.floor(rv*attivi.length)] || attivi[0];
+    const candidati=attivi.filter(p=>p.id!==requester.id)
+      .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a))
+      .slice(0,3);
+    if(candidati.length<2) return null;
+    st.pending={
+      mode,
+      requesterId:requester.id,
+      requesterName:requester.n,
+      candidateIds:candidati.map(p=>p.id),
+      candidateNames:candidati.map(p=>p.n),
+      createdAbsoluteDay:oggi
+    };
+  }else{
+    const fidati=attivi.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+    if(fidati.length<2) return null;
+    const primo=Math.floor(rv*fidati.length);
+    const a=fidati[primo] || fidati[0];
+    const b=fidati[(primo+1)%fidati.length];
+    if(!a || !b || a.id===b.id) return null;
+    st.pending={
+      mode,
+      personAId:a.id,personAName:a.n,
+      personBId:b.id,personBName:b.n,
+      createdAbsoluteDay:oggi
+    };
+  }
+
+  st.nextEventAbsoluteDay=oggi+Number(cfg.cooldownGiorni||21);
+  return Object.assign({},st.pending);
+}
+
+function stradaRisolviEventoRete(personId){
+  const st=stradaEventoReteStato();
+  const p=st.pending;
+  if(!p) return {ok:false,reason:"Non c'è nessuna richiesta di rete aperta."};
+  const oggi=stradaAbsDay();
+
+  if(p.mode==="ask-name"){
+    const requester=stradaPersonaDaId(p.requesterId);
+    const candidato=(p.candidateIds||[]).includes(personId)
+      ? stradaPersonaDaId(personId)
+      : null;
+    if(!stradaRelazioneDisponibile(requester) || !stradaRelazioneDisponibile(candidato))
+      return {ok:false,reason:"La rete è cambiata prima che riuscissi a fare il nome."};
+
+    stradaModificaFiducia(requester,2,"rete-nome-dato");
+    stradaModificaFiducia(candidato,2,"rete-presentato");
+    stradaAggiungiFavore(requester,1,"rete-nome-dato");
+    st.connectionsMade++;
+    st.history.push({
+      type:"name-given",absoluteDay:oggi,
+      requesterId:requester.id,personId:candidato.id
+    });
+    st.pending=null;
+    if(st.history.length>20) st.history.shift();
+    return {ok:true,mode:p.mode,requester:requester.n,persona:candidato.n};
+  }
+
+  if(p.mode==="bridge"){
+    const a=stradaPersonaDaId(p.personAId), b=stradaPersonaDaId(p.personBId);
+    if(!stradaRelazioneDisponibile(a) || !stradaRelazioneDisponibile(b))
+      return {ok:false,reason:"Uno dei due contatti non è più raggiungibile."};
+
+    stradaModificaFiducia(a,3,"rete-ponte");
+    stradaModificaFiducia(b,3,"rete-ponte");
+    stradaAggiungiFavore(a,1,"rete-ponte");
+    stradaAggiungiFavore(b,1,"rete-ponte");
+    st.connectionsMade++;
+    st.history.push({
+      type:"bridge-made",absoluteDay:oggi,
+      personAId:a.id,personBId:b.id
+    });
+    st.pending=null;
+    if(st.history.length>20) st.history.shift();
+    return {ok:true,mode:p.mode,personaA:a.n,personaB:b.n};
+  }
+
+  return {ok:false,reason:"Richiesta di rete non riconosciuta."};
+}
+
+function stradaRifiutaEventoRete(){
+  const st=stradaEventoReteStato();
+  if(!st.pending) return null;
+  const p=Object.assign({},st.pending,{status:"declined",closedAbsoluteDay:stradaAbsDay()});
+  st.history.push({
+    type:"declined",mode:p.mode,absoluteDay:stradaAbsDay(),
+    requesterId:p.requesterId||null,
+    personAId:p.personAId||null,personBId:p.personBId||null
+  });
+  if(st.history.length>20) st.history.shift();
+  st.pending=null;
+  return p;
+}
+
+function stradaAnnullaEventoRete(){
+  const st=stradaEventoReteStato();
+  if(!st.pending) return null;
+  const p=st.pending;
+  st.pending=null;
+  st.nextEventAbsoluteDay=null;
+  return p;
+}
+
 function stradaChanceConOpportunita(colpo,approccio,lead,personaSquadra,preparazione){
   return clamp(
     stradaChance(colpo,approccio,personaSquadra,preparazione)+Number(lead&&lead.chanceDelta||0),
