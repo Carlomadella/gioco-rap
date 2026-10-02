@@ -42,6 +42,12 @@ const CFG = Object.freeze({
     bonusPct:15,
     extraHeat:2,
     durataGiorni:7
+  }),
+  pacing:Object.freeze({
+    /* Gli eventi incidentali devono dare vita al turno, non trasformarlo in
+       una roulette di popup. Tre giorni di calendario fra due scene automatiche
+       significano in pratica circa 1–2 eventi a settimana su un 5/5. */
+    incidentalGapDays:3
   })
 });
 
@@ -63,6 +69,15 @@ const FAMILIES = Object.freeze({
 
 const MUSIC_AGENDA_IDS = new Set(["live","free","sala","promo"]);
 const CRIME_JOBS = new Set(["buttafuori","fattorino"]);
+
+/* Le famiglie automatiche dopo turno non hanno una priorità fissa. La
+   rotazione impedisce che "musica" o "ruolo", solo perché controllate prima,
+   facciano sparire sistematicamente colleghi o stanchezza. Carriera,
+   disciplina, straordinari e conflitti Agenda restano fuori: sono conseguenze
+   esplicite del gioco e non random encounter. */
+const INCIDENTAL_FAMILIES = Object.freeze([
+  "factory","colleague","role","music","physical","crime"
+]);
 let bypassConflict = null;
 
 function nclamp(v,min,max){
@@ -105,6 +120,10 @@ function state(job){
   const s=sede.workEvents;
   if(!s.lastFamilyDay || typeof s.lastFamilyDay!=="object") s.lastFamilyDay={};
   if(!Array.isArray(s.history)) s.history=[];
+  if(!Array.isArray(s.incidentalRecent)) s.incidentalRecent=[];
+  if(!Number.isInteger(s.incidentalCursor) || s.incidentalCursor<0 ||
+     s.incidentalCursor>=INCIDENTAL_FAMILIES.length)
+    s.incidentalCursor=absDay()%INCIDENTAL_FAMILIES.length;
   return s;
 }
 
@@ -113,6 +132,34 @@ function familyReady(s,family){
   const cd=Number(CFG.cooldown[family]||0);
   const last=Number(s.lastFamilyDay[family]);
   return !Number.isFinite(last) || absDay()-last>=cd;
+}
+
+function incidentalReady(s){
+  if(!s) return false;
+  const last=Number(s.lastIncidentalDay);
+  return !Number.isFinite(last) ||
+    absDay()-last>=Number(CFG.pacing.incidentalGapDays||0);
+}
+
+function incidentalOrder(s){
+  const n=INCIDENTAL_FAMILIES.length;
+  const start=Number.isInteger(s&&s.incidentalCursor)
+    ? ((s.incidentalCursor%n)+n)%n
+    : absDay()%n;
+  const out=[];
+  for(let i=0;i<n;i++) out.push(INCIDENTAL_FAMILIES[(start+i)%n]);
+  return {start,order:out};
+}
+
+function markIncidental(s,family){
+  if(!s) return;
+  const idx=INCIDENTAL_FAMILIES.indexOf(family);
+  s.lastIncidentalDay=absDay();
+  s.lastIncidentalFamily=family;
+  s.incidentalCursor=idx>=0 ? (idx+1)%INCIDENTAL_FAMILIES.length : 0;
+  s.incidentalRecent.unshift({family,absoluteDay:absDay()});
+  if(s.incidentalRecent.length>8) s.incidentalRecent.length=8;
+  try{ if(typeof save==="function") save(); }catch(_){}
 }
 
 function record(s,family,data){
@@ -1436,15 +1483,34 @@ function afterShift(payload,rolls){
   rolls=rolls||{};
   const r=name => Number.isFinite(Number(rolls[name])) ? Number(rolls[name]) : Math.random();
 
+  /* Carriera prima di tutto: è una proposta guadagnata dal giocatore, non
+     consuma né rispetta il pacing degli incontri casuali. */
   const career=careerCandidate(job);
   if(career && showCareer(job,s,career)) return true;
-  if(showMusic(job,s,r("music"))) return true;
-  if(showFactoryRole(job,s,r("role"))) return true;
-  if(showFactoryFloor(job,s,r("factory"))) return true;
-  if(showCrime(job,s,r("crime"))) return true;
-  if(showColleague(job,s,r("colleague"))) return true;
-  if(showPhysical(job,s,r("physical"))) return true;
 
+  if(!incidentalReady(s)) return false;
+
+  const handlers={
+    music:()=>showMusic(job,s,r("music")),
+    role:()=>showFactoryRole(job,s,r("role")),
+    factory:()=>showFactoryFloor(job,s,r("factory")),
+    crime:()=>showCrime(job,s,r("crime")),
+    colleague:()=>showColleague(job,s,r("colleague")),
+    physical:()=>showPhysical(job,s,r("physical"))
+  };
+  const giro=incidentalOrder(s);
+  for(let i=0;i<giro.order.length;i++){
+    const family=giro.order[i];
+    const shown=handlers[family]();
+    if(shown){
+      markIncidental(s,family);
+      return true;
+    }
+  }
+
+  /* Anche una giornata senza popup fa ruotare chi viene controllato per primo
+     al prossimo turno: nessuna famiglia possiede permanentemente la corsia 1. */
+  s.incidentalCursor=(giro.start+1)%INCIDENTAL_FAMILIES.length;
   return false;
 }
 
@@ -1467,7 +1533,15 @@ window.ADF_WORK_EVENTS=Object.freeze({
       key:workKey(G.job),
       conflict:conflictForShift(),
       musicLead:activeLead("musicLead"),
-      crimeLead:activeLead("crimeLead")
+      crimeLead:activeLead("crimeLead"),
+      pacing:{
+        ready:incidentalReady(state(G.job)),
+        gapDays:Number(CFG.pacing.incidentalGapDays||0),
+        lastDay:state(G.job)&&state(G.job).lastIncidentalDay,
+        lastFamily:state(G.job)&&state(G.job).lastIncidentalFamily,
+        cursor:state(G.job)&&state(G.job).incidentalCursor,
+        recent:state(G.job)&&state(G.job).incidentalRecent.slice()
+      }
     };
   }
 });
