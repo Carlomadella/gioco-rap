@@ -110,6 +110,113 @@ describe("famiglie eventi lavoro", () => {
       .toBeGreaterThanOrEqual(3);
   });
 
+  it("limita gli eventi incidentali a circa due per settimana e ruota le famiglie", () => {
+    const env=ambiente({
+      random:0,
+      G:{
+        year:1,week:1,day:1,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{},
+        gente:[{
+          id:"m1",n:"Mauri",ruolo:"promoter",origineLuogo:"fabbrica",
+          numero:true,via:false,pt:0,rel:1
+        }],
+        skills:{rete:0},wellbeing:80,lucidita:80,shifts:4,
+        strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id)
+      }
+    });
+    const rolls={music:0,role:0,factory:0,crime:0,colleague:0,physical:0};
+
+    for(let week=1;week<=4;week++){
+      for(const day of [1,2,3,4,5]){
+        env.G.week=week;
+        env.G.day=day;
+        env.ctx.ADF_WORK_EVENTS.afterShift({},rolls);
+      }
+    }
+
+    const s=env.G.workplaces.fabbrica.workEvents;
+    const shown=s.history.filter(x =>
+      x.status==="shown" &&
+      ["factory","colleague","role","music","physical","crime"].includes(x.family)
+    );
+    const perWeek={};
+    for(const row of shown) perWeek[row.week]=(perWeek[row.week]||0)+1;
+
+    expect(shown).toHaveLength(8);
+    expect(Object.values(perWeek).every(n=>n<=2)).toBe(true);
+    expect(new Set(shown.map(x=>x.family)).size).toBeGreaterThanOrEqual(5);
+    expect(s.incidentalRecent).toHaveLength(8);
+    expect(env.ctx.ADF_WORK_EVENTS.debug().pacing.gapDays).toBe(3);
+  });
+
+  it("il cooldown globale blocca i popup casuali nei due giorni successivi", () => {
+    const env=ambiente({
+      random:0,
+      G:{
+        year:1,week:1,day:1,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:70,lucidita:70,shifts:1,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id)
+      }
+    });
+    const rolls={music:0,role:0,factory:0,crime:0,colleague:0,physical:0};
+
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},rolls)).toBe(true);
+    const prima=env.shown.length;
+    expect(env.G.workplaces.fabbrica.workEvents.lastIncidentalDay).toBe(1);
+
+    env.G.day=2;
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},rolls)).toBe(false);
+    env.G.day=3;
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},rolls)).toBe(false);
+    expect(env.shown).toHaveLength(prima);
+
+    env.G.day=4;
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},rolls)).toBe(true);
+    expect(env.shown).toHaveLength(prima+1);
+  });
+
+  it("carriera e disciplina non vengono soffocate dal pacing degli eventi casuali", () => {
+    const env=ambiente({
+      random:0,
+      G:{
+        year:1,week:1,day:1,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{},gente:[],skills:{rete:0},
+        wellbeing:70,lucidita:70,shifts:1,strada:{giroAvviato:false}
+      },
+      extra:{
+        lavoroLuogo:job => job && job.place,
+        lavoroReteChiave:job => job && (job.place||job.id)
+      }
+    });
+    const rolls={music:0,role:0,factory:0,crime:0,colleague:0,physical:0};
+
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},rolls)).toBe(true);
+    env.G.day=2;
+
+    env.ctx.lavoroCarrieraDef=()=>({});
+    env.ctx.lavoroAumentoDisponibile=()=>true;
+    env.ctx.lavoroPromozioneDisponibile=()=>false;
+    expect(env.ctx.ADF_WORK_EVENTS.afterShift({},rolls)).toBe(true);
+    expect(env.shown.at(-1).t).toContain("aumento");
+
+    env.ctx.ADF_WORK_EVENTS.onDiscipline("fabbrica",{
+      eligible:true,dismissed:false,warningAdded:1,absences:3,
+      warningsAfter:1,reliabilityDelta:-10
+    });
+    expect(env.notifications.at(-1).title).toBe("Richiamo formale");
+  });
+
   it("gli straordinari esistenti entrano nella stessa storia persistente", () => {
     const env=ambiente({
       G:{
@@ -356,7 +463,10 @@ describe("famiglie eventi lavoro", () => {
       G:{
         year:1,week:10,day:3,
         job:{id:"capoturno",place:"fabbrica",n:"Capoturno",pay:330,e:28},
-        workplaces:{},gente:[],skills:{rete:0},wellbeing:70,lucidita:60,shifts:2,
+        workplaces:{fabbrica:{workEvents:{
+          lastFamilyDay:{},history:[],musicLead:null,crimeLead:null,
+          incidentalRecent:[],incidentalCursor:2
+        }}},gente:[],skills:{rete:0},wellbeing:70,lucidita:60,shifts:2,
         strada:{giroAvviato:false}
       },
       extra:{
@@ -723,7 +833,7 @@ describe("famiglie eventi lavoro", () => {
     expect(strada).toContain("ADF_WORK_EVENTS.consumeCrimeLead(successo)");
     expect(strada).toContain('"Dritta " + lead.sourceLabel');
     expect(eventi).toContain("ADF_WORK_EVENTS.crimeLeadActive()) return false");
-    expect(html).toContain('js/game/lavoro-eventi.js?v=7');
+    expect(html).toContain('js/game/lavoro-eventi.js?v=8');
     expect(famepedia).toContain("Quando il lavoro si scontra con la musica");
   });
 });
