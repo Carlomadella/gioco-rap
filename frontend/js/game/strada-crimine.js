@@ -99,7 +99,13 @@ const STRADA_FABBRICA_LEAD = Object.freeze({
   trigger:"fabbrica"
 });
 const STRADA_OPPORTUNITA_TRIGGER = Object.freeze({
-  fabbrica:STRADA_FABBRICA_LEAD
+  fabbrica:STRADA_FABBRICA_LEAD,
+  mondo:Object.freeze({
+    chance:.05,
+    cooldownGiorni:10,
+    durataGiorni:7,
+    trigger:"mondo"
+  })
 });
 
 /* Pool di opportunità criminali. Non aggiunge nuovi metodi operativi nel mondo
@@ -309,6 +315,10 @@ function stradaOpportunitaStato(){
   const st=s.crimeOpportunity;
   if(!Array.isArray(st.history)) st.history=[];
   if(!Array.isArray(st.recentIds)) st.recentIds=[];
+  if(!st.lastCheckByTrigger || typeof st.lastCheckByTrigger!=="object")
+    st.lastCheckByTrigger={};
+  if(st.nextOfferAbsoluteDay==null && st.lastOfferAbsoluteDay!=null)
+    st.nextOfferAbsoluteDay=Number(st.lastOfferAbsoluteDay)+Number(STRADA_FABBRICA_LEAD.cooldownGiorni||14);
   /* alias legacy finché tutti i salvataggi non sono passati dal nuovo runtime */
   s.fabbricaLead=st;
   return st;
@@ -374,13 +384,19 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(st.active || st.pending) return null;
 
   const oggi=stradaAbsDay();
-  if(Number(st.lastCheckAbsoluteDay)===oggi) return null;
-  st.lastCheckAbsoluteDay=oggi;
-
   const cfg=STRADA_OPPORTUNITA_TRIGGER[trigger];
   if(!cfg) return null;
-  if(st.lastOfferAbsoluteDay!=null &&
-     oggi-Number(st.lastOfferAbsoluteDay)<Number(cfg.cooldownGiorni||14))
+
+  /* Ogni contesto può controllare una volta al giorno: fallire il roll del
+     mondo al mattino non deve bruciare la chance Fabbrica della sera. */
+  if(trigger==="fabbrica" && st.lastCheckByTrigger[trigger]==null &&
+     st.lastCheckAbsoluteDay!=null)
+    st.lastCheckByTrigger[trigger]=Number(st.lastCheckAbsoluteDay);
+  if(Number(st.lastCheckByTrigger[trigger])===oggi) return null;
+  st.lastCheckByTrigger[trigger]=oggi;
+  st.lastCheckAbsoluteDay=oggi; /* alias legacy */
+
+  if(st.nextOfferAbsoluteDay!=null && oggi<Number(st.nextOfferAbsoluteDay))
     return null;
 
   const r=roll==null ? Math.random() : Number(roll);
@@ -390,6 +406,7 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(!variante) return null;
 
   st.lastOfferAbsoluteDay=oggi;
+  st.nextOfferAbsoluteDay=oggi+Number(cfg.cooldownGiorni||10);
   st.recentIds.unshift(variante.id);
   if(st.recentIds.length>4) st.recentIds.length=4;
 
