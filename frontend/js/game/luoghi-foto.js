@@ -729,6 +729,12 @@ function lfFabbrica(){
 
   const contratto = typeof lavoroContrattoDef === "function" ? lavoroContrattoDef("fabbrica") : null;
   const quota = contratto ? Number(contratto.turniSettimanali || 0) : 0;
+  const bonusSesto = contratto ? Number(contratto.bonusSestoGiornoPct || 0) : 0;
+  const bonusDomenica = contratto ? Number(contratto.bonusDomenicaPct || 0) : 0;
+  const regolaMaggiorazioni =
+    "Il 6° giorno distinto della settimana paga +" + bonusSesto +
+    "%. La domenica resta riposo: se l’azienda propone e autorizza uno straordinario, paga +" +
+    bonusDomenica + "%.";
   const pagaTurno = mio && typeof lavoroPagaTurno === "function"
     ? lavoroPagaTurno("fabbrica", def.pay)
     : {totale:def.pay, bonus:0, percentuale:0, etichetta:""};
@@ -773,10 +779,11 @@ function lfFabbrica(){
                 ' · maggiorazione +' + Number(straordinarioAccettato.bonusPct || 0) + '%.'
               : pagaTurno.percentuale
                 ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> questo turno ha una maggiorazione del ' + pagaTurno.percentuale + '%.'
-                : 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica.')
+                : 'Linea di montaggio, otto ore piene. Il cartellino misura la tua continuità in Fabbrica. ' + regolaMaggiorazioni)
         : (bloccoRiassunzione.active
             ? 'Dopo il licenziamento la Fabbrica non ti riassume subito. Il blocco dura 8 settimane.'
-            : 'Prima di iniziare firmi un contratto: ' + (quota || 5) + ' giorni a settimana, lunedì–sabato. La domenica è riposo salvo straordinario richiesto dall’azienda.')) +
+            : 'Prima di iniziare firmi un contratto: ' + (quota || 5) +
+              ' giorni a settimana, lunedì–sabato. ' + regolaMaggiorazioni)) +
     '</p>' +
     riga +
     '<div class="stazioni"><button type="button" class="stprimo"' + azioneLavoro +
