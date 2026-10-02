@@ -1647,8 +1647,9 @@ const PIZZERIA_SOCIAL_STORIES = Object.freeze({
 function socialStoryBeat(p,st){
   const arc=p&&PIZZERIA_SOCIAL_STORIES[p.ruolo];
   if(!arc || !arc.length) return null;
-  const step=Math.max(0,Math.min(arc.length-1,Number(st&&st.storyStep||0)));
-  return {step,beat:arc[step],done:Number(st&&st.storyStep||0)>=arc.length};
+  const step=Math.max(0,Number(st&&st.storyStep||0));
+  if(step>=arc.length) return null;
+  return {step,beat:arc[step],done:false};
 }
 
 
