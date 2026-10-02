@@ -447,7 +447,6 @@ function lfDimissioniLavoro(luogo, nome){
       {n:"Dai le dimissioni", d:"Chiudi il rapporto di lavoro", run(){
         const ruolo = G.job && G.job.n ? G.job.n : "dipendente";
         if(typeof lavoroTerminaContratto === "function") lavoroTerminaContratto(luogo, "dimissioni");
-        G.job = null;
         if(typeof pushLog === "function")
           pushLog("<b>Hai dato le dimissioni dalla " + nome + ".</b> Il rapporto di lavoro è chiuso.", "");
         if(typeof save === "function") save();
