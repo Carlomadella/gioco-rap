@@ -303,6 +303,8 @@ describe("Strada · ingresso nascosto",()=>{
     expect(strada).toContain("STRADA_FERRO_FIDUCIA_MIN = 50");
     expect(strada).toContain("const rischioControllo=s.ferro");
     expect(strada).toContain('status:"seized"');
+    expect(strada).toContain('status:"seized-on-crime"');
+    expect(strada).toContain("ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30");
     expect(eventi).toContain("adfStreetFerroAfterAction");
     expect(eventi).toContain("stradaAccettaFerro()");
     expect(eventi).toContain("TRAPHONE16.receiveStorySms");
