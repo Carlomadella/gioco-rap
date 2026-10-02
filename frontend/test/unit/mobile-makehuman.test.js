@@ -52,31 +52,36 @@ describe("MakeHuman mobile separato dal desktop",()=>{
     expect(env.window.ADF_MAKEHUMAN_MOBILE.attivo).toBe(true);
     expect(
       env.frame.contentDocument.getElementById("localEditorFrame").dataset.makehumanSrc
-    ).toBe("../makehuman-mobile-v1/index.html?v=2&quick=1");
+    ).toBe("../makehuman-mobile-v1/index.html?v=3");
   });
 
-  it("il relay protegge l'intero bootstrap rapido mobile con heartbeat limitato",()=>{
+  it("il watchdog mobile vive nel documento principale, non nel relay nascosto",()=>{
+    const mobile=leggi("js/mobile/makehuman-mobile.js");
     const relay=leggi("media/makehuman-mobile-v1/index.html");
 
-    expect(relay).toContain("../makehuman-camerino-v1/index.html?v=mobile-2");
-    expect(relay).toContain('const QUICK=params.get("quick")==="1"');
-    expect(relay).toContain("BOOTSTRAP_HEARTBEAT_MS=10000");
-    expect(relay).toContain("BOOTSTRAP_MAX_MS=360000");
-    expect(relay).toContain("avviaBootstrapHeartbeat();");
-    expect(relay).toContain('ultimaFase+" · caricamento ancora in corso"');
-    expect(relay).not.toContain("TARGET_HEARTBEAT_MS");
-    expect(relay).not.toContain("avviaTargetHeartbeat");
-    expect(relay).toContain('"adf-makehuman-progress"');
-    expect(relay).toContain('"adf-makehuman-quick-preset-error"');
+    expect(mobile).toContain("HEARTBEAT_MS=10000");
+    expect(mobile).toContain("QUICK_MAX_MS=360000");
+    expect(mobile).toContain('watchdog:"top-level-v3"');
+    expect(mobile).toContain('new MessageEvent("message"');
+    expect(mobile).toContain('source:frame.contentWindow');
+    expect(mobile).toContain('"adf-rpg-v24-quick-makehuman-progress"');
+    expect(mobile).toContain('"adf-rpg-v24-quick-makehuman-error"');
+
+    expect(relay).toContain("../makehuman-camerino-v1/index.html?v=mobile-3");
+    expect(relay).not.toContain("setInterval");
+    expect(relay).not.toContain("BOOTSTRAP_HEARTBEAT_MS");
+    expect(relay).not.toContain("QUICK_MAX_MS");
   });
 
-  it("non ferma il keepalive al semplice ready del camerino",()=>{
-    const relay=leggi("media/makehuman-mobile-v1/index.html");
-    const stop=relay.slice(relay.indexOf("/* \"ready\" significa"),relay.indexOf("try{ parent.postMessage(msg",relay.indexOf("/* \"ready\" significa")));
+  it("il watchdog mobile si ferma solo sul risultato rapido o su errore",()=>{
+    const mobile=leggi("js/mobile/makehuman-mobile.js");
+    const start=mobile.indexOf('window.addEventListener("message"');
+    const end=mobile.indexOf("function applicaSorgenteMobile",start);
+    const osservatore=mobile.slice(start,end);
 
-    expect(stop).not.toContain('msg.type==="adf-makehuman-ready"');
-    expect(stop).toContain('msg.type==="adf-makehuman-quick-preset-result"');
-    expect(stop).toContain('msg.type==="adf-makehuman-quick-preset-error"');
+    expect(osservatore).toContain('msg.type==="adf-rpg-v24-quick-makehuman-ready"');
+    expect(osservatore).toContain('msg.type==="adf-rpg-v24-quick-makehuman-error"');
+    expect(osservatore).not.toContain('msg.type==="adf-makehuman-ready"');
   });
 
   it("la pagina carica l'adattatore mobile dopo il ponte e prima dell'ingresso",()=>{
