@@ -2650,6 +2650,59 @@ function adfStreetOpportunityDecision(proposta){
   });
 }
 
+function adfStreetFerroAfterAction(a){
+  if(!a || a.id==="turno") return false;
+  if(typeof stradaTentaPropostaFerro!=="function") return false;
+
+  const stato=st();
+  if(stato.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaPropostaFerro(Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-ferro")){
+    if(typeof stradaAnnullaPropostaFerro==="function") stradaAnnullaPropostaFerro();
+    return false;
+  }
+
+  stato.lastHookEventDay=absDay();
+  try{
+    if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+      TRAPHONE16.receiveStorySms({
+        id:"ferro-offer-"+String(absDay()),
+        family:"street-ferro",
+        voice:"contact",
+        from:proposta.persona||"SCONOSCIUTO",
+        text:"Se vuoi fare un salto di qualità, conosco uno che può procurarti una cosa. Non è roba da chiedere due volte.",
+        tags:["street","danger"]
+      });
+    }
+  }catch(_){}
+
+  afterClear(()=>showEvent({
+    k:"TrapPhone",
+    t:(proposta.persona||"Un contatto")+" apre una porta",
+    d:"Il messaggio è corto. Non ti sta vendendo un oggetto da catalogo: si sta prendendo il rischio di presentarti a qualcuno."+
+      "<br><br><b>Costo:</b> "+fmt(proposta.costo||0)+" €"+
+      "<br><b>Rischio:</b> se ti trovano con il ferro, un controllo può diventare carcere anche senza un colpo in corso.",
+    annulla(){
+      if(typeof stradaRifiutaFerro==="function") stradaRifiutaFerro();
+    },
+    opts:[
+      {n:"Prendilo",d:"Chiudi il favore tramite "+(proposta.persona||"il contatto"),run(){
+        const out=typeof stradaAccettaFerro==="function" ? stradaAccettaFerro() : null;
+        if(!out || out.ok===false)
+          return {t:(out&&out.reason)||"La cosa non si chiude.",c:"bad"};
+        return {t:"<b>"+(out.persona||proposta.persona||"Il contatto")+"</b> te lo procura. Da ora il ferro è tuo, ma anche tenerlo è un rischio.",c:"bad"};
+      }},
+      {n:"Lascia stare",d:"Non vuoi avere quella cosa addosso",run(){
+        if(typeof stradaRifiutaFerro==="function") stradaRifiutaFerro();
+        return {t:"Hai chiuso la porta. Non è detto che qualcuno te la riapra presto.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
 function adfStreetOpportunityAfterAction(a){
   if(!a || a.id==="turno") return false;
   if(typeof stradaTentaOpportunita!=="function") return false;
@@ -3290,7 +3343,10 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   const introShown = !overtimeShown && !streetShown && !workFamilyShown && !contactShown
     ? adfStreetIntroAfterAction(a)
     : false;
-  const streetOpportunityShown = a.id!=="turno" && !introShown
+  const ferroShown = a.id!=="turno" && !introShown
+    ? adfStreetFerroAfterAction(a)
+    : false;
+  const streetOpportunityShown = a.id!=="turno" && !introShown && !ferroShown
     ? adfStreetOpportunityAfterAction(a)
     : false;
 
@@ -3304,7 +3360,7 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !streetOpportunityShown)
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
   if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown)
     emitHook("after_job_shift",shiftPayload || {
