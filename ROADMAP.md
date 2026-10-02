@@ -23,7 +23,9 @@ sta in [`documentazione/roadmap.md`](documentazione/roadmap.md), che si aggiorna
 - **Niente studio personale** — per fare musica devi uscire, andare dagli altri e conoscere gente.
 - Livelli di fama: Sconosciuto → Rapper esordiente → Rapper emergente → Rapper → Star → Man of the Year → GOAT.
 - **Si esce su Steam e sugli store del telefono** — quindi ogni schermata nuova nasce già
-  pensando al telefono in verticale e ai tocchi, non solo al monitor.
+  pensando al telefono e ai tocchi, non solo al monitor. **Sul mobile il landscape è la
+  modalità di riferimento** per il gameplay e per conservare composizione, sfondi e
+  informazioni; il portrait resta supportato, ma non si elimina contenuto solo per farlo stare.
 
 ---
 
@@ -200,7 +202,7 @@ vendita sì.
 | **33** | **Il build** — bundle minificato con l'impronta nel nome, server di sviluppo con ricarica automatica, controlli automatici | frontend | ✅ **fatto (31/08/2026)** |
 | **34** | **I salvataggi** — file vero sul dispositivo, Steam Cloud, cloud nostro. Il `localStorage` non basta più | frontend + backend | **metà: il cloud c'è** (01/09/2026) |
 | **35** | **Gli account** — da ospite o con la mail, sessioni, cancellazione, verifica Steam/Apple/Google | backend | ✅ **fatto (01/09/2026)** — dei tre negozi mancano solo le chiavi |
-| **36** | **L'interfaccia sul telefono** — verticale, a tocchi, leggibile. Il lavoro più lungo di tutti | frontend | da fare |
+| **36** | **L'interfaccia sul telefono** — landscape di riferimento, portrait supportato, a tocchi e leggibile. Il lavoro più lungo di tutti | frontend | da fare |
 | **37** | **Il database vero** — SQLite adesso, PostgreSQL il giorno dell'uscita | backend | ✅ **fatto (01/09/2026)** |
 
 ### 33 · Il build _(fatto)_
@@ -256,11 +258,15 @@ sicurezza** a server acceso.
 
 ### 36 · L'interfaccia sul telefono
 
-La plancia è disegnata a 1536×1024 e rimpicciolita tutta insieme: su un monitor va bene, su
-un telefono in verticale no. Serve una disposizione sua (profilo, mappa e telefono uno
-sotto l'altro), aree da toccare di almeno 44 punti, niente `hover`, testi leggibili senza
-zoom. Non è una riscrittura — sono i CSS e un pezzo di `hub.js` — ma è il lavoro più lungo,
-ed è quello da provare su un telefono vero il prima possibile.
+La plancia è disegnata a 1536×1024 e non basta rimpicciolirla tutta insieme su un telefono.
+Dal **02/10/2026** la vecchia regola «mobile in verticale» è superata: il gioco mobile
+supporta entrambe le orientazioni, ma il **landscape è il layout di riferimento e quello
+consigliato** perché conserva meglio composizione, sfondi, mappa e informazioni a schermo.
+Il portrait resta supportato e leggibile, senza rotazione forzata, ma non deve imporre tagli
+di contenuto o sostituzioni grafiche solo per far stare tutto in colonna. Restano obbligatori
+aree da toccare di almeno 44 punti, niente `hover` indispensabili e testi leggibili senza
+zoom. Le prove mobile devono coprire almeno **844×390 in landscape** e **390×844 in portrait**
+(oltre a **360×640** come stretto piccolo).
 
 ### 37 · Il database vero _(fatto: SQLite)_
 
