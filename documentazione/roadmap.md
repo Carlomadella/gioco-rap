@@ -128,7 +128,9 @@ sbloccano e le offerte della settimana», stesso foglio). Dei tre punti dello Sh
 non resta niente. **FATTO (02/10/2026)** — il cambio di giornata riallinea anche
 la schermata alla posizione reale: +1/+7 giorni riportano il personaggio a Casa e mostrano
 la mappa, invece di lasciare aperta Fabbrica/Pizzeria/Palestra mentre `G.currentPlace`
-è già `vita`. Il carcere resta l'eccezione.
+è già `vita`. Il carcere resta l'eccezione. **FATTO (02/10/2026)** — il badge della
+Pizzeria è ora coerente col turno reale: apertura alle 17:00 sia sulla mappa sia per il
+lavapiatti (`js/game/orari.js`).
 
 **Manca**:
 

@@ -1548,6 +1548,9 @@ test("i turni con luogo fisico mantengono la mappa esplicita",
   travel.includes('lavapiatti:"pizzeria"') &&
   travel.includes('operaio:"fabbrica"') &&
   travel.includes('if(id === "turno")'));
+test("la Pizzeria apre alle 17 sia sulla mappa sia per il turno lavapiatti",
+  hours.includes('pizzeria:  {open:"17:00", close:"02:00"}') &&
+  hours.includes('lavapiatti: {open:"17:00", close:"02:00"}'));
 
 console.log("\nLuoghi — Beat Maker assorbito dallo Studio");
 test("Beat Maker non è più un hotspot fisico",

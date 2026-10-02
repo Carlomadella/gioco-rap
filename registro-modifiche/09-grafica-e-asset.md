@@ -6,6 +6,31 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:2dcdfaa6 -->
+## 02/10/26, 11:35 — fix/mobile-avvio-clean-background → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `2dcdfaa6`
+
+### Cosa è entrato
+
+- `2d78f391` — Merge pull request #61 from Carlomadella/main — **mycolbraga**
+- `6c10394e` — Test: corregge newline nel controllo pannello Inizia — **mycolbraga**
+- `29949797` — Test: nasconde FAMEpedia sotto Inizia in portrait — **mycolbraga**
+- `23abe1ad` — Mobile: aggiorna cache pannello Inizia — **mycolbraga**
+- `22757fe1` — Test: tutte le voci Inizia visibili in landscape — **mycolbraga**
+- `1de5b9df` — Mobile: corregge posizione pannello Inizia in landscape — **mycolbraga**
+- `0c835639` — Mobile: nasconde la coda landing quando Inizia e aperto — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/avvio.css`
+- **Modificato:** `frontend/css/mobile-landscape.css`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:d88a31c4 -->
 ## 02/10/26, 09:55 — task/studio-mixtape-album → main
 
