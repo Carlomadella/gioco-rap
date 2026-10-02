@@ -373,18 +373,22 @@ se il giocatore accetta:
 - `G.job` torna `null`, quindi da quel momento non arrivano più paga e turni di quel posto;
 - eventuali straordinari già accettati o ancora pendenti vengono cancellati insieme al
   contratto;
-- **presenze, storico e carriera del luogo non vengono cancellati**;
-- i richiami già ricevuti **non vengono azzerati dalle dimissioni**;
+- il rapporto appena chiuso viene archiviato in `contractHistory`, insieme a una fotografia
+  della carriera raggiunta al momento dell'uscita;
+- **presenze e progressione corrente vengono azzerate**: affidabilità torna a 50, ruolo,
+  cicli, aumenti e richiami ripartono da zero;
 - le dimissioni non applicano il blocco di riassunzione previsto per un licenziamento.
 
 Il **licenziamento** resta una conseguenza diversa. Passa da `lavoroLicenzia()`: registra
 un licenziamento nello storico, chiude il contratto con motivo `licenziamento` e applica
 il blocco di riassunzione definito dalla disciplina del luogo (**8 settimane in Fabbrica,
-4 in Pizzeria**). Quando quel blocco è scaduto e il giocatore viene riassunto, i richiami
-attivi vengono azzerati; lo storico complessivo della carriera resta.
+4 in Pizzeria**). Anche il licenziamento azzera subito la progressione corrente; resta
+soltanto il blocco temporaneo necessario a impedire il rientro immediato. Scaduto il blocco,
+una nuova assunzione riparte dalla mansione e dalla paga iniziali.
 
-Quindi la regola corrente è: **puoi lasciare volontariamente il lavoro, ma dimissioni e
-licenziamento hanno conseguenze diverse**. I testi e la documentazione non devono più
+Quindi la regola corrente è: **dimissioni e licenziamento chiudono la carriera interna e
+un'eventuale riassunzione riparte da zero; il licenziamento aggiunge anche il blocco di
+riassunzione**. I testi e la documentazione non devono più
 riproporre la vecchia frase *«da un lavoro non ci si licenzia»*.
 
 ## L'attesa lunga non si trascina
