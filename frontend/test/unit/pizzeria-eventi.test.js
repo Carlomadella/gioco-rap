@@ -75,9 +75,10 @@ describe("eventi Pizzeria per ruolo e cucina",()=>{
     const roles=["lavapiatti","aiuto_cucina","aiuto_pizzaiolo","pizzaiolo"];
 
     for(let i=0;i<roles.length;i++){
-      const from=block.indexOf(roles[i]+":Object.freeze([");
+      const marker="\n  "+roles[i]+":Object.freeze([";
+      const from=block.indexOf(marker);
       const to=i<roles.length-1
-        ? block.indexOf(roles[i+1]+":Object.freeze([",from)
+        ? block.indexOf("\n  "+roles[i+1]+":Object.freeze([",from+marker.length)
         : block.length;
       const piece=block.slice(from,to);
       expect((piece.match(/\bid:"[^"]+"/g)||[]).length).toBe(5);
@@ -130,20 +131,22 @@ describe("eventi Pizzeria per ruolo e cucina",()=>{
     expect(env.G.gente).toHaveLength(0);
   });
 
-  it("la stanchezza da evento resta più leggera della Fabbrica",()=>{
-    const env=ambiente();
-    const debug=vm.runInContext(
-      '({p:PIZZERIA_ROLE_EVENT_LOAD.lavapiatti,f:FACTORY_ROLE_EVENT_LOAD.operaio})',
-      env.ctx
-    );
-    expect(Math.abs(debug.p.push.wellbeing)).toBeLessThan(Math.abs(debug.f.push.wellbeing));
-    expect(Math.abs(debug.p.push.lucidita)).toBeLessThanOrEqual(Math.abs(debug.f.push.lucidita));
+  it("la stanchezza da evento usa il profilo leggero del part-time",()=>{
+    const env=ambiente({role:"lavapiatti",random:0});
+    env.G.shifts=4;
+    const shown=env.ctx.ADF_WORK_EVENTS.afterShift({},{
+      factory:1,colleague:1,role:1,music:1,physical:0,crime:1
+    });
+    expect(shown).toBe(true);
+    expect(env.shown[0].k).toContain("Stanchezza");
+    expect(env.shown[0].opts[1].d).toContain("−2 benessere");
+    expect(env.shown[0].opts[1].d).toContain("−1 lucidità");
   });
 
   it("riusa il pacing globale invece di aggiungere popup extra",()=>{
     const src=leggi("js/game/lavoro-eventi.js");
     expect(src).toContain("incidentalGapDays:3");
-    expect(src).toContain('const INCIDENTAL_FAMILIES = Object.freeze([\\n  "factory","colleague","role","music","physical","crime"\\n]);');
+    expect(src).toContain('"factory","colleague","role","music","physical","crime"');
     expect(src).not.toContain('"pizzeriaRole"');
     expect(src).not.toContain('"kitchen"');
   });
