@@ -38,7 +38,7 @@ Da qui discendono **cinque lavori** che prima non servivano. Sono i punti 33-37 
 | 33 | **Il build**: bundle minificato con l'impronta nel nome, server di sviluppo con ricarica, controlli automatici | **fatto** (31/08/2026) |
 | 34 | **I salvataggi**: file vero sul dispositivo + Steam Cloud + cloud nostro, al posto del `localStorage` | metà: **il cloud c'è** (01/09/2026) |
 | 35 | **Gli account**: da ospite o con la mail, sessioni, cancellazione, verifica Steam/Apple/Google | **fatto** (01/09/2026) — dei tre negozi mancano solo le chiavi |
-| 36 | **L'interfaccia sul telefono**: landscape di riferimento, portrait supportato, a tocchi — il lavoro più lungo | da fare |
+| 36 | **L'interfaccia sul telefono**: gameplay in landscape, portrait solo avviso di rotazione, a tocchi — il lavoro più lungo | da fare |
 | 37 | **Il database vero**: SQLite adesso, PostgreSQL il giorno dell'uscita | **fatto** (01/09/2026) |
 
 Più l'impacchettamento vero e proprio (Electron per Steam, Capacitor per il telefono) e i
