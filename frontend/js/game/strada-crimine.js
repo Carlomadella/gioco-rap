@@ -960,6 +960,39 @@ function stradaRelazioneDisponibile(p){
   return st.streetStatus==="active" || st.streetStatus==="cold";
 }
 
+/* Punto 11: nessun grado criminale. Queste non sono "promozioni": sono
+   capacità derivate da quello che il personaggio ha davvero costruito nel
+   giro. Non vengono mostrate come livelli o titoli. */
+const STRADA_CAPACITA_RETE = Object.freeze({
+  chiamate:Object.freeze({rep:12,contatti:2}),
+  scelta:Object.freeze({rep:25,contatti:3}),
+  nome:Object.freeze({rep:40,contatti:4,fidati:1}),
+  ponte:Object.freeze({rep:60,contatti:5,fidati:2})
+});
+
+function stradaContattiAttivi(){
+  stradaAggiornaRelazioniCriminali(true);
+  return (G.gente||[]).filter(stradaRelazioneDisponibile);
+}
+
+function stradaCapacitaRete(){
+  const rep=Math.max(0,Number(G.strada&&G.strada.rep||0));
+  const attivi=stradaContattiAttivi();
+  const fidati=attivi.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const ok=req=>rep>=Number(req.rep||0) &&
+    attivi.length>=Number(req.contatti||0) &&
+    fidati.length>=Number(req.fidati||0);
+  return {
+    rep,
+    contatti:attivi.length,
+    fidati:fidati.length,
+    piuChiamate:ok(STRADA_CAPACITA_RETE.chiamate),
+    sceltaOpportunita:ok(STRADA_CAPACITA_RETE.scelta),
+    richiestaNome:ok(STRADA_CAPACITA_RETE.nome),
+    creaPonte:ok(STRADA_CAPACITA_RETE.ponte)
+  };
+}
+
 function stradaRelazioneTransizione(p,status,reason,oggi){
   if(!p) return null;
   const st=stradaPersonaMeta(p);
