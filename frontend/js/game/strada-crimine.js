@@ -1137,14 +1137,18 @@ function stradaLavaggioStato(){
   return s.lavaggio;
 }
 
-function stradaTenta(colpoId, approccioId){
+function stradaTenta(colpoId, approccioId, personaSquadraId){
   const colpo = STRADA_COLPI.find(c => c.id === colpoId);
   const approccio = STRADA_APPROCCI.find(a => a.id === approccioId);
   if(!colpo || !approccio) return;
   const s = G.strada;
 
   if(G.energy < colpo.energia){ STRADA_SCENA = stScenaAvviso(colpo, "Non hai abbastanza energia per questo colpo (serve " + colpo.energia + ")."); return; }
-  if(approccio.serveUomo && s.uomini <= 0){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve avere almeno un uomo con te."); return; }
+  const personaSquadra=approccio.id==="squadra" ? stradaPersonaSquadra(personaSquadraId) : null;
+  if(approccio.serveUomo && !personaSquadra){
+    STRADA_SCENA = stScenaAvviso(colpo, "Per muoverti con il giro ti serve una persona reale che si fidi abbastanza di te.");
+    return;
+  }
   if(approccio.serveFerro && !s.ferro){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve il ferro, e non ce l'hai ancora."); return; }
 
   if(stradaAttivitaSbloccate()) s.giroAvviato=true;
@@ -1154,7 +1158,7 @@ function stradaTenta(colpoId, approccioId){
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
-  const successo = Math.random() < stradaChanceConOpportunita(colpo,approccio,opportunita);
+  const successo = Math.random() < stradaChanceConOpportunita(colpo,approccio,opportunita,personaSquadra);
   const leadUsato = opportunita
     ? stradaConsumaOpportunita(colpoId, successo)
     : (leadLavoro && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeCrimeLead === "function"
@@ -1165,6 +1169,21 @@ function stradaTenta(colpoId, approccioId){
   const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore, 2, 30);
   const rumoreLead = Number(effettiLead.heatDelta||0);
   const reputazioneLead = Number(effettiLead.repDelta||0);
+  const personaLead=leadUsato&&leadUsato.personId?stradaPersonaDaId(leadUsato.personId):null;
+
+  if(personaSquadra){
+    const stessa=personaLead&&personaLead.id===personaSquadra.id;
+    stradaModificaFiducia(
+      personaSquadra,
+      successo?(stessa?10:7):(stessa?-8:-6),
+      successo?"colpo-insieme-success":"colpo-insieme-failure"
+    );
+    stradaPersonaMeta(personaSquadra).colpiInsieme++;
+  }
+  if(personaLead && (!personaSquadra || personaLead.id!==personaSquadra.id))
+    stradaModificaFiducia(personaLead,successo?8:-5,
+      successo?"opportunita-success":"opportunita-failure");
+
   /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
      il suo peso — è il più rischioso dei sei eventi della settimana, e
      deve rendere in proporzione quando capita davvero quel giorno lì.
@@ -1204,10 +1223,9 @@ function stradaTenta(colpoId, approccioId){
             (reputazioneLead ? ", reputazione " + stradaSegno(reputazioneLead) : "") + ".</b>"
           : " La dritta arrivata dal lavoro è bruciata.")
       : "";
-    if(approccio.id === "squadra" && s.uomini > 0 && Math.random() < .5){
-      s.uomini--;
-      STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. Uno dei tuoi ci è rimasto sotto: " +
-          "tu sei rientrato pulito, lui no. Un uomo in meno." + notaLeadFallita,
+    if(approccio.id === "squadra" && personaSquadra && Math.random() < .5){
+      STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. <b>" +
+          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." + notaLeadFallita,
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
       const ingressoProtetto = !stradaAttivitaSbloccate();
