@@ -384,7 +384,15 @@ function stradaHaTrapPhone(){
 }
 
 function stradaConsegnaTrapPhone(personId,personName,source){
-  const t=stradaTrapPhoneStato();
+  const s=stradaIngressoStato();
+  /* Se il salvataggio è stato creato dopo il punto 1 ma prima del punto 2 può
+     essere ancora a metà introduzione e non avere affatto il campo traphone.
+     Qui non va trattato come legacy già sbloccato: è proprio il momento in cui
+     l'oggetto viene consegnato. */
+  if(!s.traphone || typeof s.traphone!=="object"){
+    s.traphone={owned:false,sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null};
+  }
+  const t=s.traphone;
   if(t.owned) return {acquired:false,state:t};
 
   t.owned=true;
