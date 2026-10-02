@@ -35,6 +35,17 @@ const START = () => ({
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
     attivita:{}, precedenti:0, arresto:null, giroAvviato:false,
+    /* Punto Strada 1: il mondo criminale nasce nascosto. La "strana proposta"
+       apre una fase introduttiva di due lavoretti protetti; solo dopo compare
+       il badge Attività criminali e il giro diventa stabile. */
+    badgeSbloccato:false,
+    ingressoFase:"locked",
+    ingressoPersonaId:null,
+    ingressoPersonaNome:null,
+    ingressoTentativi:0,
+    ingressoLastOfferAbsoluteDay:null,
+    ingressoNextOfferAbsoluteDay:null,
+    ingressoLastShownAbsoluteDay:null,
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
@@ -97,7 +108,7 @@ const CHIAVE_PARTITA = () => (typeof slotKey === "function" ? slotKey(SAVE_KEY) 
    `strada.giroAvviato` mancante è un salvataggio di prima del flag, e
    stradaGiroAvviato() lo ricava dalle prove (precedenti, ferro, attività).
    Messo a false da qui, una carriera criminale vecchia tornava «pulita». */
-const NON_COMPLETARE = {strada:["giroAvviato"]};
+const NON_COMPLETARE = {strada:["giroAvviato","badgeSbloccato"]};
 function partitaDaSalvataggio(dati){
   const base = START(), g = Object.assign(base, dati || {});
   const iniziali = START();
