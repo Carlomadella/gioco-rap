@@ -48,15 +48,20 @@ describe("stress test Pizzeria part-time",()=>{
     });
   });
 
-  it("la carriera perfetta arriva a Pizzaiolo senza avvicinarsi all'economia Fabbrica",()=>{
-    const out=simulaCarrieraPerfetta(13);
-    const tappe=out.storia.filter(x=>x.evento);
+  it("la carriera perfetta resta secondaria nel primo anno e arriva a Pizzaiolo solo dopo",()=>{
+    const anno=simulaCarrieraPerfetta(13);
+    const tappeAnno=anno.storia.filter(x=>x.evento);
 
-    expect(out.finale.ruolo).toBe("pizzaiolo");
-    expect(out.finale.paga).toBe(191);
-    expect(out.pagaAnnua).toBe(28208);
-    expect(tappe.filter(x=>x.evento.tipo==="promozione")).toHaveLength(3);
-    expect(tappe.filter(x=>x.evento.tipo==="aumento")).toHaveLength(3);
+    expect(anno.finale.ruolo).toBe("aiuto_pizzaiolo");
+    expect(anno.finale.paga).toBe(154);
+    expect(anno.pagaAnnua).toBe(24544);
+    expect(tappeAnno.filter(x=>x.evento.tipo==="promozione")).toHaveLength(2);
+    expect(tappeAnno.filter(x=>x.evento.tipo==="aumento")).toHaveLength(2);
+
+    const lungo=simulaCarrieraPerfetta(19);
+    const tappeLunghe=lungo.storia.filter(x=>x.evento);
+    expect(lungo.finale.ruolo).toBe("pizzaiolo");
+    expect(tappeLunghe.filter(x=>x.evento.tipo==="promozione")).toHaveLength(3);
   });
 
   it("ogni livello Pizzeria espone a più rete del livello Fabbrica equivalente",()=>{
@@ -109,8 +114,8 @@ describe("stress test Pizzeria part-time",()=>{
       oreFabbricaSettimana:40,
       pagaIngressoPizzeria:400,
       pagaIngressoFabbrica:1100,
-      pagaTopPizzeria:764,
-      pagaAnnuaPizzeria:28208
+      pagaTopPizzeria:616,
+      pagaAnnuaPizzeria:24544
     });
     expect(out.economia.pagaTopPizzeria).toBeLessThan(out.economia.pagaIngressoFabbrica);
   });

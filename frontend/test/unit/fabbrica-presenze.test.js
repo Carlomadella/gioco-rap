@@ -1736,8 +1736,8 @@ describe("Pizzeria strutturata", () => {
         pizzeria:{
           contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"lavapiatti"},
           career:{
-            reliability:76,cyclesCompleted:4,perfectCycles:3,perfectStreak:2,
-            cyclesInRole:4,perfectCyclesInRole:2,roleId:"lavapiatti",roleLevel:0,
+            reliability:82,cyclesCompleted:6,perfectCycles:4,perfectStreak:3,
+            cyclesInRole:6,perfectCyclesInRole:3,roleId:"lavapiatti",roleLevel:0,
             raisesByRole:{lavapiatti:1},payHistory:[],roleHistory:[],warnings:0,
             warningHistory:[],weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,evaluations:[]
           }

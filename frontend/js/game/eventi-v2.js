@@ -2735,7 +2735,7 @@ function adfWorkContactAfterShift(){
       {n:"Parlate un po'", d:"Costruisci il rapporto senza scambiarvi ancora il numero", run(){
         if(typeof postoAvvicinaContattoLavoro==="function")
           postoAvvicinaContattoLavoro(p,2);
-        if(typeof lavoroBonusRetePersona==="function")
+        if(chiave==="pizzeria" && typeof lavoroBonusRetePersona==="function")
           lavoroBonusRetePersona(p,"work-contact-talk",0.2,2);
         else if(typeof gain==="function") gain("rete",0.2);
         return {

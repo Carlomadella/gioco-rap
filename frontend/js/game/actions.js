@@ -260,14 +260,18 @@ const ADF_PIZZERIA_CARRIERA = Object.freeze({
      principale per scegliere questo lavoro. Il valore della Pizzeria e'
      soprattutto tempo residuo e rete sociale. */
   aumento:Object.freeze({
-    cicliNelRuolo:2,
-    affidabilita:65,
+    /* La carriera qui e' volutamente secondaria: gli aumenti arrivano
+       molto piu' raramente della Fabbrica. */
+    cicliNelRuolo:4,
+    affidabilita:72,
     maxPerRuolo:1
   }),
   promozione:Object.freeze({
-    cicliNelRuolo:4,
-    affidabilita:75,
-    cicliPerfettiNelRuolo:2
+    /* Sei cicli = circa 24 settimane nello stesso ruolo. La Pizzeria
+       puo' portare fino a Pizzaiolo, ma non in un solo anno perfetto. */
+    cicliNelRuolo:6,
+    affidabilita:80,
+    cicliPerfettiNelRuolo:3
   }),
   disciplina:Object.freeze({
     /* Part-time: una singola assenza pesa, ma non deve trasformare la Pizzeria

@@ -214,4 +214,40 @@ describe("socialità Pizzeria e autopromozione",()=>{
     expect(state.incidentalRecent.some(x=>x.family==="social")).toBe(true);
     expect(n).toBe(1);
   });
+
+  it("i contatti normali sviluppano una micro-storyline persistente in tre episodi",()=>{
+    const p=persona("cliente");
+    const env=ambiente({persona:p,random:.5});
+    const testi=[];
+
+    for(const [week,day] of [[1,2],[2,4],[4,1]]){
+      env.G.week=week; env.G.day=day; env.shown.length=0;
+      expect(env.turnoSocial()).toBe(true);
+      testi.push(env.shown[0].d);
+      const talk=env.shown[0].opts.find(x=>x.n==="Fermati a parlare");
+      expect(talk).toBeTruthy();
+      talk.run();
+    }
+
+    const st=env.G.workplaces.pizzeria.workEvents.socialPeople.p1;
+    expect(st.storyStep).toBe(3);
+    expect(st.talks).toBe(3);
+    expect(new Set(testi).size).toBe(3);
+
+    env.G.week=6; env.G.day=2; env.shown.length=0;
+    expect(env.turnoSocial()).toBe(true);
+    expect(env.shown[0].d).not.toBe(testi[0]);
+    expect(env.shown[0].d).not.toBe(testi[1]);
+    expect(env.shown[0].d).not.toBe(testi[2]);
+    expect(env.shown[0].d).toContain("due minuti veri");
+  });
+
+
+  it("anche favore collega e dritta musicale Pizzeria passano dal budget rete per-persona",()=>{
+    const src=leggi("js/game/lavoro-eventi.js");
+    expect(src).toContain('lavoroBonusRetePersona(p,"pizzeria-colleague-help",.4,2)');
+    expect(src).toContain('lavoroBonusRetePersona(p,"pizzeria-music-lead",.5,2)');
+    expect(src).toContain('workKey(job)==="pizzeria"');
+  });
+
 });

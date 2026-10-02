@@ -1026,6 +1026,23 @@ if(typeof mostraScena === "function"){
         ? LUOGO.id : null;
     const id = a && (LUOGO_MOSSE[a.id] || turnoLuogo);
     if(!id) return lfScenaOriginale.apply(this, arguments);
+
+    /* ui.js chiude normalmente il clock con azioneFatta() prima di mostrare
+       la scena. Quando però la mossa parte da una pagina luogo già aperta,
+       overlayAperto() è vero e quel commit viene saltato: soldi/turno cambiano
+       ma l'orologio resta fermo. La scena locale è già la conferma che a.run()
+       è terminata, quindi qui completiamo la stessa transazione una sola volta.
+       Se un evento alto ha davvero sospeso l'azione, non la forziamo. */
+    try{
+      const sospesa = window.GAME_TIME && typeof GAME_TIME.suspended==="function"
+        ? GAME_TIME.suspended() : null;
+      const pendente = window.GAME_TIME && typeof GAME_TIME.pending==="function"
+        ? GAME_TIME.pending() : false;
+      if(pendente && !sospesa && typeof azioneFatta==="function") azioneFatta();
+    }catch(e){
+      console.error("[Anni di Fame] luoghi-foto: chiusura tempo azione",e);
+    }
+
     const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
     const mostra = () => {
       /* arrivata da fuori (una card degli eventi, l'agenda): la pagina si apre

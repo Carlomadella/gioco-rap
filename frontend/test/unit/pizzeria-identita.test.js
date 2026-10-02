@@ -68,8 +68,8 @@ describe("identità gameplay Pizzeria", () => {
     const pizzeria = vm.runInContext("ADF_PIZZERIA_CARRIERA",ctx);
     const fabbrica = vm.runInContext("ADF_FABBRICA_CARRIERA",ctx);
 
-    expect(pizzeria.aumento.cicliNelRuolo).toBe(2);
-    expect(pizzeria.promozione.cicliNelRuolo).toBe(4);
+    expect(pizzeria.aumento.cicliNelRuolo).toBe(4);
+    expect(pizzeria.promozione.cicliNelRuolo).toBe(6);
     expect(pizzeria.promozione.cicliNelRuolo).toBeGreaterThan(fabbrica.promozione.cicliNelRuolo);
     expect(pizzeria.straordinari.chanceSestoGiorno).toBeLessThan(fabbrica.straordinari.chanceSestoGiorno);
     expect(pizzeria.straordinari.chanceDomenica).toBeLessThan(fabbrica.straordinari.chanceDomenica);
@@ -169,6 +169,17 @@ describe("identità gameplay Pizzeria", () => {
     expect(vm.runInContext('lavoroBonusRetePersona(p,"social",0.2,2)',ctx)).toBe(0);
     expect(G.skills.rete).toBeCloseTo(.3);
     expect(p.workNetworkRewards.social).toBe(2);
+  });
+
+
+  it("conserva l'anti-farming del popup nel solo perimetro Pizzeria", () => {
+    const eventi=leggi("js/game/eventi-v2.js");
+    const start=eventi.indexOf("function adfWorkContactAfterShift");
+    const end=eventi.indexOf("function hookMatches",start);
+    const block=eventi.slice(start,end);
+
+    expect(block).toContain('if(chiave==="pizzeria" && typeof lavoroBonusRetePersona==="function")');
+    expect(block).toContain('else if(typeof gain==="function") gain("rete",0.2)');
   });
 
 });
