@@ -639,7 +639,7 @@ function stImpostaProtezione(livello,personId){
   st.providerName=p.n;
   st.source="trusted-contact";
   st.prepaidWeekKey=stradaWeekKey();
-  st.history.push({status:"started",level,providerPersonId:p.id,providerName:p.n,
+  st.history.push({status:"started",level:livello,providerPersonId:p.id,providerName:p.n,
     absoluteDay:stradaAbsDay(),cost:costo});
   if(st.history.length>12)st.history.shift();
   stradaModificaFiducia(p,1,"protezione-accordo");
