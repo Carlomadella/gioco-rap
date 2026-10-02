@@ -86,6 +86,10 @@ describe("Strada · ingresso nascosto",()=>{
     expect(primo.success).toBe(true);
     expect(primo.unlocked).toBe(false);
     expect(G.strada.ingressoTentativi).toBe(1);
+    expect(G.gente[0].ruolo).toBe("rider");
+    expect(G.gente[0].strada.known).toBe(true);
+    expect(G.gente[0].strada.sources).toContain("intro");
+    expect(G.gente[0].circoloSbloccato).toBe(true);
     expect(G.strada.badgeSbloccato).toBe(false);
     expect(G.strada.arresto).toBeNull();
 
@@ -148,6 +152,17 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.badgeSbloccato).toBe(true);
     expect(vm.runInContext("stradaHaTrapPhone()",ctx)).toBe(true);
     expect(G.strada.traphone.source).toBe("legacy");
+  });
+
+  it("una persona del lavoro mantiene il suo ruolo quando si scopre il lato Strada",()=>{
+    const {ctx,G}=contesto({
+      gente:[{id:"p9",n:"Teo",ruolo:"rider",origine:"lavoro",origineLuogo:"pizzeria",rel:1,pt:0,circoloSbloccato:false}]
+    });
+    const p=vm.runInContext('stradaSegnaPersona(G.gente[0],{key:"intro:p9",source:"intro"})',ctx);
+    expect(p.id).toBe("p9");
+    expect(p.ruolo).toBe("rider");
+    expect(p.strada.known).toBe(true);
+    expect(p.circoloSbloccato).toBe(true);
   });
 
   it("il TrapPhone e la sua UI rispettano il possesso reale",()=>{
