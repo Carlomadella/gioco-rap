@@ -15,16 +15,19 @@ function helperStradaFabbrica(){
   const colpiEnd = source.indexOf("const STRADA_COLPI_MILANO", colpiStart);
   const cfgStart = source.indexOf("const STRADA_FABBRICA_LEAD");
   const cfgEnd = source.indexOf("/* ==================== LA SCENA IN CORSO", cfgStart);
+  const prepStart = source.indexOf("function stradaPreparazioneDaId");
+  const prepEnd = source.indexOf("/* ==================== TENTARE UN COLPO", prepStart);
   const giroStart = source.indexOf("function stradaGiroAvviato(){");
   const chanceStart = source.indexOf("function stradaChance", giroStart);
   const chanceEnd = source.indexOf("function stradaLavaggioStato", chanceStart);
 
   if(colpiStart < 0 || colpiEnd < 0 || cfgStart < 0 || cfgEnd < 0 ||
-     giroStart < 0 || chanceStart < 0 || chanceEnd < 0)
+     prepStart < 0 || prepEnd < 0 || giroStart < 0 || chanceStart < 0 || chanceEnd < 0)
     throw new Error("helper proposta Fabbrica/Strada non trovato");
 
   return source.slice(colpiStart, colpiEnd) + "\n" +
     source.slice(cfgStart, cfgEnd) + "\n" +
+    source.slice(prepStart, prepEnd) + "\n" +
     source.slice(giroStart, chanceEnd);
 }
 
