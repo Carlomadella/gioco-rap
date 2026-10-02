@@ -131,17 +131,23 @@ describe("identità sociale dei lavori", () => {
     const telefono = leggi("js/game/telefono.js");
 
     expect(posto).toContain('promoter: {n:"Promoter"');
+    expect(posto).toContain('cliente: {n:"Cliente abituale"');
+    expect(posto).toContain('fornitore: {n:"Fornitore"');
+    expect(posto).toContain('rider: {n:"Rider"');
     expect(posto).toContain('collega: {n:"Collega"');
     expect(posto).toContain('strada: {n:"Conoscenza della Strada"');
     expect(posto).toContain("p.origineLavoro = meta.jobId || luogo;");
     expect(posto).toContain("function postoContattoLavoroCandidato(luogo, daRiprendere, maxContatti, ruoli, meta)");
 
-    expect(chat).toContain('const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","strada"]');
+    expect(chat).toContain('const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","cliente","fornitore","rider","strada"]');
     expect(chat).toContain("function chatSpuntiLavoroGenerici(p)");
     expect(chat).toContain('p.ruolo === "promoter"');
     expect(chat).toContain('p.ruolo === "collega"');
     expect(chat).toContain('p.ruolo === "strada"');
     expect(telefono).toContain('promoter:"Promoter"');
+    expect(telefono).toContain('cliente:"Cliente abituale"');
+    expect(telefono).toContain('fornitore:"Fornitore"');
+    expect(telefono).toContain('rider:"Rider"');
     expect(telefono).toContain('collega:"Collega"');
     expect(telefono).toContain('strada:"Conoscenza della Strada"');
     expect(telefono).toContain('data-chat="sala:' + "' + p.id + '" + '"');

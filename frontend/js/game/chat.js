@@ -793,6 +793,23 @@ function chatSpuntiLavoroGenerici(p){
        {n:"Vediamo come gira la giornata", d:"+benessere", run(){ chBene(2); return "Ci sta. Tanto ci rivediamo qui."; }}
      ]}
   ];
+  if(["cliente","fornitore","rider"].includes(p.ruolo)){
+    const etichetta=p.ruolo==="cliente" ? "qui" : p.ruolo==="fornitore" ? "in giro per lavoro" : "tra un ritiro e l'altro";
+    return [
+      {id:"zona", peso:3,
+       testo:() => "A forza di incrociarci "+etichetta+", ormai ci si riconosce. Tu conosci parecchia gente da queste parti?",
+       opts:[
+         {n:"Qualcuno sì", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Alla fine funziona così: prima le facce, poi i nomi."; }},
+         {n:"Non così tanta", d:"+benessere", run(){ chBene(2); return "Meglio pochi buoni che cento numeri salvati a caso."; }}
+       ]},
+      {id:"vita-fuori", peso:2,
+       testo:() => "È buffo quante persone conosci solo perché passi sempre dallo stesso posto.",
+       opts:[
+         {n:"È anche il bello del quartiere", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Esatto. Senza accorgertene costruisci un giro."; }},
+         {n:"Finché resta naturale", d:"+lucidità", run(){ addLuc(2); return "Sì. Appena inizi a forzarlo, si sente."; }}
+       ]}
+    ];
+  }
   /* Rapper incontrato lavorando: resta un artista, ma il rapporto nasce fuori
      dal Circolo e non gli attribuiamo servizi che non ha. */
   return [
@@ -825,6 +842,12 @@ function chatTuLavoroGenerico(p){
     {n:"Ci prendiamo un caffè in pausa?", d:"+rete",
      run(){ chRete(1); return "Sì. Niente lavoro per cinque minuti però."; }}
   ];
+  if(["cliente","fornitore","rider"].includes(p.ruolo)) return [
+    {n:"Tu giri spesso da queste parti?", d:"+rete",
+     run(){ chRete(1); chatAvvicina(p,1); return "Abbastanza da riconoscere quasi tutte le facce. È un quartiere piccolo quando lo vivi davvero."; }},
+    {n:"Com'è la zona ultimamente?", d:"+lucidità",
+     run(){ addLuc(2); return "Cambia poco alla volta. Però se ci passi sempre, te ne accorgi."; }}
+  ];
   if(p.ruolo === "strada") return [
     {n:"Com'è il giro?", d:"+lucidità",
      run(){ addLuc(3); chatAvvicina(p,1); return "Sempre uguale finché non cambia all'improvviso. Non correre dietro a ogni voce."; }},
@@ -840,7 +863,7 @@ function chatTuLavoroGenerico(p){
 }
 
 function chatTuSala(p, fonico){
-  if(["rapper","promoter","collega","strada"].includes(p.ruolo))
+  if(["rapper","promoter","collega","cliente","fornitore","rider","strada"].includes(p.ruolo))
     return chatTuLavoroGenerico(p);
   if(p.ruolo === "videomaker") return [
     {n:"Quando giriamo?",
@@ -879,7 +902,7 @@ function chatTuSala(p, fonico){
 function chatContattoSala(p){
   const fonico = p.ruolo === "fonico";
   const video = p.ruolo === "videomaker";
-  const generico = ["rapper","promoter","collega","strada"].includes(p.ruolo);
+  const generico = ["rapper","promoter","collega","cliente","fornitore","rider","strada"].includes(p.ruolo);
   const r = (typeof POSTO_RUOLI === "object" && POSTO_RUOLI[p.ruolo]) || {k:"#94A3B8", n:"Contatto"};
   const origine = p.origineLuogo
     ? " · " + (p.origineDettaglio || "conosciuto al lavoro")
@@ -894,7 +917,7 @@ function chatContattoSala(p){
       : fonico ? "cursori"
       : p.ruolo === "rapper" ? "mic"
       : p.ruolo === "promoter" ? "fama"
-      : p.ruolo === "collega" ? "persona"
+      : ["collega","cliente","fornitore","rider"].includes(p.ruolo) ? "persona"
       : p.ruolo === "strada" ? "maschera"
       : "manopole",
     k: r.k,
@@ -914,7 +937,7 @@ function chatContattoSala(p){
    Può essere una persona conosciuta alla Sala oppure sul lavoro: in entrambi
    i casi è la stessa persona persistente in G.gente, non un contatto finto. */
 const CHAT_MESTIERI = ["beatmaker","fonico","videomaker"];
-const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","strada"];
+const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","cliente","fornitore","rider","strada"];
 function chatDaSala(){
   return (G.gente || [])
     .filter(x => x.numero && !x.via && (
@@ -944,6 +967,8 @@ function chatPresentazione(p){
           ? intro + "Giro tra locali e serate. Se passa qualcosa di sensato, ti scrivo."
           : p.ruolo === "collega"
             ? intro + "Ci vediamo già al lavoro. Se hai bisogno di staccare un attimo dal turno, scrivimi."
+            : ["cliente","fornitore","rider"].includes(p.ruolo)
+              ? intro + "Ci siamo incrociati abbastanza volte da scambiarci il numero. Ci si sente."
             : p.ruolo === "strada"
               ? intro + "Hai il mio numero. Usalo solo quando serve."
               : intro + "Anche io faccio musica. Quando hai qualcosa fuori, mandamela.";
