@@ -518,6 +518,77 @@ function lfFabbricaEsitoTurno(){
     '</div>';
 }
 
+function lfCarrieraSegno(v){
+  const n=Number(v||0);
+  return (n>0?"+":n<0?"−":"")+Math.abs(n);
+}
+
+function lfCarrieraReq(label,req,suffisso){
+  if(!req) return "";
+  const valore=Math.max(0,Number(req.valore||0));
+  const soglia=Math.max(0,Number(req.soglia||0));
+  const pct=soglia>0 ? Math.max(0,Math.min(100,Math.round(valore/soglia*100))) : 100;
+  return '<div class="lfcareer-req '+(req.ok?"ok":"wait")+'">'+
+    '<div class="lfcareer-reqtop"><span>'+lfEsc(label)+'</span><b>'+
+      Math.round(valore)+(suffisso||"")+' / '+Math.round(soglia)+(suffisso||"")+'</b></div>'+
+    '<div class="lfcareer-bar"><i style="width:'+pct+'%"></i></div>'+
+  '</div>';
+}
+
+function lfFabbricaCarriera(){
+  const p=typeof lavoroProgressoCarriera==="function"
+    ? lavoroProgressoCarriera("fabbrica")
+    : null;
+  if(!p) return '<div class="stvuoto">Progressione non disponibile.</div>';
+
+  const percorso=(p.percorso||[]).map(r=>
+    '<span class="lfcareer-step '+lfEsc(r.stato||"futuro")+'">'+lfEsc(r.n)+'</span>'
+  ).join('<i class="lfcareer-arrow">›</i>');
+
+  const aumento=p.aumento||{};
+  let aumentoTesto;
+  if(aumento.esaurito)
+    aumentoTesto='<b>Aumento del ruolo già ottenuto.</b> Il prossimo salto economico passa dalla promozione.';
+  else if(aumento.disponibile)
+    aumentoTesto='<b>Candidatura aumento pronta.</b> La proposta può arrivare dopo un turno.';
+  else
+    aumentoTesto='Aumento: servono '+Math.round(aumento.cicli&&aumento.cicli.soglia||0)+
+      ' ciclo nel ruolo e affidabilità '+Math.round(aumento.affidabilita&&aumento.affidabilita.soglia||0)+'.';
+
+  let avanzamento="";
+  if(p.promozione&&p.promozione.massimo){
+    avanzamento=
+      '<div class="lfcareer-max"><b>Grado massimo raggiunto</b>'+
+      '<span>Non ci sono altre mansioni sopra '+lfEsc(p.ruolo.n)+'.</span></div>';
+  }else if(p.prossimo){
+    const next=p.prossimo;
+    const impatto=[
+      next.energia!=null ? next.energia+' energia' : null,
+      next.benessere!=null ? lfCarrieraSegno(next.benessere)+' benessere' : null,
+      next.lucidita!=null ? lfCarrieraSegno(next.lucidita)+' lucidità' : null,
+      next.fisico ? 'fisico '+lfEsc(next.fisico) : null,
+      next.stress ? 'stress '+lfEsc(next.stress) : null
+    ].filter(Boolean).join(' · ');
+
+    avanzamento=
+      '<div class="lfcareer-next"><span>Prossimo ruolo</span><b>'+lfEsc(next.n)+'</b></div>'+
+      '<p class="lfcareer-desc">'+lfEsc(next.descrizione||"")+'</p>'+
+      (impatto ? '<p class="lfcareer-impact"><b>Cosa cambia per turno:</b> '+impatto+'</p>' : '')+
+      lfCarrieraReq("Cicli nel ruolo",p.promozione.cicli,"")+
+      lfCarrieraReq("Cicli perfetti",p.promozione.perfetti,"")+
+      lfCarrieraReq("Affidabilità",p.promozione.affidabilita,"");
+  }
+
+  return '<div class="lfcareer">'+
+    '<div class="lfcareer-path">'+percorso+'</div>'+
+    '<div class="lfcareer-now"><span>Ora</span><b>'+lfEsc(p.ruolo.n)+'</b>'+
+      '<i>Affidabilità '+Math.round(Number(p.affidabilita||0))+'/100</i></div>'+
+    avanzamento+
+    '<div class="lfcareer-raise">'+aumentoTesto+'</div>'+
+    '<p class="lfcareer-note">Le soglie aprono una <b>candidatura</b>: aumento e promozione arrivano come proposta di carriera dopo un turno, non automaticamente.</p>'+
+  '</div>';
+}
+
 function lfFabbrica(){
   const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
   if(!baseDef) return {mid:lfPan("Fabbrica", '<div class="stvuoto">Turno non disponibile.</div>', "orologio")};
@@ -649,9 +720,11 @@ function lfFabbrica(){
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 
-  /* A destra non ripetiamo più energia/cassa (sono già nella HUD globale):
-     qui c'è il cartellino vero, che registra soltanto i turni completati. */
-  const dx = lfPan("Cartellino presenze", lfFabbricaCartellino(), "orologio");
+  /* A destra il cartellino resta il primo riferimento operativo. Sotto,
+     la carriera traduce i contatori persistenti in un percorso leggibile:
+     requisiti, prossimo ruolo e significato concreto del passaggio. */
+  const dx = lfPan("Cartellino presenze", lfFabbricaCartellino(), "orologio") +
+    (mio ? lfPan("Carriera", lfFabbricaCarriera(), "spunta") : "");
 
   return {sx:sx, mid:mid, dx:dx};
 }

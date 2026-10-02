@@ -638,6 +638,67 @@ function lavoroProssimoRuolo(luogo){
   return idx >= 0 ? (cfg.ruoli[idx + 1] || null) : null;
 }
 
+/* Stato leggibile della progressione. Le soglie restano qui insieme alla
+   logica della carriera: la UI non deve conoscere numeri hardcoded né
+   reinterpretare cosa significhi "pronto". */
+function lavoroProgressoCarriera(luogo){
+  const cfg=lavoroCarrieraDef(luogo);
+  const c=lavoroCarriera(luogo);
+  const ruolo=lavoroRuoloCorrente(luogo);
+  if(!cfg || !c || !ruolo) return null;
+
+  const ruoli=Array.isArray(cfg.ruoli) ? cfg.ruoli : [];
+  const idx=Math.max(0,ruoli.findIndex(r=>r.id===ruolo.id));
+  const next=idx>=0 ? (ruoli[idx+1]||null) : null;
+  const raiseCfg=cfg.aumento||{};
+  const promotionCfg=cfg.promozione||{};
+  const ricevuti=Math.max(0,Number(c.raisesByRole&&c.raisesByRole[ruolo.id]||0));
+  const maxAumenti=Math.max(0,Number(raiseCfg.maxPerRuolo||0));
+
+  const req=(valore,soglia)=>({
+    valore:Math.max(0,Number(valore||0)),
+    soglia:Math.max(0,Number(soglia||0)),
+    ok:Number(valore||0)>=Number(soglia||0)
+  });
+
+  return {
+    luogo,
+    ruolo:{
+      id:ruolo.id,
+      n:ruolo.n,
+      livello:idx,
+      descrizione:ruolo.d||""
+    },
+    percorso:ruoli.map((r,i)=>({id:r.id,n:r.n,livello:i,stato:i<idx?"fatto":i===idx?"corrente":"futuro"})),
+    prossimo:next ? {
+      id:next.id,
+      n:next.n,
+      descrizione:next.d||"",
+      energia:Number.isFinite(Number(next.energia)) ? Number(next.energia) : null,
+      benessere:Number.isFinite(Number(next.benessereTurno)) ? Number(next.benessereTurno) : null,
+      lucidita:Number.isFinite(Number(next.luciditaTurno)) ? Number(next.luciditaTurno) : null,
+      fisico:next.fisico||null,
+      stress:next.stress||null
+    } : null,
+    affidabilita:Math.max(0,Math.min(100,Number(c.reliability||0))),
+    aumento:{
+      disponibile:lavoroAumentoDisponibile(luogo),
+      ricevuti,
+      maxPerRuolo:maxAumenti,
+      esaurito:maxAumenti>0 && ricevuti>=maxAumenti,
+      cicli:req(c.cyclesInRole,raiseCfg.cicliNelRuolo),
+      affidabilita:req(c.reliability,raiseCfg.affidabilita)
+    },
+    promozione:{
+      disponibile:lavoroPromozioneDisponibile(luogo),
+      massimo:!next,
+      cicli:req(c.cyclesInRole,promotionCfg.cicliNelRuolo),
+      affidabilita:req(c.reliability,promotionCfg.affidabilita),
+      perfetti:req(c.perfectCyclesInRole,promotionCfg.cicliPerfettiNelRuolo)
+    }
+  };
+}
+
 /* Profilo concreto del turno per ruolo. Per i lavori che non hanno ancora
    questa profondità mantiene esattamente il comportamento storico. */
 function lavoroEffettiTurno(luogo, job){
