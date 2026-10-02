@@ -4,7 +4,8 @@ import { describe, expect, it } from "vitest";
 const require = createRequire(import.meta.url);
 const {
   esegui, simulaFatica, simulaCarrieraPerfetta,
-  simulaProfiliRuolo, simulaDisciplina, simulaEventiRuolo, simulaConflittiMusica
+  simulaProfiliRuolo, simulaDisciplina, simulaEventiRuolo, simulaConflittiMusica,
+  simulaDoppiaVita
 } = require("../../strumenti/bilanciamento/fabbrica.js");
 
 describe("stress test annuale Fabbrica", () => {
@@ -116,6 +117,61 @@ describe("stress test annuale Fabbrica", () => {
     expect(c.scegliLavoro.row.choice).toBe("work");
     expect(c.scegliLavoro.started).toEqual(["turno"]);
     expect(c.scegliLavoro.missed).toBe(1);
+  });
+
+  it("la doppia vita 5/5 + musica serale resta possibile all'inizio", () => {
+    const d=simulaDoppiaVita();
+
+    expect(d.fonti).toMatchObject({
+      turnoFabbrica:480,
+      scrivi:120,
+      beat:120,
+      registra:180,
+      mixa:120,
+      promo:45
+    });
+    expect(d.base.lavorabili).toBe(6);
+    expect(d.base.richiesti).toBe(5);
+    expect(d.base.margine).toBe(1);
+    expect(d.base.contrattoPossibile).toBe(true);
+    expect(d.base.conflitti).toEqual([]);
+  });
+
+  it("una giornata piena di musica toglie il margine ma si recupera col sabato", () => {
+    const d=simulaDoppiaVita();
+
+    expect(d.unaGiornataPiena.giorni[4].giorno).toBe(5);
+    expect(d.unaGiornataPiena.giorni[4].preWork.map(x=>x.id)).toEqual(["scrivi","beat"]);
+    expect(d.unaGiornataPiena.giorni[4].musicaPrima).toBe(240);
+    expect(d.unaGiornataPiena.giorni[4].turnoPossibile).toBe(false);
+    expect(d.unaGiornataPiena.lavorabili).toBe(5);
+    expect(d.unaGiornataPiena.margine).toBe(0);
+    expect(d.unaGiornataPiena.contrattoPossibile).toBe(true);
+  });
+
+  it("due giornate musicali piene rendono il 5/5 impossibile senza una scelta", () => {
+    const d=simulaDoppiaVita();
+
+    expect(d.dueGiornatePiene.lavorabili).toBe(4);
+    expect(d.dueGiornatePiene.contrattoPossibile).toBe(false);
+    expect(d.dueGiornatePiene.giorni[3].turnoPossibile).toBe(false);
+    expect(d.dueGiornatePiene.giorni[4].turnoPossibile).toBe(false);
+  });
+
+  it("tre ore di studio prima del turno possono trasformare un evento serale in conflitto", () => {
+    const d=simulaDoppiaVita();
+    const r=d.registrazionePrima;
+
+    expect(r.preWork.map(x=>x.id)).toEqual(["registra"]);
+    expect(r.musicaPrima).toBe(180);
+    expect(r.inizioTurno).toBe(11*60);
+    expect(r.fineTurno).toBe(19*60);
+    expect(r.turnoPossibile).toBe(true);
+
+    if(r.evento && r.evento.id==="promo"){
+      expect(r.evento.ora).toBe("18:00");
+      expect(r.conflitto).toBe(true);
+    }
   });
 
   it("il pacchetto di guardrail del punto 16 passa interamente", () => {
