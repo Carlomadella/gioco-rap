@@ -197,7 +197,7 @@ describe("Fabbrica × Strada", () => {
     expect(testo).toContain("guadagno");
     expect(testo).toContain("riuscita");
     expect(testo).toContain("attenzione");
-    expect(testo).toContain("reputazione");
+    expect(testo).toContain("nome nel giro");
   });
 
   it("un contatto del mondo entra una volta sola in G.gente e viene riusato",()=>{

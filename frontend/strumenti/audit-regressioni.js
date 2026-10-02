@@ -1365,6 +1365,21 @@ test("punto 11: rete avanzata usa persone e favori reali, non una valuta-rango",
   crime.includes('stradaAggiungiFavore(requester,1,"rete-nome-dato")') &&
   crime.includes('stradaAggiungiFavore(a,1,"rete-ponte")') &&
   crime.includes('stradaAggiungiFavore(b,1,"rete-ponte")'));
+test("punto 12: reputazione globale e fiducia personale hanno API e stato distinti",
+  crime.includes("function stradaReputazioneGlobale()") &&
+  crime.includes("function stradaModificaReputazione") &&
+  crime.includes("function stradaFiduciaValore(p)") &&
+  crime.includes("function stradaModificaFiducia(p,delta,motivo)") &&
+  state.includes("repStato:{history:[]}"));
+test("punto 12: i gate leggono separatamente nome globale e fiducia della persona",
+  crime.includes("stradaReputazioneGlobale()<req.rep") &&
+  crime.includes("stradaFiduciaValore(p)<req.fiducia") &&
+  crime.includes("stradaReputazioneGlobale()<STRADA_FERRO_REP_MIN") &&
+  crime.includes("stradaFiduciaValore(p)>=STRADA_FERRO_FIDUCIA_MIN"));
+test("punto 12: la UI distingue nome nel giro e fiducia",
+  index.includes("<span>Nome nel giro</span>") &&
+  crime.includes("p.n + ' · Fiducia: ' + stradaFiduciaEtichetta(p)") &&
+  crime.includes('"nome nel giro "+stradaSegno(p.successRep)'));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&

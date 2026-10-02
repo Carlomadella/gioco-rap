@@ -19,12 +19,13 @@ function runtimeCapacita(G){
   const code=blocco("const STRADA_CAPACITA_RETE","function stradaRelazioneTransizione");
   return new Function(
     "G","STRADA_FIDUCIA_SQUADRA","stradaAggiornaRelazioniCriminali",
-    "stradaRelazioneDisponibile","stradaFiduciaValore",
+    "stradaRelazioneDisponibile","stradaFiduciaValore","stradaReputazioneGlobale",
     code+"\nreturn {STRADA_CAPACITA_RETE,stradaCapacitaRete};"
   )(
     G,25,()=>{},
     p=>!!p.available,
-    p=>Number(p.trust||0)
+    p=>Number(p.trust||0),
+    ()=>Math.max(0,Math.min(100,Number(G.strada&&G.strada.rep||0)))
   );
 }
 

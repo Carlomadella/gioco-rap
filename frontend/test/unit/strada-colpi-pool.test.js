@@ -24,6 +24,7 @@ function runtime(){
   const ctx={
     G,Math,Number,Object,Array,Set,String,
     clamp:(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0)),
+    stradaReputazioneGlobale:()=>Math.max(0,Math.min(100,Number(G.strada&&G.strada.rep||0))),
     stradaOpportunitaAttiva:()=>null
   };
   vm.createContext(ctx);
