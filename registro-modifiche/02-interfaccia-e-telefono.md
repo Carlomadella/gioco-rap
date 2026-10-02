@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:63e6420a -->
+## 02/10/26, 10:02 — task/via-agente-telefono → main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `63e6420a`
+
+### Cosa è entrato
+
+- `efd73c23` — Merge remote-tracking branch 'origin/main' into task/via-agente-telefono — **Carlomadella**
+- `b16d78d5` — Merge remote-tracking branch 'origin/main' into task/via-agente-telefono — **Carlomadella**
+- `fd83936d` — Via l'agente prova-sul-telefono, e il suo promemoria — **Carlomadella**
+
+### File di questa categoria
+
+- **Rimosso:** `.claude/agents/prova-sul-telefono.md`
+- **Modificato:** `.claude/settings.json`
+- **Modificato:** `documentazione/README.md`
+- **Modificato:** `documentazione/come-si-lavora.md`
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:d88a31c4 -->
 ## 02/10/26, 09:55 — task/studio-mixtape-album → main
 
