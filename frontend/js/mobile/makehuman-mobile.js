@@ -136,6 +136,24 @@
       editor.dataset.makehumanMobile="1";
       editor.dataset.makehumanMobileQuick=QUICK?"1":"0";
 
+      /* Il primo intervallo puo' scattare mentre l'iframe sta ancora navigando
+         da about:blank al relay. Appena il relay ha davvero finito il load gli
+         mandiamo quindi un ping immediato; da li' prosegue il timer ogni 10 s. */
+      if(editor.dataset.makehumanMobileWatchdogBound!=="1"){
+        editor.dataset.makehumanMobileWatchdogBound="1";
+        editor.addEventListener("load",()=>{
+          try{
+            if(!String(editor.src||"").includes("/makehuman-mobile-v1/index.html")) return;
+          }catch(e){ return; }
+
+          pingRelayMobile(
+            frame,
+            "progress",
+            ultimaFase+" · caricamento ancora in corso"
+          );
+        });
+      }
+
       /* Il timer e' nel documento principale, quindi resta attivo anche se
          gioco-ingresso nasconde il creator con visibility:hidden. */
       avviaWatchdog(frame);

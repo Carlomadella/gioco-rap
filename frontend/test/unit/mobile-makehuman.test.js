@@ -64,6 +64,8 @@ describe("MakeHuman mobile separato dal desktop",()=>{
     expect(mobile).toContain('watchdog:"top-level-v4-relay-ping"');
     expect(mobile).toContain('type:"adf-mobile-watchdog-ping"');
     expect(mobile).toContain('editor.contentWindow.postMessage');
+    expect(mobile).toContain('makehumanMobileWatchdogBound');
+    expect(mobile).toContain('editor.addEventListener("load"');
     expect(mobile).not.toContain('new MessageEvent("message"');
     expect(mobile).toContain('"adf-rpg-v24-quick-makehuman-progress"');
     expect(mobile).toContain('"adf-rpg-v24-quick-makehuman-error"');
