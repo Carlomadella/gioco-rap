@@ -1813,6 +1813,8 @@ function stradaSettimana(){
 
 function stradaOpp(){
   const s = G.strada;
+  const fidati=stradaPersoneSquadra();
+  const chiamabile=fidati[0]||null;
   showEvent({k:"Fuori programma", t:"Ti aspettano", d:"Non te l'aspettavi: qualcuno ti sta aspettando sotto casa.",
     annulla(){},
     opts:[
@@ -1822,17 +1824,24 @@ function stradaOpp(){
         return {t:"Sei scappato. Ti hanno preso " + fmt(perso) + " €, e in giro si è visto.", c:"bad"};
       }},
       {n:"Li affronti", d:"Rischi, ma se vinci sali", run(){
-        const vinci = Math.random() < clamp(.4 + s.rep/200 + Math.min(s.uomini,5) * .05, .15, .85);
+        const vinci = Math.random() < clamp(.4 + s.rep/200, .15, .85);
         if(vinci){ s.rep = clamp(s.rep + 6, 0, 100); G.hype = clamp(G.hype + 4, 0, (typeof hypeCap==="function"?hypeCap():100));
           return {t:"Li hai affrontati e hai vinto. La cosa gira.", c:"good"}; }
         G.wellbeing = clamp(G.wellbeing - 15, 0, 100);
         return {t:"Li hai affrontati e sei rimasto male. Settimana da dimenticare.", c:"bad"};
       }},
-      {n:"Chiami i tuoi", d:"Serve avere qualcuno da chiamare", run(){
-        if(s.uomini <= 0) return {t:"Non avevi nessuno da chiamare. Te la sei vista brutta da solo.", c:"bad"};
-        if(Math.random() < .72) return {t:"I tuoi sono arrivati in tempo. Liscia.", c:"good"};
-        s.uomini--; G.wellbeing = clamp(G.wellbeing - 10, 0, 100);
-        return {t:"Uno dei tuoi ci è rimasto sotto per te.", c:"bad"};
+      {n:chiamabile ? "Chiami "+chiamabile.n : "Chiami qualcuno",
+       d:chiamabile ? "Fiducia: "+stradaFiduciaEtichetta(chiamabile) : "Nessuno si fida abbastanza da arrivare per te",
+       run(){
+        if(!chiamabile) return {t:"Non avevi nessuno che si fidasse abbastanza da arrivare per te.", c:"bad"};
+        const chance=clamp(.55+stradaFiduciaValore(chiamabile)/250,.55,.90);
+        if(Math.random()<chance){
+          stradaModificaFiducia(chiamabile,3,"opp-aiuto-success");
+          return {t:"<b>"+chiamabile.n+"</b> arriva in tempo. Stavolta ne uscite puliti.", c:"good"};
+        }
+        stradaModificaFiducia(chiamabile,-6,"opp-aiuto-failure");
+        G.wellbeing = clamp(G.wellbeing - 10, 0, 100);
+        return {t:"<b>"+chiamabile.n+"</b> prova a coprirti, ma la situazione si mette male per entrambi.", c:"bad"};
       }}
     ]});
 }
