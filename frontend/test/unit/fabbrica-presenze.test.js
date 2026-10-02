@@ -130,7 +130,7 @@ describe("cartellino presenze Fabbrica", () => {
     expect(vm.runInContext("lavoroQualitaFattore(5)", ctx)).toBe(1);
   });
 
-  it("le settimane piene ripetute diventano un malus di lungo periodo", () => {
+  it("un anno di contratto normale 5/5 si assesta senza malus globale permanente", () => {
     const ctx = {
       G:{year:1,week:1,day:1,shifts:5,workFatigue:0},
       Number, Math, Array, Object, Set,
@@ -140,11 +140,32 @@ describe("cartellino presenze Fabbrica", () => {
     vm.createContext(ctx);
     vm.runInContext(helperLavoro(), ctx);
 
-    for(let i=0;i<6;i++) vm.runInContext("lavoroAggiornaFaticaSettimanale(5)", ctx);
+    for(let i=0;i<52;i++) vm.runInContext("lavoroAggiornaFaticaSettimanale(5)", ctx);
 
-    expect(ctx.G.workFatigue).toBe(24);
-    expect(vm.runInContext("lavoroQualitaFattore(5)", ctx)).toBeCloseTo(.988);
-    expect(vm.runInContext("lavoroLifestyleFattore(5)", ctx)).toBeCloseTo(.955);
+    expect(ctx.G.workFatigue).toBeLessThanOrEqual(15);
+    expect(vm.runInContext("lavoroQualitaFattore(5)", ctx)).toBe(1);
+    expect(vm.runInContext("lavoroLifestyleFattore(5)", ctx)).toBe(1);
+  });
+
+  it("il sovraccarico ripetuto resta un malus di lungo periodo e poi rientra gradualmente", () => {
+    const ctx = {
+      G:{year:1,week:1,day:1,shifts:6,workFatigue:0},
+      Number, Math, Array, Object, Set,
+      clamp:(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0))
+    };
+    ctx.totalWeeks = () => 1;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    for(let i=0;i<12;i++) vm.runInContext("lavoroAggiornaFaticaSettimanale(6)", ctx);
+    expect(ctx.G.workFatigue).toBeGreaterThanOrEqual(40);
+    expect(vm.runInContext("lavoroQualitaFattore(6)", ctx)).toBeLessThan(.9);
+    expect(vm.runInContext("lavoroLifestyleFattore(6)", ctx)).toBeLessThan(.8);
+
+    const prima=ctx.G.workFatigue;
+    for(let i=0;i<4;i++) vm.runInContext("lavoroAggiornaFaticaSettimanale(5)", ctx);
+    expect(ctx.G.workFatigue).toBeLessThan(prima);
+    expect(ctx.G.workFatigue).toBeGreaterThan(15);
   });
 
   it("sesto e settimo turno creano sovraccarico immediato, mentre settimane leggere recuperano", () => {
@@ -164,8 +185,9 @@ describe("cartellino presenze Fabbrica", () => {
 
     ctx.G.workFatigue=50;
     const out=vm.runInContext("lavoroAggiornaFaticaSettimanale(2)", ctx);
-    expect(out.dopo).toBe(32);
-    expect(out.delta).toBe(-18);
+    expect(out.recupero).toBe(13);
+    expect(out.dopo).toBe(19);
+    expect(out.delta).toBe(-31);
   });
 
   it("la simulazione usa il nuovo carico progressivo invece delle vecchie penalità lineari", () => {

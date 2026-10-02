@@ -24,7 +24,9 @@ const somma = (tab, da) => { for(const [k, v] of Object.entries(da || {})) tab[k
 /* una carriera interrotta chiude con una settimana `parziale` che ha solo i tempi */
 const ultima = r => r.settimane.filter(s => !s.parziale).pop() || {};
 
-const CURVE = ["fan", "soldi", "hype", "pezzi", "stream", "ben", "luc", "rep", "calore", "ms", "msSalto"];
+const CURVE = ["fan", "soldi", "hype", "pezzi", "stream", "ben", "luc", "rep", "calore",
+  "faticaLavoro", "pagaLavoro", "affidabilitaLavoro", "cicliRuoloLavoro", "perfettiRuoloLavoro",
+  "richiamiLavoro", "ms", "msSalto"];
 
 function leggi(file){
   if(!fs.existsSync(file)) return [];
@@ -75,6 +77,8 @@ function riassunto(lista){
     for(const [k, v] of Object.entries(f.abilita || {})) (abil[k] = abil[k] || []).push(v);
   }
   const q = k => ({ p10: quantile(fine.map(f => f[k]), .1), p50: med(fine.map(f => f[k])), p90: quantile(fine.map(f => f[k]), .9) });
+  const ruoliLavoro={};
+  for(const f of fine) if(f.ruoloLavoro) ruoliLavoro[f.ruoloLavoro]=(ruoliLavoro[f.ruoloLavoro]||0)+1;
   return {
     carriere: lista.length,
     interrotte: lista.filter(r => r.interrotta).length,
@@ -88,6 +92,7 @@ function riassunto(lista){
     abilita: Object.fromEntries(Object.entries(abil).map(([k, v]) => [k, med(v)])),
     contratto: fine.filter(f => f.contratto).length,
     lavoro: fine.filter(f => f.lavoro).length,
+    ruoliLavoro,
     classifica: med(fine.map(f => f.classifica).filter(Boolean)),
     fasi, salti,
     colpi: med(lista.map(r => r.colpi)), arresti: med(lista.map(r => r.arresti)),
@@ -277,6 +282,10 @@ function scriviRapporto(file, cartella, opz){
     ["fasi raggiunte", ...riga(0, r => Object.entries(r.fasi).map(([f, n]) => `${f}: ${n}`).join(", "))],
     ["con contratto", ...riga(0, r => pct(r.contratto, r.carriere))],
     ["con un lavoro", ...riga(0, r => pct(r.lavoro, r.carriere))],
+    ["ruolo lavoro", ...riga(0, r => Object.entries(r.ruoliLavoro||{}).map(([k,v])=>k+": "+v).join(", ") || "—")],
+    ["paga lavoro €/turno", ...riga(0, r => q3(r.fine.pagaLavoro))],
+    ["fatica lavoro", ...riga(0, r => q3(r.fine.faticaLavoro))],
+    ["affidabilità lavoro", ...riga(0, r => q3(r.fine.affidabilitaLavoro))],
     ["miglior classifica", ...riga(0, r => num(r.classifica))],
     ["colpi · arresti · giorni dentro", ...riga(0, r => `${num(r.colpi)} · ${num(r.arresti)} · ${num(r.giorniInCarcere)}`)],
     ["eventi risposti", ...riga(0, r => num(r.eventi))],
