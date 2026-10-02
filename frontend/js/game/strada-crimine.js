@@ -423,6 +423,8 @@ function stradaConsegnaTrapPhone(personId,personName,source){
    Ogni contatto vive in G.gente, conserva la propria identità/origine e può
    ricomparire nei sistemi sociali esistenti. Il punto 4 aggiungerà la fiducia
    criminale: qui costruiamo soltanto identità e continuità. */
+const STRADA_FIDUCIA_SQUADRA = 30;
+
 function stradaPersonaMeta(p){
   if(!p) return null;
   if(!p.strada || typeof p.strada!=="object"){
@@ -432,19 +434,74 @@ function stradaPersonaMeta(p){
       firstLinkedAbsoluteDay:null,
       sources:[],
       opportunityIds:[],
-      introducedByPersonId:null
+      introducedByPersonId:null,
+      fiducia:0,
+      fiduciaEventi:[],
+      colpiInsieme:0
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
   if(!Array.isArray(p.strada.opportunityIds)) p.strada.opportunityIds=[];
+  if(!Array.isArray(p.strada.fiduciaEventi)) p.strada.fiduciaEventi=[];
+  if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
+  if(!Number.isFinite(Number(p.strada.fiducia))){
+    let base=p.strada.known?10:0;
+    if(p.strada.sources.includes("intro")) base+=10;
+    base+=Math.min(3,p.strada.opportunityIds.length)*5;
+    p.strada.fiducia=clamp(base,0,40);
+  }else p.strada.fiducia=clamp(Number(p.strada.fiducia)||0,0,100);
   return p.strada;
+}
+
+function stradaFiduciaValore(p){
+  const st=stradaPersonaMeta(p);
+  return st?Number(st.fiducia||0):0;
+}
+
+function stradaFiduciaEtichetta(p){
+  const v=stradaFiduciaValore(p);
+  if(v>=75) return "si gioca la faccia";
+  if(v>=50) return "fidato";
+  if(v>=STRADA_FIDUCIA_SQUADRA) return "si fida";
+  if(v>=10) return "ti conosce";
+  return "appena entrati in contatto";
+}
+
+function stradaModificaFiducia(p,delta,motivo){
+  if(!p || p.via || !delta) return p;
+  const st=stradaPersonaMeta(p);
+  st.fiducia=clamp(Number(st.fiducia||0)+Number(delta||0),0,100);
+  st.fiduciaEventi.push({absoluteDay:stradaAbsDay(),delta:Number(delta||0),reason:String(motivo||"street")});
+  if(st.fiduciaEventi.length>12) st.fiduciaEventi.shift();
+  return p;
+}
+
+function stradaPersoneSquadra(){
+  return (G.gente||[])
+    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+      stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)
+    .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) || Number(b.rel||0)-Number(a.rel||0));
+}
+
+function stradaPersonaSquadra(id){
+  if(!id) return null;
+  const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via) || null;
+  if(!p || !p.strada || !p.strada.known) return null;
+  return stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA ? p : null;
+}
+
+function stradaBonusFiduciaSquadra(p){
+  if(!p) return 0;
+  return clamp(stradaFiduciaValore(p)/100*.10,.03,.10);
 }
 
 function stradaSegnaPersona(p,meta){
   if(!p || p.via) return null;
   meta=meta||{};
   const st=stradaPersonaMeta(p);
+  const eraConosciuto=!!st.known;
   st.known=true;
+  if(!eraConosciuto && stradaFiduciaValore(p)<5) st.fiducia=5;
   if(!st.key && meta.key) st.key=String(meta.key);
   if(st.firstLinkedAbsoluteDay==null) st.firstLinkedAbsoluteDay=stradaAbsDay();
   if(meta.source && !st.sources.includes(meta.source)) st.sources.push(meta.source);
