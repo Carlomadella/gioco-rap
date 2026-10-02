@@ -715,7 +715,9 @@ function studioPronti(){
   return ready().filter(s => !s.tenuto);
 }
 function studioTenuti(){
-  return (G.songs || []).filter(s => !s.released && s.tenuto);
+  /* le tracce di un disco in coda stanno ferme in cassaforte, ma non si
+     ritirano una a una: si ritira il disco (progetti.js) */
+  return (G.songs || []).filter(s => !s.released && s.tenuto && s.progetto == null);
 }
 function studioInCoda(){
   return (G.songs || []).filter(s => !s.released && s.esce != null);

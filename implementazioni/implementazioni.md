@@ -78,7 +78,7 @@ viene.
 2. **Il guscio nativo: Electron per Steam, Capacitor per il telefono** — CARLO, «Uscita
    sugli store (29/09/2026)». Oggi il gioco gira solo nel browser: Steam e gli store
    vogliono un'app da installare, e nel repo non c'è né Electron né Capacitor. `npm run
-   build` fa già la cartella `dist/` che i due gusci sanno aprire; manca tutto il resto,
+build` fa già la cartella `dist/` che i due gusci sanno aprire; manca tutto il resto,
    in quattro passi (il dettaglio sotto al punto). Si porta dietro la metà che manca di
    «I salvataggi non possono più stare nel localStorage» e le chiavi di «Gli account
    veri», in `08-uscita-sugli-store.md`, e aspetta la decisione sul telefono **di
@@ -118,8 +118,9 @@ _Niente di aperto: i tre punti dello Shop scelti il 20/09 sono chiusi tutti il 2
    si fa.
 8. **Il joint album con altri rapper, su chiamata di un produttore** — CARLO, «Studio
    (16/09/2026)»: «fai in modo che un produttore possa chiamarti per fare un joint album
-   con altri rapper». La chiamata è un evento del telefono; l'album, più pezzi in fila
-   con più feat, oggi non esiste come oggetto. Viene dopo i collettivi.
+   con altri rapper». La chiamata è un evento del telefono. L'album come oggetto c'è dal
+   02/10 («Studio · Mixtape e album», in `04-musica-e-suoni.md`): manca la chiamata e gli
+   altri rapper sulle tracce. Viene dopo i collettivi.
 
 **Decisioni prima che lavori**
 
@@ -182,6 +183,7 @@ intatte** e sono importate automaticamente nel cruscotto: non vengono riscritte 
 cancellate.
 
 <!-- ADF-AUTO-INBOX:BEGIN -->
+
 - [x] voglio sistemare gli eventi ed il tempo in game <!-- ADF-TASK:ADF-NEW-3E6D8998D1BD --> — **🟡 ESTENSIONE → ADF-LEG-EC3A45E275D0, ADF-LEG-99F7F334DFE9** · La richiesta è più ampia delle task esistenti: EC3A45E275D0 copre la gerarchia degli incontri durante i salti e 99F7F334DFE9 il passaggio alla giornata; resta un delta reale di coerenza e prestazioni del motore eventi-tempo.
 
 <!-- Esempio (non attivo): - [ ] voglio cambiare il tempo del turno in fabbrica -->
@@ -323,26 +325,17 @@ che costava troppo._
    voce sua nell'indice in testa). Cover e Feat non hanno più una sezione loro dal 15/09,
    quindi non hanno più bisogno di una foto.
 
-6. togli il parametro «lucidità» e tutto ciò che ne consegue
+<!-- 6. togli il parametro «lucidità» e tutto ciò che ne consegue -->
 
 7. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
 8. non sempre far scorrere una giornata ti ridà l'energia
 
-10. mettere un recap giornaliero con in aggiunta gli highlights.
+9. mettere un recap giornaliero con in aggiunta gli highlights.
 
-11. le trasferte di lavoro in altre città ci stanno già dalla prima città, i concerti in giro per l'italia da Milano
+10. le trasferte di lavoro in altre città ci stanno già dalla prima città, i concerti in giro per l'italia da Milano
 
-12. mettere la possibilità di avere due lavori: la mattina/pomeriggio fabbrica e successivamenete durante la giornata il turno di lavoro in pizzeria
-
-13. Cosa devi fare o decidere tu
-
-- Foto pulita: lo sfondo è ancora un ritaglio del mockup. Quando hai la foto senza cartelli, sovrascrivi
-  media/photo/schermate_luoghi/schermate luoghi_senza_HTML/il_circolo.png con lo stesso nome: non serve altro.
-- Due scelte aperte nel foglio dei problemi:
-  - il live partito da una card o dall'agenda vale sempre 1, quello giocato sul palco da 0,55 a 1,45;
-  - le cinque immagini di riferimento (circa 10 MB) finiscono nel pacchetto degli store, come le altre della stessa cartella.
-- Foglio dei punti: per push e merge ho messo da parte e poi rimesso com'era la tua modifica a implementazioni.md: è ancora lì, non committata. Per questo non ho ancora scritto «FATTO» sul punto dei momenti. Salva il file e ci penso io con salva-punti.js.
+11. bisogna cambiare le immagini nelle transizioni
 
 #### Studio (16/09/2026)
 
@@ -351,11 +344,13 @@ sono i punti chiusi in [`fatte.md`](fatte.md). Il 7 (il Marketing spostato) e l'
 preview di un pezzo non uscito) risultavano fatti dal 14 e dal 15/09 senza che il foglio
 lo dicesse: riconosciuti il 20/09. L'11 (la Sala senza energia) è chiuso il 21/09, in
 `fatte.md`. Il 10 (Beat, Testo e Cabina a mano, il resto in automatico) è chiuso il
-28/09, in `fatte.md`. Gli altri due sono nell'ordine in testa._
+28/09, in `fatte.md`. «fai in modo che si possano creare mixtape e album» è chiuso il
+02/10, in `04-musica-e-suoni.md` («Studio · Mixtape e album»). Gli altri due sono
+nell'ordine in testa._
 
-11. fai in modo che si possano creare collettivi di rapper
+1. fai in modo che si possano creare collettivi di rapper
 
-12. fai in modo che un produttore possa chiamarti per fare un joint album con altri rapper
+2. fai in modo che un produttore possa chiamarti per fare un joint album con altri rapper
 
 #### Uscita sugli store (29/09/2026)
 

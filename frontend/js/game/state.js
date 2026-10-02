@@ -20,6 +20,8 @@ const START = () => ({
      livello 1, ma la scheda non parte più con quattro barre vuote. */
   skills:{scrittura:1, flow:1, presenza:1, rete:1},
   songs:[], bars:[], beats:[], market:[], job:null, shifts:0,
+  /* i mixtape e gli album, usciti o in coda (progetti.js) */
+  progetti:[],
   life:{casa:0, auto:0, look:0, uscite:0, crew:0}, gear:{}, contract:null, obligation:null,
   offersSeen:{}, goals:{}, log:[], streak:0,
   phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
