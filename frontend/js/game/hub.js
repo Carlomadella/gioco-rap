@@ -138,6 +138,17 @@ const HUB_LUOGHI = [
    }},
 ];
 
+function hubCrimineSbloccato(){
+  try{
+    if(typeof stradaAttivitaSbloccate==="function") return !!stradaAttivitaSbloccate();
+  }catch(_){}
+  return !!(G.strada && G.strada.badgeSbloccato);
+}
+
+function hubLuogoVisibile(l){
+  return !!l && (l.id!=="crimin" || hubCrimineSbloccato());
+}
+
 /* ================= I PROFILI DEGLI EDIFICI =================
    Punti in percentuale della foto (la foto tiene sempre il suo rapporto
    1672×941, quindi le percentuali restano incollate ai palazzi a qualsiasi
@@ -838,7 +849,7 @@ function renderHub(){
     hsvg(ic) + '<span>' + n + '</span></button>').join("");
 
   /* ---- i luoghi sulla mappa ---- */
-  $("hb-pins").innerHTML = HUB_LUOGHI.map(l => {
+  $("hb-pins").innerHTML = HUB_LUOGHI.filter(hubLuogoVisibile).map(l => {
     const s = hubSagoma(l.id);
     if(!s) return "";
     return '<button class="pspot' + (l.chiuso ? " chiuso" : "") +
@@ -875,7 +886,9 @@ function renderHub(){
      prima (js/game/agenda.js). Il tasto per segnare sta FUORI dal bottone della
      card e non dentro: un bottone dentro a un bottone non è HTML valido e il
      browser fa quello che gli pare. Per questo la card sta in una scatola. */
-  $("hb-eventi").innerHTML = HUB_EVENTI.map(e => {
+  $("hb-eventi").innerHTML = HUB_EVENTI
+    .filter(e => e.id!=="colpo" || hubCrimineSbloccato())
+    .map(e => {
     const st = hubDetenuto()
       ? {ok:false, perche:"Sei in carcere"}
       : ((e.presto || e.posto || e.strada) ? {ok:true, perche:""} : hubPronta(e.id));
@@ -963,6 +976,7 @@ $("hb-eventi").addEventListener("click", ev => {
 
   const b = ev.target.closest(".pev"); if(!b || b.disabled) return;
   const e = HUB_EVENTI.find(x => x.id === b.dataset.e); if(!e) return;
+  if(e.id==="colpo" && !hubCrimineSbloccato()) return;
   /* card spenta per la sola energia: risponde e si ferma qui */
   if(b.classList.contains("spenta")){ avvisoSenzaEnergia(e.id); return; }
   if(hubDetenuto()){
