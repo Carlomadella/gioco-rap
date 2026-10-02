@@ -71,6 +71,15 @@ test("landscape mobile: parte alta scorre e barra 01-06 resta fissa", async ({ p
   expect(continuaBox.y + continuaBox.height).toBeLessThanOrEqual(dockBox.y + 1);
 });
 
+test("portrait mobile: Inizia nasconde la coda FAMEpedia", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/pagine/landing.html");
+  await page.evaluate(() => document.querySelector("#m-play").click());
+
+  await expect(page.locator("#mhero")).toHaveClass(/avvio-aperto/);
+  await expect(page.locator("#s-menu > .menu")).toBeHidden();
+});
+
 test("landscape mobile: il suggerimento di rotazione non copre il gioco", async ({ page }) => {
   await page.goto("/pagine/landing.html");
   await page.waitForFunction(() => window.ADF_MOBILE_ORIENTATION_HINT);
