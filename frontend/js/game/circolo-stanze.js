@@ -99,7 +99,7 @@ function ccCartaBancone(m){
   return '<button type="button" class="cc-bcarta' + (m.puo ? "" : " no") + '" data-cc-ban="' + m.id + '"' + (m.puo ? "" : " disabled") + ' title="' + ccEsc(m.puo ? m.d : m.perche) + '">' +
     '<span class="cc-bcfoto" aria-hidden="true" style="background-image:url(&quot;' + CIRCOLO_FOTO + 'stanze/' + CC_BAN_FOTO[m.id] + '&quot;)"></span>' +
     '<i>' + ccIco(CC_BAN_ICO[m.id]) + '</i><b>' + m.n + '</b><em>' + ccEsc(m.d) + '</em>' +
-    '<span class="cc-bcpiede"><u>' + (m.puo ? ccIco("orologio") + ccEsc(m.costo) : ccEsc(m.perche + ".")) + '</u><s>' + ccIco("freccia") + '</s></span></button>';
+    '<span class="cc-bcpiede"><u>' + (m.puo ? ccIco("orologio") + ccEsc(m.costo) : ccEsc(m.perche + ".")) + '</u>' + (m.puo ? '<s>' + ccIco("freccia") + '</s>' : "") + '</span></button>';
 }
 function ccBancone(f){
   const chi = circoloPresenti().slice().sort((a, b) => (circoloSconosciuto(b) ? 1 : 0) - (circoloSconosciuto(a) ? 1 : 0));
@@ -121,7 +121,7 @@ function ccBancone(f){
       '<div class="cc-bfoto" style="background-image:url(&quot;' + CIRCOLO_FOTO + 'stanze/bancone.jpg&quot;)">' + ccBriciole("bancone", true) + '</div>' +
       '<div class="cc-bpan">' +
         '<h3 class="cc-h">' + (dialogo ? "Con " + ccNome(p) : "Azioni disponibili") +
-          (dialogo ? "" : ' <small>Cosa vuoi fare?</small>') + '</h3>' +
+          (dialogo || !f || (typeof circoloQui === "function" && !circoloQui()) ? "" : ' <small>Cosa vuoi fare?</small>') + '</h3>' +
         azioni + ccDettoRiga() +
       '</div>' +
     '</section>' +

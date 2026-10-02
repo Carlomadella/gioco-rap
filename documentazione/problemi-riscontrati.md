@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 90. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 95. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -96,7 +96,11 @@ Circolo): le voci 85–89 sono chiuse lo stesso giorno nel branch, prima del pus
 **91.** Nota: col cambio del 02/10 lo Shop sul telefono non si vede più senza scorrere la
 mappa (02/10). È la conseguenza di una scelta, non un errore.
 
-La prossima voce nuova è la 92.
+**94.** Nota: sugli schermi bassi (1366 × 768, 1280 × 720) le descrizioni delle card del
+Bancone e le frasi della gente si tagliano coi puntini (02/10). È una scelta, non un errore.
+
+Le voci 92 e 93 (il Bancone del 02/10) sono chiuse lo stesso giorno, prima del push, e stanno in
+`problemi-risolti.md`. La prossima voce nuova è la 95.
 
 ---
 
@@ -801,3 +805,44 @@ Guardato e **a posto**:
 - **quanto pesa** — da sistemare con calma (è una scelta: va deciso se va bene così).
 
 **RISOLTO in parte (02/10/2026)** — il commento in `spostamenti.js` ora dice che lo Shop è l'eccezione, spostato apposta. Resta da decidere se va bene lo Shop fuori vista sul telefono.
+
+---
+
+## Giro del 02/10/2026 (segnala-problemi, fine task `task/bancone-neon`, commit `7f1b49ed`)
+
+Non ho rifatto girare la verifica (era già passata). Ho letto il commit, cercato in tutto
+`frontend/` chi usava ancora quello che è stato tolto, e ho aperto il Bancone su un server mio
+(porta 8150) a 1774 × 887, 1920 × 1080, 1440 × 900, 1366 × 768, 1280 × 720, 1181 × 800,
+1024 × 768, 390 × 844 e 844 × 390, mettendolo accanto al riferimento nuovo e a `origin/main`
+servito su un'altra porta. Guardato e **a posto**:
+
+- **Somiglia al riferimento.** A 1774 × 887 la pagina è quella della foto: foto a sinistra con
+  lo spillo, le quattro card con foto, orologio e tasto tondo, a destra il titolo con
+  l'atmosfera viola e le righe della gente col ruolo in pastiglia; la fascia in alto con
+  «Mappa» nel riquadro e «Il Circolo» acceso. Il carattere giusto si carica. A 1920, 1440,
+  1366 e 1280 la pagina sta tutta nello schermo, senza scorrere e senza niente che esca di lato.
+- **Le altre pagine non sono cambiate.** Sala, Palco, Backstage, la foto del Circolo coi
+  cartelli, Casa e Palestra, a 1774 e a 1366: le schermate sono identiche pixel per pixel a
+  quelle di `origin/main`, fascia in alto compresa.
+- **Niente di tolto è rimasto appeso.** `ccTastoMossa`, `.cc-mossa2`, `.cc-risultati`, `.cc-ris`
+  e `.cc-bdesc` non li usa più nessun file; le icone che servono alle card (orologio, freccia,
+  boccale, orecchio, mano, bolla, il nuovo spillo) ci sono tutte, e le quattro foto delle card
+  esistono. Nessun errore all'avvio a nessuna misura.
+- **Il dialogo di «Attacca bottone»** prende il posto delle card con «Con …» e le tre
+  risposte, sia sul computer sia sul telefono, e si legge bene.
+- **Il Bancone chiuso o lontano**: le quattro card sono spente e al posto del prezzo dicono il
+  perché («Il Circolo è chiuso.», «Sei lontano: raggiungi il Circolo dalla mappa.», «Servono
+  6 €.»). Sul telefono le card vanno una sotto l'altra e il tocco è abbastanza grande.
+- **Sul telefono di traverso** «NETWORKING» esce di poco dalla fascia, ma succede uguale su
+  `origin/main`: non viene da questo lavoro.
+
+### 94. Nota: sugli schermi bassi le descrizioni delle card si tagliano coi puntini
+- **dove** — `frontend/css/circolo-bancone.css:106-112` (sotto gli 800 punti di altezza le
+  descrizioni stanno in due righe al massimo).
+- **cosa succede** — a 1366 × 768 «Ascolta la conversazione» dice «Potresti cogliere
+  informazioni…» e a 1280 × 720 anche «Offri da bere» finisce in «creare il giusto…»; lo stesso
+  le frasi della gente a destra. Serve a far stare la pagina in uno schermo senza scorrere, ed
+  è fatto apposta: **è una scelta, non un errore**. Lo scrivo perché sono i due schermi da
+  portatile più comuni, e la frase intera si legge solo passandoci sopra col mouse.
+- **come si vede** — finestra 1366 × 768, Bancone, la terza card.
+- **quanto pesa** — da sistemare con calma.

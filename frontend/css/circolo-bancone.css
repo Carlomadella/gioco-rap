@@ -57,14 +57,14 @@
 
 /* a destra: il titolo con l'atmosfera, poi la gente */
 .cc-bancone .cc-bdx{padding:12px 18px 14px 6px;gap:12px;background:#08080A}
-.cc-bancone .cc-bhead{grid-template-columns:minmax(0,1fr) minmax(220px,44%);gap:14px;align-items:stretch;
+.cc-bancone .cc-bhead{grid-template-columns:minmax(0,1fr) minmax(190px,44%);gap:14px;align-items:stretch;
   padding:10px 10px 10px 22px;border-radius:12px;border:1px solid var(--cbRiga);background:#0B0B0E}
 .cc-bancone .cc-stit{align-self:start;margin-top:14px;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:18px}
 .cc-bancone .cc-stit > div{display:contents}
 .cc-bancone .cc-stit p{grid-column:1 / -1;margin-top:8px}
 .cc-bancone .cc-stit > i{width:clamp(34px,2.4vw,44px);height:clamp(34px,2.4vw,44px);color:#F3E6CF}
 .cc-bancone .cc-stit h2{font-family:"Roboto Condensed",Arial,sans-serif;font-weight:900;letter-spacing:.02em;
-  font-size:clamp(34px,2.9vw,54px)}
+  font-size:clamp(26px,2.9vw,54px)}
 .cc-bancone .cc-stit p{font-size:clamp(14px,.98vw,17px);color:#E4DFD6}
 .cc-bancone .cc-atm{padding:12px 6px 6px 8px;border:0;background:none}
 .cc-bancone .cc-atm h4{font-family:"Roboto Condensed",Arial,sans-serif;font-size:clamp(14px,.95vw,17px);letter-spacing:.02em;margin-bottom:12px}
