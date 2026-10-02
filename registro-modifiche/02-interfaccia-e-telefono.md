@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3393dad5 -->
+## 02/10/26, 21:44 — feature/strada-punto4-fiducia → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `3393dad5`
+
+### Cosa è entrato
+
+- `3fdf3244` — fix(test): correggi asserzione statica sulla chiamata al contatto — **mycolbraga**
+- `e6c15297` — test(regressioni): aggiorna il contratto uomini al sistema fiducia — **mycolbraga**
+- `40af2a12` — test(strada): copri i contatti fidati negli eventi fuori programma — **mycolbraga**
+- `8c964366` — feat(strada): usa i contatti fidati anche negli eventi fuori programma — **mycolbraga**
+- `e6dca994` — test(strada): verifica che la squadra usi fiducia e persone reali — **mycolbraga**
+- `af652a8e` — chore(frontend): aggiorna cache per fiducia Strada — **mycolbraga**
+- `3dd16ee7` — test(strada): copri fiducia personale e separazione dal rapporto sociale — **mycolbraga**
+- `e86ed0e3` — balance(strada): rendi la fiducia conseguenza reale di successo e fallimento — **mycolbraga**
+- `6c5f9a07` — feat(circolo): mostra la fiducia criminale in forma qualitativa — **mycolbraga**
+- `f5808113` — fix(strada): congela uomini legacy senza costi o bonus nascosti — **mycolbraga**
+- `596300bd` — feat(strada-ui): mostra persone e fiducia al posto degli uomini comprabili — **mycolbraga**
+- `ba9d8b36` — feat(strada): lega esito e rischio alla persona scelta — **mycolbraga**
+- `16634024` — feat(strada): scegli una persona fidata per l approccio di squadra — **mycolbraga**
+- `3318072e` — feat(strada): fai crescere la fiducia con i fatti e usala nelle chance — **mycolbraga**
+- `370110cc` — feat(strada): aggiungi fiducia criminale personale — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/circolo-stanze.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:252e6f8f -->
 ## 02/10/26, 21:07 — feature/strada-punto2-traphone → main
 
