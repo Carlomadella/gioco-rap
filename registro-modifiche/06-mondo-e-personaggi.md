@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:2919c0b3 -->
+## 02/10/26, 14:05 — task/pizzeria-sociale-autopromozione → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `2919c0b3`
+
+### Cosa è entrato
+
+- `e94b4491` — test(pizzeria): copre dialoghi ricorrenti e autopromozione — **mycolbraga**
+- `e2a1d646` — test(pizzeria): include socialità nel pacing condiviso — **mycolbraga**
+- `0524e03a` — test(lavoro): include la famiglia social nel dispatcher — **mycolbraga**
+- `0c93d5a2` — fix(pizzeria): pulisce la reazione autopromozione — **mycolbraga**
+- `ea86e572` — feat(pizzeria): aggiunge socialità ricorrente e autopromozione contestuale — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-eventi.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:60f258d7 -->
 ## 02/10/26, 13:53 — task/pizzeria-eventi-ruolo-cucina → main
 
