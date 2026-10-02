@@ -52,13 +52,14 @@ describe("MakeHuman mobile separato dal desktop",()=>{
     expect(env.window.ADF_MAKEHUMAN_MOBILE.attivo).toBe(true);
     expect(
       env.frame.contentDocument.getElementById("localEditorFrame").dataset.makehumanSrc
-    ).toBe("../makehuman-mobile-v1/index.html?v=2&quick=1");
+    ).toBe("../makehuman-mobile-v1/index.html?v=3&quick=1");
   });
 
   it("il relay protegge l'intero bootstrap rapido mobile con heartbeat limitato",()=>{
     const relay=leggi("media/makehuman-mobile-v1/index.html");
 
-    expect(relay).toContain("../makehuman-camerino-v1/index.html?v=mobile-2");
+    expect(relay).toContain("../makehuman-camerino-v1/index.html?v=mobile-3&mobile=1");
+    expect(relay).toContain('mobile=1');
     expect(relay).toContain('const QUICK=params.get("quick")==="1"');
     expect(relay).toContain("BOOTSTRAP_HEARTBEAT_MS=10000");
     expect(relay).toContain("BOOTSTRAP_MAX_MS=360000");
@@ -77,6 +78,15 @@ describe("MakeHuman mobile separato dal desktop",()=>{
     expect(stop).not.toContain('msg.type==="adf-makehuman-ready"');
     expect(stop).toContain('msg.type==="adf-makehuman-quick-preset-result"');
     expect(stop).toContain('msg.type==="adf-makehuman-quick-preset-error"');
+  });
+
+  it("anche la landing carica l'adattatore mobile dopo il ponte",()=>{
+    const pagina=leggi("pagine/landing.html");
+    const bridge=pagina.indexOf("js/creator/rpg-v24-bridge.js");
+    const mobile=pagina.indexOf("js/mobile/makehuman-mobile.js");
+
+    expect(bridge).toBeGreaterThan(-1);
+    expect(mobile).toBeGreaterThan(bridge);
   });
 
   it("la pagina carica l'adattatore mobile dopo il ponte e prima dell'ingresso",()=>{
