@@ -79,3 +79,55 @@ test("i quattro comandi segnalati hanno una presa di almeno 44 punti", async ({ 
      anche 43,969, una volta su cinque: un decimo di pixel non cambia la presa */
   expect.soft(filtro.height, "Filtro Shop").toBeGreaterThanOrEqual(43.9);
 });
+
+
+test("l'avvio rapido reale seleziona il percorso MakeHuman mobile", async ({ page }) => {
+  /* Non scarichiamo MakeHuman nel CI: sostituiamo soltanto creator.html con
+     un guscio minimo che espone gli stessi due punti necessari al bootstrap.
+     Tutto il resto — pagina gioco, bridge RPG, adattatore mobile e
+     gioco-ingresso — e' quello reale del build. */
+  await page.route("**/media/creator-rpg-v24/creator.html*", async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: "text/html",
+      body: `<!doctype html>
+        <html><body>
+          <iframe id="localEditorFrame"
+                  data-makehuman-src="../makehuman-camerino-v1/index.html"></iframe>
+          <script>
+            window.playCareerIntro = function(){};
+            parent.postMessage({type:"adf-rpg-v24-ready"},"*");
+          <\/script>
+        </body></html>`
+    });
+  });
+
+  await page.goto("/pagine/gioco.html?nuova=rapido");
+
+  await page.waitForFunction(() => {
+    const host=document.getElementById("adf-rpg-v24-frame");
+    const editor=host?.contentDocument?.getElementById("localEditorFrame");
+    return Boolean(
+      window.ADF_MAKEHUMAN_MOBILE?.attivo &&
+      window.ADF_MAKEHUMAN_MOBILE?.quick &&
+      window.ADF_MAKEHUMAN_MOBILE?.watchdog==="top-level-v3" &&
+      editor?.dataset?.makehumanMobile==="1"
+    );
+  });
+
+  const stato=await page.evaluate(() => {
+    const host=document.getElementById("adf-rpg-v24-frame");
+    const editor=host.contentDocument.getElementById("localEditorFrame");
+    return {
+      adattatore:window.ADF_MAKEHUMAN_MOBILE,
+      src:editor.dataset.makehumanSrc,
+      quick:editor.dataset.makehumanMobileQuick
+    };
+  });
+
+  expect(stato.adattatore.attivo).toBe(true);
+  expect(stato.adattatore.quick).toBe(true);
+  expect(stato.adattatore.watchdog).toBe("top-level-v3");
+  expect(stato.src).toBe("../makehuman-mobile-v1/index.html?v=3");
+  expect(stato.quick).toBe("1");
+});
