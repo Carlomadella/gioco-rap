@@ -38,7 +38,10 @@ function contesto(overrides={}){
     diarioBordo:()=>G.diario,
     pushLog:(msg,cls)=>logs.push({msg,cls}),
     save:()=>{},
-    window:{}
+    window:{},
+    STRADA_FERRO_REP_MIN:20,
+    STRADA_FERRO_FIDUCIA_MIN:50,
+    STRADA_FERRO_COSTO:1200
   };
   vm.createContext(ctx);
   vm.runInContext(helperIngresso(),ctx);
