@@ -41,6 +41,45 @@ test("landscape mobile: il suggerimento di rotazione non copre il gioco", async 
 });
 
 
+test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", async ({ page }) => {
+  await page.goto("/pagine/landing.html");
+  await page.locator("#m-play").tap();
+
+  const chiudi = page.locator(".avv-close-mobile");
+  await expect(chiudi).toBeVisible();
+  const box = await chiudi.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box.height).toBeGreaterThanOrEqual(43.9);
+
+  await chiudi.tap();
+  await expect(page.locator("#mhero")).not.toHaveClass(/avvio-aperto/);
+  await expect(page.locator("#m-play")).toBeVisible();
+});
+
+test("landscape mobile: il camerino mostra Indietro in alto e toccabile", async ({ page }) => {
+  await page.goto("/media/creator-rpg-v24/creator.html");
+
+  const indietro = page.locator("#creatorExitGame");
+  await expect(indietro).toBeVisible();
+
+  const dati = await indietro.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    const pseudo = getComputedStyle(el, "::after").content;
+    return {
+      top: r.top,
+      height: r.height,
+      width: r.width,
+      pseudo
+    };
+  });
+
+  expect(dati.top).toBeLessThan(80);
+  expect(dati.height).toBeGreaterThanOrEqual(43.9);
+  expect(dati.width).toBeGreaterThanOrEqual(95);
+  expect(dati.pseudo).toContain("Indietro");
+});
+
+
 test("landscape mobile: le Impostazioni restano leggibili", async ({ page }) => {
   await entraNellaPlancia(page);
   await page.evaluate(() => IMPOSTAZIONI());
