@@ -113,6 +113,16 @@ test("CI usa npm ci con Node 22 e cache del lockfile frontend",
   ciWorkflow.includes("node-version: 22") &&
   ciWorkflow.includes("run: npm ci") &&
   ciWorkflow.includes("frontend/package-lock.json"));
+
+/* Dal 02/10/2026 il landscape e' il riferimento del gameplay mobile.
+   Il portrait resta una compatibilita' obbligatoria, non sparisce. */
+test("la CI copre landscape di riferimento e portrait di compatibilita",
+  leggi("test/e2e/mobile-landscape.spec.js").includes("viewport: { width: 844, height: 390 }") &&
+  leggi("test/e2e/mobile-landscape.spec.js").includes("isMobile: true") &&
+  leggi("test/e2e/mobile-landscape.spec.js").includes("hasTouch: true") &&
+  leggi("test/e2e/mobile-touch.spec.js").includes("viewport: { width: 360, height: 640 }") &&
+  fs.readFileSync(path.resolve(ROOT,"..",".claude","agents","prova-sul-telefono.md"),"utf8").includes("844 × 390") &&
+  fs.readFileSync(path.resolve(ROOT,"..",".claude","agents","prova-sul-telefono.md"),"utf8").includes("390 × 844"));
 /* Il gate CI verifica il flusso Avvio rapido fino all'hub senza affidare
    l'esito alle prestazioni di targets.bin sul runner headless. La prova
    MakeHuman completa non sparisce: resta esplicita e manuale. */
