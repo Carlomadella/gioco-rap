@@ -1,0 +1,12 @@
+/* IL BANCONE SUL TELEFONO (02/10/2026) — il modulo mobile di circolo-bancone.css.
+   La regola di casa del 02/10: desktop e mobile non si correggono a vicenda, quello
+   che serve solo al telefono sta in un file suo. Sotto i 760 punti le card vanno una
+   per riga, il titolo e l'atmosfera uno sotto l'altro. */
+@media (max-width:760px){
+  .cc-bancone .cc-bgriglia{grid-template-columns:minmax(0,1fr)}
+  .cc-bancone .cc-bhead{grid-template-columns:minmax(0,1fr);padding:10px 14px}
+  .cc-bancone .cc-umore{min-width:0;padding-left:10px}
+  .cc-bancone .cc-umore{font-size:13px}
+  .cc-bcarta{min-height:0}
+  .cc-bcarta > i{margin-bottom:12px}
+}

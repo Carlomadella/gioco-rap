@@ -111,21 +111,13 @@
   .cc-bancone .cc-pers{padding-top:7px;padding-bottom:7px}
 }
 
-/* sotto i 1180 le colonne vanno in pila (circolo-stanze.css): le card due per riga */
+/* sotto i 1180 le colonne vanno in pila (circolo-stanze.css): le card due per riga.
+   Quello che serve solo al telefono (sotto i 760) sta in circolo-bancone-mobile.css. */
 @media (max-width:1180px){
   .cc-bancone .cc-bgriglia{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cc-bancone .cc-bdx{padding:12px 16px 16px}
   .cc-bcarta{min-height:180px}
 }
-@media (max-width:760px){
-  .cc-bancone .cc-bgriglia{grid-template-columns:minmax(0,1fr)}
-  .cc-bancone .cc-bhead{grid-template-columns:minmax(0,1fr);padding:10px 14px}
-  .cc-bancone .cc-umore{min-width:0;padding-left:10px}
-  .cc-bancone .cc-umore{font-size:13px}
-  .cc-bcarta{min-height:0}
-  .cc-bcarta > i{margin-bottom:12px}
-}
-
 /* ==================== LA FASCIA IN ALTO, NEL BANCONE ==================== */
 @media (min-width:1181px){
   #luogo:has(.cc-in[data-stanza="bancone"]) .lfhead{gap:0;font-family:"Roboto Condensed",Arial,sans-serif}

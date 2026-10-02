@@ -3006,3 +3006,7 @@ Due cose del riferimento non le ho copiate: «connessi» e «Il pasto della scen
 refusi, restano «conosci» e «il posto». Provato a 1774 × 887 (la misura del riferimento), 1920,
 1366, 1280, 1024 e sul telefono: niente scroll di lato, il clic su «Offri da bere» va. Un
 controllo nuovo nell'audit.
+
+Con la regola del 02/10 «mobile isolato dal desktop», arrivata mentre la pagina si faceva, quello che
+serve solo al telefono (sotto i 760 punti: card una per riga, titolo e atmosfera in pila) sta nel modulo
+mobile `frontend/css/circolo-bancone-mobile.css`, non nel foglio condiviso.
