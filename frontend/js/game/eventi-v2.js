@@ -2735,7 +2735,9 @@ function adfWorkContactAfterShift(){
       {n:"Parlate un po'", d:"Costruisci il rapporto senza scambiarvi ancora il numero", run(){
         if(typeof postoAvvicinaContattoLavoro==="function")
           postoAvvicinaContattoLavoro(p,2);
-        if(typeof gain==="function") gain("rete",0.2);
+        if(typeof lavoroBonusRetePersona==="function")
+          lavoroBonusRetePersona(p,"work-contact-talk",0.2,2);
+        else if(typeof gain==="function") gain("rete",0.2);
         return {
           t:"Con <b>"+p.n+"</b> non è rimasta solo una chiacchiera da turno. Potrà ricapitare.",
           c:""
