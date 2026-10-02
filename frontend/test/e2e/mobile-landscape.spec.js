@@ -141,6 +141,34 @@ test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", as
   await expect(page.locator("#m-play")).toBeVisible();
 });
 
+test("landscape mobile: scelta Avaturn/MakeHuman scorre con il dito", async ({ page }) => {
+  await page.goto("/media/creator-rpg-v24/creator.html");
+
+  const area = page.locator("#pageAppearance .layout");
+  await expect(area).toBeVisible();
+  await expect(page.getByRole("button", { name: /Avaturn/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /MakeHuman/i })).toBeVisible();
+
+  const misure = await area.evaluate(el => ({
+    clientHeight: el.clientHeight,
+    scrollHeight: el.scrollHeight,
+    overflowY: getComputedStyle(el).overflowY,
+    touchAction: getComputedStyle(el).touchAction
+  }));
+
+  expect(misure.overflowY).toBe("auto");
+  expect(misure.touchAction).toContain("pan-y");
+  expect(misure.scrollHeight).toBeGreaterThan(misure.clientHeight);
+
+  const prima = await area.evaluate(el => el.scrollTop);
+  await area.evaluate(el => { el.scrollTop = Math.min(160, el.scrollHeight - el.clientHeight); });
+  const dopo = await area.evaluate(el => el.scrollTop);
+  expect(dopo).toBeGreaterThan(prima);
+
+  await page.locator("#avatarSelectionNote").scrollIntoViewIfNeeded();
+  await expect(page.locator("#avatarSelectionNote")).toBeVisible();
+});
+
 test("landscape mobile: il camerino mostra Indietro in alto e toccabile", async ({ page }) => {
   await page.goto("/media/creator-rpg-v24/creator.html");
 
