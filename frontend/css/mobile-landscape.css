@@ -25,9 +25,16 @@
   .land-hero{
     margin-left:5vw;
     width:min(48vw,520px);
-    padding:38px 0 6px;
-    justify-content:center
+    padding:38px 0 14px;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    justify-content:flex-start
   }
+  .land-hero::-webkit-scrollbar{display:none}
   .land-kick{
     margin-bottom:6px;
     font-size:9px;
