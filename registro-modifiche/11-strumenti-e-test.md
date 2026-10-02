@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:599ba725 -->
+## 02/10/26, 16:43 — fix/mobile-avvio-full-height → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `599ba725`
+
+### Cosa è entrato
+
+- `a50ef301` — chore(mobile): invalida cache landscape CSS — **mycolbraga**
+- `93424b02` — test(mobile): verifica menu Inizia interamente visibile — **mycolbraga**
+- `04018e2a` — fix(mobile): usa tutta l'altezza per il menu Inizia — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/mobile-landscape.css`
+- **Modificato:** `frontend/pagine/landing.html`
+- **Modificato:** `frontend/test/e2e/mobile-landscape.spec.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:e460a62b -->
 ## 02/10/26, 14:31 — task/pizzeria-bilanciamento-playtest → main
 
