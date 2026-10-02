@@ -243,6 +243,68 @@ test("landscape mobile: Avaturn e MakeHuman si aprono direttamente al tap", asyn
   await expect(page.locator("#pageDressingRoom")).toHaveClass(/on/);
 });
 
+test("landscape mobile: camerino Avaturn usa tutto lo schermo e apre l'editor senza scroll", async ({ page }) => {
+  await page.goto("/pagine/gioco.html");
+  await page.waitForFunction(() => window.ADF_RPG_V24);
+  await page.evaluate(() => ADF_RPG_V24.open());
+
+  const creator = page.frameLocator("#adf-rpg-v24-frame");
+  await creator.getByRole("button", { name: /Avaturn/i }).tap();
+
+  await expect(creator.locator("#pageDressingRoom")).toHaveClass(/on/);
+  await expect(creator.locator(".topbar")).toBeHidden();
+  await expect(creator.locator("#creatorExitGame")).toBeHidden();
+
+  const room = creator.frameLocator("#dressingRoomFrame");
+  const back = room.locator("#roomExit");
+  const openAvaturn = room.locator("#openAvaturn");
+  const tools = room.locator(".room-tools");
+  const progress = room.locator(".room-progress");
+
+  await expect(back).toBeVisible();
+  await expect(openAvaturn).toBeVisible();
+  await expect(progress).toBeVisible();
+
+  const misure = await tools.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    const button = document.querySelector("#openAvaturn").getBoundingClientRect();
+    const progress = document.querySelector(".room-progress").getBoundingClientRect();
+    return {
+      vw:innerWidth,
+      vh:innerHeight,
+      left:r.left,
+      right:r.right,
+      top:r.top,
+      bottom:r.bottom,
+      scrollTop:el.scrollTop,
+      buttonTop:button.top,
+      buttonBottom:button.bottom,
+      progressBottom:progress.bottom
+    };
+  });
+
+  expect(misure.left).toBeGreaterThan(misure.vw * .50);
+  expect(misure.right).toBeLessThanOrEqual(misure.vw + 1);
+  expect(misure.top).toBeGreaterThanOrEqual(40);
+  expect(misure.bottom).toBeLessThanOrEqual(misure.vh - 45);
+  expect(misure.scrollTop).toBe(0);
+  expect(misure.buttonTop).toBeGreaterThanOrEqual(misure.top);
+  expect(misure.buttonBottom).toBeLessThanOrEqual(misure.bottom + 1);
+  expect(misure.progressBottom).toBeLessThanOrEqual(misure.vh + 1);
+
+  await openAvaturn.tap();
+  await expect(room.locator("#avaturnOverlay")).toHaveClass(/open/);
+
+  const shell = await room.locator(".avaturn-shell").evaluate(el => {
+    const r=el.getBoundingClientRect();
+    return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,vw:innerWidth,vh:innerHeight};
+  });
+  expect(shell.left).toBeLessThanOrEqual(1);
+  expect(shell.top).toBeLessThanOrEqual(1);
+  expect(shell.right).toBeGreaterThanOrEqual(shell.vw - 1);
+  expect(shell.bottom).toBeGreaterThanOrEqual(shell.vh - 1);
+});
+
 test("landscape mobile: nella scelta avatar Indietro e' compatto e integrato a destra", async ({ page }) => {
   await page.goto("/media/creator-rpg-v24/creator.html");
 

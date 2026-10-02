@@ -1,7 +1,7 @@
 /* Creator RPG V24 — ponte isolato fra il creator approvato e la partita vera. */
 "use strict";
 (function(){
-  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=31";
+  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=32";
   let overlay=null, frame=null;
   let modalita="normal";
   let aperta=false, overflowPrima="", faseAudioPrima=null;
