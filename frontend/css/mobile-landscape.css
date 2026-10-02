@@ -127,14 +127,22 @@
     backdrop-filter:blur(10px)
   }
 
-  /* avvio/slot: in landscape usa la larghezza, non una colonna lunga */
+  /* avvio/slot: deve occupare il viewport reale, non l'altezza residua
+     di .land-hero (che sui browser mobile con barre visibili puo' diventare
+     molto piu' bassa dello schermo). */
+  .land.avvio-aperto .land-dock{display:none}
   .land-avvio{
-    top:0;
-    bottom:0;
-    left:5vw;
-    width:min(860px,calc(95% - 12px));
-    max-height:none;
-    overflow:auto;
+    position:fixed;
+    inset:0 auto 0 0;
+    box-sizing:border-box;
+    width:min(860px,calc(100% - 12px));
+    height:100dvh;
+    max-height:100dvh;
+    padding:8px 12px max(10px,env(safe-area-inset-bottom,0px)) 5vw;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
     transform:none
   }
   .land.avvio-aperto .land-avvio{transform:none}
