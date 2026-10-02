@@ -144,6 +144,10 @@
   .avv-diff{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
   .avv-diff-card{min-height:0;padding:10px 40px 10px 12px}
   .avv-riga,.avv-slot{min-height:48px}
+  /* Nel menu iniziale le icone tonde a sinistra venivano parzialmente ritagliate
+     sul telefono in landscape. Qui non servono: teniamo solo testo + freccia. */
+  .avv-riga{grid-template-columns:minmax(0,1fr) 34px;padding-left:0}
+  .avv-riga .avv-ic{display:none}
 
   /* ---------- accesso ---------- */
   .accesso{
