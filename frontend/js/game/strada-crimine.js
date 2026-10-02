@@ -1618,13 +1618,6 @@ function stAssumiUomo(){
 function stLicenziaUomo(){
   return "Le persone del giro non sono un organico da licenziare: i rapporti cambiano attraverso quello che succede fra voi.";
 }
-function stImpostaProtezione(livello){
-  G.strada.prot = clamp(livello, 0, STRADA_PROT.length - 1);
-  save(); renderStrada(); renderGioco();
-  const p = STRADA_PROT[G.strada.prot];
-  return G.strada.prot === 0 ? "Niente protezione: da qui in poi sei scoperto."
-    : "Protezione: " + p.n.toLowerCase() + ", " + fmt(p.costo) + " €/sett.";
-}
 function stCompraFerro(){
   if(G.strada.ferro) return "Il ferro ce l'hai già.";
   const st=stradaFerroStato();
@@ -1636,10 +1629,7 @@ function stCompraFerro(){
   return "Non è merce da scaffale. Se "+p.n+" decide di aprirti quella porta, la proposta arriverà sul TrapPhone.";
 }
 function stToggleAvvocato(){
-  G.strada.avvocato = !G.strada.avvocato;
-  save(); renderStrada(); renderGioco();
-  return G.strada.avvocato ? "Avvocato preso: " + fmt(STRADA_AVVOCATO_COSTO) + " €/sett."
-    : "Avvocato mandato via.";
+  return "L'avvocato non è più un toggle: devi conoscerne uno e affidargli davvero l'incarico.";
 }
 function stCompraAttivita(id){
   const a = STRADA_ATTIVITA.find(x => x.id === id);
