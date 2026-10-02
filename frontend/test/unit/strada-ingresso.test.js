@@ -206,6 +206,26 @@ describe("Strada · ingresso nascosto",()=>{
     expect(leggi("js/game/eventi-v2.js")).toContain("TRAPHONE16.receiveStorySms");
   });
 
+  it("l'approccio di squadra usa persone reali e non il vecchio contatore uomini",()=>{
+    const strada=leggi("js/game/strada-crimine.js");
+    expect(strada).toContain("function stScenaPersonaSquadra(colpo)");
+    expect(strada).toContain('personaSquadraId');
+    expect(strada).toContain('nessuno si fida abbastanza');
+    expect(strada).toContain('stradaPersonaSquadra(personaSquadraId)');
+    expect(strada).toContain('stradaBonusFiduciaSquadra(personaSquadra)');
+    expect(strada).not.toContain('if(approccio.serveUomo && s.uomini <= 0)');
+    expect(strada).not.toContain('s.uomini--');
+    expect(strada).toContain("Persone del giro (");
+    expect(strada).toContain("Non puoi comprare la fiducia di qualcuno");
+  });
+
+  it("gli uomini legacy non danno piu bonus ne costi invisibili",()=>{
+    const strada=leggi("js/game/strada-crimine.js");
+    expect(strada).not.toContain("p += Math.min(s.uomini, 5) * .025");
+    expect(strada).not.toContain("return s.uomini * STRADA_UOMO_UPKEEP");
+    expect(strada).toContain("Gli uomini numerici sono solo compatibilità legacy");
+  });
+
   it("hub e colpo rapido rispettano lo stesso gate",()=>{
     const hub=leggi("js/game/hub.js");
     const strada=leggi("js/game/strada-crimine.js");
