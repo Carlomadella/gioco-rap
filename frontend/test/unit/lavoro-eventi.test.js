@@ -101,12 +101,12 @@ describe("famiglie eventi lavoro", () => {
         ? block.indexOf(ruoli[i+1]+":Object.freeze([",from)
         : block.length;
       const pezzo=block.slice(from,to);
-      expect((pezzo.match(/\\bid:"[^"]+"/g)||[]).length).toBe(5);
+      expect((pezzo.match(/\bid:"[^"]+"/g)||[]).length).toBe(5);
     }
 
     expect(src).toContain("if(s.roleRecent.length>4) s.roleRecent.length=4");
     expect(src).toContain("x.roles.includes(job.id)");
-    expect((src.match(/roles:Object\\.freeze\\(\\["operaio","operaio_esperto"\\]\\)/g)||[]).length)
+    expect((src.match(/roles:Object\.freeze\(\["operaio","operaio_esperto"\]\)/g)||[]).length)
       .toBeGreaterThanOrEqual(3);
   });
 
