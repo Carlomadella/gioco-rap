@@ -71,7 +71,8 @@ const avviso =
   "L'interfaccia del gioco e' cambiata dall'ultimo giro sul telefono" +
   (quante ? ` (${quante} file toccati)` : "") + ".\n" +
   "Se la sessione riguarda il frontend, proponi in una riga l'agente `prova-sul-telefono` " +
-  "(`.claude/agents/prova-sul-telefono.md`): apre il gioco a misura di telefono e segna cosa si rompe. " +
+  "(`.claude/agents/prova-sul-telefono.md`): prova prima 844x390 landscape, poi 390x844 portrait " +
+  "e segna cosa si rompe in entrambe le orientazioni. " +
   "Se l'utente sta facendo altro, lascia perdere e non tornarci sopra.";
 
 if (modo === "--hook") {
