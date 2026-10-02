@@ -2415,9 +2415,16 @@ function adfFactoryStreetDecision(proposta){
           ? stradaAccettaPropostaFabbrica()
           : null;
         if(!lead) return {t:"La proposta non è più disponibile.",c:""};
+        let colpo=lead.colpoId||"indicato";
+        try{
+          if(typeof STRADA_COLPI!=="undefined"){
+            const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
+            if(c) colpo=c.n;
+          }
+        }catch(_){}
         return {
-          t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi sul colpo <b>"+
-            (lead.colpoId||"indicato")+"</b> nella Strada finché non la usi o scade.",
+          t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
+            colpo+"</b> nella Strada finché non la usi o scade.",
           c:"good"
         };
       }},
