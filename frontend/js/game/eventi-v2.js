@@ -3516,7 +3516,10 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   const ferroShown = a.id!=="turno" && !introShown
     ? adfStreetFerroAfterAction(a)
     : false;
-  const streetOpportunityShown = a.id!=="turno" && !introShown && !ferroShown
+  const networkShown = a.id!=="turno" && !introShown && !ferroShown
+    ? adfStreetNetworkAfterAction(a)
+    : false;
+  const streetOpportunityShown = a.id!=="turno" && !introShown && !ferroShown && !networkShown
     ? adfStreetOpportunityAfterAction(a)
     : false;
 
@@ -3530,7 +3533,7 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !streetOpportunityShown)
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !networkShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
   if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown)
     emitHook("after_job_shift",shiftPayload || {
