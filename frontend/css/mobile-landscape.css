@@ -138,6 +138,25 @@
     transform:none
   }
   .land.avvio-aperto .land-avvio{transform:none}
+
+  /* Quando Inizia e' aperto il dock 01-06 non deve continuare a sottrarre
+     altezza al flex della landing: il pannello usa davvero tutto il viewport. */
+  .land.avvio-aperto .land-dock{display:none}
+  .land.avvio-aperto .land-hero{
+    flex:1 1 100%;
+    padding:0;
+    min-height:0
+  }
+  .land.avvio-aperto .land-avvio{
+    box-sizing:border-box;
+    height:100%;
+    padding:8px 0 max(8px,env(safe-area-inset-bottom,0px));
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch
+  }
+
   .avv-testa{margin-bottom:8px}
   .avv-testa h2{font-size:clamp(24px,8vh,36px)}
   .avv-testa p{font-size:11px}
@@ -479,6 +498,15 @@
 /* Landscape molto basso: limita ulteriormente solo la densita' verticale. */
 @media (pointer:coarse) and (orientation:landscape) and (max-width:1180px) and (max-height:420px){
   .land-hero{padding-top:38px}
+  .land.avvio-aperto .land-hero{padding:0}
+  .land.avvio-aperto .land-avvio{padding-top:4px;padding-bottom:max(4px,env(safe-area-inset-bottom,0px))}
+  .land.avvio-aperto .avv-close-mobile{margin-bottom:2px}
+  .land.avvio-aperto .avv-testa{margin-bottom:4px}
+  .land.avvio-aperto .avv-kicker{font-size:9px}
+  .land.avvio-aperto .avv-testa h2{margin:6px 0 3px;font-size:clamp(22px,7vh,28px)}
+  .land.avvio-aperto .avv-testa p{margin-top:4px;font-size:10px;line-height:1.25}
+  .land.avvio-aperto .avv-riga{min-height:44px;padding-top:6px;padding-bottom:6px}
+  .land.avvio-aperto .avv-importa{min-height:44px;margin-top:6px;padding-top:6px;padding-bottom:6px}
   .land-sub{font-size:10px}
   .land-hero .mrow.big{margin-top:6px}
   .land-voce{min-height:44px}
