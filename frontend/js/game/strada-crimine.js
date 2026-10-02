@@ -171,6 +171,33 @@ const STRADA_APPROCCI = [
    guadagno:1.40, rumore:1.35, riuscita:.12, pena:2.2, serveFerro:true}
 ];
 
+/* Punto 8: preparazione corta e leggibile. Ogni colpo consente UNA sola
+   preparazione prima dell'approccio: niente alberi di pianificazione e niente
+   stacking. Le opzioni astratte cambiano chance/attenzione e costano tempo
+   oppure un favore reale maturato con una persona del giro. */
+const STRADA_PREPARAZIONI = Object.freeze([
+  Object.freeze({
+    id:"subito", n:"Vai adesso",
+    d:"Non perdi tempo e non chiami nessuno. Ti prendi il colpo così com'è.",
+    minuti:0, chance:0, heat:1
+  }),
+  Object.freeze({
+    id:"informazioni", n:"Chiedi informazioni",
+    d:"Spendi un po' di tempo per capire meglio la situazione prima di muoverti.",
+    minuti:45, chance:.05, heat:.90
+  }),
+  Object.freeze({
+    id:"finestra", n:"Aspetta il momento migliore",
+    d:"Aspetti una finestra più favorevole: costa più tempo, ma riduce l'improvvisazione.",
+    minuti:90, chance:.08, heat:.82
+  }),
+  Object.freeze({
+    id:"contatto", n:"Chiama un contatto",
+    d:"Usi un favore che qualcuno del giro ti deve per arrivare più preparato.",
+    minuti:0, chance:.07, heat:.88, favore:1
+  })
+]);
+
 /* Attività di provincia: Lavanderia, Autolavaggio, Minimarket (nomi dal
    documento). Il documento non fissa costo d'acquisto né resa esatta per la
    provincia (lo fa solo per il tipo di reparto, 45% pulito/55% sporco): i
@@ -324,10 +351,10 @@ function stradaDescriviOpportunita(p){
    {k, titolo, testo, stats:[{t,c}], approcci, opts:[{n,d,sx,dx,hot,no,run()}]} */
 let STRADA_SCENA = null;
 
-function stScenaAvviso(colpo, msg){
+function stScenaAvviso(colpo, msg, preparazione){
   return {k:"Non si può", titolo:"Così no", testo:msg,
     opts:[
-      {n:"Torna alle scelte", d:"Rivedi come muoverti", run(){ STRADA_SCENA = stScenaApproccio(colpo); }},
+      {n:"Torna alle scelte", d:"Rivedi come muoverti", run(){ STRADA_SCENA = stScenaApproccio(colpo,preparazione); }},
       {n:"Lascia stare", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}
     ]};
 }
@@ -342,7 +369,161 @@ function stRigaApproccio(a){
   };
 }
 
-function stScenaPersonaSquadra(colpo){
+function stradaPreparazioneDaId(id){
+  return STRADA_PREPARAZIONI.find(p=>p.id===id) || STRADA_PREPARAZIONI[0];
+}
+
+function stradaPreparazioneContesto(ctx){
+  if(!ctx || ctx.pagata!==true) return {
+    id:"subito", pagata:true, personId:null, personName:null
+  };
+  const prep=stradaPreparazioneDaId(ctx.id);
+  return {
+    id:prep.id,
+    pagata:true,
+    personId:ctx.personId||null,
+    personName:ctx.personName||null
+  };
+}
+
+function stradaPreparazioneEffetti(ctx){
+  const c=stradaPreparazioneContesto(ctx);
+  const prep=stradaPreparazioneDaId(c.id);
+  return {
+    id:prep.id,
+    n:prep.n,
+    chance:Number(prep.chance||0),
+    heat:Number(prep.heat||1),
+    minuti:Number(prep.minuti||0),
+    personId:c.personId,
+    personName:c.personName
+  };
+}
+
+function stradaPreparazioneEtichetta(ctx){
+  const eff=stradaPreparazioneEffetti(ctx);
+  return eff.id==="contatto" && eff.personName
+    ? eff.n+" · "+eff.personName
+    : eff.n;
+}
+
+function stradaErroreTempoPreparazione(minuti){
+  const durata=(typeof GAME_TIME!=="undefined" && GAME_TIME.formatDuration)
+    ? GAME_TIME.formatDuration(minuti)
+    : minuti+" minuti";
+  return "Non hai abbastanza tempo oggi: questa preparazione richiede "+durata+".";
+}
+
+function stradaApplicaPreparazione(colpo,prepId,personId){
+  const prep=stradaPreparazioneDaId(prepId);
+
+  if(prep.id==="contatto"){
+    const p=stradaPersonaDaId(personId);
+    if(!p || !p.strada || !p.strada.known || stradaFavoriValore(p)<1)
+      return {ok:false,reason:"Non hai un favore disponibile con questo contatto."};
+    if(!stradaConsumaFavore(p,"preparazione:"+String(colpo&&colpo.id||"colpo")))
+      return {ok:false,reason:"Quel favore non è più disponibile."};
+    if(typeof save==="function") save();
+    return {
+      ok:true,
+      context:{id:prep.id,pagata:true,personId:p.id,personName:p.n}
+    };
+  }
+
+  const minuti=Math.max(0,Math.round(Number(prep.minuti)||0));
+  if(minuti>0){
+    if(typeof GAME_TIME==="undefined")
+      return {ok:false,reason:"Il sistema del tempo non è ancora disponibile."};
+    const gate=typeof GAME_TIME.canSpend==="function"
+      ? GAME_TIME.canSpend(minuti)
+      : {ok:typeof GAME_TIME.remaining!=="function" || GAME_TIME.remaining()>=minuti};
+    if(!gate || gate.ok===false) return {ok:false,reason:stradaErroreTempoPreparazione(minuti)};
+    const tx=typeof GAME_TIME.spend==="function"
+      ? GAME_TIME.spend(minuti,"crime:prepare",{detail:{crimePreparation:prep.id,colpoId:colpo&&colpo.id}})
+      : GAME_TIME.advance(minuti,"crime:prepare");
+    if(tx && tx.blocked)
+      return {ok:false,reason:"Prima devi chiudere la decisione o l'azione in corso."};
+  }
+
+  return {ok:true,context:{id:prep.id,pagata:true,personId:null,personName:null}};
+}
+
+function stScenaPreparazioneErrore(colpo,msg){
+  return {
+    k:"Preparazione",
+    titolo:"Non adesso",
+    testo:msg,
+    opts:[
+      {n:"Torna alla preparazione",d:"Scegli un'altra strada",run(){STRADA_SCENA=stScenaPreparazione(colpo);}},
+      {n:"Lascia stare",d:"Torni alla strada",run(){STRADA_SCENA=null;}}
+    ]
+  };
+}
+
+function stScenaContattoPreparazione(colpo){
+  const persone=stradaPersoneConFavore();
+  return {
+    k:"Chiami chi?",
+    titolo:colpo.n,
+    testo:"Un favore vale perché nasce da qualcosa che hai già fatto per quella persona. Se lo usi, è consumato.",
+    stats:[
+      {t:persone.length+" "+(persone.length===1?"contatto disponibile":"contatti disponibili")},
+      {t:"Costo: 1 favore"}
+    ],
+    opts:[
+      ...persone.map(p=>({
+        n:p.n,
+        d:"Fiducia nel giro: "+stradaFiduciaEtichetta(p),
+        sx:stradaFavoriValore(p)+" "+(stradaFavoriValore(p)===1?"favore":"favori"),
+        dx:"+7% riuscita · attenzione ↓",
+        run(){
+          const out=stradaApplicaPreparazione(colpo,"contatto",p.id);
+          STRADA_SCENA=out.ok
+            ? stScenaApproccio(colpo,out.context)
+            : stScenaPreparazioneErrore(colpo,out.reason);
+        }
+      })),
+      {n:"Torna indietro",d:"Scegli un'altra preparazione",run(){STRADA_SCENA=stScenaPreparazione(colpo);}}
+    ]
+  };
+}
+
+function stScenaPreparazione(colpo){
+  const personeFavori=stradaPersoneConFavore();
+  return {
+    k:"Prima di muoverti",
+    titolo:colpo.n,
+    testo:"Puoi partire subito oppure spendere tempo o un favore per arrivare più preparato. Una sola scelta: poi si decide come affrontare il colpo.",
+    stats:[
+      {t:fmt(colpo.min)+"–"+fmt(colpo.max)+" €",c:"money"},
+      {t:colpo.energia+" energia"},
+      {t:"Rischio "+stRischio(colpo).toLowerCase(),c:stClasseRischio(colpo)}
+    ],
+    opts:STRADA_PREPARAZIONI.map(p=>{
+      const favore=p.id==="contatto";
+      const minuti=Math.max(0,Number(p.minuti||0));
+      const costo=favore
+        ? (personeFavori.length?"1 favore":"nessun favore disponibile")
+        : (minuti?((typeof GAME_TIME!=="undefined"&&GAME_TIME.formatDuration)?GAME_TIME.formatDuration(minuti):minuti+" min"):"nessun costo");
+      const effetto=Number(p.chance||0)>0
+        ? "+"+Math.round(Number(p.chance||0)*100)+"% riuscita · attenzione ↓"
+        : "nessun bonus";
+      return {
+        n:p.n,d:p.d,sx:costo,dx:effetto,
+        no:favore&&!personeFavori.length,
+        run(){
+          if(favore){STRADA_SCENA=stScenaContattoPreparazione(colpo);return;}
+          const out=stradaApplicaPreparazione(colpo,p.id);
+          STRADA_SCENA=out.ok
+            ? stScenaApproccio(colpo,out.context)
+            : stScenaPreparazioneErrore(colpo,out.reason);
+        }
+      };
+    })
+  };
+}
+
+function stScenaPersonaSquadra(colpo,preparazione){
   const persone=stradaPersoneSquadra();
   return {
     k:"Con chi ti muovi?",
@@ -350,7 +531,8 @@ function stScenaPersonaSquadra(colpo){
     testo:"Per questo approccio non basta pagare qualcuno: serve una persona che si fidi abbastanza da metterci la faccia con te.",
     stats:[
       {t:persone.length+" "+(persone.length===1?"persona disponibile":"persone disponibili")},
-      {t:"Fiducia costruita facendo cose insieme"}
+      {t:"Fiducia costruita facendo cose insieme"},
+      {t:"Preparazione: "+stradaPreparazioneEtichetta(preparazione)}
     ],
     opts:[
       ...persone.map(p=>({
@@ -358,22 +540,24 @@ function stScenaPersonaSquadra(colpo){
         d:"Fiducia nel giro: "+stradaFiduciaEtichetta(p),
         sx:"+"+Math.round(stradaBonusFiduciaSquadra(p)*100)+"% riuscita",
         dx:String(p.ruolo||"contatto"),
-        run(){ stradaTenta(colpo.id,"squadra",p.id); }
+        run(){ stradaTenta(colpo.id,"squadra",p.id,preparazione); }
       })),
-      {n:"Torna indietro",d:"Scegli un altro approccio",run(){STRADA_SCENA=stScenaApproccio(colpo);}}
+      {n:"Torna indietro",d:"Scegli un altro approccio",run(){STRADA_SCENA=stScenaApproccio(colpo,preparazione);}}
     ]
   };
 }
 
-function stScenaApproccio(colpo){
+function stScenaApproccio(colpo,preparazione){
   const s = G.strada;
+  preparazione=stradaPreparazioneContesto(preparazione);
   const personeSquadra=stradaPersoneSquadra();
   return {k:"Come vuoi muoverti?", titolo:colpo.n, testo:colpo.d, approcci:true,
     stats:[
       {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
       {t:colpo.energia + " energia"},
       {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)},
-      {t:stradaCategoriaLabel(colpo)}
+      {t:stradaCategoriaLabel(colpo)},
+      {t:"Preparazione: "+stradaPreparazioneEtichetta(preparazione)}
     ],
     opts:STRADA_APPROCCI.map(a => {
       const riga = stRigaApproccio(a);
@@ -386,8 +570,8 @@ function stScenaApproccio(colpo){
       return {n:a.n, d:a.d, sx:riga.sx, dx, hot:a.id === "ferro",
         no:(squadra && !personeSquadra.length) || (a.serveFerro && !s.ferro) || G.energy < colpo.energia,
         run(){
-          if(squadra){ STRADA_SCENA=stScenaPersonaSquadra(colpo); return; }
-          stradaTenta(colpo.id, a.id);
+          if(squadra){ STRADA_SCENA=stScenaPersonaSquadra(colpo,preparazione); return; }
+          stradaTenta(colpo.id, a.id, null, preparazione);
         }};
     })};
 }
@@ -395,7 +579,7 @@ function stScenaApproccio(colpo){
 function stAvviaColpo(colpoId){
   const colpo = STRADA_COLPI.find(c => c.id === colpoId);
   if(!colpo) return;
-  STRADA_SCENA = stScenaApproccio(colpo);
+  STRADA_SCENA = stScenaPreparazione(colpo);
   renderStrada();
 }
 
@@ -642,12 +826,17 @@ function stradaPersonaMeta(p){
       introducedByPersonId:null,
       fiducia:0,
       fiduciaEventi:[],
+      favori:0,
+      favoriEventi:[],
       colpiInsieme:0
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
   if(!Array.isArray(p.strada.opportunityIds)) p.strada.opportunityIds=[];
   if(!Array.isArray(p.strada.fiduciaEventi)) p.strada.fiduciaEventi=[];
+  if(!Array.isArray(p.strada.favoriEventi)) p.strada.favoriEventi=[];
+  if(!Number.isFinite(Number(p.strada.favori))) p.strada.favori=0;
+  p.strada.favori=Math.max(0,Math.min(3,Math.floor(Number(p.strada.favori)||0)));
   if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
   if(!Number.isFinite(Number(p.strada.fiducia))){
     let base=p.strada.known?10:0;
@@ -679,6 +868,43 @@ function stradaModificaFiducia(p,delta,motivo){
   st.fiduciaEventi.push({absoluteDay:stradaAbsDay(),delta:Number(delta||0),reason:String(motivo||"street")});
   if(st.fiduciaEventi.length>12) st.fiduciaEventi.shift();
   return p;
+}
+
+/* I favori non sono comprabili. Nascono quando fai qualcosa con successo per
+   una persona concreta e si consumano quando le chiedi una mano in fase di
+   preparazione. Cap a 3: evita di trasformarli in una seconda moneta da farmare. */
+function stradaFavoriValore(p){
+  const st=stradaPersonaMeta(p);
+  return st?Math.max(0,Math.floor(Number(st.favori)||0)):0;
+}
+
+function stradaAggiungiFavore(p,delta,motivo){
+  if(!p || p.via || !delta) return 0;
+  const st=stradaPersonaMeta(p);
+  const prima=stradaFavoriValore(p);
+  st.favori=Math.max(0,Math.min(3,prima+Math.trunc(Number(delta)||0)));
+  const reale=st.favori-prima;
+  if(reale){
+    st.favoriEventi.push({
+      absoluteDay:stradaAbsDay(),
+      delta:reale,
+      reason:String(motivo||"street-favor")
+    });
+    if(st.favoriEventi.length>12) st.favoriEventi.shift();
+  }
+  return reale;
+}
+
+function stradaConsumaFavore(p,motivo){
+  if(stradaFavoriValore(p)<1) return false;
+  return stradaAggiungiFavore(p,-1,motivo)<0;
+}
+
+function stradaPersoneConFavore(){
+  return (G.gente||[])
+    .filter(p=>p && !p.via && p.strada && p.strada.known && stradaFavoriValore(p)>0)
+    .sort((a,b)=>stradaFavoriValore(b)-stradaFavoriValore(a) ||
+      stradaFiduciaValore(b)-stradaFiduciaValore(a));
 }
 
 function stradaPersoneSquadra(){
@@ -1249,6 +1475,8 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
   let pulito=0,sporco=0,multa=0;
   if(personaIngresso)
     stradaModificaFiducia(personaIngresso,successo?8:-3,"intro-"+step+(successo?"-success":"-failure"));
+  if(successo && personaIngresso)
+    stradaAggiungiFavore(personaIngresso,1,"intro-"+step+"-success");
   if(successo){
     const min=Number(STRADA_INGRESSO.min[step-1]||120);
     const max=Number(STRADA_INGRESSO.max[step-1]||240);
@@ -1561,9 +1789,9 @@ function stradaConsumaPropostaFabbrica(colpoId,successo){
   return stradaConsumaOpportunita(colpoId,successo);
 }
 
-function stradaChanceConOpportunita(colpo,approccio,lead,personaSquadra){
+function stradaChanceConOpportunita(colpo,approccio,lead,personaSquadra,preparazione){
   return clamp(
-    stradaChance(colpo,approccio,personaSquadra)+Number(lead&&lead.chanceDelta||0),
+    stradaChance(colpo,approccio,personaSquadra,preparazione)+Number(lead&&lead.chanceDelta||0),
     .06,.93
   );
 }
@@ -1584,11 +1812,13 @@ function stradaEffettiOpportunita(lead,successo){
   };
 }
 
-function stradaChance(colpo, approccio, personaSquadra){
+function stradaChance(colpo, approccio, personaSquadra, preparazione){
   const s = G.strada;
   const categoria=stradaEffettiCategoria(colpo);
+  const prep=stradaPreparazioneEffetti(preparazione);
   let p = .62 - colpo.difficolta * .34;
   p += categoria.chance;
+  p += prep.chance;
   p += s.rep/100 * .20;
   if(approccio && approccio.id==="squadra" && personaSquadra)
     p += stradaBonusFiduciaSquadra(personaSquadra);
@@ -1606,19 +1836,21 @@ function stradaLavaggioStato(){
   return s.lavaggio;
 }
 
-function stradaTenta(colpoId, approccioId, personaSquadraId){
+function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
   const colpo = STRADA_COLPI.find(c => c.id === colpoId);
   const approccio = STRADA_APPROCCI.find(a => a.id === approccioId);
   if(!colpo || !approccio) return;
   const s = G.strada;
+  preparazione=stradaPreparazioneContesto(preparazione);
+  const effettiPreparazione=stradaPreparazioneEffetti(preparazione);
 
-  if(G.energy < colpo.energia){ STRADA_SCENA = stScenaAvviso(colpo, "Non hai abbastanza energia per questo colpo (serve " + colpo.energia + ")."); return; }
+  if(G.energy < colpo.energia){ STRADA_SCENA = stScenaAvviso(colpo, "Non hai abbastanza energia per questo colpo (serve " + colpo.energia + ").", preparazione); return; }
   const personaSquadra=approccio.id==="squadra" ? stradaPersonaSquadra(personaSquadraId) : null;
   if(approccio.serveUomo && !personaSquadra){
-    STRADA_SCENA = stScenaAvviso(colpo, "Per muoverti con il giro ti serve una persona reale che si fidi abbastanza di te.");
+    STRADA_SCENA = stScenaAvviso(colpo, "Per muoverti con il giro ti serve una persona reale che si fidi abbastanza di te.", preparazione);
     return;
   }
-  if(approccio.serveFerro && !s.ferro){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve il ferro, e non ce l'hai ancora."); return; }
+  if(approccio.serveFerro && !s.ferro){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve il ferro, e non ce l'hai ancora.", preparazione); return; }
 
   if(stradaAttivitaSbloccate()) s.giroAvviato=true;
   G.energy -= colpo.energia;
@@ -1627,7 +1859,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
-  const successo = Math.random() < stradaChanceConOpportunita(colpo,approccio,opportunita,personaSquadra);
+  const successo = Math.random() < stradaChanceConOpportunita(colpo,approccio,opportunita,personaSquadra,preparazione);
   const leadUsato = opportunita
     ? stradaConsumaOpportunita(colpoId, successo)
     : (leadLavoro && window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.consumeCrimeLead === "function"
@@ -1636,7 +1868,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
   const effettiLead=stradaEffettiOpportunita(leadUsato,successo);
   const moltiplicatoreLead = 1 + Number(effettiLead.bonusPct||0) / 100;
   const effettiCategoria=stradaEffettiCategoria(colpo);
-  const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore * effettiCategoria.heat, 2, 30);
+  const rumore = clamp((6 + colpo.difficolta * 10) * approccio.rumore *
+    effettiCategoria.heat * effettiPreparazione.heat, 2, 30);
   const rumoreLead = Number(effettiLead.heatDelta||0);
   const reputazioneLead = Number(effettiLead.repDelta||0);
   const personaLead=leadUsato&&leadUsato.personId?stradaPersonaDaId(leadUsato.personId):null;
@@ -1653,6 +1886,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
   if(personaLead && (!personaSquadra || personaLead.id!==personaSquadra.id))
     stradaModificaFiducia(personaLead,successo?8:-5,
       successo?"opportunita-success":"opportunita-failure");
+  if(successo && personaLead)
+    stradaAggiungiFavore(personaLead,1,"opportunita-success");
 
   /* Da smistare, punto 6: "Il giro grosso" segnato in agenda per oggi vale
      il suo peso — è il più rischioso dei sei eventi della settimana, e
