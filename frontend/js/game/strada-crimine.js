@@ -1985,12 +1985,32 @@ function stradaRifiutaOpportunita(){
 }
 function stradaRifiutaPropostaFabbrica(){ return stradaRifiutaOpportunita(); }
 
+function stradaIgnoraOpportunita(){
+  const st=stradaOpportunitaStato();
+  if(!st.pending) return null;
+  const proposta=Object.assign({},st.pending,{status:"ignored",ignoredAbsoluteDay:stradaAbsDay()});
+  const persona=stradaPersonaDaId(proposta.personId);
+  if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
+  st.pending=null;
+  st.history.push({
+    type:"ignored",
+    absoluteDay:stradaAbsDay(),
+    opportunityId:proposta.id,
+    trigger:proposta.trigger||null,
+    colpoId:proposta.colpoId,
+    personId:proposta.personId||null
+  });
+  if(st.history.length>30) st.history.shift();
+  return proposta;
+}
+function stradaIgnoraPropostaFabbrica(){ return stradaIgnoraOpportunita(); }
+
+/* Cancellazione tecnica: se un altro evento ha già occupato quello slot il
+   giocatore non ha visto né ignorato nessuno, quindi la relazione non cambia. */
 function stradaAnnullaOpportunita(){
   const st=stradaOpportunitaStato();
   if(!st.pending) return null;
   const proposta=st.pending;
-  const persona=stradaPersonaDaId(proposta.personId);
-  if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
   st.pending=null;
   if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay)){
     st.lastOfferAbsoluteDay=null;
