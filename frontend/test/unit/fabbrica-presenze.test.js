@@ -1280,6 +1280,59 @@ describe("cartellino presenze Fabbrica", () => {
     expect(luoghi).toContain('effettiRuolo.stress');
   });
 
+  it("espone requisiti carriera reali e il prossimo ruolo senza hardcode UI", () => {
+    const ctx = {
+      G:{
+        year:1,week:13,day:1,
+        job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40},
+        workplaces:{
+          fabbrica:{
+            career:{
+              reliability:68,cyclesCompleted:2,perfectCycles:1,perfectStreak:1,
+              cyclesInRole:2,perfectCyclesInRole:1,roleId:"operaio",roleLevel:0,
+              raisesByRole:{operaio:1},payHistory:[],roleHistory:[],
+              warnings:0,warningHistory:[],weeklyEvaluations:[],dismissals:0,
+              blockedUntilWeek:null,lastEvaluatedCycle:null,lastEvaluation:null,evaluations:[]
+            }
+          }
+        },
+        strada:{}
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => 13;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const p=vm.runInContext('lavoroProgressoCarriera("fabbrica")',ctx);
+    expect(p.ruolo.n).toBe("Operaio");
+    expect(p.prossimo.n).toBe("Operaio esperto");
+    expect(p.aumento.esaurito).toBe(true);
+    expect(p.promozione.cicli).toEqual({valore:2,soglia:3,ok:false});
+    expect(p.promozione.perfetti).toEqual({valore:1,soglia:2,ok:false});
+    expect(p.promozione.affidabilita).toEqual({valore:68,soglia:75,ok:false});
+    expect(p.prossimo.energia).toBe(36);
+    expect(p.prossimo.fisico).toBe("medio-alto");
+    expect(p.percorso.map(x=>x.stato)).toEqual(["corrente","futuro","futuro","futuro"]);
+  });
+
+  it("la UI Fabbrica spiega progressione, candidatura e impatto del prossimo ruolo", () => {
+    const luoghi = leggi("js/game/luoghi-foto.js");
+    const css = leggi("css/luoghi-foto.css");
+
+    expect(luoghi).toContain("function lfFabbricaCarriera()");
+    expect(luoghi).toContain('lavoroProgressoCarriera("fabbrica")');
+    expect(luoghi).toContain('lfPan("Carriera", lfFabbricaCarriera(), "spunta")');
+    expect(luoghi).toContain("Prossimo ruolo");
+    expect(luoghi).toContain("Cicli nel ruolo");
+    expect(luoghi).toContain("Cicli perfetti");
+    expect(luoghi).toContain("Affidabilità");
+    expect(luoghi).toContain("Cosa cambia per turno:");
+    expect(luoghi).toContain("Le soglie aprono una <b>candidatura</b>");
+    expect(css).toContain(".lfcareer-path{");
+    expect(css).toContain(".lfcareer-req.ok");
+  });
+
   it("il turno usa il luogo e la UI Fabbrica non dipende dall'id operaio", () => {
     const actions = leggi("js/game/actions.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
