@@ -2689,6 +2689,16 @@ window.ADF_JAIL=Object.freeze({
 function stradaSettimana(){
   const s = G.strada;
 
+  /* Un accordo di protezione ancora attivo è una relazione viva: il pagamento
+     settimanale conta come contatto e non deve far "sparire" il provider per
+     semplice trascorrere del tempo. */
+  const protRel=stradaProtezioneStato();
+  if(Number(s.prot||0)>0 && protRel.providerPersonId){
+    const providerRel=stradaPersonaDaId(protRel.providerPersonId);
+    if(providerRel) stradaRegistraInterazione(providerRel,"protezione-attiva");
+  }
+  stradaAggiornaRelazioniCriminali(false);
+
   if(s.arresto){
     s.arresto.settimane--;
     const persi = Math.round(G.fans * rnd(.06, .13));
@@ -2771,8 +2781,10 @@ function stradaSettimana(){
       protSt.prepaidWeekKey=null;
     }else{
       const costoProt=Number(STRADA_PROT[s.prot].costo||0);
-      if(Number(G.money||0)>=costoProt) G.money-=costoProt;
-      else{
+      if(Number(G.money||0)>=costoProt){
+        G.money-=costoProt;
+        if(provider) stradaRegistraInterazione(provider,"protezione-pagata");
+      }else{
         if(provider) stradaModificaFiducia(provider,-5,"protezione-non-pagata");
         protSt.history.push({status:"unpaid",level:Number(s.prot||0),providerPersonId:protSt.providerPersonId||null,
           providerName:protSt.providerName||null,absoluteDay:stradaAbsDay()});
@@ -3128,23 +3140,30 @@ function renderStColpi(){
 /* ---- a destra: chi ti copre, le attività ---- */
 function renderStCopre(){
   const s = G.strada;
+  stradaAggiornaRelazioniCriminali(true);
   const prot = STRADA_PROT[s.prot];
   const protSt=stradaProtezioneStato();
   const avvSt=stradaAvvocatoStato();
-  const contatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via)
+  const tuttiContatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via);
+  const contatti=tuttiContatti.filter(stradaRelazioneDisponibile)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const dormienti=tuttiContatti.filter(p=>!stradaRelazioneDisponibile(p));
   const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
   const avvConosciuti=stradaAvvocatiConosciuti();
   $("st-tab-copre").innerHTML =
-    '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ')</strong>' +
+    '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ' attive)</strong>' +
       '<span>' + (fidati.length
         ? fidati.length + ' ' + (fidati.length===1?'si fida':'si fidano') + ' abbastanza da muoversi con te.'
-        : 'Conosci gente, ma nessuno si fida ancora abbastanza da venire a un colpo con te.') + '</span></div>' +
+        : 'Conosci gente, ma nessuno attivo si fida ancora abbastanza da venire a un colpo con te.') +
+        (dormienti.length ? ' · ' + dormienti.length + ' ' +
+          (dormienti.length===1?'contatto è fuori dal giro per ora':'contatti sono fuori dal giro per ora') + '.' : '') +
+      '</span></div>' +
       '<div class="pills">' +
         (contatti.slice(0,3).map(p=>'<span class="pill' +
           (stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
           p.n + ' · ' + stradaFiduciaEtichetta(p) + '</span>').join('') ||
-          '<span class="pill no">Nessun contatto</span>') +
+          '<span class="pill no">Nessun contatto attivo</span>') +
+        (dormienti.length ? '<span class="pill no">' + dormienti.length + ' non raggiungibili</span>' : '') +
       '</div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
