@@ -341,6 +341,8 @@ composizione, sfondi, mappa e informazioni senza impoverire l'esperienza. Il por
 è una seconda disposizione del gioco: mostra l'invito a ruotare il dispositivo, senza forzare
 la rotazione a livello di sistema. Restano obbligatori bersagli da almeno 44 punti, niente `hover` indispensabili e
 testi leggibili senza zoom. Il giro mobile di gameplay copre 844×390; in portrait si controlla soltanto l'avviso di rotazione.
+Dal 02/10/2026 l'agente `prova-sul-telefono` e il suo promemoria non ci sono più (Carlo): il
+giro sul telefono lo coprono le e2e in orizzontale, e quello su un telefono vero si fa a mano.
 
 *«Responsività di tutto il gioco»* — **il giro sugli `:hover` è fatto (08/09/2026)**: tutte
 le regole `:hover` dei 24 fogli che ne avevano stanno dentro a `@media (hover:hover)`, e un

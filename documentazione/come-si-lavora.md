@@ -173,9 +173,9 @@ Non serve ricordarselo: dopo ogni `git commit` c'è un hook che lo chiede
 (`scripts/dopo-la-task.js`, qui sotto). Se però il commit è fatto a mano da un terminale
 qualsiasi, l'hook non c'è — lì tocca ricordarselo.
 
-C'è anche un terzo agente, `prova-sul-telefono`, che apre il gioco a misura di telefono e
-ci gioca davvero. Quello **non** è da ogni task: il giro dura, e si fa quando si sono
-toccate schermate, CSS o card. Se ne occupa un promemoria suo, all'inizio della sessione.
+Fino al 02/10/2026 c'era anche un terzo agente, `prova-sul-telefono`, col suo promemoria
+all'apertura della sessione: Carlo l'ha fatto togliere. Il telefono in orizzontale lo tengono
+d'occhio le e2e (`mobile-landscape.spec.js`, `mobile-touch.spec.js`); il resto si guarda a mano.
 
 ## Quello che gira da solo
 
@@ -194,10 +194,9 @@ sono, se non altro per non rifarle a mano:
 | cosa | quando parte | dove sta |
 | --- | --- | --- |
 | il controllo che il backend sia allineato | a ogni messaggio | `scripts/controlla-backend.js`, acceso da `.claude/settings.json` |
-| il promemoria del giro sul telefono | all'inizio della sessione, e non più di una volta al giorno | `scripts/promemoria-telefono.js` |
 | la richiesta del giro di fine task | dopo ogni `git commit` | `scripts/dopo-la-task.js` |
 | **il registro delle modifiche** | dai merge in `main` | `scripts/genera-registro-modifiche.js` |
-| i tre agenti (`segnala-problemi`, `backend-allineato`, `prova-sul-telefono`) | a richiesta, o quando lo chiedono gli hook qui sopra | `.claude/agents/` |
+| i due agenti (`segnala-problemi`, `backend-allineato`) | a richiesta, o quando lo chiedono gli hook qui sopra | `.claude/agents/` |
 
 Due cose da sapere. **[`registro-modifiche/`](../registro-modifiche) non si scrive a
 mano**: è un bot che lo rifà leggendo i merge, diviso per argomento, e quello che ci metti
@@ -210,7 +209,6 @@ Quando si tocca uno di questi script si prova prima a mano — girano tutti anch
 
 ```bash
 node scripts/controlla-backend.js
-node scripts/promemoria-telefono.js
 node scripts/dopo-la-task.js
 ```
 
