@@ -211,6 +211,8 @@ describe("cartellino presenze Fabbrica", () => {
     expect(contratto.turniSettimanali).toBe(5);
     expect(Array.from(contratto.giorniConsentiti)).toEqual([1,2,3,4,5,6]);
     expect(contratto.domenicaRiposo).toBe(true);
+    expect(contratto.bonusSestoGiornoPct).toBe(30);
+    expect(contratto.bonusDomenicaPct).toBe(75);
     expect(contratto.cicloSettimane).toBe(4);
   });
 
@@ -462,12 +464,17 @@ describe("cartellino presenze Fabbrica", () => {
     expect(cart.giorniLavoratiSettimana).toBe(4);
   });
 
-  it("mostra la maggiorazione sia prima del turno sia nel risultato", () => {
+  it("mostra le maggiorazioni nel contratto, prima del turno e nel risultato", () => {
     const actions = leggi("js/game/actions.js");
     const luoghi = leggi("js/game/luoghi-foto.js");
 
     expect(actions).toContain('paga.etichetta + ": bonus +" + paga.percentuale');
     expect(actions).toContain('paga.totale');
+    expect(luoghi).toContain("contratto.bonusSestoGiornoPct");
+    expect(luoghi).toContain("contratto.bonusDomenicaPct");
+    expect(luoghi).toContain('"Il 6° giorno distinto della settimana paga +"');
+    expect(luoghi).toContain('"%. La domenica resta riposo: se l’azienda propone e autorizza uno straordinario, paga +"');
+    expect(luoghi).toContain("regolaMaggiorazioni");
     expect(luoghi).toContain('pagaTurno.etichetta');
     expect(luoghi).toContain("(pagaTurno.percentuale ? ' (+' + pagaTurno.percentuale + '%)' : '')");
   });
