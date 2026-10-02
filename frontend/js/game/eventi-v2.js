@@ -2394,7 +2394,7 @@ function adfWorkOvertimeAfterShift(){
    L'offerta arriva dal pool generale della Strada e non ha bisogno di essere
    collegata al lavoro. Prima c'è un dialogo breve, poi la decisione con i
    numeri reali del gameplay davanti. */
-function adfFactoryStreetDecision(proposta){
+function adfStreetOpportunityDecision(proposta){
   if(!proposta) return;
   const termini=typeof stradaDescriviOpportunita==="function"
     ? stradaDescriviOpportunita(proposta)
@@ -2437,6 +2437,46 @@ function adfFactoryStreetDecision(proposta){
   });
 }
 
+function adfStreetOpportunityAfterAction(a){
+  if(!a || a.id==="turno") return false;
+  if(typeof stradaTentaOpportunita!=="function") return false;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.crimeLeadActive==="function" &&
+     ADF_WORK_EVENTS.crimeLeadActive()) return false;
+
+  const s=st();
+  if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaOpportunita("mondo",Math.random(),Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-opportunity")){
+    if(typeof stradaAnnullaOpportunita==="function") stradaAnnullaOpportunita();
+    return false;
+  }
+
+  s.lastHookEventDay=absDay();
+  afterClear(()=>showEvent({
+    k:"Strada",
+    t:(proposta.persona||"Qualcuno")+" si fa vivo",
+    d:"Più tardi, mentre sei fuori, ti arriva un messaggio corto da una persona del giro."+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»"),
+    annulla(){
+      if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
+    },
+    opts:[
+      {n:"Sentiamo",d:"Ti fai spiegare la proposta",run(){
+        afterClear(()=>adfStreetOpportunityDecision(proposta),60);
+        return null;
+      }},
+      {n:"Ignora",d:"Non vuoi aprire quella porta oggi",run(){
+        if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
+        return {t:"Hai ignorato il messaggio. Nessun effetto sulla Strada.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
 function adfFactoryStreetAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
     return false;
@@ -2469,7 +2509,7 @@ function adfFactoryStreetAfterShift(){
     },
     opts:[
       {n:"Sentiamo",d:"Gli lasci spiegare cosa vuole",run(){
-        afterClear(()=>adfFactoryStreetDecision(proposta),60);
+        afterClear(()=>adfStreetOpportunityDecision(proposta),60);
         return null;
       }},
       {n:"Taglia corto",d:"Non vuoi nemmeno sentire i dettagli",run(){
@@ -3005,6 +3045,9 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
     ? adfWorkContactAfterShift()
     : false;
+  const streetOpportunityShown = a.id!=="turno"
+    ? adfStreetOpportunityAfterAction(a)
+    : false;
 
   if(a.id==="turno" && shiftPayload && shiftPayload.workplace){
     adfShiftOutcomeEvent(shiftPayload.workplace,jobBefore,{
@@ -3015,7 +3058,7 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
   if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
     emitHook("after_job_shift",shiftPayload || {
