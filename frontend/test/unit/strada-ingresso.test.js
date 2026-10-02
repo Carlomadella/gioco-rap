@@ -117,6 +117,28 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.ingressoPending).toBeTruthy();
   });
 
+  it("un salvataggio a meta ingresso conserva il vero contatto che consegna il TrapPhone",()=>{
+    const {ctx,G}=contesto({
+      day:4,
+      gente:[{id:"p1",n:"Milo",ruolo:"rider",origine:"lavoro",origineLuogo:"pizzeria"}],
+      strada:{
+        rep:1,heat:2,sporchi:80,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:false,
+        badgeSbloccato:false,ingressoFase:"contact",ingressoPersonaId:"p1",
+        ingressoPersonaNome:"Milo",ingressoTentativi:1,
+        ingressoLastOfferAbsoluteDay:null,ingressoNextOfferAbsoluteDay:4
+      }
+    });
+    expect(G.strada.traphone).toBeUndefined();
+    vm.runInContext("stradaTentaIngresso(0,0)",ctx);
+    const out=vm.runInContext("stradaAccettaIngresso(0,.5)",ctx);
+    expect(out.unlocked).toBe(true);
+    expect(out.trapPhoneAcquired).toBe(true);
+    expect(G.strada.traphone.sourcePersonId).toBe("p1");
+    expect(G.strada.traphone.sourceName).toBe("Milo");
+    expect(G.strada.traphone.source).toBe("intro");
+  });
+
   it("migra i salvataggi legacy senza richiudere una carriera gia avviata",()=>{
     const {ctx,G}=contesto();
     delete G.strada.badgeSbloccato;
