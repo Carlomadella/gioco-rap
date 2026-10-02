@@ -6,6 +6,40 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:ebbb3031 -->
+## 02/10/26, 20:42 — feature/strada-punto1-ingresso → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `ebbb3031`
+
+### Cosa è entrato
+
+- `406338ea` — chore(frontend): aggiorna cache agenda criminale — **mycolbraga**
+- `dc73f223` — fix(strada): evita spam della proposta introduttiva — **mycolbraga**
+- `9737a7f9` — chore(strada): limita il reminder della proposta a una volta al giorno — **mycolbraga**
+- `993a6a0b` — feat(agenda): nascondi eventi criminali prima dello sblocco — **mycolbraga**
+- `ca92a80e` — chore(frontend): aggiorna cache busting Strada punto 1 — **mycolbraga**
+- `e2576634` — test(strada): copri ingresso nascosto e fase protetta — **mycolbraga**
+- `fabaa695` — feat(strada): collega la strana proposta agli eventi reali — **mycolbraga**
+- `b225a423` — fix(strada): impedisci accesso diretto prima dello sblocco — **mycolbraga**
+- `922d0e65` — feat(hub): nascondi criminalita finche non viene sbloccata — **mycolbraga**
+- `82466416` — feat(strada): implementa ingresso protetto prima del badge — **mycolbraga**
+- `43a6ccdb` — feat(strada): aggiungi stato ingresso criminale nascosto — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/agenda.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/hub.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-ingresso.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:234a3d39 -->
 ## 02/10/26, 18:43 — fix/pizzeria-secondo-audit → main
 
