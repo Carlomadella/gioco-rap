@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8663aedd -->
+## 02/10/26, 11:21 — task/fabbrica-capoturno-terminale → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `8663aedd`
+
+### Cosa è entrato
+
+- `9af6b6c3` — docs(fabbrica): chiarisce limite attuale della carriera — **mycolbraga**
+- `c4a81de2` — test(fabbrica): fissa Capoturno come grado terminale attuale — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:bbc0a744 -->
 ## 02/10/26, 11:09 — task/fabbrica-eventi-pacing → main
 

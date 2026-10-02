@@ -1556,6 +1556,39 @@ describe("cartellino presenze Fabbrica", () => {
     expect(p.percorso.map(x=>x.stato)).toEqual(["corrente","futuro","futuro","futuro"]);
   });
 
+  it("Capoturno resta il grado terminale finché non esiste un percorso successivo definito", () => {
+    const ctx = {
+      G:{
+        year:2,week:10,day:1,
+        job:{id:"capoturno",place:"fabbrica",n:"Capoturno",pay:456,e:28},
+        workplaces:{
+          fabbrica:{
+            career:{
+              reliability:100,cyclesCompleted:20,perfectCycles:20,perfectStreak:20,
+              cyclesInRole:10,perfectCyclesInRole:10,roleId:"capoturno",roleLevel:3,
+              raisesByRole:{operaio:1,operaio_esperto:1,capolinea:1,capoturno:1},
+              payHistory:[],roleHistory:[],warnings:0,warningHistory:[],
+              weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,
+              lastEvaluatedCycle:null,lastEvaluation:null,evaluations:[]
+            }
+          }
+        },
+        strada:{}
+      },
+      Number, Math, Array, Object, Set
+    };
+    ctx.totalWeeks = () => 62;
+    vm.createContext(ctx);
+    vm.runInContext(helperLavoro(), ctx);
+
+    const p=vm.runInContext('lavoroProgressoCarriera("fabbrica")',ctx);
+    expect(p.ruolo.id).toBe("capoturno");
+    expect(p.prossimo).toBeNull();
+    expect(p.promozione.massimo).toBe(true);
+    expect(p.promozione.disponibile).toBe(false);
+    expect(vm.runInContext('lavoroPromozioneDisponibile("fabbrica")',ctx)).toBe(false);
+  });
+
   it("la UI Fabbrica spiega progressione, candidatura e impatto del prossimo ruolo", () => {
     const luoghi = leggi("js/game/luoghi-foto.js");
     const css = leggi("css/luoghi-foto.css");
@@ -1564,6 +1597,8 @@ describe("cartellino presenze Fabbrica", () => {
     expect(luoghi).toContain('lavoroProgressoCarriera("fabbrica")');
     expect(luoghi).toContain('lfPan("Carriera", lfFabbricaCarriera(), "spunta")');
     expect(luoghi).toContain("Prossimo ruolo");
+    expect(luoghi).toContain("Grado massimo raggiunto");
+    expect(luoghi).toContain("Non ci sono altre mansioni sopra");
     expect(luoghi).toContain("Cicli nel ruolo");
     expect(luoghi).toContain("Cicli perfetti");
     expect(luoghi).toContain("Affidabilità");
