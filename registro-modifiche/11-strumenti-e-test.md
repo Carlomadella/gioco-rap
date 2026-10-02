@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:6bad7f1d -->
+## 02/10/26, 00:35 — task/strada-incontri-criminali-gameplay → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `6bad7f1d`
+
+### Cosa è entrato
+
+- `dcf6efc9` — fix(strada): separa davvero i trigger giornalieri delle opportunita — **mycolbraga**
+- `0403a258` — fix(strada): non consuma la varieta se il popup viene annullato — **mycolbraga**
+- `74c82e92` — test(strada): include i colpi nel runtime delle opportunita — **mycolbraga**
+- `89b8074e` — test(strada): copre incontri criminali fuori dal lavoro — **mycolbraga**
+- `4e985c2c` — fix(strada): annulla anche il cooldown se il popup non parte — **mycolbraga**
+- `cdc8bd49` — feat(strada): fa emergere opportunita anche fuori dalla Fabbrica — **mycolbraga**
+- `065a5875` — feat(strada): abilita incontri criminali anche fuori dal lavoro — **mycolbraga**
+- `5f8d8f81` — fix(strada): aggiorna il riepilogo al nuovo incontro generale — **mycolbraga**
+- `211ecd21` — ux(strada): rende leggibile il colpo associato alla proposta — **mycolbraga**
+- `f48ae181` — refactor(strada): prepara trigger riutilizzabili per gli incontri — **mycolbraga**
+- `ccc0d7f8` — chore(cache): invalida opportunita criminali — **mycolbraga**
+- `a33877f3` — test(strada): copre pool dialoghi e conseguenze gameplay — **mycolbraga**
+- `03a1dde0` — refactor(strada): centralizza gli effetti reali delle opportunita — **mycolbraga**
+- `13c7bf9f` — feat(strada): aggiunge dialogo e decisione alle opportunita — **mycolbraga**
+- `2ea0280d` — feat(strada): introduce pool generale di opportunita criminali — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:4849d83d -->
 ## 02/10/26, 00:32 — fix/mobile-makehuman-bootstrap → main
 
