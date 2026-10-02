@@ -154,7 +154,9 @@ non resta niente.
   cartelli: Bancone, Sala, Palco (solo il live, coi momenti) e Backstage (con l'artista della
   serata e i tuoi fan) sono pagine loro sui riferimenti, i riquadri di sotto non ci sono più e
   gli orari si aprono col mouse sopra («Il Circolo a stanze: Bancone, Sala, Palco,
-  Backstage» in `implementazioni/02-interfaccia-e-telefono.md`). Restano lo Shop e la Strada
+  Backstage» in `implementazioni/02-interfaccia-e-telefono.md`). **FATTO (02/10/2026)** — il
+  Bancone rifatto uguale al riferimento nuovo, con le mosse come card con la foto («Il Bancone
+  uguale al riferimento nuovo»). Restano lo Shop e la Strada
   senza foto e il fondale pulito del Circolo (oggi è ritagliato dal riferimento).
 - **FATTO (19/09/2026)** — il primo minuto di chi prova il gioco: l'avvio rapido non è più
   nove secondi di nero ma la schermata «Preparo il tuo artista», con le fasi vere del

@@ -4,7 +4,9 @@
    riferimento in `media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/`:
 
      Bancone    bancone.png    la gente che non conosci, l'atmosfera, quattro
-                               modi di avvicinarla (circolo-incontri.js)
+                               modi di avvicinarla (circolo-incontri.js) —
+                               rifatto il 02/10/2026 sul riferimento nuovo,
+                               le quattro mosse come card con la foto
      Sala       sala.png       tutta la gente presente: la scheda, il rapporto,
                                le mosse di posto.js, chi c'è stasera
      Palco      open_mic.png   solo il live: l'ordine della serata, i momenti
@@ -33,13 +35,15 @@ function circoloStanza(id, f){
 }
 
 /* ---------- i pezzi che tornano ---------- */
-/* «← Il Circolo / Sala»: si torna alla foto coi cartelli */
-function ccBriciole(id){
+/* «← Il Circolo / Sala»: si torna alla foto coi cartelli. Il Bancone, sul suo
+   riferimento nuovo, ha lo spillo al posto della freccia e niente sbarra, in
+   un riquadro solo (`spillo`). */
+function ccBriciole(id, spillo){
   const fermo = circoloStato().serata;
-  return '<nav class="cc-briciole">' +
+  return '<nav class="cc-briciole' + (spillo ? " spillo" : "") + '">' +
     '<button type="button" class="cc-indietro" data-cc-esci="1"' + (fermo ? ' disabled title="Sei sul palco: prima finisci la serata"' : "") + ' aria-label="Torna al Circolo">' +
-      '<s>' + ccIco("freccia") + '</s><b>Il Circolo</b></button>' +
-    '<span>/</span><i>' + CC_STANZE[id].n + '</i></nav>';
+      '<s>' + ccIco(spillo ? "spillo" : "freccia") + '</s><b>Il Circolo</b></button>' +
+    (spillo ? "" : '<span>/</span>') + '<i>' + CC_STANZE[id].n + '</i></nav>';
 }
 function ccTitolo(id, cls){
   const s = CC_STANZE[id];
@@ -74,13 +78,6 @@ function ccSfondo(url){
   return '<div class="cc-sfondo" aria-hidden="true" style="background-image:url(&quot;' + url + '&quot;)"></div>';
 }
 function ccVuoto(t){ return '<div class="cc-vuoto">' + t + '</div>'; }
-/* le mosse come tasti grandi: icona, nome, cosa fa, e sotto il prezzo o il
-   perché no */
-function ccTastoMossa(attr, ic, m){
-  return '<button type="button" class="cc-mossa2' + (m.puo ? "" : " no") + '" ' + attr + (m.puo ? "" : " disabled") + ' title="' + ccEsc(m.puo ? m.d : m.perche) + '">' +
-    '<i>' + ccIco(ic) + '</i><span><b>' + m.n + '</b><em>' + ccEsc(m.d) + '</em>' +
-    '<u>' + ccEsc(m.puo ? m.costo : m.perche + ".") + '</u></span></button>';
-}
 /* il dialogo di posto.js (la situazione e le risposte), dove serve */
 function ccDialogo(p){
   if(typeof POSTO_PARLA === "undefined" || !POSTO_PARLA || POSTO_PARLA.p.id !== p.id) return "";
@@ -92,6 +89,18 @@ function ccDialogo(p){
 
 /* ==================== IL BANCONE ==================== */
 const CC_BAN_ICO = {attacca:"bolla", bevi:"boccale", ascolta:"orecchio", presentati:"mano"};
+/* i nomi per intero: l'audit delle immagini orfane li cerca così */
+const CC_BAN_FOTO = {attacca:"bancone-attacca.jpg", bevi:"bancone-bevi.jpg", ascolta:"bancone-ascolta.jpg", presentati:"bancone-presentati.jpg"};
+/* una mossa del Bancone come card del riferimento: la foto ritagliata dal
+   riferimento (media/photo/circolo/stanze/, CC_BAN_FOTO), l'icona,
+   il nome, cosa fa, e sotto l'orologio col prezzo e il tasto tondo. Se non
+   si può, al posto del prezzo c'è il perché. */
+function ccCartaBancone(m){
+  return '<button type="button" class="cc-bcarta' + (m.puo ? "" : " no") + '" data-cc-ban="' + m.id + '"' + (m.puo ? "" : " disabled") + ' title="' + ccEsc(m.puo ? m.d : m.perche) + '">' +
+    '<span class="cc-bcfoto" aria-hidden="true" style="background-image:url(&quot;' + CIRCOLO_FOTO + 'stanze/' + CC_BAN_FOTO[m.id] + '&quot;)"></span>' +
+    '<i>' + ccIco(CC_BAN_ICO[m.id]) + '</i><b>' + m.n + '</b><em>' + ccEsc(m.d) + '</em>' +
+    '<span class="cc-bcpiede"><u>' + (m.puo ? ccIco("orologio") + ccEsc(m.costo) : ccEsc(m.perche + ".")) + '</u><s>' + ccIco("freccia") + '</s></span></button>';
+}
 function ccBancone(f){
   const chi = circoloPresenti().slice().sort((a, b) => (circoloSconosciuto(b) ? 1 : 0) - (circoloSconosciuto(a) ? 1 : 0));
   let p = chi.find(x => x.id === CIRCOLO.scelto) || chi[0] || null;
@@ -106,22 +115,14 @@ function ccBancone(f){
   }).join("") : ccVuoto(f ? "Al bancone non c’è nessuno, adesso." : "Il Circolo è chiuso. Riapre alle 13:00: di pomeriggio ci trovi la gente del giro.");
   const dialogo = p ? ccDialogo(p) : "";
   const azioni = dialogo ||
-    '<div class="cc-bgriglia">' + circoloBanconeMosse(p).map(m => ccTastoMossa('data-cc-ban="' + m.id + '"', CC_BAN_ICO[m.id], m)).join("") + '</div>';
-  const risultato = (ic, n, d) => '<div class="cc-ris"><i>' + ccIco(ic) + '</i><span><b>' + n + '</b><em>' + d + '</em></span></div>';
+    '<div class="cc-bgriglia">' + circoloBanconeMosse(p).map(ccCartaBancone).join("") + '</div>';
   return '<div class="cc-bancone">' +
     '<section class="cc-bsx">' +
-      '<div class="cc-bfoto" style="background-image:url(&quot;' + CIRCOLO_FOTO + 'stanze/bancone.jpg&quot;)">' + ccBriciole("bancone") + '</div>' +
+      '<div class="cc-bfoto" style="background-image:url(&quot;' + CIRCOLO_FOTO + 'stanze/bancone.jpg&quot;)">' + ccBriciole("bancone", true) + '</div>' +
       '<div class="cc-bpan">' +
         '<h3 class="cc-h">' + (dialogo ? "Con " + ccNome(p) : "Azioni disponibili") +
-          (p && !dialogo ? ' <small>con ' + ccNome(p) + '</small>' : "") + '</h3>' +
+          (dialogo ? "" : ' <small>Cosa vuoi fare?</small>') + '</h3>' +
         azioni + ccDettoRiga() +
-        '<h4 class="cc-h4">Possibili risultati</h4>' +
-        '<div class="cc-risultati">' +
-          risultato("gente", "Nuovo contatto", "Aggiunge la persona alla tua rete di contatti.") +
-          risultato("fuoco", "Aumento hype", "Col locale pieno la tua presenza si fa notare nel giro.") +
-          risultato("mano", "Maggiore amicizia", "Sblocca nuove interazioni e opportunità future.") +
-          risultato("calendario", "Opportunità future", "Live, collaborazioni, inviti a eventi.") +
-        '</div>' +
       '</div>' +
     '</section>' +
     '<section class="cc-bdx">' +
@@ -131,8 +132,6 @@ function ccBancone(f){
           '<p><i>' + ccIco("gente") + '</i><span><b>' + (atm >= 82 ? "Locale pieno" : atm >= 45 ? "Gente in giro" : atm > 0 ? "Poca gente" : "Chiuso") + '</b>' + atmN[1] + '</span></p>' +
         '</div>' +
       '</div>' +
-      '<p class="cc-bdesc">Il bancone è il cuore del Circolo. Qui si incontrano artisti, producer, fonici, videomaker e gente del giro. ' +
-        'Una chiacchiera, un drink o il commento giusto possono aprire nuove opportunità.</p>' +
       '<div class="cc-lista2"><h3 class="cc-h">Persone al bancone <span class="cc-conta">' + chi.length + '</span>' +
         (f ? '<small class="cc-agg">' + ccIco("aggiorna") + 'Si aggiorna tra ' + (typeof GAME_TIME !== "undefined" && GAME_TIME.formatDuration ? GAME_TIME.formatDuration(fra) : fra + " min") + '</small>' : "") + '</h3>' +
         '<div class="cc-scorri">' + lista + '</div></div>' +
