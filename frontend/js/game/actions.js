@@ -1811,6 +1811,28 @@ function lavoroSegnaEventoEsitoTurno(luogo,event){
   return out.event;
 }
 
+/* Evita che una singola conoscenza diventi una sorgente infinita di rete.
+   Le ricompense ripetibili legate al lavoro hanno rendimento decrescente:
+   prima volta piena, seconda dimezzata, poi zero per quella fonte/persona. */
+function lavoroBonusRetePersona(persona,fonte,base,maxVolte){
+  if(!persona || !fonte) return 0;
+  base=Math.max(0,Number(base||0));
+  maxVolte=Math.max(1,Number(maxVolte||2));
+  if(!base) return 0;
+
+  if(!persona.workNetworkRewards || typeof persona.workNetworkRewards!=="object")
+    persona.workNetworkRewards={};
+
+  const key=String(fonte);
+  const usi=Math.max(0,Number(persona.workNetworkRewards[key]||0));
+  if(usi>=maxVolte) return 0;
+
+  const delta=usi===0 ? base : base*.5;
+  persona.workNetworkRewards[key]=usi+1;
+  if(typeof gain==="function") gain("rete",delta);
+  return delta;
+}
+
 function lavoroReteStato(luogo){
   const sede = lavoroSede(luogo);
   if(!sede) return null;
