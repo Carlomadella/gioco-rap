@@ -171,6 +171,27 @@ describe("Fabbrica × Strada", () => {
     expect(testo).toContain("reputazione");
   });
 
+  it("un contatto del mondo entra una volta sola in G.gente e viene riusato",()=>{
+    const {ctx,G}=contestoStrada({
+      gente:[],
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        badgeSbloccato:true,
+        traphone:{owned:true,sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:1,source:"test"},
+        fabbricaLead:{lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]}
+      }
+    });
+    const a=vm.runInContext('stradaRisolviContattoOpportunita(STRADA_OPPORTUNITA[0],"mondo",false)',ctx);
+    const count=G.gente.length;
+    const b=vm.runInContext('stradaRisolviContattoOpportunita(STRADA_OPPORTUNITA[0],"mondo",false)',ctx);
+    expect(a.id).toBe(b.id);
+    expect(G.gente).toHaveLength(count);
+    expect(a.strada.known).toBe(true);
+    expect(a.strada.opportunityIds).toContain("giro-breve");
+    expect(a.circoloSbloccato).toBe(true);
+  });
+
   it("evita di riproporre subito la stessa opportunità", () => {
     const {ctx,G} = contestoStrada({
       strada:{
@@ -343,6 +364,16 @@ describe("Fabbrica × Strada", () => {
     expect(vm.runInContext("stradaAggiornaPropostaFabbrica(false)", ctx)).toBeNull();
     expect(G.strada.fabbricaLead.active).toBeNull();
     expect(logs.some(x => x.msg.includes("opportunità della Strada è scaduta"))).toBe(true);
+  });
+
+  it("il Circolo gestisce anche ruoli di vita/Strada senza consumare gli slot del cast musicale",()=>{
+    const posto=leggi("js/game/posto.js");
+    const circolo=leggi("js/game/circolo-stanze.js");
+    expect(posto).toContain("const DIALOGHI_VITA");
+    expect(posto).toContain("DIALOGHI[p.ruolo] || DIALOGHI_VITA");
+    expect(posto).toContain("!(p.strada && p.strada.known)");
+    expect(circolo).toContain("Sai che è collegato alla Strada");
+    expect(circolo).toContain("strada:{aperto:");
   });
 
   it("collega popup fuori dal cancello, timer e bonus al colpo reale", () => {
