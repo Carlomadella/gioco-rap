@@ -66,7 +66,10 @@ const STUDIO_FOTO = {
      nella pila delle «in attesa» perché nessuno l'aveva mai guardata. (La
      scrivania di notte di `studio_promo.png` era il fondale del Marketing:
      con la promo passata al telefono è tornata fra le foto in attesa.) */
-  fuori:  {f:"studio_uscita.png", pos:"center 55%"}
+  fuori:  {f:"studio_uscita.png", pos:"center 55%"},
+  /* il disco: la scrivania di notte, quella in attesa da quando la promo è
+     passata al telefono — è dove si mettono in fila le tracce */
+  disco:  {f:"studio_promo.png",  pos:"center 50%"}
 };
 
 /* `n` è il nome corto, quello della linguetta in basso — le sette voci del
@@ -98,7 +101,11 @@ const STUDIO_SEZIONI = [
      (`studio_promo_su_lafamegram`) ha in cima «TELEFONO · LAFAMEGRAM». Sta
      li', in `telefono.js`; da qui, dopo l'uscita, ci si arriva con un tasto. */
   {id:"fuori",  n:"Uscita",    bar:"Fuori",        sc:"pubblica",
-   d:"com'è vestito, e quando esce", dopo:true}
+   d:"com'è vestito, e quando esce", dopo:true},
+  /* Mixtape e album (CARLO, «Studio (16/09/2026)»): i pezzi in fila,
+     scritti in progetti.js */
+  {id:"disco",  n:"Disco",     bar:"Il disco",
+   d:"mixtape o album: i pezzi in fila"}
 ];
 
 let STUDIO_SEZ = "beat";
@@ -1366,7 +1373,8 @@ function studioSezFuori(){
                   ? 'Oggi <b>è venerdì</b>: esce stanotte, nel giorno che rende di più. '
                   : 'Esce <b>venerdì</b>, ' + studioVenerdiTesto() + '. ')
               : quando === "cassetto"
-                ? 'Resta tuo e non esce: lo ritrovi <b>in cassaforte</b>, e da lì torna in coda quando vuoi. '
+                ? 'Resta tuo e non esce: lo ritrovi <b>in cassaforte</b>, e da lì torna in coda quando vuoi — ' +
+                  'o finisce in un mixtape o in un album, nella linguetta <b>Disco</b>. '
                 : '') +
             (da == null
               ? 'Non hai ancora fatto uscire niente: il primo pezzo è quello che dice chi sei.'
@@ -1539,6 +1547,7 @@ function renderStudio(){
      sez.id === "testo"  ? studioSezTesto() :
      sez.id === "cabina" ? studioSezCabina() :
      sez.id === "banco"  ? studioSezBanco() :
+     sez.id === "disco" && typeof studioSezDisco === "function" ? studioSezDisco() :
      studioSezFuori());
 
   $("st-sx").innerHTML = parti.sx || "";

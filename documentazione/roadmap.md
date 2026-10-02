@@ -190,6 +190,10 @@ Carletto, segnati dal push degli altri): carico dei turni e straordinari per ruo
 reparto e per mansione con bonus e malus diversi, sovraccarico settimanale progressivo con la
 fatica solo sul carico lungo, il conflitto fra turno e musica leggibile, e la rete dei contatti
 separata per ruolo (`frontend/js/game/lavoro-eventi.js`, `actions.js`, `posto.js`).
+**FATTO (02/10/2026)** — le **ferie in Fabbrica** (pull request #39, segnate dal push degli
+altri): due giorni ogni ciclo di quattro settimane, chiesti almeno il giorno prima; il giorno
+di ferie non è un turno e non è un'assenza, copre la quota del contratto senza malus e non si
+sovrappone agli straordinari. «Ferie in Fabbrica» in `05-carriera-e-tempo.md`.
 
 **Manca**:
 
@@ -277,6 +281,15 @@ decide lì e si fa in Studio — la parte 2 si incide in Cabina col titolo già 
 rimette in piedi anche il primo, la remastered si chiude al banco del Mix (24 energie, 80 €,
 metà del mix più il fonico) e il pezzo riparte quasi come nuovo. La riga della Discografia nel
 telefono, che era rotta, va su due righe. «Remastered e parti 2» in `04-musica-e-suoni.md`.
+
+**FATTO (02/10/2026)** — **mixtape e album**, la sesta linguetta dello Studio, «Disco»: le
+tracce si mettono in fila coi pezzi incisi e non usciti (banco e cassaforte) più qualche
+singolo già fuori; il mixtape va da 4 a 8 tracce ed è gratis, l'album da 8 a 16 e costa 350 €.
+Il disco ha un voto (la media meno i riempitivi) e una coesione (le tracce sullo stesso tema);
+esce stanotte o venerdì, fa uscire insieme le tracce nuove, rilancia i singoli, porta hype e
+gente, e spinge gli ascolti delle sue tracce per qualche settimana. Nella Discografia i dischi
+stanno sopra ai pezzi. «Studio · Mixtape e album» in `04-musica-e-suoni.md`; i numeri vanno
+misurati col simulatore.
 
 **Manca**: la cover «stile emblema», l'editor a livelli (una pagina a parte). L'app della
 discografia che dice come invecchiano i pezzi **c'era già** dal 04/09/2026: questa riga

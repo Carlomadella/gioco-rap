@@ -623,3 +623,47 @@ I due controlli dell'audit sulle take («una take in più si paga in energia», 
 take non costa energia») sono riscritti sui numeri nuovi. Il riferimento in
 `documentazione/pagine-azioni/README.md` («UN'ALTRA TAKE · 12 energia») è la foto di come
 doveva essere e non si riscrive.
+
+---
+
+## Studio · Mixtape e album
+
+> «fai in modo che si possano creare mixtape e album» — CARLO, «Studio (16/09/2026)»
+
+**FATTO (02/10/2026)** — branch `task/studio-mixtape-album`. Lo Studio ha una sesta
+linguetta, **Disco**: si sceglie la forma, si dà un titolo e una copertina, e si mettono in
+fila le tracce con i pezzi che hai già — quelli incisi e non usciti (sul banco o in
+cassaforte) e qualche singolo già fuori. Le tracce si spostano su e giù e si tolgono.
+
+| | Mixtape | Album |
+| --- | --- | --- |
+| tracce | da 4 a 8 | da 8 a 16 |
+| singoli già fuori, al massimo | 2 | 4 |
+| costo | gratis | 350 € (mastering e distribuzione) |
+| hype all'uscita | 6 + voto × 0,10 | 12 + voto × 0,20 |
+| spinta sugli ascolti delle tracce | ×1,15 | ×1,35 |
+| i singoli tornano a girare a | 0,3 | 0,5 |
+
+- Il **voto** del disco è la media delle qualità (un provino non mixato perde 8 punti, come
+  quando esce da solo) meno 3 punti per ogni **riempitivo**, una traccia sotto q40.
+- La **coesione**: se almeno il 60% delle tracce sta sullo stesso tema (quello scelto al
+  Testo), il disco ha una faccia — +4 hype e +0,1 sulla spinta.
+- All'uscita le tracce nuove escono tutte lo stesso giorno, i singoli dentro al disco
+  **tornano a girare** (la curva rilanciata delle parti 2, `rilancio` in `seguiti.js`),
+  arriva l'hype e un po' di gente subito; poi per qualche settimana le tracce girano di più
+  (`progettoSpinta`, letta da `songWeekly()` in `sim.js`, che cala con `exp(−settimane/8)`).
+- Come un pezzo, esce **stanotte** o **venerdì** (+4 hype). In coda le tracce nuove stanno
+  ferme in cassaforte e non si ritirano una a una: si ritira il disco intero, e il mastering
+  resta pagato — richiuso nella stessa forma non si ripaga. Di venerdì esce stanotte. Un pezzo sta in un disco solo.
+- Nella **Discografia** (anche quella del telefono) i dischi usciti stanno sopra ai pezzi,
+  e ogni pezzo dice da quale disco viene.
+
+Il codice sta in un file nuovo, `frontend/js/game/progetti.js`, con `css/progetti.css`; gli
+agganci sono una riga ciascuno in `studio.js` (la linguetta), `sim.js` (la spinta e l'uscita
+del venerdì), `ui.js` (la Discografia), `studio-elementi.js` (la cassaforte) e `state.js`
+(`G.progetti`). Otto prove in `frontend/test/unit/progetti.test.js`; cinque controlli
+nell'audit, e i due che contavano le linguette a cinque (audit e `prova.js`) adesso ne contano
+sei. I numeri sono un primo giro: vanno misurati col simulatore di bilanciamento.
+
+Il **joint album** su chiamata di un produttore resta aperto: adesso l'album come oggetto
+c'è, manca la chiamata e gli altri rapper sulle tracce.
