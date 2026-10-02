@@ -11,63 +11,18 @@ iframe{display:block;width:100%;height:100%;border:0;background:#050609}
 </head>
 <body>
 <iframe id="makehuman-mobile-inner"
-        src="../makehuman-camerino-v1/index.html?v=mobile-2"
+        src="../makehuman-camerino-v1/index.html?v=mobile-3"
         title="Editor MakeHuman personaggio"></iframe>
 <script>
 "use strict";
 (()=>{
   const inner=document.getElementById("makehuman-mobile-inner");
-  const params=new URLSearchParams(location.search);
-  const QUICK=params.get("quick")==="1";
-  const BOOTSTRAP_HEARTBEAT_MS=10000;
-  const BOOTSTRAP_MAX_MS=360000;
-
   let innerCaricato=false;
-  let bootstrapHeartbeat=null;
-  let bootstrapInizio=0;
-  let ultimaFase="Avvio MakeHuman sul telefono…";
   const coda=[];
 
-  const manda=(type,extra={})=>{
-    try{ parent.postMessage({type,...extra},"*"); }catch(e){}
-  };
-
-  const fermaBootstrapHeartbeat=()=>{
-    if(bootstrapHeartbeat){
-      clearInterval(bootstrapHeartbeat);
-      bootstrapHeartbeat=null;
-    }
-    bootstrapInizio=0;
-  };
-
-  const avviaBootstrapHeartbeat=()=>{
-    if(!QUICK || bootstrapHeartbeat) return;
-
-    bootstrapInizio=Date.now();
-
-    /* Il watchdog condiviso considera viva la sessione quando riceve una fase.
-       Su mobile QUALSIASI fetch del bootstrap (body, cataloghi, targets.bin,
-       ricostruzione) puo' restare silenzioso a lungo: il keepalive copre quindi
-       l'intero avvio rapido, non una sola risorsa. */
-    manda("adf-makehuman-progress",{message:ultimaFase});
-
-    bootstrapHeartbeat=setInterval(()=>{
-      if(Date.now()-bootstrapInizio>=BOOTSTRAP_MAX_MS){
-        fermaBootstrapHeartbeat();
-        manda("adf-makehuman-quick-preset-error",{
-          message:"MakeHuman sul telefono non ha completato l'avvio entro sei minuti."
-        });
-        return;
-      }
-
-      manda("adf-makehuman-progress",{
-        message:ultimaFase+" · caricamento ancora in corso"
-      });
-    },BOOTSTRAP_HEARTBEAT_MS);
-  };
-
-  avviaBootstrapHeartbeat();
-
+  /* Questo file e' solo un relay. Il watchdog mobile NON vive qui:
+     il creator viene nascosto durante l'avvio rapido e i browser mobili
+     possono sospendere i timer degli iframe non visibili. */
   inner.addEventListener("load",()=>{
     innerCaricato=true;
     while(coda.length){
@@ -87,24 +42,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#050609}
 
     if(event.source!==inner.contentWindow) return;
 
-    const msg=event.data||{};
-
-    if(msg.type==="adf-makehuman-progress"){
-      const testo=String(msg.message||"").trim();
-      if(testo) ultimaFase=testo;
-    }
-
-    /* "ready" significa solo che il camerino puo' ricevere il preset rapido:
-       il lavoro non e' finito. Il keepalive si ferma soltanto quando arriva il
-       risultato del preset o un errore reale. */
-    if(
-      msg.type==="adf-makehuman-quick-preset-result" ||
-      msg.type==="adf-makehuman-quick-preset-error"
-    ){
-      fermaBootstrapHeartbeat();
-    }
-
-    try{ parent.postMessage(msg,"*"); }catch(e){}
+    try{ parent.postMessage(event.data,"*"); }catch(e){}
   });
 })();
 </script>
