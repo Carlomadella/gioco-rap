@@ -227,6 +227,22 @@ test("landscape mobile: scelta Avaturn/MakeHuman si ridimensiona e scorre davver
   await expect(frame.locator("#avatarSelectionNote")).toBeVisible();
 });
 
+test("landscape mobile: Avaturn e MakeHuman si aprono direttamente al tap", async ({ page }) => {
+  await page.goto("/media/creator-rpg-v24/creator.html");
+
+  const conferma = page.locator("#pageAppearance .bottom");
+  await expect(conferma).toBeHidden();
+
+  const makeHuman = page.getByRole("button", { name: /MakeHuman/i });
+  await makeHuman.tap();
+  await expect(page.locator("#localEditorOverlay")).toHaveClass(/on/);
+
+  await page.reload();
+  const avaturn = page.getByRole("button", { name: /Avaturn/i });
+  await avaturn.tap();
+  await expect(page.locator("#pageDressingRoom")).toHaveClass(/on/);
+});
+
 test("landscape mobile: nella scelta avatar Indietro e' compatto e integrato a destra", async ({ page }) => {
   await page.goto("/media/creator-rpg-v24/creator.html");
 
