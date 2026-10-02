@@ -221,7 +221,7 @@ describe("Strada · ingresso nascosto",()=>{
 
   it("l'approccio di squadra usa persone reali e non il vecchio contatore uomini",()=>{
     const strada=leggi("js/game/strada-crimine.js");
-    expect(strada).toContain("function stScenaPersonaSquadra(colpo)");
+    expect(strada).toContain("function stScenaPersonaSquadra(colpo,preparazione)");
     expect(strada).toContain('personaSquadraId');
     expect(strada).toContain('nessuno si fida abbastanza');
     expect(strada).toContain('stradaPersonaSquadra(personaSquadraId)');

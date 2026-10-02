@@ -1269,6 +1269,27 @@ test("le categorie dei colpi modificano davvero chance, resa, sporco, attenzione
   crime.includes("effettiCategoria.sporco") &&
   crime.includes("effettiCategoria.heat") &&
   crime.includes("effettiCategoria.rep"));
+test("punto 8: ogni colpo passa da una sola preparazione prima dell'approccio",
+  crime.includes("const STRADA_PREPARAZIONI") &&
+  crime.includes("function stScenaPreparazione(colpo)") &&
+  crime.includes("STRADA_SCENA = stScenaPreparazione(colpo)") &&
+  crime.includes("Una sola scelta: poi si decide come affrontare il colpo."));
+test("punto 8: prepararsi costa tempo reale o un favore per-persona",
+  crime.includes('minuti:45') &&
+  crime.includes('minuti:90') &&
+  crime.includes('GAME_TIME.spend(minuti,"crime:prepare"') &&
+  crime.includes("function stradaPersoneConFavore()") &&
+  crime.includes("function stradaConsumaFavore") &&
+  crime.includes("favoriEventi"));
+test("punto 8: i favori si guadagnano facendo qualcosa per un contatto e non si comprano",
+  crime.includes('stradaAggiungiFavore(personaIngresso,1,"intro-"+step+"-success")') &&
+  crime.includes('stradaAggiungiFavore(personaLead,1,"opportunita-success")') &&
+  crime.includes("Math.min(3") &&
+  !crime.includes("STRADA_FAVORE_COSTO"));
+test("punto 8: la preparazione cambia davvero riuscita e attenzione",
+  crime.includes("p += prep.chance") &&
+  crime.includes("effettiPreparazione.heat") &&
+  crime.includes("stradaChanceConOpportunita(colpo,approccio,opportunita,personaSquadra,preparazione)"));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
