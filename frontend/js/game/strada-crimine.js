@@ -2073,27 +2073,58 @@ function stradaSettimana(){
     s.sporchi += Math.round(a.resa * .55);
   }
 
-  /* Dal punto 4 gli uomini numerici non vengono più comprati/usati come crew.
-     Restano nel save solo per compatibilità fino al punto 6 e non costano più.
-     Protezione e avvocato mantengono invece la loro logica attuale. */
-  if(s.prot > 0){
-    const costoProt = STRADA_PROT[s.prot].costo;
-    if(G.money >= costoProt) G.money -= costoProt;
-    else{
-      s.prot = 0;
-      pushLog("<b>Protezione saltata.</b> Non avevi abbastanza per pagarla questa settimana.", "bad");
+  /* Punto 6: protezione e avvocato sono accordi con persone reali.
+     La prima settimana viene pagata al momento dell'accordo e non viene
+     addebitata due volte alla chiusura della stessa settimana. */
+  const protSt=stradaProtezioneStato();
+  if(s.prot>0){
+    const provider=protSt.providerPersonId?stradaPersonaDaId(protSt.providerPersonId):null;
+    const legacy=protSt.source==="legacy";
+    if(!legacy && (!provider || provider.via)){
+      protSt.history.push({status:"provider-lost",level:Number(s.prot||0),absoluteDay:stradaAbsDay()});
+      if(protSt.history.length>12)protSt.history.shift();
+      s.prot=0;protSt.level=0;protSt.providerPersonId=null;protSt.providerName=null;protSt.source=null;protSt.prepaidWeekKey=null;
+      pushLog("<b>Protezione saltata.</b> La persona che garantiva per te non c'è più.", "bad");
+    }else if(protSt.prepaidWeekKey===stradaWeekKey()){
+      protSt.prepaidWeekKey=null;
+    }else{
+      const costoProt=Number(STRADA_PROT[s.prot].costo||0);
+      if(Number(G.money||0)>=costoProt) G.money-=costoProt;
+      else{
+        if(provider) stradaModificaFiducia(provider,-5,"protezione-non-pagata");
+        protSt.history.push({status:"unpaid",level:Number(s.prot||0),providerPersonId:protSt.providerPersonId||null,
+          providerName:protSt.providerName||null,absoluteDay:stradaAbsDay()});
+        if(protSt.history.length>12)protSt.history.shift();
+        s.prot=0;protSt.level=0;protSt.providerPersonId=null;protSt.providerName=null;protSt.source=null;protSt.prepaidWeekKey=null;
+        pushLog("<b>Protezione saltata.</b> Non avevi abbastanza per pagarla questa settimana.", "bad");
+      }
     }
   }
-  if(s.avvocato){
-    if(G.money >= STRADA_AVVOCATO_COSTO) G.money -= STRADA_AVVOCATO_COSTO;
-    else{
-      s.avvocato = false;
+
+  const avvSt=stradaAvvocatoStato();
+  if(avvSt.retained){
+    const legale=avvSt.personId?(G.gente||[]).find(p=>p&&p.id===avvSt.personId&&!p.via):null;
+    const legacy=avvSt.source==="legacy";
+    if(!legacy && !legale){
+      s.avvocato=false;avvSt.retained=false;avvSt.prepaidWeekKey=null;
+      avvSt.history.push({status:"lost-contact",personId:avvSt.personId||null,name:avvSt.name||null,absoluteDay:stradaAbsDay()});
+      if(avvSt.history.length>12)avvSt.history.shift();
+      pushLog("<b>Il tuo avvocato non è più disponibile.</b> In caso di arresto torni alla difesa d'ufficio.", "bad");
+    }else if(avvSt.prepaidWeekKey===stradaWeekKey()){
+      avvSt.prepaidWeekKey=null;
+    }else if(Number(G.money||0)>=STRADA_AVVOCATO_COSTO){
+      G.money-=STRADA_AVVOCATO_COSTO;
+    }else{
+      s.avvocato=false;avvSt.retained=false;avvSt.prepaidWeekKey=null;
+      if(legale) legale.rel=Math.max(0,Number(legale.rel||0)-1);
+      avvSt.history.push({status:"unpaid",personId:avvSt.personId||null,name:avvSt.name||null,absoluteDay:stradaAbsDay()});
+      if(avvSt.history.length>12)avvSt.history.shift();
       pushLog("<b>L'avvocato si è tirato indietro.</b> La parcella non era coperta.", "bad");
     }
   }
 
-  /* attenzione: scende ~6% a settimana, ~12% con l'avvocato */
-  s.heat = clamp(s.heat * (1 - (s.avvocato ? .12 : .06)), 0, 100);
+  /* attenzione: scende ~6% a settimana, ~12% con un avvocato privato */
+  s.heat = clamp(s.heat * (1 - (stradaHaAvvocatoPrivato() ? .12 : .06)), 0, 100);
   /* la reputazione si sgonfia un po' se non ti fai vedere */
   s.rep = clamp(s.rep - .6, 0, 100);
 
@@ -2303,9 +2334,9 @@ function stOcchiAddosso(){
 }
 function stCopertura(){
   const s = G.strada;
-  /* Gli uomini numerici sono solo compatibilità legacy fino al punto 6:
-     non sono più una copertura acquistabile né un costo invisibile. */
-  return STRADA_PROT[s.prot].costo + (s.avvocato ? STRADA_AVVOCATO_COSTO : 0);
+  /* Gli uomini numerici sono solo compatibilità legacy e non costano più.
+     Qui mostriamo solo gli accordi realmente attivi. */
+  return STRADA_PROT[s.prot].costo + (stradaHaAvvocatoPrivato() ? STRADA_AVVOCATO_COSTO : 0);
 }
 
 /* ---- la testata e la colonna di sinistra ---- */
