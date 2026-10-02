@@ -2177,6 +2177,7 @@ function renderLoop(){
 const overlay=$('avaturnOverlay');
 const frameHost=$('avaturnFrameHost');
 let sdk=null, sdkPromise=null;
+let avaturnDirectWindow=null;
 
 async function ensureSdk(){
   if(sdk) return sdk;
@@ -2247,22 +2248,23 @@ $('openAvaturn').onclick=()=>{
   }
   if(currentSource==='avaturn'){
     if(mobileAvaturnTopLevelEnabled()){
-      /* Same-origin: chiamiamo il top-level durante lo stesso tap per non
-         perdere la user activation richiesta dai browser mobili. */
+      /* Questa chiamata avviene direttamente dentro l'handler del tap.
+         Niente bridge intermedio: il browser vede chiaramente la user activation. */
+      const url=new URL('avaturn-mobile.html?v=2',location.href).href;
+      let win=null;
       try{
-        const topBridge=window.top?.ADF_RPG_V24;
-        if(
-          topBridge &&
-          typeof topBridge.openAvaturnMobileWindow==='function' &&
-          topBridge.openAvaturnMobileWindow()
-        ){
-          return;
-        }
+        win=window.open(url,'adf-avaturn-mobile');
       }catch(e){}
 
-      /* Fallback: se il browser blocca la finestra dedicata, resta disponibile
-         il portal della #83 nella pagina corrente. */
-      window.parent.postMessage({type:'adf-avatar-room-avaturn-mobile-open'},'*');
+      if(win){
+        avaturnDirectWindow=win;
+        try{win.focus();}catch(e){}
+        return;
+      }
+
+      /* Non torniamo più silenziosamente al portal rotto: se il browser blocca
+         la finestra, lo diciamo esplicitamente all'utente. */
+      toast('Il browser ha bloccato Avaturn. Consenti popup per questa pagina e riprova.');
       return;
     }
     openEditor();
@@ -2451,6 +2453,29 @@ function applyParentInit(msg){
 
 window.addEventListener('message',e=>{
   const msg=e.data||{};
+
+  /* La pagina mobile dedicata è aperta DIRETTAMENTE dal camerino; il suo
+     window.opener è quindi questo frame. Gestiamo export/cancel qui. */
+  if(
+    avaturnDirectWindow &&
+    e.source===avaturnDirectWindow &&
+    e.origin===location.origin
+  ){
+    if(msg.type==='adf-rpg-v24-avaturn-window-export' && msg.data?.url){
+      const saved=saveExport(msg.data);
+      avaturnDirectWindow=null;
+      if(saved?.url){
+        loadAvatar(saved,true);
+        toast('Avatar aggiornato');
+      }
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-avaturn-window-cancel'){
+      avaturnDirectWindow=null;
+      return;
+    }
+  }
+
   if(msg.type==='adf-avatar-room-init'){
     applyParentInit(msg);
     return;
