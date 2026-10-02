@@ -179,6 +179,19 @@
 
   function seedInbox(n=6){const s=currentGameState(),out=[],used=new Set(),usedFamilies=new Set();let guard=0;while(out.length<n&&guard++<160){const m=generateSms(s,false);if(!m||used.has(m.id)||usedFamilies.has(m.family))continue;used.add(m.id);usedFamilies.add(m.family);rememberTrap("sms",m.id,36);rememberTrap("smsFamilies",m.family,28);m.time=out.length===0?"21:06":out.length===1?"19:42":out.length===2?"18:11":"IERI";m.unread=out.length<3;out.push(m);}return out;}
 
+  function initialInbox(){
+    if(!trapOwned()) return [];
+    const s=currentGameState()||{},meta=s.trapPhone||{};
+    const base=seedInbox(meta.sourceName?5:6);
+    if(meta.sourceName && meta.source==="intro"){
+      return [introMessage({
+        personId:meta.sourcePersonId,
+        personName:meta.sourceName
+      }),...base].slice(0,6);
+    }
+    return base;
+  }
+
   const PHONE = {
     mode:"home",
     menu:0,
@@ -190,14 +203,14 @@
     call:null,
     callStartedAt:0,
     callTimer:null,
-    unread:3,
+    unread:0,
     lastIncomingId:null,
-    messages:seedInbox(6),
-    calls:[
+    messages:initialInbox(),
+    calls:trapOwned()?[
       {from:"NUMERO PRIVATO",time:"20:51",kind:"persa"},
       {from:"RICO",time:"18:24",kind:"ricevuta"},
       {from:"M.",time:"IERI",kind:"ricevuta"}
-    ]
+    ]:[]
   };
   PHONE.messages.forEach(m=>{if(typeof m.lastReply==="undefined")m.lastReply=null;});
 
@@ -720,6 +733,32 @@
     if(typeof window.setCrimeVisualEvent==="function")window.setCrimeVisualEvent(m.tags||["street"],30000);
     return m;
   }
+
+  function receiveStorySms(data){
+    if(!trapOwned()) return null;
+    data=data||{};
+    const m={
+      id:String(data.id||("story-"+Date.now())),
+      family:String(data.family||"story"),
+      voice:String(data.voice||"contact"),
+      from:String(data.from||"SCONOSCIUTO").toUpperCase(),
+      text:String(data.text||""),
+      replies:[],
+      tags:Array.isArray(data.tags)?data.tags.slice():["street"],
+      time:String(data.time||"ADESSO"),
+      unread:true,
+      lastReply:null,
+      story:true
+    };
+    PHONE.messages=PHONE.messages.filter(x=>x&&x.id!==m.id);
+    PHONE.messages.unshift(m);
+    PHONE.messages=PHONE.messages.slice(0,18);
+    notify("<b>"+m.from+"</b> — nuovo SMS");
+    setBadge();
+    if(typeof window.setCrimeVisualEvent==="function")
+      window.setCrimeVisualEvent(m.tags,30000);
+    return m;
+  }
   function triggerTrapEvent(level="auto"){
     if(!trapOwned()) return null;
     const s=currentGameState(),heat=Number(s.heat||0),rep=Number(s.rep||0);
@@ -748,6 +787,7 @@
     owned:trapOwned,
     incoming,
     receiveSms,
+    receiveStorySms,
     triggerTrapEvent,
     contentStats:trapContentStats,
     generateSms:()=>generateSms(currentGameState(),false),
