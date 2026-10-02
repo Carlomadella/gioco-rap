@@ -6,6 +6,45 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:252e6f8f -->
+## 02/10/26, 21:07 — feature/strada-punto2-traphone → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `252e6f8f`
+
+### Cosa è entrato
+
+- `edba7ebd` — chore(strada): correggi testo delle dritte TrapPhone — **mycolbraga**
+- `7979d518` — chore(strada): correggi testo delle dritte TrapPhone — **mycolbraga**
+- `7fa078f2` — test(traphone): verifica collegamento delle dritta alla inbox — **mycolbraga**
+- `41603514` — chore(frontend): aggiorna cache dopo integrazione inbox TrapPhone — **mycolbraga**
+- `f981c3b4` — feat(strada): registra le dritta mondo nella inbox TrapPhone — **mycolbraga**
+- `7287a452` — feat(traphone): registra nell inbox le dritta di storyline — **mycolbraga**
+- `08546c33` — test(strada): copri migrazione a meta ingresso del TrapPhone — **mycolbraga**
+- `51bf1201` — fix(strada): preserva il vero contatto nei salvataggi a meta ingresso — **mycolbraga**
+- `5bf049ba` — chore(frontend): aggiorna cache busting TrapPhone punto 2 — **mycolbraga**
+- `03eecf9f` — test(traphone): copri ownership e gate UI — **mycolbraga**
+- `398db64c` — test(strada): verifica consegna e migrazione del TrapPhone — **mycolbraga**
+- `04b14e46` — feat(strada): rendi visibile la consegna del TrapPhone nella storyline — **mycolbraga**
+- `8c195c0c` — feat(traphone): rendi il telefono uno sblocco reale del giro — **mycolbraga**
+- `6a652d0f` — feat(strada-ui): mostra il TrapPhone solo quando posseduto — **mycolbraga**
+- `5e5973e8` — feat(strada): collega il TrapPhone allo sblocco e alle dritta dal mondo — **mycolbraga**
+- `867c677e` — feat(strada): rendi persistente la proprietà del TrapPhone — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/traphone16.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:ebbb3031 -->
 ## 02/10/26, 20:42 — feature/strada-punto1-ingresso → main
 
