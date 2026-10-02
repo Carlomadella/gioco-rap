@@ -381,8 +381,26 @@
     return false;
   }
 
-  function tornaMappa(){
-    if(hostAttivo() === "jail" || hostAttivo() === "hub" || mappaBloccata()) return;
+  function tornaMappa(opzioni){
+    const nuovoGiorno = !!(opzioni && opzioni.nuovoGiorno);
+    const host = hostAttivo();
+
+    if(host === "jail" || host === "hub") return false;
+
+    /* +1/+7 giorni parte dal pannello del tempo: quando il cambio giorno è
+       già avvenuto, quel pannello non deve impedire di riallineare la pagina
+       visibile con la posizione reale (Casa). Gli altri blocchi restano invece
+       intatti per il ritorno manuale alla mappa. */
+    if(nuovoGiorno){
+      try{
+        if(window.ADF_TIME_CONTROLS && typeof ADF_TIME_CONTROLS.close === "function"){
+          ADF_TIME_CONTROLS.close();
+        }
+      }catch(_){}
+    }else if(mappaBloccata()){
+      return false;
+    }
+
     chiudi();
 
     /* Prima chiudiamo gli overlay di navigazione; poi rendiamo esplicita la
@@ -407,17 +425,19 @@
     try{ if($id("strada") && $id("strada").classList.contains("on") && typeof chiudiStrada === "function") chiudiStrada(); }catch(_){}
 
     try{
-      if(window.HUB && typeof HUB.apri === "function"){ HUB.apri(); return; }
+      if(window.HUB && typeof HUB.apri === "function"){ HUB.apri(); return true; }
       if(typeof GO === "function"){
         GO("hub");
         if(typeof renderHub === "function") renderHub();
-        return;
+        return true;
       }
       if(typeof goto === "function"){
         goto("hub");
         if(typeof renderHub === "function") renderHub();
+        return true;
       }
     }catch(_){}
+    return false;
   }
 
   function creaBarraGlobale(){
