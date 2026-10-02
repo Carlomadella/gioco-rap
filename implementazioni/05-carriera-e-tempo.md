@@ -432,3 +432,25 @@ passi restano da 15 minuti — eventi dell'orologio, orari e agenda li contano u
 ma le pause di un'attesa intera stanno in 1,6 secondi (`pausaPasso()`: fra 25 e 350 ms a
 passo). Fino a un'ora e un quarto non cambia niente; la luce della mappa dura almeno 380 ms e
 i cambi si fondono. L'audit controlla che la pausa non torni fissa.
+
+
+## Eventi Fabbrica per ruolo e straordinari contestuali
+
+**FATTO (02/10/2026)** — gli eventi della Fabbrica distinguono davvero la mansione del
+giocatore invece di limitarsi a cambiare il titolo del popup.
+
+- Operaio, Operaio esperto, Capolinea e Capoturno hanno **5 eventi di ruolo ciascuno**;
+- l'anti-ripetizione conserva gli ultimi **4 eventi di ruolo**, così un ruolo non alterna
+  continuamente le stesse due scene;
+- gli eventi di reparto chiaramente legati al lavoro operativo di linea vengono esclusi
+  dai ruoli per cui non avrebbero senso;
+- gli effetti continuano a usare le statistiche reali (affidabilità, benessere, lucidità,
+  rete) e il profilo fisico/mentale già previsto per ogni ruolo;
+- gli straordinari continuano a usare lo stesso motore economico e disciplinare, ma la
+  richiesta ora cambia interlocutore e responsabilità: Capolinea per gli operativi,
+  Capoturno per il Capolinea, Responsabile di produzione per il Capoturno;
+- il motivo dello straordinario resta persistente dopo l'accettazione e ora registra
+  anche il ruolo con cui l'offerta è stata generata.
+
+Le probabilità globali degli eventi non sono state aumentate: la modifica amplia varietà
+e coerenza, senza trasformare il lavoro in una sequenza più frequente di popup.
