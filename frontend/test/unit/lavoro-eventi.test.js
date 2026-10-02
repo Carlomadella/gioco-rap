@@ -352,7 +352,7 @@ describe("famiglie eventi lavoro", () => {
   it("un Capoturno può ricevere un evento specifico del suo ruolo con effetti reali", () => {
     const career={reliability:70};
     const env=ambiente({
-      random:0.9,
+      random:0,
       G:{
         year:1,week:10,day:3,
         job:{id:"capoturno",place:"fabbrica",n:"Capoturno",pay:330,e:28},
@@ -412,7 +412,7 @@ describe("famiglie eventi lavoro", () => {
     )).toBe(true);
   });
 
-  it("gli eventi di reparto modulano il costo fisico e mentale in base al ruolo", () => {
+  it("gli eventi di reparto rispettano il profilo fisico/mentale e il ruolo", () => {
     const crea=(id,n,random) => {
       const career={reliability:70};
       return ambiente({
@@ -440,13 +440,14 @@ describe("famiglie eventi lavoro", () => {
     operaioFisico.shown[0].opts[1].run();
     expect(operaioFisico.G.wellbeing).toBe(58);
 
-    const capoFisico=crea("capoturno","Capoturno",.21);
-    expect(capoFisico.ctx.ADF_WORK_EVENTS.afterShift({},{
+    /* Il Capoturno non riceve più gli eventi operativi di postazione/linea:
+       il suo carico arriva dagli eventi di coordinamento e da quelli mentali. */
+    const capoNonOperativo=crea("capoturno","Capoturno",.21);
+    expect(capoNonOperativo.ctx.ADF_WORK_EVENTS.afterShift({},{
       music:1,role:1,factory:0,crime:1,colleague:1,physical:1
     })).toBe(true);
-    expect(capoFisico.shown[0].opts[1].d).toContain("−1 benessere");
-    capoFisico.shown[0].opts[1].run();
-    expect(capoFisico.G.wellbeing).toBe(59);
+    expect(capoNonOperativo.shown[0].t).not.toContain("muore di caldo");
+    expect(capoNonOperativo.shown[0].t).not.toContain("postazione");
 
     const operaioMentale=crea("operaio","Operaio",.31);
     operaioMentale.ctx.ADF_WORK_EVENTS.afterShift({},{
@@ -461,6 +462,7 @@ describe("famiglie eventi lavoro", () => {
     capoMentale.ctx.ADF_WORK_EVENTS.afterShift({},{
       music:1,role:1,factory:0,crime:1,colleague:1,physical:1
     });
+    expect(capoMentale.shown[0].t).toContain("protezione");
     expect(capoMentale.shown[0].opts[0].d).toContain("−2 lucidità");
     capoMentale.shown[0].opts[0].run();
     expect(capoMentale.G.lucidita).toBe(48);
