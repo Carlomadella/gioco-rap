@@ -156,8 +156,11 @@ test("landscape mobile: scelta Avaturn/MakeHuman si ridimensiona e scorre davver
     const content = el.querySelector(".content");
     const griglia = el.querySelector(".avatar-method-grid");
     const cards = [...el.querySelectorAll(".avatar-method")];
+    const topbar = document.querySelector(".topbar").getBoundingClientRect();
+    const viewport = document.querySelector(".viewport").getBoundingClientRect();
     const cs = getComputedStyle(griglia);
     return {
+      innerHeight,
       clientWidth: el.clientWidth,
       scrollWidth: el.scrollWidth,
       clientHeight: el.clientHeight,
@@ -166,7 +169,10 @@ test("landscape mobile: scelta Avaturn/MakeHuman si ridimensiona e scorre davver
       touchAction: getComputedStyle(el).touchAction,
       contentWidth: content.getBoundingClientRect().width,
       colonne: cs.gridTemplateColumns.trim().split(/\s+/).filter(Boolean).length,
-      cardMaxHeight: Math.max(...cards.map(card => card.getBoundingClientRect().height))
+      cardMaxHeight: Math.max(...cards.map(card => card.getBoundingClientRect().height)),
+      topbarBottom: topbar.bottom,
+      viewportTop: viewport.top,
+      viewportBottom: viewport.bottom
     };
   });
 
@@ -176,6 +182,8 @@ test("landscape mobile: scelta Avaturn/MakeHuman si ridimensiona e scorre davver
   expect(misure.contentWidth).toBeLessThanOrEqual(misure.clientWidth + 1);
   expect(misure.colonne).toBe(2);
   expect(misure.cardMaxHeight).toBeLessThanOrEqual(132);
+  expect(Math.abs(misure.viewportTop - misure.topbarBottom)).toBeLessThanOrEqual(1);
+  expect(misure.viewportBottom).toBeLessThanOrEqual(misure.innerHeight + 1);
 
   /* Regressione reale: su un viewport landscape piu' basso il contenuto deve
      poter scorrere con un gesto touch nativo dentro l'iframe, non solo con
