@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e2ebfed1 -->
+## 02/10/26, 10:51 — fix/day-start-return-map-v2 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e2ebfed1`
+
+### Cosa è entrato
+
+- `d3aa0550` — fix: riallinea la schermata alla mappa al nuovo giorno — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/spostamenti.js`
+- **Modificato:** `frontend/js/menu-sistema.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/navigazione-globale.test.js`
+- **Modificato:** `frontend/test/unit/travel-modal.test.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:63e6420a -->
 ## 02/10/26, 10:02 — task/via-agente-telefono → main
 

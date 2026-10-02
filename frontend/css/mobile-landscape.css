@@ -23,9 +23,10 @@
     min-height:0
   }
   .land-hero{
-    margin-left:5vw;
-    width:min(48vw,520px);
-    padding:38px 0 14px;
+    margin-left:0;
+    width:100%;
+    box-sizing:border-box;
+    padding:38px 0 14px 5vw;
     min-height:0;
     overflow-y:auto;
     overflow-x:hidden;
@@ -46,6 +47,7 @@
     line-height:.8
   }
   .land-sub{
+    width:min(48vw,520px);
     max-width:48ch;
     margin-top:8px;
     font-size:clamp(10.5px,2.9vh,13px);

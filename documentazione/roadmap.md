@@ -125,7 +125,10 @@ con la carriera: sette capi si sbloccano col primo contratto, coi fan o dopo Mil
 bloccata dice cosa serve), e ogni lunedì un capo va a metà prezzo mentre il banco dell'usato
 si rinnova (`js/game/negozio-offerte.js`; «Lo Shop cresce con la carriera: i capi che si
 sbloccano e le offerte della settimana», stesso foglio). Dei tre punti dello Shop del 20/09
-non resta niente.
+non resta niente. **FATTO (02/10/2026)** — il cambio di giornata riallinea anche
+la schermata alla posizione reale: +1/+7 giorni riportano il personaggio a Casa e mostrano
+la mappa, invece di lasciare aperta Fabbrica/Pizzeria/Palestra mentre `G.currentPlace`
+è già `vita`. Il carcere resta l'eccezione.
 
 **Manca**:
 

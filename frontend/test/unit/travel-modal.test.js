@@ -82,4 +82,47 @@ describe("conferma spostamento", () => {
     expect(window.document.querySelector("#m-d").hidden).toBe(false);
     dom.window.close();
   });
+
+  it("un nuovo giorno riporta a Casa e chiede alla navigazione di mostrare la mappa", () => {
+    const dom = gameWithTravelModal();
+    const { window } = dom;
+    let richiesta = null;
+
+    window.ADF_NAVIGATION = {
+      toMap(opzioni){
+        richiesta = opzioni;
+        return true;
+      }
+    };
+
+    window.G.currentPlace = "studio";
+    window.dispatchEvent(new window.CustomEvent("game-time:day-start"));
+
+    expect(window.G.currentPlace).toBe("vita");
+    expect(richiesta).toEqual({nuovoGiorno:true});
+    dom.window.close();
+  });
+
+  it("il nuovo giorno non manda alla mappa se il personaggio e' detenuto", () => {
+    const dom = gameWithTravelModal();
+    const { window } = dom;
+    let chiamate = 0;
+
+    window.HUB_LUOGHI.push({ id:"crimin", n:"Carcere" });
+    window.G.currentPlace = "studio";
+    window.G.strada = {arresto:{}};
+    window.ADF_NAVIGATION = {
+      toMap(){
+        chiamate += 1;
+        return true;
+      }
+    };
+
+    window.dispatchEvent(new window.CustomEvent("game-time:day-start"));
+
+    expect(window.G.currentPlace).toBe("crimin");
+    expect(chiamate).toBe(0);
+    dom.window.close();
+  });
+
 });
