@@ -2254,6 +2254,12 @@ function stradaTentaEventoRete(roll,variantRoll){
   if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
   if(typeof stradaHaTrapPhone==="function" && !stradaHaTrapPhone()) return null;
 
+  const opp=stradaOpportunitaStato();
+  stradaAggiornaOpportunita(true);
+  if(opp.active || opp.pending || (opp.pendingChoices&&opp.pendingChoices.length)) return null;
+  const ferro=typeof stradaFerroStato==="function" ? stradaFerroStato() : null;
+  if(ferro&&ferro.pending) return null;
+
   const cap=stradaCapacitaRete();
   const mode=cap.creaPonte ? "bridge" : cap.richiestaNome ? "ask-name" : null;
   if(!mode) return null;
