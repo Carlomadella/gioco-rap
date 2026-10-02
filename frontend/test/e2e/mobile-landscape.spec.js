@@ -292,43 +292,44 @@ test("landscape mobile: camerino Avaturn usa tutto lo schermo e apre l'editor se
   expect(misure.buttonBottom).toBeLessThanOrEqual(misure.bottom + 1);
   expect(misure.progressBottom).toBeLessThanOrEqual(misure.vh + 1);
 
-  await page.evaluate(() => {
+  await room.locator("body").evaluate(() => {
     window.__adfOpenedAvaturn = null;
-    window.open = (url,name,features) => {
-      window.__adfOpenedAvaturn = {url:String(url),name,features};
+    window.open = (url,name) => {
+      window.__adfOpenedAvaturn = {url:String(url),name};
       return {closed:false,focus(){},close(){this.closed=true;}};
     };
   });
 
   await openAvaturn.tap();
 
-  /* Il tap deve tentare PRIMA la pagina dedicata top-level. */
-  await expect.poll(async () => page.evaluate(() => window.__adfOpenedAvaturn)).not.toBeNull();
+  /* Il window.open nasce direttamente nel camerino, nello stesso handler del tap. */
+  await expect.poll(async () => room.locator("body").evaluate(() => window.__adfOpenedAvaturn)).not.toBeNull();
 
-  const opened=await page.evaluate(() => window.__adfOpenedAvaturn);
-  expect(opened.url).toContain("/media/creator-rpg-v24/avaturn-mobile.html?v=1");
+  const opened=await room.locator("body").evaluate(() => window.__adfOpenedAvaturn);
+  expect(opened.url).toContain("/media/creator-rpg-v24/avaturn-mobile.html?v=2");
   expect(opened.name).toBe("adf-avaturn-mobile");
   await expect(room.locator("#avaturnOverlay")).not.toHaveClass(/open/);
   await expect(page.locator("#adf-rpg-v24-avaturn-mobile-host")).toHaveCount(0);
 });
 
-test("landscape mobile: se la finestra Avaturn e' bloccata usa il portal fallback", async ({ page }) => {
+test("landscape mobile: popup Avaturn bloccato non ricade nel vecchio portal", async ({ page }) => {
   await page.goto("/pagine/gioco.html");
   await page.waitForFunction(() => window.ADF_RPG_V24);
-  await page.evaluate(() => {
-    const original=window.open;
-    window.__adfOriginalOpen=original;
-    window.open=()=>null;
-    ADF_RPG_V24.open();
-  });
+  await page.evaluate(() => ADF_RPG_V24.open());
 
   const creator = page.frameLocator("#adf-rpg-v24-frame");
   await creator.getByRole("button", { name: /Avaturn/i }).tap();
   const room = creator.frameLocator("#dressingRoomFrame");
+
+  await room.locator("body").evaluate(() => {
+    window.open=()=>null;
+  });
+
   await room.locator("#openAvaturn").tap();
 
-  await expect(page.locator("#adf-rpg-v24-avaturn-mobile-host")).toBeVisible();
+  await expect(page.locator("#adf-rpg-v24-avaturn-mobile-host")).toHaveCount(0);
   await expect(room.locator("#avaturnOverlay")).not.toHaveClass(/open/);
+  await expect(room.locator("#avToast")).toContainText(/bloccato Avaturn/i);
 });
 
 test("landscape mobile: nella scelta avatar Indietro e' compatto e integrato a destra", async ({ page }) => {
