@@ -501,6 +501,39 @@ const FACTORY_ROLE_EVENTS = Object.freeze({
         Object.freeze({n:"Sistemalo al volo",d:"−1 benessere · −1 lucidità",fx:{wellbeing:-1,lucidita:-1},
           result:"L'hai rimesso in riga senza fermare tutto, ma hai passato il resto del turno in tensione."})
       ])
+    }),
+    Object.freeze({
+      id:"postazione-pesante",
+      t:"Ti chiedono di scambiare postazione",
+      d:"Quello accanto a te è cotto e ti chiede di prendere per un po' la postazione più pesante. Puoi caricarti il pezzo duro oppure proporre una rotazione vera.",
+      opts:Object.freeze([
+        Object.freeze({n:"Prendi tu la postazione",d:"+0,3 rete · −2 benessere",fx:{rete:.3,wellbeing:-2},
+          result:"Gli hai tolto pressione, ma a fine turno senti bene dove hai passato l'ultima ora."}),
+        Object.freeze({n:"Proponi una rotazione",d:"+1 lucidità · +0,1 rete",fx:{lucidita:1,rete:.1},
+          result:"Avete spezzato il carico invece di spostarlo da una persona all'altra. Meno eroico, più sostenibile."})
+      ])
+    }),
+    Object.freeze({
+      id:"scarto-ripetuto",
+      t:"Troppi pezzi finiscono nello scarto",
+      d:"Non è un singolo pezzo storto: ne stai mettendo via troppi di fila. Puoi fermare il flusso e segnalarlo oppure continuare a separare gli scarti senza rallentare tutti.",
+      opts:Object.freeze([
+        Object.freeze({n:"Ferma e segnala l'andamento",d:"+1 affidabilità · −1 lucidità",fx:{reliability:1,lucidita:-1},
+          result:"Hai fatto perdere qualche minuto alla linea, ma il problema è stato preso prima di diventare un lotto intero."}),
+        Object.freeze({n:"Continua a selezionare",d:"+1 benessere · −1 affidabilità",fx:{wellbeing:1,reliability:-1},
+          result:"Hai evitato lo stop, ma hai lasciato che il problema restasse dentro al ritmo del turno."})
+      ])
+    }),
+    Object.freeze({
+      id:"cambio-fine-linea",
+      t:"A fine linea si accumula materiale",
+      d:"Il ritmo a monte non cala ma davanti a te il materiale si ammassa. Puoi spingere per svuotare il collo di bottiglia oppure chiedere un rallentamento coordinato.",
+      opts:Object.freeze([
+        Object.freeze({n:"Spingi per svuotare",d:"+1 affidabilità · −2 benessere",fx:{reliability:1,wellbeing:-2},
+          result:"Hai riaperto spazio a forza di ritmo. Il reparto respira, tu un po' meno."}),
+        Object.freeze({n:"Chiedi di rallentare",d:"+1 lucidità · +1 benessere",fx:{lucidita:1,wellbeing:1},
+          result:"Hai fatto abbassare il ritmo per qualche minuto e il collo di bottiglia si è sciolto senza correre."})
+      ])
     })
   ]),
   operaio_esperto:Object.freeze([
@@ -524,6 +557,39 @@ const FACTORY_ROLE_EVENTS = Object.freeze({
           result:"Hai preferito prenderti la responsabilità adesso invece di nascondere il problema."}),
         Object.freeze({n:"Lascialo scorrere",d:"+1 benessere · −2 affidabilità",fx:{wellbeing:1,reliability:-2},
           result:"Il turno è filato più liscio, ma hai fatto finta di non vedere una cosa che ormai sai riconoscere."})
+      ])
+    }),
+    Object.freeze({
+      id:"cambio-formato",
+      t:"C'è un cambio formato da chiudere",
+      d:"La linea riparte con un formato diverso e sei uno dei pochi che sa davvero dove guardare. Puoi fare tu ogni controllo oppure guidare chi è meno esperto.",
+      opts:Object.freeze([
+        Object.freeze({n:"Controlli tutto tu",d:"+2 affidabilità · −2 lucidità",fx:{reliability:2,lucidita:-2},
+          result:"La ripartenza è pulita, ma ti sei caricato addosso ogni verifica."}),
+        Object.freeze({n:"Guida un collega",d:"+0,3 rete · −1 lucidità",fx:{rete:.3,lucidita:-1},
+          result:"Hai distribuito i controlli e trasformato il cambio formato in un piccolo affiancamento."})
+      ])
+    }),
+    Object.freeze({
+      id:"anomalia-ricorrente",
+      t:"La stessa anomalia torna per la terza volta",
+      d:"Sai già come tamponarla, ma ormai è chiaro che il problema non è il singolo pezzo. Puoi fermarti a cercare la causa oppure registrarla bene e passarla al turno dopo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Cerchi la causa",d:"+1 affidabilità · −2 lucidità",fx:{reliability:1,lucidita:-2},
+          result:"Non hai risolto il mondo, ma hai trovato il punto da cui partire invece di fare il terzo rattoppo."}),
+        Object.freeze({n:"Documenti e passi consegna",d:"+1 lucidità · +1 benessere",fx:{lucidita:1,wellbeing:1},
+          result:"Hai lasciato una consegna utile e hai evitato di trasformare il turno in una caccia infinita al guasto."})
+      ])
+    }),
+    Object.freeze({
+      id:"doppio-controllo",
+      t:"Ti chiedono un doppio controllo sul lotto",
+      d:"La qualità vuole una seconda verifica prima di liberare il materiale. Puoi rifare tutto con calma oppure campionare i punti più critici e tenere il ritmo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Rifai il controllo completo",d:"+2 affidabilità · −1 benessere",fx:{reliability:2,wellbeing:-1},
+          result:"Hai chiuso il dubbio senza lasciare buchi, ma ti sei tenuto addosso anche il controllo extra."}),
+        Object.freeze({n:"Controlli i punti critici",d:"+1 lucidità · +1 benessere",fx:{lucidita:1,wellbeing:1},
+          result:"Hai usato l'esperienza per concentrarti dove serviva davvero e il lotto è ripartito senza trascinarsi."})
       ])
     })
   ]),
@@ -549,6 +615,39 @@ const FACTORY_ROLE_EVENTS = Object.freeze({
         Object.freeze({n:"Tagli corto e li rimandi al lavoro",d:"+1 benessere · −1 affidabilità",fx:{wellbeing:1,reliability:-1},
           result:"La linea è ripartita subito, ma la tensione è rimasta sotto."})
       ])
+    }),
+    Object.freeze({
+      id:"assenza-improvvisa",
+      t:"Ti manca una persona a metà turno",
+      d:"Una persona deve uscire e resti con un buco vero sulla linea. Puoi ridistribuire subito le postazioni oppure chiedere supporto al reparto vicino.",
+      opts:Object.freeze([
+        Object.freeze({n:"Ridisegni le postazioni",d:"+1 affidabilità · −2 lucidità",fx:{reliability:1,lucidita:-2},
+          result:"Hai tenuto la linea in piedi cambiando incastri per il resto del turno."}),
+        Object.freeze({n:"Chiedi supporto al reparto vicino",d:"+0,3 rete · −1 affidabilità",fx:{rete:.3,reliability:-1},
+          result:"Hai trovato una mano fuori dalla tua linea, ma hai dovuto ammettere che da solo il numero non stava in piedi."})
+      ])
+    }),
+    Object.freeze({
+      id:"pause-da-incastrare",
+      t:"Le pause non entrano più nel piano",
+      d:"Un ritardo ha mangiato il margine e adesso le pause si sovrappongono al momento peggiore. Puoi proteggere le rotazioni oppure stringerle per recuperare produzione.",
+      opts:Object.freeze([
+        Object.freeze({n:"Mantieni le rotazioni",d:"+0,3 rete · −1 affidabilità",fx:{rete:.3,reliability:-1},
+          result:"Hai protetto il ritmo delle persone e accettato un numero di produzione meno bello."}),
+        Object.freeze({n:"Stringi le rotazioni",d:"+2 affidabilità · −2 lucidità",fx:{reliability:2,lucidita:-2},
+          result:"Avete recuperato il ritardo, ma hai passato il resto del turno a rincorrere tempi e malumori."})
+      ])
+    }),
+    Object.freeze({
+      id:"priorita-cambiata",
+      t:"Il piano cambia a turno iniziato",
+      d:"Arriva una priorità nuova quando la linea è già impostata. Puoi rifare subito l'assetto oppure chiedere al capoturno di proteggere il piano originale.",
+      opts:Object.freeze([
+        Object.freeze({n:"Riorganizzi la linea",d:"+1 affidabilità · −2 lucidità",fx:{reliability:1,lucidita:-2},
+          result:"Hai assorbito il cambio senza fermare il reparto, ma il turno è diventato tutto incastri."}),
+        Object.freeze({n:"Difendi il piano originale",d:"+1 benessere · −1 affidabilità",fx:{wellbeing:1,reliability:-1},
+          result:"Hai evitato di ribaltare tutto all'ultimo, pagando però un po' di credito verso l'alto."})
+      ])
     })
   ]),
   capoturno:Object.freeze([
@@ -572,6 +671,39 @@ const FACTORY_ROLE_EVENTS = Object.freeze({
           result:"Hai tenuto insieme due livelli di responsabilità per tutto il turno."}),
         Object.freeze({n:"Delega a un esperto",d:"+0,3 rete · +1 benessere",fx:{rete:.3,wellbeing:1},
           result:"Hai dato fiducia a chi conosce la linea e ti sei tenuto libero per il resto dello stabilimento."})
+      ])
+    }),
+    Object.freeze({
+      id:"due-linee-corte",
+      t:"Due linee partono corte insieme",
+      d:"Non hai abbastanza persone per coprire entrambe come da piano. Puoi spostare un esperto dove brucia di più oppure abbassare il target di una linea.",
+      opts:Object.freeze([
+        Object.freeze({n:"Sposti un esperto",d:"+1 affidabilità · −2 lucidità",fx:{reliability:1,lucidita:-2},
+          result:"Hai tenuto i numeri in piedi spostando esperienza dove serviva, ma hai passato il turno a compensare il buco rimasto."}),
+        Object.freeze({n:"Abbassi un target",d:"+0,2 rete · +1 benessere · −1 affidabilità",fx:{rete:.2,wellbeing:1,reliability:-1},
+          result:"Hai scelto un obiettivo realistico e tolto pressione a un reparto, pagando qualcosa sul risultato di giornata."})
+      ])
+    }),
+    Object.freeze({
+      id:"qualita-ferma-reparto",
+      t:"La qualità vuole fermare un reparto",
+      d:"Un controllo apre un dubbio serio su un lotto. Puoi fermare tutto finché non è chiaro oppure isolare il materiale e tenere aperto il resto.",
+      opts:Object.freeze([
+        Object.freeze({n:"Fermi il reparto",d:"+2 affidabilità · −2 lucidità",fx:{reliability:2,lucidita:-2},
+          result:"Hai scelto la certezza e ti sei preso il costo del fermo davanti a tutti."}),
+        Object.freeze({n:"Isoli il lotto",d:"+1 affidabilità · −1 benessere",fx:{reliability:1,wellbeing:-1},
+          result:"Hai salvato il resto della produzione, ma hai tenuto addosso il rischio della decisione fino a fine turno."})
+      ])
+    }),
+    Object.freeze({
+      id:"pressione-produzione",
+      t:"Dall'alto chiedono di spingere i numeri",
+      d:"Il piano è già tirato, ma arriva la richiesta di fare di più senza persone in più. Puoi difendere il carico dei reparti oppure scaricare la pressione verso il basso.",
+      opts:Object.freeze([
+        Object.freeze({n:"Difendi il carico",d:"+0,3 rete · −1 affidabilità",fx:{rete:.3,reliability:-1},
+          result:"Hai tenuto il punto sui carichi e perso un po' di credito sul numero, ma sotto di te se ne accorgono."}),
+        Object.freeze({n:"Spingi la produzione",d:"+2 affidabilità · −3 lucidità",fx:{reliability:2,lucidita:-3},
+          result:"Il numero sale. Per farlo hai passato il turno a rincorrere ogni reparto e a mettere pressione ovunque."})
       ])
     })
   ])
@@ -696,7 +828,7 @@ function showFactoryRole(job,s,roll){
   const candidati=disponibili.length?disponibili:pool;
   const scena=candidati[Math.floor(Math.random()*candidati.length)];
   s.roleRecent.unshift(scena.id);
-  if(s.roleRecent.length>2) s.roleRecent.length=2;
+  if(s.roleRecent.length>4) s.roleRecent.length=4;
 
   record(s,"role",{status:"shown",roleId:job.id,eventId:scena.id});
   if(typeof showEvent!=="function") return false;
@@ -728,6 +860,7 @@ function showFactoryRole(job,s,roll){
 const FACTORY_FLOOR_EVENTS = Object.freeze([
   Object.freeze({
     id:"fermo-linea",
+    roles:Object.freeze(["operaio","operaio_esperto","capolinea"]),
     t:"La linea si ferma per venti minuti",
     d:"Una protezione scatta e il reparto resta fermo mentre arriva la manutenzione. Per una volta il ritmo si spezza davvero.",
     opts:Object.freeze([
@@ -750,6 +883,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   }),
   Object.freeze({
     id:"caldo-reparto",
+    roles:Object.freeze(["operaio","operaio_esperto"]),
     t:"Oggi in reparto si muore di caldo",
     d:"L'aria gira male e dopo qualche ora il turno comincia a pesare più del normale. Puoi chiedere di ruotare o stringere i denti.",
     opts:Object.freeze([
@@ -772,6 +906,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   }),
   Object.freeze({
     id:"ordine-chiuso",
+    roles:Object.freeze(["operaio","operaio_esperto"]),
     t:"Il lotto finisce prima del previsto",
     d:"Per una volta siete avanti. Restano minuti buoni prima della chiusura del turno e nessuno sta correndo.",
     opts:Object.freeze([
@@ -783,6 +918,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   }),
   Object.freeze({
     id:"rumore-anomalo",
+    roles:Object.freeze(["operaio","operaio_esperto","capolinea"]),
     t:"Una macchina fa un rumore che ieri non faceva",
     d:"Continua a lavorare, ma il rumore è nuovo. Può essere niente oppure l'inizio del fermo che nessuno vuole.",
     opts:Object.freeze([
@@ -805,6 +941,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   }),
   Object.freeze({
     id:"collega-in-calo",
+    roles:Object.freeze(["operaio","operaio_esperto"]),
     t:"Quello accanto a te oggi è in difficoltà",
     d:"Lo vedi rallentare da un po'. Non è un evento da eroe: puoi coprirgli qualche passaggio oppure chiamare chi coordina il reparto.",
     opts:Object.freeze([
@@ -816,6 +953,7 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   }),
   Object.freeze({
     id:"materiale-in-ritardo",
+    roles:Object.freeze(["operaio","operaio_esperto","capolinea"]),
     t:"Il materiale arriva tardi alla linea",
     d:"Per quasi mezz'ora non puoi produrre al ritmo previsto. Il ritardo non dipende da te, ma il clima del reparto cambia lo stesso.",
     opts:Object.freeze([
@@ -844,8 +982,10 @@ function showFactoryFloor(job,s,roll){
   if(!claim("work-factory-floor")) return false;
 
   if(!Array.isArray(s.factoryRecent)) s.factoryRecent=[];
-  const disponibili=FACTORY_FLOOR_EVENTS.filter(x=>!s.factoryRecent.includes(x.id));
-  const pool=disponibili.length?disponibili:FACTORY_FLOOR_EVENTS;
+  const adatti=FACTORY_FLOOR_EVENTS.filter(x=>!Array.isArray(x.roles) || x.roles.includes(job.id));
+  if(!adatti.length) return false;
+  const disponibili=adatti.filter(x=>!s.factoryRecent.includes(x.id));
+  const pool=disponibili.length?disponibili:adatti;
   const scena=pool[Math.floor(Math.random()*pool.length)];
 
   s.factoryRecent.unshift(scena.id);

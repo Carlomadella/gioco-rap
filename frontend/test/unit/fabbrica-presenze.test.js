@@ -1108,6 +1108,15 @@ describe("cartellino presenze Fabbrica", () => {
     expect(eventi).toContain('id:"spedizione-lunedi"');
     expect(eventi).toContain("adfFactoryOvertimeScenario(offerta)");
     expect(eventi).toContain("overtime.pendingOffer.scenarioLabel=scelta.label");
+    expect(eventi).toContain("overtime.pendingOffer.scenarioRoleId=scelta.roleId");
+    expect(eventi).toContain("ADF_FACTORY_OVERTIME_ROLE_CONTEXT");
+    expect(eventi).toContain('asker:"Il capolinea"');
+    expect(eventi).toContain('asker:"Il capoturno"');
+    expect(eventi).toContain('asker:"Il responsabile di produzione"');
+    expect(eventi).toContain('duty:"coordinare la linea nel turno extra"');
+    expect(eventi).toContain('duty:"coordinare i reparti nel turno extra"');
+    expect(eventi).not.toContain("Il capo ti chiede se puoi entrare");
+    expect(eventi).not.toContain("A fine turno il capolinea ti ferma");
     expect(eventi).toContain("lavoroAccettaStraordinario(luogo)");
     expect(eventi).toContain('lavoroAggiornaStraordinariTempo();');
     expect(luoghi).toContain("straordinarioOggi");
