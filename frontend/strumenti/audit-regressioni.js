@@ -1328,9 +1328,9 @@ test("punto 10: una storia forte può riemergere più fredda",
   crime.includes("coldTrustLoss:15") &&
   crime.includes("coldReturnAfterDays:84"));
 test("punto 10: ghosting, rifiuto e cancellazione tecnica sono distinti",
-  events.includes('typeof stradaIgnoraOpportunita==="function"') &&
-  events.includes('typeof stradaIgnoraPropostaFabbrica==="function"') &&
-  events.includes('typeof stradaRifiutaPropostaFabbrica==="function"') &&
+  ev.includes('typeof stradaIgnoraOpportunita==="function"') &&
+  ev.includes('typeof stradaIgnoraPropostaFabbrica==="function"') &&
+  ev.includes('typeof stradaRifiutaPropostaFabbrica==="function"') &&
   crime.includes("Cancellazione tecnica"));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
