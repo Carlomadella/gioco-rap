@@ -483,6 +483,8 @@ function stradaAnnullaOpportunita(){
   if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay)){
     st.lastOfferAbsoluteDay=null;
     st.nextOfferAbsoluteDay=null;
+    if(Array.isArray(st.recentIds) && st.recentIds[0]===proposta.id)
+      st.recentIds.shift();
   }
   return proposta;
 }
