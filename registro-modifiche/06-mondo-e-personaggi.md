@@ -6,6 +6,32 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:202190f7 -->
+## 02/10/26, 00:06 — task/fabbrica-esito-turno-in-scena → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `202190f7`
+
+### Cosa è entrato
+
+- `c9226f51` — chore(cache): invalida esito turno Fabbrica — **mycolbraga**
+- `4cf20581` — test(fabbrica): copre esito turno completo nella scena — **mycolbraga**
+- `bd270135` — feat(fabbrica): mostra esito completo del turno nella scena — **mycolbraga**
+- `a1803e37` — feat(fabbrica): collega evento di fine turno all'esito in scena — **mycolbraga**
+- `975dfc7b` — feat(fabbrica): salva esito strutturato del turno — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:1c3b791c -->
 ## 01/10/26, 23:54 — task/fabbrica-contatti-per-ruolo → main
 
