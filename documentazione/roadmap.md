@@ -175,8 +175,11 @@ non resta niente.
 `phases.js`) e un tetto settimanale sulla promo — **FATTO (06/09/2026)**; energia a 100,
 giornate e skip di quanto vuoi; le classifiche settimanali con le frecce; **FATTO
 (20/09/2026)** i prezzi dei beat su tre fasce per fama del beatmaker (100–250 / 300–1000 /
-1000–2000, `BEAT_FASCE` in `beats.js`), la partenza con tutti i parametri a 1, e la regola
-che da un lavoro non ci si licenzia — il posto lo perdi solo se non ti presenti.
+1000–2000, `BEAT_FASCE` in `beats.js`), la partenza con tutti i parametri a 1.
+**AGGIORNATO (02/10/2026)** — nei lavori strutturati (Fabbrica e Pizzeria) si può ora
+dare volontariamente le dimissioni dalla schermata del luogo: il contratto si chiude,
+lo storico resta, mentre il licenziamento per disciplina rimane una conseguenza distinta
+e può bloccare temporaneamente la riassunzione.
 **FATTO (29/09/2026)** il simulatore di bilanciamento: `npm run bilanciamento` gioca mille
 carriere da un anno con sei strategie (chi lavora, chi spinge la promo, chi fa crimini, chi
 sta fermo, chi fa a caso, il musicista) e scrive un rapporto con le curve che sembrano
