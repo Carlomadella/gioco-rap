@@ -353,39 +353,39 @@ con quattro barre vuote. Le partite salvate prima restano coi loro numeri: non s
 
 ---
 
-## Non ci si può licenziare
+## Dimissioni e licenziamento nei lavori strutturati
 
-> **FATTO (20/09/2026)** — branch `task/piccole-agenda-beat-parametri-licenziarsi`, una
-> delle quattro piccole chiuse insieme. File: `frontend/js/game/hub.js` (i due testi),
-> `actions.js` (`offerJobs`), `eventi-v2.js` (`no_job`, `set_job`) e il catalogo
-> `eventi-master-1000-v1.2.13.json` (EV0035).
+> **AGGIORNATO (02/10/2026)** — la vecchia regola del 20/09/2026
+> *«da un lavoro non ci si può licenziare»* è stata superata dal gameplay attuale.
+> La fonte di verità è il contratto per luogo in `frontend/js/game/actions.js` e
+> la UI dei luoghi in `frontend/js/game/luoghi-foto.js`.
 
-Il punto di CARLO: *«non ci si può licenziare dal lavoro corrente, implementalo per tutti i
-lavori»*.
+La decisione storica del 20/09 impediva di lasciare volontariamente un lavoro e faceva
+dipendere l'uscita dal posto soltanto dal licenziamento. **Non è più il comportamento del
+gioco.**
 
-**Com'era.** Un tasto per licenziarsi non c'è mai stato: `G.job` torna `null` solo in
-`sim.js`, dopo tre settimane senza presentarsi. Ma tre cose dicevano o facevano il
-contrario:
+**Com'è adesso.** Fabbrica e Pizzeria, i due lavori strutturati attualmente giocabili,
+mostrano nella loro schermata il tasto **«Dai le dimissioni»**. La scelta apre una conferma;
+se il giocatore accetta:
 
-- il testo di rifiuto — sui due posti di lavoro della mappa e al centro per l'impiego —
-  diceva *«lascialo o aspetta di essere licenziato»*: prometteva un «lascialo» che non
-  esiste;
-- l'evento **EV0035 «Ti offrono un lavoro vero che paga bene»** non chiedeva niente e
-  poteva capitare a chi lavorava già: accettare voleva dire mollare il posto di prima, cioè
-  licenziarsi;
-- `offerJobs()` (i colloqui) escludeva solo il lavoro che hai e offriva gli altri due; la
-  mossa «Cerca lavoro» lo copriva col suo `avail`, ma la funzione da sola no.
+- `lavoroTerminaContratto(luogo, "dimissioni")` chiude il contratto corrente e lo archivia
+  in `contractHistory` con giorno e motivo della chiusura;
+- `G.job` torna `null`, quindi da quel momento non arrivano più paga e turni di quel posto;
+- eventuali straordinari già accettati o ancora pendenti vengono cancellati insieme al
+  contratto;
+- **presenze, storico e carriera del luogo non vengono cancellati**;
+- i richiami già ricevuti **non vengono azzerati dalle dimissioni**;
+- le dimissioni non applicano il blocco di riassunzione previsto per un licenziamento.
 
-**Com'è.** La regola è una e vale per tutti i lavori: **il posto lo lasci solo se ti mandano
-via**. I due testi dicono *«da un lavoro non ci si licenzia: lo perdi solo se non ti presenti
-per tre settimane»*. `offerJobs()` con un posto in tasca apre la stessa risposta e non fa i
-colloqui. In `eventi-v2.js` c'è il test `no_job` (accanto a `has_job`, che c'era già) e
-EV0035 lo chiede fra i suoi `requirements`; e il gestore di `set_job` non sovrascrive un
-lavoro che c'è — rete di sicurezza per un evento futuro che dovesse dimenticarsi la
-condizione.
+Il **licenziamento** resta una conseguenza diversa. Passa da `lavoroLicenzia()`: registra
+un licenziamento nello storico, chiude il contratto con motivo `licenziamento` e applica
+il blocco di riassunzione definito dalla disciplina del luogo (**8 settimane in Fabbrica,
+4 in Pizzeria**). Quando quel blocco è scaduto e il giocatore viene riassunto, i richiami
+attivi vengono azzerati; lo storico complessivo della carriera resta.
 
-L'audit («Le quattro piccole del 20/09») controlla che «lascialo» non torni nei testi, che
-`offerJobs` si fermi con un lavoro, e che EV0035 chieda `no_job` nel catalogo.
+Quindi la regola corrente è: **puoi lasciare volontariamente il lavoro, ma dimissioni e
+licenziamento hanno conseguenze diverse**. I testi e la documentazione non devono più
+riproporre la vecchia frase *«da un lavoro non ci si licenzia»*.
 
 ## L'attesa lunga non si trascina
 
