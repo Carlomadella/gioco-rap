@@ -201,6 +201,40 @@
   };
   PHONE.messages.forEach(m=>{if(typeof m.lastReply==="undefined")m.lastReply=null;});
 
+  function introMessage(meta){
+    const name=String(meta&&meta.personName||"CONTATTO").trim()||"CONTATTO";
+    return {
+      id:"trap-intro-"+String(meta&&meta.personId||"contact"),
+      family:"trap-intro",
+      voice:"contact",
+      from:name.toUpperCase(),
+      text:"Da ora usa questo. Le cose che non posso dirti in faccia arrivano qui. Non usarlo per altro.",
+      replies:["RICEVUTO.","CHI MI SCRIVERÀ?","NON MI PIACE."],
+      tags:["street","danger"],
+      time:"ADESSO",
+      unread:true,
+      lastReply:null
+    };
+  }
+
+  function acquire(meta){
+    meta=meta||{};
+    PHONE.mode="home";
+    PHONE.menu=0;
+    PHONE.msgIndex=0;
+    PHONE.callIndex=0;
+    PHONE.replyIndex=0;
+    PHONE.ringing=false;
+    PHONE.call=null;
+    PHONE.calls=[];
+    PHONE.messages=[introMessage(meta),...seedInbox(4)].slice(0,18);
+    PHONE.messages.forEach(m=>{if(typeof m.lastReply==="undefined")m.lastReply=null;});
+    setBadge();
+    render();
+    notify("<b>"+String(meta.personName||"Il contatto")+"</b> ti ha consegnato il TrapPhone.");
+    return true;
+  }
+
   let homeParent=dock.parentNode;
   let homeNext=dock.nextSibling;
   let placeholder=null;
@@ -238,6 +272,11 @@
     return {};
   }
 
+  function trapOwned(){
+    const s=currentGameState()||{};
+    return s.hasTrapPhone!==false;
+  }
+
   function dynamicIncoming(){
     return generateCall(currentGameState(),true);
   }
@@ -248,6 +287,7 @@
   }
 
   function focus(on=true){
+    if(on && !trapOwned()) return false;
     const panel=dock.closest(".right");
     const pane=dock.closest(".tabpane");
 
@@ -437,6 +477,7 @@
   }
 
   function enter(){
+    if(!trapOwned()) return false;
     if(PHONE.ringing){
       answerCall();
       return;
@@ -551,6 +592,7 @@
   }
 
   function incoming(){
+    if(!trapOwned()) return null;
     if(PHONE.ringing || PHONE.mode==="callActive" || PHONE.mode==="callOptions") return;
     PHONE.call=dynamicIncoming();
     PHONE.ringing=true;
@@ -671,6 +713,7 @@
   if(trapTestSms)trapTestSms.onclick=()=>{clickTone();receiveSms();if(!PHONE.focused)focus(true);PHONE.mode="messages";PHONE.msgIndex=0;render();};
 
   function receiveSms(priority=null){
+    if(!trapOwned()) return null;
     const m=generateSms(currentGameState(),true,priority);if(!m)return null;
     PHONE.messages.unshift(m);PHONE.messages=PHONE.messages.slice(0,18);
     notify("<b>"+m.from+"</b> — nuovo SMS");setBadge();
@@ -678,6 +721,7 @@
     return m;
   }
   function triggerTrapEvent(level="auto"){
+    if(!trapOwned()) return null;
     const s=currentGameState(),heat=Number(s.heat||0),rep=Number(s.rep||0);
     if(level==="high"){incoming();return "call";}
     if(level==="medium"){if(Math.random()<.45){incoming();return "call";}receiveSms("medium");return "sms";}
@@ -700,6 +744,8 @@
 
   /* Produzione: nessuna chiamata automatica dimostrativa. Gli ingressi arrivano dagli eventi reali. */
   window.TRAPHONE16={
+    acquire,
+    owned:trapOwned,
     incoming,
     receiveSms,
     triggerTrapEvent,
@@ -713,7 +759,7 @@
     answerCall,
     declineCall,
     render,
-    openMessages(){focus(true);PHONE.mode="messages";PHONE.msgIndex=0;render()},
+    openMessages(){if(!trapOwned())return false;focus(true);PHONE.mode="messages";PHONE.msgIndex=0;render();return true;},
     snapshot(){
       return {
         mode:PHONE.mode,
@@ -723,7 +769,8 @@
         replyIndex:PHONE.replyIndex,
         focused:PHONE.focused,
         ringing:PHONE.ringing,
-        unread:PHONE.messages.filter(m=>m.unread).length,
+        owned:trapOwned(),
+        unread:trapOwned()?PHONE.messages.filter(m=>m.unread).length:0,
         lastReply:(PHONE.messages[PHONE.msgIndex]||{}).lastReply||null,
         callFrom:PHONE.call&&PHONE.call.from,
         screen:view.innerText,
