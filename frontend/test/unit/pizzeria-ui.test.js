@@ -8,6 +8,7 @@ const QUI = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(QUI, "../..");
 const leggi = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 const LUOGHI = leggi("js/game/luoghi-foto.js");
+const EVENTI = leggi("js/game/eventi-v2.js");
 
 function pezzo(da,a){
   const start=LUOGHI.indexOf(da);
@@ -103,4 +104,47 @@ describe("UI carriera e servizio Pizzeria", () => {
     expect(LUOGHI).toContain('function lfFabbricaCarriera(){ return lfCarrieraLavoro("fabbrica"); }');
     expect(LUOGHI).toContain('lfPan("Ferie", lfFabbricaFerie(), "orologio")');
   });
+
+  it("il riepilogo turno usa il contatto più recente, non il primo dello storico", () => {
+    const start=EVENTI.indexOf("function adfShiftOutcomeEvent");
+    const end=EVENTI.indexOf("function adfCompletaHookAzione",start);
+    if(start<0 || end<0) throw new Error("adfShiftOutcomeEvent non trovato");
+    const source=EVENTI.slice(start,end);
+
+    let salvato=null;
+    const ctx={
+      G:{
+        workplaces:{
+          pizzeria:{
+            network:{
+              history:[
+                {personId:"vecchio"},
+                {personId:"nuovo"}
+              ]
+            }
+          }
+        },
+        gente:[
+          {id:"vecchio",n:"Primo contatto"},
+          {id:"nuovo",n:"Ultimo contatto"}
+        ],
+        strada:{}
+      },
+      window:{},
+      lavoroSegnaEventoEsitoTurno:(luogo,event)=>{ salvato={luogo,event}; },
+      renderLuogo:()=>{},
+      Number,Object,Array
+    };
+    vm.createContext(ctx);
+    vm.runInContext(source,ctx);
+    vm.runInContext(
+      'adfShiftOutcomeEvent("pizzeria",{id:"lavapiatti",place:"pizzeria"},{contact:true})',
+      ctx
+    );
+
+    expect(salvato.luogo).toBe("pizzeria");
+    expect(salvato.event.type).toBe("contact");
+    expect(salvato.event.detail).toBe("Ultimo contatto");
+  });
+
 });
