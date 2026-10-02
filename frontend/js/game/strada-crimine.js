@@ -295,6 +295,32 @@ const STRADA_OPPORTUNITA_TRIGGER = Object.freeze({
   })
 });
 
+function stradaOpportunitaTriggerConfig(trigger){
+  const base=STRADA_OPPORTUNITA_TRIGGER[trigger];
+  if(!base) return null;
+  const cap=stradaCapacitaRete();
+  let chance=Number(base.chance||0);
+  let cooldown=Math.max(1,Number(base.cooldownGiorni||1));
+
+  /* Più persone ti conoscono e il tuo nome gira, più spesso qualcuno prova a
+     coinvolgerti. Non esiste alcun "livello": cambia soltanto il mondo. */
+  if(trigger==="mondo" && cap.piuChiamate){
+    chance+=.035;
+    cooldown=Math.max(7,cooldown-2);
+  }
+  if(trigger==="mondo" && cap.richiestaNome){
+    chance+=.015;
+    cooldown=Math.max(6,cooldown-1);
+  }
+
+  return {
+    chance:Math.min(.16,chance),
+    cooldownGiorni:cooldown,
+    durataGiorni:Number(base.durataGiorni||7),
+    trigger
+  };
+}
+
 /* Pool di opportunità criminali. Non aggiunge nuovi metodi operativi nel mondo
    reale: varia i quattro colpi già esistenti sul piano di gameplay.
    Ogni offerta modifica davvero ricompensa, probabilità, attenzione e
@@ -1838,6 +1864,7 @@ function stradaOpportunitaStato(){
   const st=s.crimeOpportunity;
   if(!Array.isArray(st.history)) st.history=[];
   if(!Array.isArray(st.recentIds)) st.recentIds=[];
+  if(!Array.isArray(st.pendingChoices)) st.pendingChoices=[];
   if(!st.lastCheckByTrigger || typeof st.lastCheckByTrigger!=="object")
     st.lastCheckByTrigger={};
   /* Migrazione UNA SOLA VOLTA del vecchio contatore giornaliero. Prima veniva
@@ -1893,20 +1920,28 @@ function stradaOpportunitaAttiva(colpoId){
 }
 function stradaFabbricaLeadAttivo(colpoId){ return stradaOpportunitaAttiva(colpoId); }
 
-function stradaScegliOpportunita(roll){
+function stradaPoolOpportunita(escludi){
   const st=stradaOpportunitaStato();
   const rep=Math.max(0,Number((G.strada&&G.strada.rep)||0));
+  const skip=new Set(Array.isArray(escludi)?escludi:[]);
   let pool=STRADA_OPPORTUNITA.filter(x=>
     rep>=Number(x.minRep||0) &&
     (x.maxRep==null || rep<=Number(x.maxRep)) &&
-    !st.recentIds.includes(x.id)
+    !st.recentIds.includes(x.id) &&
+    !skip.has(x.id)
   );
   if(!pool.length)
     pool=STRADA_OPPORTUNITA.filter(x=>
-      rep>=Number(x.minRep||0) && (x.maxRep==null || rep<=Number(x.maxRep))
+      rep>=Number(x.minRep||0) &&
+      (x.maxRep==null || rep<=Number(x.maxRep)) &&
+      !skip.has(x.id)
     );
-  if(!pool.length) return null;
+  return pool;
+}
 
+function stradaScegliOpportunita(roll,escludi){
+  const pool=stradaPoolOpportunita(escludi);
+  if(!pool.length) return null;
   const r=Number.isFinite(Number(roll))
     ? Math.max(0,Math.min(.999999,Number(roll)))
     : Math.random();
