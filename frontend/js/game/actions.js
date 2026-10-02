@@ -1188,9 +1188,11 @@ function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle
   const giorni = new Set(
     lista.filter(n => n >= from && n < to && consentiti.includes((n - from) + 1))
   );
+  const giorniNumero = new Set(Array.from(giorni).map(n => (n - from) + 1));
   const fatti = giorni.size;
   const richiesti = Math.max(0, Number(def.turniSettimanali || 0));
-  const assenze = Math.max(0, richiesti - fatti);
+  const ferie = lavoroFerieCoperturaSettimana(luogo,absoluteWeek,giorniNumero,richiesti);
+  const assenze = Math.max(0, richiesti - ferie.coperti);
 
   const cfg = carrieraCfg.disciplina;
   const primaAffidabilita = carriera.reliability;
@@ -1230,6 +1232,8 @@ function lavoroValutaDisciplinaSettimana(luogo, absoluteWeek, cycle, weekInCycle
     weekInCycle:weekInCycle + 1,
     eligible:eligible,
     workedDays:fatti,
+    vacationDays:ferie.utili,
+    coveredDays:ferie.coperti,
     requiredDays:richiesti,
     absences:assenze,
     warningAdded:warningAdded,
@@ -1375,14 +1379,19 @@ function lavoroValutaCiclo(luogo, ciclo, turni){
     const giorni = new Set(
       lista.filter(n => n >= from && n < to && consentiti.includes((n - from) + 1))
     );
+    const giorniNumero = new Set(Array.from(giorni).map(n => (n - from) + 1));
     const fatti = giorni.size;
     const richiesti = Number(def.turniSettimanali || 0);
+    const absoluteWeek = ciclo * ADF_LAVORO_CICLO_SETTIMANE + w + 1;
+    const ferie = lavoroFerieCoperturaSettimana(luogo,absoluteWeek,giorniNumero,richiesti);
     settimane.push({
       settimana:w + 1,
       giorni:fatti,
+      ferie:ferie.utili,
+      coperti:ferie.coperti,
       richiesti:richiesti,
-      completa:fatti >= richiesti,
-      assenze:Math.max(0, richiesti - fatti)
+      completa:ferie.coperti >= richiesti,
+      assenze:Math.max(0, richiesti - ferie.coperti)
     });
   }
 
@@ -1502,6 +1511,7 @@ function lavoroCandidatoStraordinario(luogo){
      La Pizzeria ha invece 4 turni, martedì-domenica: dopo aver coperto la
      quota può essere chiesto un quinto turno nel weekend, con premio più basso. */
   if(oggi === 5 && Array.isArray(def.giorniConsentiti) && def.giorniConsentiti.includes(6)){
+    if(lavoroFeriePerGiorno(luogo,assoluto+1)) return null;
     return {
       luogo:luogo,
       tipo:luogo === "fabbrica" ? "sesto-giorno" : "giorno-extra",
@@ -1514,6 +1524,7 @@ function lavoroCandidatoStraordinario(luogo){
   }
 
   if(oggi === 6){
+    if(lavoroFeriePerGiorno(luogo,assoluto+1)) return null;
     const domenicaConsentita = Array.isArray(def.giorniConsentiti) && def.giorniConsentiti.includes(7);
     if(!domenicaConsentita && !def.domenicaRiposo) return null;
     return {
@@ -1914,12 +1925,25 @@ function lavoroCartellino(luogo){
   const giorniConsentiti = contratto && Array.isArray(contratto.giorniConsentiti)
     ? contratto.giorniConsentiti
     : [1,2,3,4,5,6,7];
-  const giorniLavoratiSettimana = new Set(
+  const posizioniLavorateSettimana = new Set(
     stato.turni.filter(n => {
       if(n < inizio || n >= inizio + 7) return false;
       return giorniConsentiti.includes((n - inizio) + 1);
     })
-  ).size;
+  );
+  const giorniLavoratiSettimana = posizioniLavorateSettimana.size;
+  const giorniLavoratiNumero = new Set(
+    Array.from(posizioniLavorateSettimana).map(n => (n - inizio) + 1)
+  );
+  const ferieCopertura = lavoroFerieCoperturaSettimana(
+    luogo,
+    lavoroSettimanaAssoluta(),
+    giorniLavoratiNumero,
+    contratto ? Number(contratto.turniSettimanali || 0) : 0
+  );
+  const feriePosizioni = lavoroFeriePerCiclo(luogo,ciclo)
+    .map(r => Number(r.targetAbsoluteDay) - lavoroCicloInizioGiorno(ciclo))
+    .filter(n => Number.isInteger(n) && n >= 0 && n < ADF_LAVORO_GIORNI_CICLO);
   /* Migrazione/sync: se questa partita era già dentro al ciclo quando il
      sistema settimanale è stato introdotto, i richiami delle settimane già
      chiuse vengono recuperati subito. */
@@ -1935,6 +1959,9 @@ function lavoroCartellino(luogo){
     settimana:settimana,
     giorno:(posOggi % 7) + 1,
     giorniLavoratiSettimana:giorniLavoratiSettimana,
+    giorniFerieSettimana:ferieCopertura.utili,
+    giorniCopertiSettimana:ferieCopertura.coperti,
+    feriePosizioni:feriePosizioni,
     turniSettimanaliRichiesti:contratto ? Number(contratto.turniSettimanali || 0) : 0,
     affidabilita:carriera ? carriera.reliability : 50,
     mesiPerfetti:carriera ? carriera.perfectCycles : 0,
