@@ -1,7 +1,8 @@
 /* Stress test rapido della Fabbrica.
    Fa parte del sistema strumenti/bilanciamento: usa le stesse funzioni del gioco
    lette da actions.js, ma senza avviare Chromium. Serve per regressioni veloci su
-   fatica, carriera e paga; il simulatore lungo resta simulatore-bilanciamento.js. */
+   fatica, carriera, paga e scenari operativi (ruoli, disciplina, eventi,
+   conflitti musica/lavoro); il simulatore lungo resta simulatore-bilanciamento.js. */
 "use strict";
 
 const fs = require("node:fs");
@@ -11,6 +12,7 @@ const vm = require("node:vm");
 const ROOT = path.resolve(__dirname, "../..");
 const ACTIONS = path.join(ROOT, "js/game/actions.js");
 const LIFESTYLE = path.join(ROOT, "js/game/lifestyle.js");
+const WORK_EVENTS = path.join(ROOT, "js/game/lavoro-eventi.js");
 
 function helperLavoro(){
   const source = fs.readFileSync(ACTIONS, "utf8");
@@ -35,6 +37,17 @@ function runtime(G){
     aggiornaFatica:n => vm.runInContext("lavoroAggiornaFaticaSettimanale("+Number(n)+")",ctx),
     qualita:(n,f) => vm.runInContext("lavoroQualitaFattore("+Number(n)+","+Number(f)+")",ctx),
     lifestyle:(n,f) => vm.runInContext("lavoroLifestyleFattore("+Number(n)+","+Number(f)+")",ctx),
+    effetti:job => {
+      ctx.__job=job;
+      return vm.runInContext("lavoroEffettiTurno('fabbrica',__job)",ctx);
+    },
+    disciplina:(absoluteWeek,cycle,weekInCycle,turni) => {
+      ctx.__turni=turni;
+      return vm.runInContext(
+        "lavoroValutaDisciplinaSettimana('fabbrica',"+Number(absoluteWeek)+","+
+        Number(cycle)+","+Number(weekInCycle)+",__turni,{silent:true})",ctx
+      );
+    },
     valutaCiclo:(c,turni) => {
       ctx.__turni = turni;
       return vm.runInContext("lavoroValutaCiclo('fabbrica',"+Number(c)+",__turni)",ctx);
@@ -81,6 +94,7 @@ function simulaFatica(nome, pattern, settimane=52){
 function statoCarriera(){
   return {
     year:1,week:1,day:1,money:0,shifts:0,workFatigue:0,strada:{},
+    wellbeing:70,lucidita:70,skills:{rete:0},gente:[],
     job:{id:"operaio",place:"fabbrica",n:"Operaio",pay:220,e:40,d:""},
     workplaces:{fabbrica:{
       contract:{signed:true,signedAbsoluteDay:1},
@@ -100,6 +114,230 @@ function turniPerfetti(){
   const out=[];
   for(let w=0;w<4;w++) for(const d of [0,1,2,3,4]) out.push(w*7+d);
   return out;
+}
+
+function runtimeEventi(G, opts){
+  opts=opts||{};
+  const base=runtime(G), ctx=base.ctx;
+  const shown=[], notifications=[], started=[], missed=[];
+  const agenda=[];
+  const clock={
+    now:Number(opts.now==null?8*60:opts.now),
+    duration:Number(opts.duration==null?480:opts.duration)
+  };
+  const math=Object.create(Math);
+  math.random=()=>Number(opts.random==null?0:opts.random);
+
+  Object.assign(ctx,{
+    console,
+    Math:math,
+    String,Boolean,Date,
+    setTimeout:fn=>{ fn(); return 1; },
+    clearTimeout:()=>{},
+    save:()=>{},
+    showEvent:e=>shown.push(e),
+    avviaAzioneDiretta:id=>started.push(id),
+    gain:(skill,v)=>{
+      G.skills=G.skills||{};
+      G.skills[skill]=Number(G.skills[skill]||0)+Number(v||0);
+    },
+    addLuc:v=>{
+      G.lucidita=Math.max(0,Math.min(100,Number(G.lucidita||0)+Number(v||0)));
+    },
+    chatAvvicina:(p,v)=>{
+      if(p) p.pt=Math.max(0,Number(p.pt||0)+Number(v||0));
+    },
+    AGENDA:{
+      conflittiTra:()=>agenda.slice(),
+      mancaVoce:v=>{ missed.push(v); return v; },
+      pesoDiOggi:()=>1
+    },
+    GAME_TIME:{
+      now:()=>clock.now,
+      durationFor:()=>clock.duration,
+      format:m=>{
+        const n=((Math.round(Number(m)||0)%1440)+1440)%1440;
+        return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");
+      }
+    },
+    ADF_EVENTI:{
+      claimAutoEvent:()=>true,
+      addNotification:n=>{ notifications.push(n); return n; }
+    }
+  });
+  ctx.window=ctx;
+  vm.runInContext(fs.readFileSync(WORK_EVENTS,"utf8"),ctx);
+
+  return Object.assign(base,{
+    shown,notifications,started,missed,
+    setAgenda:voci=>{ agenda.splice(0,agenda.length,...(voci||[])); },
+    setClock:(now,duration)=>{
+      if(now!=null) clock.now=Number(now);
+      if(duration!=null) clock.duration=Number(duration);
+    },
+    afterShift:(payload,rolls)=>{
+      ctx.__payload=payload||{};
+      ctx.__rolls=rolls||{};
+      return vm.runInContext("ADF_WORK_EVENTS.afterShift(__payload,__rolls)",ctx);
+    },
+    guardTurno:()=>vm.runInContext("ADF_WORK_EVENTS.guardAction('turno')",ctx)
+  });
+}
+
+function simulaProfiliRuolo(turniSettimana=5){
+  const G=statoCarriera(), r=runtime(G);
+  const ruoli=vm.runInContext(
+    "lavoroCarrieraDef('fabbrica').ruoli.map(x=>({id:x.id,n:x.n,energia:x.energia,"+
+    "benessereTurno:x.benessereTurno,luciditaTurno:x.luciditaTurno,fisico:x.fisico,stress:x.stress}))",
+    r.ctx
+  );
+  const out={};
+  for(const ruolo of ruoli){
+    G.job={id:ruolo.id,place:"fabbrica",n:ruolo.n,pay:220,e:ruolo.energia,d:""};
+    const fx=r.effetti(G.job);
+    out[ruolo.id]={
+      ruolo:ruolo.n,
+      energiaTurno:Number(fx.energia),
+      benessereTurno:Number(fx.benessere),
+      luciditaTurno:Number(fx.lucidita),
+      fisico:fx.fisico,
+      stress:fx.stress,
+      settimana:{
+        turni:turniSettimana,
+        energia:Number(fx.energia)*turniSettimana,
+        benessere:Number(fx.benessere)*turniSettimana,
+        lucidita:Number(fx.lucidita)*turniSettimana
+      }
+    };
+  }
+  return out;
+}
+
+function simulaDisciplina(){
+  const scenario=turni=>{
+    const G=statoCarriera(), r=runtime(G);
+    const risultato=r.disciplina(1,0,0,turni);
+    return {risultato,carriera:r.carriera()};
+  };
+  const normale=scenario([0,1,2,3,4]);
+  const lieve=scenario([0,1,2,3]);
+
+  const G=statoCarriera(), r=runtime(G), gravi=[];
+  const settimane=[
+    {week:1,weekInCycle:0,turni:[0,1]},
+    {week:2,weekInCycle:1,turni:[7,8]},
+    {week:3,weekInCycle:2,turni:[14,15]}
+  ];
+  for(const x of settimane){
+    G.week=x.week;
+    const risultato=r.disciplina(x.week,0,x.weekInCycle,x.turni);
+    gravi.push(risultato);
+    if(risultato&&risultato.dismissed) break;
+  }
+  const blocco=vm.runInContext("lavoroBloccoRiassunzione('fabbrica')",r.ctx);
+  return {normale:normale.risultato,lieve:lieve.risultato,gravi,blocco};
+}
+
+function simulaEventiRuolo(){
+  const profili=simulaProfiliRuolo();
+  const out={};
+  for(const [id,p] of Object.entries(profili)){
+    const G=statoCarriera();
+    G.job={id,place:"fabbrica",n:p.ruolo,pay:300,e:p.energiaTurno,d:""};
+    G.workplaces.fabbrica.career.roleId=id;
+    G.workplaces.fabbrica.career.roleLevel=["operaio","operaio_esperto","capolinea","capoturno"].indexOf(id);
+    G.workplaces.fabbrica.career.reliability=70;
+    G.wellbeing=70;
+    G.lucidita=70;
+    const rt=runtimeEventi(G,{random:0});
+    const prima={wellbeing:G.wellbeing,lucidita:G.lucidita,rete:G.skills.rete,reliability:70};
+    const ids=[];
+
+    for(let settimana=1;settimana<=5;settimana++){
+      G.week=settimana;
+      G.day=3;
+      const mostrato=rt.afterShift({},{
+        music:1,role:0,factory:1,crime:1,colleague:1,physical:1
+      });
+      if(!mostrato || !rt.shown.length) continue;
+      const scena=rt.shown[rt.shown.length-1];
+      if(scena.opts&&scena.opts[0]&&typeof scena.opts[0].run==="function") scena.opts[0].run();
+      const row=(G.workplaces.fabbrica.workEvents.history||[]).find(x=>
+        x.family==="role" && x.status==="resolved" && x.roleId===id &&
+        Number(x.absoluteDay)===((settimana-1)*7+3)
+      );
+      if(row) ids.push(row.eventId);
+    }
+
+    const c=G.workplaces.fabbrica.career;
+    out[id]={
+      mostrati:ids.length,
+      unici:new Set(ids).size,
+      eventi:ids,
+      delta:{
+        wellbeing:G.wellbeing-prima.wellbeing,
+        lucidita:G.lucidita-prima.lucidita,
+        rete:Number(G.skills.rete||0)-prima.rete,
+        reliability:Number(c.reliability||0)-prima.reliability
+      }
+    };
+  }
+  return out;
+}
+
+function voceMusica(){
+  return {
+    k:"settimana:live",id:"live",tipo:"settimana",n:"Serata live",
+    ora:"18:00",minuti:18*60,anno:1,settimana:2,giorno:3
+  };
+}
+
+function scenarioConflitto(day,turni,scelta){
+  const G=statoCarriera();
+  G.week=2;
+  G.day=day;
+  G.workplaces.fabbrica.attendance={ciclo:0,turni:turni.slice()};
+  const rt=runtimeEventi(G,{random:0,now:12*60,duration:480});
+  const voce=voceMusica();
+  voce.giorno=day;
+  rt.setAgenda([voce]);
+
+  const gate=rt.guardTurno();
+  const scena=rt.shown[rt.shown.length-1];
+  if(!gate || gate.ok || !scena) return {gate,errore:"conflitto non mostrato"};
+  const indice=scelta==="work"?0:1;
+  scena.opts[indice].run();
+
+  if(scelta==="work"){
+    rt.afterShift({started_at:12*60,ended_at:20*60,job_id:"operaio"},{
+      music:1,role:1,factory:1,crime:1,colleague:1,physical:1
+    });
+  }
+  const rows=(G.workplaces.fabbrica.workEvents.history||[]).filter(x=>x.family==="conflict");
+  return {
+    gate,
+    scelta,
+    started:rt.started.slice(),
+    missed:rt.missed.length,
+    row:rows[0]||null
+  };
+}
+
+function simulaConflittiMusica(){
+  return {
+    musicaRecuperabile:scenarioConflitto(3,[7,8],"music"),
+    musicaCritica:scenarioConflitto(5,[7,8,9],"music"),
+    scegliLavoro:scenarioConflitto(3,[7,8],"work")
+  };
+}
+
+function simulaOperativo(){
+  return {
+    profili:simulaProfiliRuolo(),
+    disciplina:simulaDisciplina(),
+    eventi:simulaEventiRuolo(),
+    conflitti:simulaConflittiMusica()
+  };
 }
 
 function simulaCarrieraPerfetta(cicli=13){
@@ -153,6 +391,7 @@ function esegui(){
   const sette=simulaFatica("7 turni ogni settimana",()=>7);
   const recupero=simulaFatica("12 settimane da 6, poi 5",w=>w<=12?6:5);
   const carriera=simulaCarrieraPerfetta(13);
+  const operativo=simulaOperativo();
   const lifestyleMax=costoLifestyleMassimo();
   const pagaTop=Number(carriera.finale.paga||0);
   const economia={
@@ -178,7 +417,34 @@ function esegui(){
     {nome:"il 5/5 al grado massimo non finanzia da solo il lifestyle massimo",
       ok:economia.pagaTopSettimana<economia.costoMinimoSettimanaleMassimo},
     {nome:"il 6° giorno può colmare il gap ma passa dal sovraccarico",
-      ok:economia.pagaTopSestoGiorno>=economia.costoMinimoSettimanaleMassimo && sei.finale.fatica>=40}
+      ok:economia.pagaTopSestoGiorno>=economia.costoMinimoSettimanaleMassimo && sei.finale.fatica>=40},
+    {nome:"i ruoli spostano davvero il carico da fisico a mentale",
+      ok:operativo.profili.operaio.energiaTurno>operativo.profili.operaio_esperto.energiaTurno &&
+        operativo.profili.operaio_esperto.energiaTurno>operativo.profili.capolinea.energiaTurno &&
+        operativo.profili.capolinea.energiaTurno>operativo.profili.capoturno.energiaTurno &&
+        Math.abs(operativo.profili.capoturno.luciditaTurno)>Math.abs(operativo.profili.operaio.luciditaTurno)},
+    {nome:"la disciplina distingue settimana piena, assenza lieve e assenze gravi",
+      ok:operativo.disciplina.normale.absences===0 &&
+        operativo.disciplina.normale.reliabilityDelta===0 &&
+        operativo.disciplina.lieve.absences===1 &&
+        operativo.disciplina.lieve.reliabilityDelta===-5 &&
+        operativo.disciplina.gravi.length===3 &&
+        operativo.disciplina.gravi[0].warningAdded===1 &&
+        operativo.disciplina.gravi[1].warningAdded===1 &&
+        operativo.disciplina.gravi[2].dismissed===true &&
+        operativo.disciplina.blocco.active===true},
+    {nome:"ogni ruolo attraversa l'intero pool di 5 eventi senza ripetersi",
+      ok:Object.values(operativo.eventi).every(x=>x.mostrati===5 && x.unici===5)},
+    {nome:"il conflitto musica/lavoro registra costo opportunità e rischio presenza",
+      ok:operativo.conflitti.musicaRecuperabile.row &&
+        operativo.conflitti.musicaRecuperabile.row.choice==="music" &&
+        operativo.conflitti.musicaRecuperabile.row.forgonePay===220 &&
+        operativo.conflitti.musicaRecuperabile.row.attendance.assenzeCreateDalConflitto===0 &&
+        operativo.conflitti.musicaCritica.row &&
+        operativo.conflitti.musicaCritica.row.attendance.assenzeCreateDalConflitto===1 &&
+        operativo.conflitti.scegliLavoro.row &&
+        operativo.conflitti.scegliLavoro.row.choice==="work" &&
+        operativo.conflitti.scegliLavoro.missed===1}
   ];
 
   return {
@@ -195,7 +461,8 @@ function esegui(){
       finale:carriera.finale,
       tappe:carriera.storia.filter(x=>x.evento)
     },
-    economia
+    economia,
+    operativo
   };
 }
 
@@ -214,6 +481,15 @@ function stampa(out){
   console.log("Economia settimanale: 5/5 top "+out.economia.pagaTopSettimana+
     " € · 6/7 top "+out.economia.pagaTopSestoGiorno+
     " € · lifestyle massimo minimo "+out.economia.costoMinimoSettimanaleMassimo+" €");
+  console.log("Ruoli (energia/turno): operaio "+out.operativo.profili.operaio.energiaTurno+
+    " · esperto "+out.operativo.profili.operaio_esperto.energiaTurno+
+    " · capolinea "+out.operativo.profili.capolinea.energiaTurno+
+    " · capoturno "+out.operativo.profili.capoturno.energiaTurno);
+  console.log("Disciplina grave: "+out.operativo.disciplina.gravi.length+
+    " settimane critiche · licenziamento="+
+    !!out.operativo.disciplina.gravi[out.operativo.disciplina.gravi.length-1].dismissed);
+  console.log("Eventi ruolo unici in 5 settimane: "+
+    Object.entries(out.operativo.eventi).map(([k,v])=>k+"="+v.unici).join(" · "));
 }
 
 if(require.main===module){
@@ -222,4 +498,8 @@ if(require.main===module){
   if(!out.ok) process.exitCode=1;
 }
 
-module.exports={simulaFatica,simulaCarrieraPerfetta,costoLifestyleMassimo,esegui,stampa};
+module.exports={
+  simulaFatica,simulaCarrieraPerfetta,simulaProfiliRuolo,simulaDisciplina,
+  simulaEventiRuolo,simulaConflittiMusica,simulaOperativo,
+  costoLifestyleMassimo,esegui,stampa
+};
