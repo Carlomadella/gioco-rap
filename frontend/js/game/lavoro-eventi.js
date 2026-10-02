@@ -1643,7 +1643,9 @@ function socialRoleLine(p){
 function socialTalkResult(p,st){
   st.talks+=1;
   relation(p,1);
-  addNetwork(.1);
+  if(typeof lavoroBonusRetePersona==="function")
+    lavoroBonusRetePersona(p,"pizzeria-social-talk",.1,2);
+  else addNetwork(.1);
   if(p.ruolo==="rapper")
     return "Avete parlato di musica senza trasformarla in una gara. Con <b>"+p.n+"</b> adesso c'è un pezzo di rapporto in più.";
   if(p.ruolo==="promoter")
@@ -1690,7 +1692,11 @@ function socialPromoReaction(p,song,st,roll){
   }
 
   if(deltaRel) relation(p,deltaRel);
-  if(deltaRete) addNetwork(deltaRete);
+  if(deltaRete){
+    deltaRete=typeof lavoroBonusRetePersona==="function"
+      ? lavoroBonusRetePersona(p,"pizzeria-autopromo",deltaRete,2)
+      : (addNetwork(deltaRete),deltaRete);
+  }
   st.lastPromoOutcome=outcome;
   return {outcome,score,relationDelta:deltaRel,networkDelta:deltaRete,text};
 }
