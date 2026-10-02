@@ -437,7 +437,15 @@ function stradaApplicaPreparazione(colpo,prepId,personId){
     const gate=typeof GAME_TIME.canSpend==="function"
       ? GAME_TIME.canSpend(minuti)
       : {ok:typeof GAME_TIME.remaining!=="function" || GAME_TIME.remaining()>=minuti};
-    if(!gate || gate.ok===false) return {ok:false,reason:stradaErroreTempoPreparazione(minuti)};
+    if(!gate || gate.ok===false){
+      const reason=gate&&gate.reason;
+      return {
+        ok:false,
+        reason:reason==="day-end"
+          ? stradaErroreTempoPreparazione(minuti)
+          : "Prima devi chiudere la decisione o l'azione in corso."
+      };
+    }
     const tx=typeof GAME_TIME.spend==="function"
       ? GAME_TIME.spend(minuti,"crime:prepare",{detail:{crimePreparation:prep.id,colpoId:colpo&&colpo.id}})
       : GAME_TIME.advance(minuti,"crime:prepare");
