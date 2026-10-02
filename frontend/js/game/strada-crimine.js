@@ -475,9 +475,7 @@ function stradaPersonaDaId(id){
 
 function stradaContattiLuogo(luogo){
   return (G.gente||[]).filter(p=>
-    p && !p.via &&
-    p.origineLuogo===luogo &&
-    p.strada && p.strada.known
+    p && !p.via && p.origineLuogo===luogo
   );
 }
 
@@ -532,10 +530,13 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
   /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Una dritta
      post-turno può esistere solo se in quel posto c'è già una persona reale
      che il giocatore ha scoperto essere collegata alla Strada. */
-  const candidati=stradaContattiLuogo("fabbrica").sort((a,b)=>
-    Number(b.rel||0)-Number(a.rel||0) ||
-    Number(b.pt||0)-Number(a.pt||0)
-  );
+  const candidati=stradaContattiLuogo("fabbrica").sort((a,b)=>{
+    const ak=a.strada&&a.strada.known?1:0;
+    const bk=b.strada&&b.strada.known?1:0;
+    return (bk-ak) ||
+      Number(b.rel||0)-Number(a.rel||0) ||
+      Number(b.pt||0)-Number(a.pt||0);
+  });
   const p=candidati[0] || null;
   return p ? stradaSegnaPersona(p,{
     source:"factory-opportunity",
