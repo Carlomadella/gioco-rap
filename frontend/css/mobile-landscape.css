@@ -1,0 +1,443 @@
+/* MOBILE LANDSCAPE — 02/10/2026
+   Gameplay mobile supportato in orizzontale.
+   Questo foglio viene caricato per ultimo e non modifica desktop o portrait. */
+
+@media (pointer:coarse) and (orientation:landscape) and (max-width:1180px){
+  html,body{min-width:0;max-width:100%;overflow-x:hidden}
+
+  /* ---------- shell comune ---------- */
+  .screen{padding-top:56px}
+  .topnav{min-height:52px;padding-block:6px}
+  .navacc{min-height:44px}
+  .modal,.setts{overscroll-behavior:contain}
+
+  /* ---------- landing ---------- */
+  body.su-menu #s-menu{padding-top:0}
+  .land{
+    height:100dvh;
+    min-height:0;
+    overflow:hidden
+  }
+  body.su-menu .topnav{
+    padding:10px 18px;
+    min-height:0
+  }
+  .land-hero{
+    margin-left:5vw;
+    width:min(48vw,520px);
+    padding:48px 0 8px;
+    justify-content:center
+  }
+  .land-kick{
+    margin-bottom:6px;
+    font-size:9px;
+    letter-spacing:.16em
+  }
+  .land-kick::before{width:24px}
+  .land-hero h1{
+    font-size:clamp(38px,11vh,66px);
+    line-height:.8
+  }
+  .land-sub{
+    max-width:48ch;
+    margin-top:8px;
+    font-size:clamp(10.5px,2.9vh,13px);
+    line-height:1.32
+  }
+  .land-hero .mrow.big{
+    margin-top:9px;
+    min-height:44px;
+    padding:8px 14px 8px 10px;
+    gap:9px
+  }
+  .land-hero .mrow.big .ic{width:26px;height:26px;font-size:11px}
+  .land-hero .mrow.big .a{font-size:11px}
+  .land-hero .mrow.big .b{font-size:9px}
+  .land-hero .mrow.big .arw{font-size:17px}
+  .land-dock{
+    margin:0 10px max(6px,env(safe-area-inset-bottom,0px))
+  }
+  .land-dock nav{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:4px;
+    padding:5px;
+    border-radius:17px
+  }
+  .land-voce{
+    min-height:48px;
+    padding:6px 7px 5px;
+    border-radius:12px
+  }
+  .land-voce .su{gap:4px}
+  .land-voce .n{font-size:8px}
+  .land-voce .tit{
+    margin-top:2px;
+    font-size:9px;
+    letter-spacing:.035em
+  }
+  .land-voce .des{display:none}
+  .land-voce::after{left:8px;right:8px;bottom:5px}
+  .land-piede,.land-giu{display:none}
+
+  /* avvio/slot: in landscape usa la larghezza, non una colonna lunga */
+  .land-avvio{
+    top:56px;
+    bottom:8px;
+    width:min(860px,calc(100% - 24px));
+    max-height:calc(100dvh - 64px);
+    overflow:auto
+  }
+  .avv-testa{margin-bottom:8px}
+  .avv-testa h2{font-size:clamp(24px,8vh,36px)}
+  .avv-testa p{font-size:11px}
+  .avv-diff{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .avv-diff-card{min-height:0;padding:10px 40px 10px 12px}
+  .avv-riga,.avv-slot{min-height:48px}
+
+  /* ---------- accesso ---------- */
+  .accesso{
+    min-height:100dvh;
+    padding:58px 14px 12px;
+    place-items:start center;
+    overflow:auto
+  }
+  .acc-scheda{
+    width:min(760px,100%);
+    padding:14px 18px 16px;
+    border-radius:16px
+  }
+  .acc-scheda h1{font-size:23px;margin:5px 0 3px}
+  .acc-scheda .acc-sub{font-size:11.5px;margin-bottom:10px}
+  .acc-tabs{margin-bottom:10px}
+  .acc-campo{margin-bottom:8px}
+  .acc-campo span{margin-bottom:4px}
+  .acc-campo input{padding:10px 12px}
+  .acc-vai{padding:11px;margin-top:2px}
+  .acc-piede,.acc-nota{margin-top:9px}
+
+  /* ---------- plancia / hub ---------- */
+  .palco{
+    position:fixed;
+    inset:0;
+    overflow:hidden
+  }
+  .plancia{
+    height:100dvh;
+    min-height:0;
+    padding:0 6px 4px;
+    gap:5px;
+    grid-template-columns:minmax(190px,27vw) minmax(0,1fr);
+    grid-template-rows:56px minmax(0,1fr) 30px;
+    grid-template-areas:
+      "barra barra"
+      "sx centro"
+      "sugg sugg"
+  }
+  .pbarra{
+    height:56px;
+    min-height:56px;
+    flex-wrap:nowrap;
+    padding:4px 5px;
+    gap:4px;
+    overflow:hidden
+  }
+  .plogo{width:96px;padding:0 4px}
+  .pcitta{
+    width:120px;
+    flex:none;
+    order:initial;
+    padding-left:8px;
+    border-left:1px solid rgba(255,255,255,.08)
+  }
+  .pcitta .pk{display:none}
+  .pcitta .pcn{font-size:12px}
+  .pcitta .pcf{font-size:8.5px}
+  .pstat{
+    order:initial;
+    flex:1 1 auto;
+    display:flex;
+    min-width:0;
+    padding:0;
+    border-top:0;
+    gap:0
+  }
+  .pstat .ps{
+    min-width:0;
+    padding:0 3px;
+    gap:3px;
+    border-left:1px solid rgba(255,255,255,.06)
+  }
+  .pstat .ps .hicon{width:14px;height:14px}
+  .ps .pk,.ps .pbar{display:none}
+  .ps .pv{font-size:10.5px;margin:0}
+  .psett{
+    width:auto;
+    min-width:62px;
+    padding-left:5px
+  }
+  .psett .pk{display:none}
+  .pcn2{font-size:9px}
+  .pora{display:none}
+  body.in-hub #adf-time-dock[data-host="hub"]{
+    flex:0 0 auto;
+    width:auto;
+    height:44px;
+    margin-left:0
+  }
+  body.in-hub #adf-time-dock[data-host="hub"] #adf-time-widget{
+    transform:scale(.76);
+    transform-origin:center right
+  }
+  .ptelbtn{margin-left:0;padding-inline:6px}
+  .pmenu{min-width:44px}
+  html #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav{
+    top:6px!important;
+    left:4px!important;
+    bottom:auto!important;
+    height:44px!important
+  }
+  #s-hub.screen.on .pbarra.adf-system-host-v7 > .adf-global-nav > .adf-global-system{
+    width:92px!important;
+    min-width:92px!important;
+    height:44px!important
+  }
+
+  .pcolsx,.pcolcentro{min-height:0;grid-template-rows:minmax(0,1fr) auto}
+  .psx{
+    max-height:none;
+    overflow:auto;
+    padding:7px 8px 6px
+  }
+  .psxtab{height:52px;padding:5px}
+  .pface{gap:7px;margin-top:5px}
+  .pport{width:54px;height:66px}
+  .pwho{padding-top:0}
+  .pnome{font-size:11px}
+  .plv,.pgrado{font-size:9.5px}
+  .pxp{margin-top:5px;font-size:8px}
+  .pbar2{height:4px;margin-top:3px}
+  .prighe{margin-top:6px}
+  .prow{height:21px;font-size:9.5px;gap:5px}
+  .prow .hicon{width:12px;height:12px}
+  .prow .mini{width:42px;height:3px}
+  .psk{margin-top:5px}
+  .pskrow{height:18px;font-size:8.5px;gap:4px}
+  .pskrow .n{width:54px}
+  .pskrow .b{height:3px}
+  .pdue{margin-top:5px}
+  .pdue>div{padding:4px 6px}
+  .pdue .v{font-size:9px}
+  .pnext{margin-top:5px;padding:5px 7px}
+  .pnext .t{font-size:9px}
+  .ptab{gap:2px}
+  .ptab .hicon{width:18px;height:18px}
+  .ptab span{font-size:7px}
+
+  .pmappa{
+    overflow:hidden;
+    place-items:center;
+    grid-template-columns:1fr
+  }
+  .pmappa::before{display:block}
+  .pmappa>.pfoto{grid-area:auto}
+  .pmappa.si-scorre .pmappa-freccia{display:none}
+  .pfoto{
+    width:100%;
+    max-width:100%;
+    height:auto;
+    max-height:100%
+  }
+  .peventi{height:82px}
+  .pevrow{height:58px;flex-wrap:nowrap;gap:4px}
+  .pevbox{flex:1 1 0}
+  .pev{min-height:0;height:58px;padding:4px 5px}
+  .pevd,.pevl{display:none}
+  .pevsett{flex:0 0 auto}
+  .pevpiu{flex:0 0 auto;padding:5px;gap:4px}
+  .psugg{height:30px;padding:5px 8px;font-size:9px;line-height:1.2}
+
+  /* ---------- Studio e luoghi fotografici ---------- */
+  .studio,.luogo{overflow:hidden}
+  .sthead,.lfhead{min-height:52px!important;padding-right:8px}
+  .sthead .stk,.lfhead .lfk{font-size:14px}
+  .stnome{font-size:12px;gap:5px}
+  .stnome i{font-size:10px}
+  .strisorse{gap:5px}
+  .strisorse span{font-size:10px;gap:3px}
+  .strisorse i{font-size:9px}
+  .strisorse svg{width:12px;height:12px}
+  .stwrap,.lfwrap{
+    top:52px;
+    bottom:8px;
+    grid-template-columns:minmax(150px,25vw) minmax(0,1fr) minmax(150px,25vw);
+    gap:7px;
+    padding:7px 8px;
+    align-items:end;
+    overflow:hidden
+  }
+  .stwrap:has(.stsx:empty){grid-template-columns:minmax(0,1fr) minmax(170px,28vw)}
+  .stwrap:has(.stdx:empty){grid-template-columns:minmax(170px,28vw) minmax(0,1fr)}
+  .stwrap:has(.stsx:empty):has(.stdx:empty),
+  .lfwrap:has(.lfsx:empty):has(.lfdx:empty){
+    grid-template-columns:minmax(0,1fr);
+    max-width:none;
+    margin:0
+  }
+  .lfwrap:has(.lfsx:empty){grid-template-columns:minmax(0,1fr) minmax(170px,28vw)}
+  .lfwrap:has(.lfdx:empty){grid-template-columns:minmax(170px,28vw) minmax(0,1fr)}
+  .stcol,.lfcol{max-height:100%;overflow:auto;gap:6px}
+  .stpan{padding:8px 9px;border-radius:10px}
+  .stpank{margin-bottom:7px;font-size:9px}
+  .stscelta{min-height:40px;padding:6px 7px;gap:7px}
+  .stmini{width:48px;height:36px}
+  .stval{font-size:10px}
+  .lfmid,.lfsx,.lfdx{order:initial}
+  .lfcentro{padding:7px 4px 5px}
+  .lftitolone{font-size:clamp(25px,10vh,42px)}
+  .lfsotto{font-size:12px;margin-bottom:7px}
+  .lfnumeri{gap:9px;margin-bottom:6px}
+  .lfnum{gap:6px}
+  .lfnum i{width:34px;height:34px}
+  .lfnum b{font-size:16px}
+  .lfwrap.lfporte{display:block;padding:0}
+  .lfporta,.lfp-tavolo,.lfp-camera,.lfp-divano,.lfp-conti{
+    position:absolute;
+    width:auto;
+    min-height:44px
+  }
+
+  /* ---------- Circolo ---------- */
+  .cc-casa{height:100%;min-height:0}
+  .cc-scena{
+    height:100%;
+    aspect-ratio:auto
+  }
+  .cc-porte{display:none}
+  .cc-cart{
+    display:flex;
+    min-height:44px;
+    align-items:center
+  }
+  .cc-cart em{display:none}
+  .cc-titolo{font-size:clamp(22px,8vh,34px)}
+  .cc-info{width:min(300px,38vw)}
+  .cc-infocorpo{padding:10px 12px 10px 4px}
+  .cc-orari h4{margin:8px 0 5px;font-size:12px}
+  .cc-orari li{grid-template-columns:78px 1fr;font-size:10px}
+  .cc-stato{margin-top:7px;font-size:11px}
+
+  /* ---------- Strada ---------- */
+  #strada .app,.strada .stapp{
+    height:100dvh;
+    min-height:0
+  }
+  #strada .topbar,.strada .topbar{
+    height:52px;
+    min-height:52px;
+    padding:0 10px;
+    grid-template-columns:1fr auto 1fr
+  }
+  #strada .logo{font-size:12px}
+  #strada .logo .mark{width:28px;height:28px}
+  #strada .where strong{font-size:15px}
+  #strada .where .k{font-size:7px}
+  #strada .session{gap:6px;font-size:8px}
+  #strada .scene,.strada .scene{
+    height:calc(100dvh - 52px);
+    min-height:0;
+    grid-template-columns:minmax(150px,22vw) minmax(0,1fr) minmax(160px,24vw);
+    grid-template-rows:minmax(0,1fr) 48px;
+    gap:6px;
+    padding:7px 8px
+  }
+  #strada .side{padding:8px}
+  #strada .panel-k{margin-bottom:7px;font-size:8px}
+  #strada .status-money{padding:7px;margin-bottom:7px}
+  #strada .status-money strong{font-size:20px;margin:2px 0 4px}
+  #strada .stat{margin-bottom:6px}
+  #strada .street-note{font-size:8px;padding-top:6px}
+  #strada .quit{margin-top:5px;padding:6px}
+  #strada .herohead{padding:8px 10px 5px}
+  #strada .herohead h1{
+    font-size:clamp(28px,10vh,42px);
+    margin:5px 0 2px
+  }
+  #strada .herohead p{font-size:9px;margin-top:4px}
+  #strada .crimes{gap:5px;padding:0 7px 7px}
+  #strada .crime{padding:8px}
+  #strada .crime b{font-size:14px}
+  #strada .crime p{font-size:8px;margin:2px 0 5px}
+  #strada .go{width:25px;height:25px;right:7px;bottom:7px}
+  #strada .citybar{grid-template-columns:minmax(150px,22vw) 1fr minmax(160px,24vw);gap:6px}
+  #strada .city-note{padding-inline:8px}
+  #strada .city{padding:5px 7px}
+  #strada .city .n{font-size:12px}
+  #strada .city .d{display:none}
+  #strada .app .panel,#strada .panel{border-radius:10px}
+
+  /* ---------- FAMEpedia ---------- */
+  .fp-top{
+    min-height:52px;
+    padding:6px 10px;
+    gap:8px;
+    flex-wrap:nowrap
+  }
+  .fp-brand{min-width:150px}
+  .fp-brand-mark{width:32px;height:32px;font-size:17px}
+  .fp-brand-copy span{display:none}
+  .fp-search-wrap{order:initial;flex:1;max-width:none}
+  .fp-search{height:38px}
+  .fp-body{
+    grid-template-columns:190px minmax(0,1fr);
+    grid-template-rows:1fr
+  }
+  .fp-rail{
+    display:block;
+    max-height:none;
+    overflow:auto;
+    padding:0;
+    border-right:1px solid rgba(255,255,255,.075);
+    border-bottom:0
+  }
+  .fp-rail-scroll{height:100%;padding:8px 9px;overflow:auto}
+  #fp-categorie{display:block;overflow:visible;padding:0}
+  .fp-cat{width:100%;padding:6px 7px}
+  .fp-rail-title{padding:7px 2px 5px}
+  .fp-nav-list{display:flex;flex-direction:column;gap:4px;overflow:visible}
+  .fp-nav-item{width:100%;min-width:0;padding:6px 7px}
+  .fp-home,.fp-article-view{padding:14px 18px 28px}
+  .fp-home h1{font-size:clamp(34px,12vh,54px)}
+  .fp-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .fp-card{min-height:100px;padding:10px}
+  .fp-article-title{font-size:clamp(32px,11vh,50px)}
+
+  /* ---------- impostazioni e pannelli ---------- */
+  .setts{padding:7px}
+  .swrap{max-width:900px;border-radius:15px}
+  .shead{padding:9px 12px 7px}
+  .shead h2{font-size:20px}
+  .stabs{padding:6px 9px}
+  .stab{padding:7px 10px;font-size:11px}
+  .sbody{padding:8px 10px 3px}
+  .scard{padding:3px 10px;margin-bottom:7px;border-radius:12px}
+  .scard .stit{font-size:12px;padding-top:8px}
+  .srow{padding:8px 0;font-size:11px}
+  .sheet2{max-height:calc(100dvh - 12px);padding:14px 16px}
+}
+
+/* Landscape molto basso: limita ulteriormente solo la densita' verticale. */
+@media (pointer:coarse) and (orientation:landscape) and (max-width:1180px) and (max-height:420px){
+  .land-hero{padding-top:38px}
+  .land-sub{font-size:10px}
+  .land-hero .mrow.big{margin-top:6px}
+  .land-voce{min-height:44px}
+  .plancia{grid-template-rows:52px minmax(0,1fr) 26px}
+  .pbarra{height:52px;min-height:52px}
+  .peventi{height:72px}
+  .pevrow,.pev{height:50px}
+  .psugg{height:26px}
+  .sthead,.lfhead{min-height:48px!important}
+  .stwrap,.lfwrap{top:48px}
+  #strada .topbar,.strada .topbar{height:48px;min-height:48px}
+  #strada .scene,.strada .scene{height:calc(100dvh - 48px)}
+}

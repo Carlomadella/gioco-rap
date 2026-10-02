@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:072806cf -->
+## 02/10/26, 09:17 — task/fix-mobile-landscape-settings → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `072806cf`
+
+### Cosa è entrato
+
+- `f054479a` — chore(cache): invalida fix impostazioni mobile landscape — **mycolbraga**
+- `241a021c` — fix(mobile): impila le impostazioni in landscape touch — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/stretto.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:58261118 -->
 ## 02/10/26, 09:11 — task/fabbrica-ferie → main
 

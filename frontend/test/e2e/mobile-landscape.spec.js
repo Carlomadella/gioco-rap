@@ -102,3 +102,55 @@ test("landscape mobile: i comandi principali mantengono una presa di almeno 44 p
   const filtro = await page.locator(".shtab").first().boundingBox();
   expect.soft(filtro.height, "Filtro Shop").toBeGreaterThanOrEqual(43.9);
 });
+
+
+test("landscape mobile: landing non scala oltre il viewport", async ({ page }) => {
+  await page.goto("/pagine/landing.html");
+
+  const misure = await page.evaluate(() => {
+    const land = document.querySelector(".land").getBoundingClientRect();
+    const titolo = document.querySelector(".land-hero h1").getBoundingClientRect();
+    const dock = document.querySelector(".land-dock").getBoundingClientRect();
+    return {
+      vw: innerWidth,
+      vh: innerHeight,
+      landW: land.width,
+      landH: land.height,
+      titoloW: titolo.width,
+      titoloH: titolo.height,
+      dockRight: dock.right,
+      dockBottom: dock.bottom
+    };
+  });
+
+  expect(misure.landW).toBeLessThanOrEqual(misure.vw + 1);
+  expect(misure.landH).toBeLessThanOrEqual(misure.vh + 1);
+  expect(misure.titoloW).toBeLessThan(misure.vw * 0.7);
+  expect(misure.titoloH).toBeLessThan(misure.vh * 0.45);
+  expect(misure.dockRight).toBeLessThanOrEqual(misure.vw + 1);
+  expect(misure.dockBottom).toBeLessThanOrEqual(misure.vh + 1);
+});
+
+test("landscape mobile: la plancia resta dentro allo schermo", async ({ page }) => {
+  await entraNellaPlancia(page);
+
+  const misure = await page.evaluate(() => {
+    const plancia = document.querySelector(".plancia").getBoundingClientRect();
+    const stile = getComputedStyle(document.querySelector(".plancia"));
+    return {
+      vw: innerWidth,
+      vh: innerHeight,
+      left: plancia.left,
+      top: plancia.top,
+      right: plancia.right,
+      bottom: plancia.bottom,
+      colonne: stile.gridTemplateColumns
+    };
+  });
+
+  expect(misure.left).toBeGreaterThanOrEqual(-1);
+  expect(misure.top).toBeGreaterThanOrEqual(-1);
+  expect(misure.right).toBeLessThanOrEqual(misure.vw + 1);
+  expect(misure.bottom).toBeLessThanOrEqual(misure.vh + 1);
+  expect(misure.colonne.split(" ").length).toBeGreaterThanOrEqual(2);
+});
