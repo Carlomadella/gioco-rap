@@ -82,10 +82,46 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
     .toBeGreaterThanOrEqual(1);
   expect(diag.watchdogAttivo).toBe(true);
 
-  /* Prova separata del tratto relay -> creator -> gioco. Se questa arriva ma
-     quella automatica no, il guasto e' nel timing; se non arriva neppure
-     questa, il guasto e' nell'inoltro fra iframe. */
+  /* Tracciamo ogni hop del ping senza cambiare il codice di produzione. */
+  const creatorFrame = page.frames().find(frame =>
+    frame.url().includes("/media/creator-rpg-v24/creator.html")
+  );
+  expect(creatorFrame).toBeTruthy();
+
+  await relayFrame.evaluate(() => {
+    window.__ADF_TEST_RELAY_PING = 0;
+    window.addEventListener("message", e => {
+      if(e.data?.type === "adf-mobile-watchdog-ping") window.__ADF_TEST_RELAY_PING++;
+    });
+  });
+
+  await creatorFrame.evaluate(() => {
+    window.__ADF_TEST_CREATOR_PROGRESS = 0;
+    window.addEventListener("message", e => {
+      const editor = document.getElementById("localEditorFrame");
+      if(
+        editor &&
+        e.source === editor.contentWindow &&
+        e.data?.type === "adf-makehuman-progress"
+      ){
+        window.__ADF_TEST_CREATOR_PROGRESS++;
+      }
+    });
+  });
+
   await page.evaluate(() => {
+    window.__ADF_TEST_GAME_PROGRESS = 0;
+    window.addEventListener("message", e => {
+      const creator = document.getElementById("adf-rpg-v24-frame");
+      if(
+        creator &&
+        e.source === creator.contentWindow &&
+        e.data?.type === "adf-rpg-v24-quick-makehuman-progress"
+      ){
+        window.__ADF_TEST_GAME_PROGRESS++;
+      }
+    });
+
     const creator = document.getElementById("adf-rpg-v24-frame");
     const editor = creator?.contentDocument?.getElementById("localEditorFrame");
     editor?.contentWindow?.postMessage({
@@ -95,10 +131,24 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
     },"*");
   });
 
-  await expect(page.locator("#preparo-fase")).toContainText(
-    "PING DIRETTO TEST",
-    { timeout: 3000 }
-  );
+  await page.waitForTimeout(1000);
+
+  const hops = {
+    relay: await relayFrame.evaluate(() => window.__ADF_TEST_RELAY_PING),
+    creator: await creatorFrame.evaluate(() => window.__ADF_TEST_CREATOR_PROGRESS),
+    game: await page.evaluate(() => window.__ADF_TEST_GAME_PROGRESS),
+    pending: await creatorFrame.evaluate(() =>
+      typeof quickMakeHumanPending === "undefined" ? "missing" : quickMakeHumanPending
+    ),
+    fase: await page.locator("#preparo-fase").textContent()
+  };
+  console.log("ADF_MOBILE_HOPS", JSON.stringify(hops));
+
+  expect(hops.relay, "top-level -> relay").toBeGreaterThanOrEqual(1);
+  expect(hops.creator, "relay -> creator").toBeGreaterThanOrEqual(1);
+  expect(hops.pending, "quickMakeHumanPending nel creator").toBe(true);
+  expect(hops.game, "creator -> gioco").toBeGreaterThanOrEqual(1);
+  expect(hops.fase, "gioco-ingresso -> Preparo").toContain("PING DIRETTO TEST");
 
   expect(
     faseAutomatica,

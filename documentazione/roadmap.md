@@ -387,8 +387,9 @@ successivo ha isolato anche il filtro sulla source del ping annidato: il protoco
 `parent.parent`. Il modulo espone inoltre contatori diagnostici di load/ping. Il test
 aspetta il relay realmente `complete`, lascia muto solo il MakeHuman pesante interno e
 deve vedere entro 15 s «caricamento ancora in corso». Per isolare l'eventuale anello
-residuo, il test registra anche `relayLoads` e `heartbeatCount` e invia un ping manuale
-attraverso lo stesso relay. Resta la prova sul telefono reale prima di chiudere il punto.
+residuo, il test registra anche `relayLoads` e `heartbeatCount` e traccia separatamente i tre
+hop top-level → relay → creator → gioco, insieme a `quickMakeHumanPending`. Resta la prova
+sul telefono reale prima di chiudere il punto.
 
 ### H · Los Angeles _(da fare)_
 
