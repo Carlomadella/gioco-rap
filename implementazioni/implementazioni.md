@@ -342,6 +342,8 @@ _«mettere un recap giornaliero con in aggiunta gli highlights» è chiuso il 02
 
 12. le trasferte non devono essere istantanee ma programmate
 
+13. fai in modo che si possa decidere quando far uscire il pezzo, non solo di venerdì
+
 #### Studio (16/09/2026)
 
 _Scritti da Carletto il 16/09 nella lista dello Studio; i numeri sono i suoi, i buchi
