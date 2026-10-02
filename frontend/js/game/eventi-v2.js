@@ -2530,6 +2530,83 @@ function adfWorkOvertimeAfterShift(){
    L'offerta arriva dal pool generale della Strada e non ha bisogno di essere
    collegata al lavoro. Prima c'è un dialogo breve, poi la decisione con i
    numeri reali del gameplay davanti. */
+
+function adfStreetIntroDecision(proposta){
+  if(!proposta || typeof stradaAccettaIngresso!=="function") return;
+  showEvent({
+    k:"Una strana proposta",
+    t:proposta.titolo||"Un favore",
+    d:"<b>"+(proposta.persona||"Una conoscenza")+":</b> "+
+      (proposta.pitch||"Ti propone qualcosa di chiaramente losco.")+
+      "<br><br>Non è ancora un accesso alla Strada: è un favore piccolo. "+
+      "Se continui a rispondere a queste chiamate, quel mondo inizierà ad aprirsi.",
+    annulla(){
+      if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+    },
+    opts:[
+      {n:"Accetta",d:"Serve "+Number(proposta.energia||0)+" energia",run(){
+        const out=stradaAccettaIngresso(Math.random(),Math.random());
+        if(!out) return {t:"La proposta non è più disponibile.",c:""};
+        if(out.ok===false) return {t:out.reason||"Oggi non riesci a prenderti questo favore.",c:""};
+        try{ if(typeof renderHub==="function") renderHub(); }catch(_){}
+        if(out.unlocked){
+          return {
+            t:out.success
+              ? "Il favore va a buon fine. <b>Adesso sai dove andare e con chi parlare: Attività criminali è comparso sulla mappa.</b>"
+              : "Il favore salta e ti costa, ma non finisci dentro. <b>Ormai però sei entrato abbastanza nel giro: Attività criminali è comparso sulla mappa.</b>",
+            c:out.success?"good":"bad"
+          };
+        }
+        return {
+          t:out.success
+            ? "Il favore va bene. Ti porti a casa qualcosa, ma per ora il resto del giro rimane nascosto."
+            : "Il favore salta. Perdi soldi e attiri attenzione, ma non sei ancora abbastanza esposto da finire dentro.",
+          c:out.success?"good":"bad"
+        };
+      }},
+      {n:"Rifiuta",d:"Non apri quella porta",run(){
+        if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+        return {t:"Hai lasciato perdere. La tua vita continua normalmente.",c:""};
+      }}
+    ]
+  });
+}
+
+function adfStreetIntroAfterAction(a){
+  if(!a || typeof stradaTentaIngresso!=="function") return false;
+  if(typeof stradaAttivitaSbloccate==="function" && stradaAttivitaSbloccate()) return false;
+
+  const stato=st();
+  if(stato.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaIngresso(Math.random(),Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-intro")) return false;
+
+  stato.lastHookEventDay=absDay();
+  afterClear(()=>showEvent({
+    k:"Una strana proposta",
+    t:(proposta.persona||"Una conoscenza")+" ti prende da parte",
+    d:"Non arriva da un menu e non è un contatto anonimo: è una persona che hai già incontrato."+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»"),
+    annulla(){
+      if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+    },
+    opts:[
+      {n:"Sentiamo",d:"Gli lasci spiegare",run(){
+        afterClear(()=>adfStreetIntroDecision(proposta),60);
+        return null;
+      }},
+      {n:"Lascia stare",d:"Non vuoi sapere altro",run(){
+        if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+        return {t:"Hai tagliato corto. Nessuna attività criminale viene sbloccata.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
 function adfStreetOpportunityDecision(proposta){
   if(!proposta) return;
   const termini=typeof stradaDescriviOpportunita==="function"
@@ -3145,6 +3222,15 @@ function adfShiftOutcomeEvent(luogo,jobBefore,flags){
       title:"Contatto dopo il turno",
       detail:p ? p.n : "Una conoscenza nata sul lavoro"
     };
+  }else if(flags.intro){
+    const p=G.strada && G.strada.ingressoPending;
+    event={
+      type:"crime-intro",
+      title:"Una strana proposta",
+      detail:p
+        ? ((p.persona ? p.persona+" · " : "")+(p.titolo||"Un favore"))
+        : "Una conoscenza ti ha aperto una porta che prima non vedevi"
+    };
   }else{
     const s=window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.stateForJob==="function"
       ? ADF_WORK_EVENTS.stateForJob(G.job||jobBefore)
@@ -3189,7 +3275,10 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
     ? adfWorkContactAfterShift()
     : false;
-  const streetOpportunityShown = a.id!=="turno"
+  const introShown = !overtimeShown && !streetShown && !workFamilyShown && !contactShown
+    ? adfStreetIntroAfterAction(a)
+    : false;
+  const streetOpportunityShown = a.id!=="turno" && !introShown
     ? adfStreetOpportunityAfterAction(a)
     : false;
 
@@ -3198,13 +3287,14 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
       overtime:overtimeShown,
       street:streetShown,
       workFamily:workFamilyShown,
-      contact:contactShown
+      contact:contactShown,
+      intro:introShown
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !streetOpportunityShown)
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
-  if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+  if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown)
     emitHook("after_job_shift",shiftPayload || {
       action_id:"turno",
       job_id:G.job.id,
