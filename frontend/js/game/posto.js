@@ -622,13 +622,16 @@ function postoSoloLavoro(p){
    fa arrivare — se no due feat comprati in Cabina volevano dire due persone
    in meno alla Sala, magari il videomaker o il giornalista
    (problemi-riscontrati, 15/09; chiuso il 21/09). */
+function genteBaseDellaSala(){
+  /* Invariante storico, lasciato esplicito anche per il gate regressioni:
+     classifica e contatti confinati al lavoro non consumano slot della Sala. */
+  return (G.gente || []).filter(p => p && !p.rivale && !postoSoloLavoro(p));
+}
 function genteDellaSala(){
-  /* Conserviamo prima il filtro storico: classifica e contatti solo-lavoro
-     non devono rubare posti alla Sala. Poi togliamo dal SOLO CONTEGGIO anche
-     i contatti Strada già scoperti: possono frequentare il Circolo, ma non
-     devono ridurre il cast musicale minimo generato da sistemaGente(). */
-  const base = (G.gente || []).filter(p => p && !p.rivale && !postoSoloLavoro(p));
-  return base.filter(p => !(p.strada && p.strada.known));
+  /* Punto 3: dal conteggio generativo escludiamo in più i contatti Strada già
+     scoperti. Possono comunque comparire in presentiOggi(): semplicemente non
+     sostituiscono beatmaker/rapper/fonici che sistemaGente deve garantire. */
+  return genteBaseDellaSala().filter(p => !(p.strada && p.strada.known));
 }
 function sistemaGente(){
   if(!G.gente) G.gente = [];
