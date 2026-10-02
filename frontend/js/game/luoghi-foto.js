@@ -932,9 +932,11 @@ function lfPizzeria(){
       (mio
         ? (straordinarioOggi
             ? '<b>Copertura extra concordata oggi:</b> ' + lfEsc(straordinarioOggi.targetLabel) +
+              (straordinarioOggi.scenarioLabel ? ' · ' + lfEsc(straordinarioOggi.scenarioLabel) : '') +
               ' · maggiorazione +' + Number(straordinarioOggi.bonusPct || 0) + '%.'
             : straordinarioAccettato
               ? '<b>Copertura extra concordata:</b> ' + lfEsc(straordinarioAccettato.targetLabel) +
+                (straordinarioAccettato.scenarioLabel ? ' · ' + lfEsc(straordinarioAccettato.scenarioLabel) : '') +
                 ' · maggiorazione +' + Number(straordinarioAccettato.bonusPct || 0) + '%.'
               : pagaTurno.percentuale
                 ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> hai già coperto i quattro servizi del contratto; questo turno è pagato di più.'
