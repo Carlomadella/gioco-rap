@@ -2390,10 +2390,93 @@ function adfWorkOvertimeAfterShift(){
   return true;
 }
 
-/* Proposte dalla Strada, ma FUORI dal posto di lavoro.
-   Il giocatore deve aver già avviato il giro criminale: il lavoro non crea da
-   zero quella carriera. La proposta diventa poi una dritta persistente e a
-   tempo nella schermata Strada. */
+/* La Fabbrica è solo il posto in cui questa persona ti intercetta.
+   L'offerta arriva dal pool generale della Strada e non ha bisogno di essere
+   collegata al lavoro. Prima c'è un dialogo breve, poi la decisione con i
+   numeri reali del gameplay davanti. */
+function adfStreetOpportunityDecision(proposta){
+  if(!proposta) return;
+  const termini=typeof stradaDescriviOpportunita==="function"
+    ? stradaDescriviOpportunita(proposta)
+    : "";
+  showEvent({
+    k:"Strada · Proposta",
+    t:proposta.titolo||"Una proposta",
+    d:"<b>"+(proposta.persona||"La persona")+":</b> "+(proposta.pitch||"Ti spiega cosa vuole.")+
+      (termini ? "<br><br><b>Se accetti:</b> "+termini+"." : "")+
+      "<br><br>L'offerta resta valida per <b>"+Number(proposta.durataGiorni||7)+" giorni</b>.",
+    annulla(){
+      if(typeof stradaRifiutaPropostaFabbrica==="function")
+        stradaRifiutaPropostaFabbrica();
+    },
+    opts:[
+      {n:"Accetta",d:termini||"Ti prendi il rischio e l'occasione",run(){
+        const lead=typeof stradaAccettaPropostaFabbrica==="function"
+          ? stradaAccettaPropostaFabbrica()
+          : null;
+        if(!lead) return {t:"La proposta non è più disponibile.",c:""};
+        let colpo=lead.colpoId||"indicato";
+        try{
+          if(typeof STRADA_COLPI!=="undefined"){
+            const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
+            if(c) colpo=c.n;
+          }
+        }catch(_){}
+        return {
+          t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
+            colpo+"</b> nella Strada finché non la usi o scade.",
+          c:"good"
+        };
+      }},
+      {n:"Rifiuta",d:"Nessun effetto: lasci perdere l'occasione",run(){
+        if(typeof stradaRifiutaPropostaFabbrica==="function")
+          stradaRifiutaPropostaFabbrica();
+        return {t:"Hai rifiutato la proposta. Il giro continua senza quell'occasione.",c:""};
+      }}
+    ]
+  });
+}
+
+function adfStreetOpportunityAfterAction(a){
+  if(!a || a.id==="turno") return false;
+  if(typeof stradaTentaOpportunita!=="function") return false;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.crimeLeadActive==="function" &&
+     ADF_WORK_EVENTS.crimeLeadActive()) return false;
+
+  const s=st();
+  if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaOpportunita("mondo",Math.random(),Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-opportunity")){
+    if(typeof stradaAnnullaOpportunita==="function") stradaAnnullaOpportunita();
+    return false;
+  }
+
+  s.lastHookEventDay=absDay();
+  afterClear(()=>showEvent({
+    k:"Strada",
+    t:(proposta.persona||"Qualcuno")+" si fa vivo",
+    d:"Più tardi, mentre sei fuori, ti arriva un messaggio corto da una persona del giro."+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»"),
+    annulla(){
+      if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
+    },
+    opts:[
+      {n:"Sentiamo",d:"Ti fai spiegare la proposta",run(){
+        afterClear(()=>adfStreetOpportunityDecision(proposta),60);
+        return null;
+      }},
+      {n:"Ignora",d:"Non vuoi aprire quella porta oggi",run(){
+        if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
+        return {t:"Hai ignorato il messaggio. Nessun effetto sulla Strada.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
 function adfFactoryStreetAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
     return false;
@@ -2416,33 +2499,23 @@ function adfFactoryStreetAfterShift(){
 
   afterClear(()=>showEvent({
     k:"Fuori dalla Fabbrica",
-    t:"Ti aspetta al cancello",
-    d:"Hai appena finito il turno. Fuori dal cancello uno ti chiama per nome. " +
-      "Non entra, non ti parla sulla linea: sa già che frequenti un certo giro." +
-      "<br><br>Ha una dritta su <b>"+proposta.label+"</b>. Se la prendi resta valida per <b>"+
-      Number(proposta.durataGiorni||7)+" giorni</b>: il colpo rende <b>+"+
-      Number(proposta.bonusPct||0)+"%</b>, ma quando la usi genera <b>+"+
-      Number(proposta.extraHeat||0)+" attenzione</b> in più.",
+    t:(proposta.persona||"Qualcuno")+" ti ferma un attimo",
+    d:"Hai appena finito il turno. Fuori dal cancello riconosci una faccia del giro. " +
+      "Il lavoro non c'entra: è semplicemente dove vi siete incrociati.<br><br>"+
+      "<b>"+(proposta.persona||"La persona")+":</b> "+(proposta.intro||"«Ho una cosa da proporti.»"),
     annulla(){
       if(typeof stradaRifiutaPropostaFabbrica==="function")
         stradaRifiutaPropostaFabbrica();
     },
     opts:[
-      {n:"Prendi la dritta", d:"La proposta resta disponibile nella Strada per una settimana", run(){
-        const lead=typeof stradaAccettaPropostaFabbrica==="function"
-          ? stradaAccettaPropostaFabbrica()
-          : null;
-        if(!lead) return {t:"La proposta non è più disponibile.",c:""};
-        return {
-          t:"Hai accettato la dritta su <b>"+lead.label+"</b>. La trovi nella Strada: +"+
-            Number(lead.bonusPct||0)+"% sul guadagno finché non la usi o scade.",
-          c:"good"
-        };
+      {n:"Sentiamo",d:"Gli lasci spiegare cosa vuole",run(){
+        afterClear(()=>adfStreetOpportunityDecision(proposta),60);
+        return null;
       }},
-      {n:"Lascia perdere", d:"Non vuoi mischiare il lavoro con quel giro", run(){
+      {n:"Taglia corto",d:"Non vuoi nemmeno sentire i dettagli",run(){
         if(typeof stradaRifiutaPropostaFabbrica==="function")
           stradaRifiutaPropostaFabbrica();
-        return {t:"Hai lasciato perdere. Nessun effetto sul lavoro o sulla Strada.",c:""};
+        return {t:"Hai chiuso il discorso prima che iniziasse. Nessun effetto sulla Strada.",c:""};
       }}
     ]
   }),80);
@@ -2905,11 +2978,16 @@ function adfShiftOutcomeEvent(luogo,jobBefore,flags){
         : "Turno extra proposto a fine turno"
     };
   }else if(flags.street){
-    const p=G.strada && G.strada.fabbricaLead && G.strada.fabbricaLead.pending;
+    const p=G.strada && (
+      (G.strada.crimeOpportunity && G.strada.crimeOpportunity.pending) ||
+      (G.strada.fabbricaLead && G.strada.fabbricaLead.pending)
+    );
     event={
       type:"street",
-      title:"Dritta fuori dalla Fabbrica",
-      detail:p && p.label ? p.label : "Una proposta ti aspetta fuori dal cancello"
+      title:"Incontro della Strada",
+      detail:p
+        ? ((p.persona ? p.persona+" · " : "")+(p.titolo||"Una proposta"))
+        : "Una persona del giro ti ha fermato fuori dal cancello"
     };
   }else if(flags.workFamily){
     event=adfWorkFamilyShiftSummary(G.job||jobBefore);
@@ -2967,6 +3045,9 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
     ? adfWorkContactAfterShift()
     : false;
+  const streetOpportunityShown = a.id!=="turno"
+    ? adfStreetOpportunityAfterAction(a)
+    : false;
 
   if(a.id==="turno" && shiftPayload && shiftPayload.workplace){
     adfShiftOutcomeEvent(shiftPayload.workplace,jobBefore,{
@@ -2977,7 +3058,7 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
   if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
     emitHook("after_job_shift",shiftPayload || {
