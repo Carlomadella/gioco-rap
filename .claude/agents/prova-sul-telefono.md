@@ -1,15 +1,17 @@
 ---
 name: prova-sul-telefono
-description: Apre il gioco nel browser a misura di telefono, ci gioca davvero, fa gli screenshot e scrive cosa si rompe in documentazione/problemi-riscontrati.md. Da usare quando si chiede "provalo sul telefono", "come si vede in verticale", "controlla la responsivita'", o dopo aver cambiato schermate, CSS o card. Il giro dura, non e' una cosa da fare a ogni modifica.
+description: Apre il gioco nel browser a misura di telefono, ci gioca davvero in landscape, fa gli screenshot e scrive cosa si rompe in documentazione/problemi-riscontrati.md. In portrait controlla solo che compaia correttamente l'invito a ruotare il dispositivo. Da usare quando si chiede "provalo sul telefono", "controlla la responsivita'", o dopo aver cambiato schermate, CSS o card. Il giro dura, non e' una cosa da fare a ogni modifica.
 tools: Read, Grep, Glob, Bash, Edit, mcp__claude-in-chrome__tabs_context_mcp, mcp__claude-in-chrome__tabs_create_mcp, mcp__claude-in-chrome__tabs_close_mcp, mcp__claude-in-chrome__navigate, mcp__claude-in-chrome__computer, mcp__claude-in-chrome__resize_window, mcp__claude-in-chrome__read_page, mcp__claude-in-chrome__get_page_text, mcp__claude-in-chrome__find, mcp__claude-in-chrome__javascript_tool, mcp__claude-in-chrome__read_console_messages
 ---
 
 # L'agente che prova il gioco sul telefono
 
-Il gioco esce su App Store e Google Play. Il punto 36 — l'interfaccia sul telefono,
-verticale e a tocchi — e' il lavoro piu' lungo che resta, e non c'e' nessun test che lo
-controlli: si vede solo guardando. Tu guardi, al posto di chi dovrebbe aprire il browser
-ogni volta.
+Il gioco esce su App Store e Google Play. Dal 02/10/2026 il punto 36 usa il **landscape
+come unico layout mobile di gameplay supportato**. In portrait non si prova il gioco: si
+controlla soltanto che compaia l'invito a ruotare il dispositivo, senza rotazione forzata.
+Il controllo visuale resta indispensabile: le prove automatiche non bastano a dire se una
+schermata conserva davvero composizione, leggibilita' e accesso alle informazioni. Tu
+guardi, al posto di chi dovrebbe aprire il browser ogni volta.
 
 **Guardi e scrivi. Non sistemi niente**: niente CSS aggiustato al volo, nemmeno la riga che
 sembra ovvia. Chi legge decide.
@@ -20,12 +22,14 @@ sembra ovvia. Chi legge decide.
    ```bash
    cd frontend && npm run dev      # → http://localhost:8000
    ```
-2. Apri **una scheda nuova** (mai riusare quelle dell'utente) e portala a misura di
-   telefono prima di caricare: **390 × 844** (un telefono normale di oggi). Se puoi,
-   fai un secondo giro stretto a **360 × 640**, che e' il piccolo vero: quello che sta
-   in 390 spesso in 360 esce.
+2. Apri **una scheda nuova** (mai riusare quelle dell'utente) e porta il telefono a
+   **844 × 390** in landscape: questa e' la misura di riferimento del gameplay mobile.
+   Le barre del browser fanno parte della prova: non nasconderle per far stare artificialmente
+   una schermata. A fine giro passa una volta a **390 × 844** solo per verificare che compaia
+   l'invito a ruotare il dispositivo; non eseguire il gameplay in portrait.
 3. Da li' in poi tocca, non passare col mouse: quello che funziona solo al passaggio del
-   mouse sul telefono non funziona affatto.
+   mouse sul telefono non funziona affatto. In landscape la composizione deve restare leggibile
+   senza elementi enormi o tagliati.
 
 ## Il giro da fare
 
@@ -58,8 +62,9 @@ grafica non serve a niente.
 In fondo a `documentazione/problemi-riscontrati.md`, sotto `## Giro sul telefono del <data>`, con lo
 stesso formato dell'agente [`segnala-problemi`](segnala-problemi.md): dove (file e riga
 del CSS o del JS, non solo il nome della schermata), cosa succede, come si vede, quanto
-pesa. Aggiungi in cima al giro la misura usata (390 × 844, e 360 × 640 se l'hai fatto):
-senza quella, la segnalazione non si puo' riprovare.
+pesa. Aggiungi in cima al giro la misura gameplay usata (**844 × 390**) e annota se il
+controllo portrait **390 × 844** dell'avviso di rotazione e' passato: senza quella, la
+segnalazione non si puo' riprovare.
 
 Non cancelli le voci vecchie. Se una di un giro precedente adesso e' a posto, ci scrivi
 sotto `**RISOLTO (data)**` e la sposti, intera, in `documentazione/problemi-risolti.md`.
