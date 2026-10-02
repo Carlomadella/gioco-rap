@@ -157,8 +157,11 @@ describe("Strada · ingresso nascosto",()=>{
     expect(ui).toContain('hasTrapPhone:');
     expect(trap).toContain("function trapOwned()");
     expect(trap).toContain("function acquire(meta)");
+    expect(trap).toContain("function receiveStorySms(data)");
     expect(trap).toContain("if(!trapOwned()) return null");
+    expect(trap).toContain("receiveStorySms,");
     expect(trap).toContain("acquire,");
+    expect(leggi("js/game/eventi-v2.js")).toContain("TRAPHONE16.receiveStorySms");
   });
 
   it("hub e colpo rapido rispettano lo stesso gate",()=>{
