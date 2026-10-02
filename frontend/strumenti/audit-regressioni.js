@@ -1380,6 +1380,31 @@ test("punto 12: la UI distingue nome nel giro e fiducia",
   index.includes("<span>Nome nel giro</span>") &&
   crime.includes("p.n + ' · Fiducia: ' + stradaFiduciaEtichetta(p)") &&
   crime.includes('"nome nel giro "+stradaSegno(p.successRep)'));
+test("punto 13: i risultati dei colpi persistono anche sulle persone",
+  crime.includes("debitiGiocatore:0") &&
+  crime.includes("tensione:0") &&
+  crime.includes("rivalita:false") &&
+  crime.includes("conseguenzeEventi:[]") &&
+  crime.includes("function stradaRegistraConseguenzaPersona"));
+test("punto 13: chi ti copre può creare un debito personale che un successo futuro ripaga",
+  crime.includes('stradaModificaDebitoPersona(personaSquadra,1,"si-prende-il-casino")') &&
+  crime.includes('stradaModificaDebitoPersona(personaSquadra,-1,"colpo-insieme-success")') &&
+  crime.includes("adesso gli devi un favore") &&
+  crime.includes("chiudi uno dei conti rimasti aperti"));
+test("punto 13: fallimenti ripetuti possono trasformare tensione in rivalità",
+  crime.includes("function stradaModificaTensionePersona") &&
+  crime.includes('stradaModificaTensionePersona(personaLead,1,"opportunita-failure")') &&
+  crime.includes('type:"rivalry-start"') &&
+  crime.includes("!st.rivalita"));
+test("punto 13: un successo forte può produrre una presentazione reale in G.gente",
+  crime.includes("function stradaPresentazioneDopoSuccesso") &&
+  crime.includes('source:"referral-after-success"') &&
+  crime.includes("introducedByPersonId:persona.id") &&
+  crime.includes("ti apre un'altra porta e ti presenta"));
+test("punto 13: la UI mostra debiti e rivalità senza cancellare le persone",
+  crime.includes("Gli devi '+stradaConseguenzePersona(p).debiti+' favore/i") &&
+  crime.includes("p.n+' · Rivalità") &&
+  crime.includes("const rivali=tuttiContatti.filter(stradaRivalitaAttiva)"));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
