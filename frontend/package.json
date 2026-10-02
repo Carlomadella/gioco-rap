@@ -16,6 +16,7 @@
     "test:e2e:tutto": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "bilanciamento": "node strumenti/simulatore-bilanciamento.js",
+    "bilanciamento:fabbrica": "node strumenti/bilanciamento/fabbrica.js",
     "setup:makehuman": "node strumenti/setup-makehuman.js",
     "setup:browser": "playwright install chromium",
     "prepare": "node strumenti/configura-git-hooks.js",
