@@ -6,6 +6,42 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:a7c7a35b -->
+## 02/10/26, 01:15 — task/fabbrica-stress-test-bilanciamento → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `a7c7a35b`
+
+### Cosa è entrato
+
+- `57f7c292` — test(balance): copre rapporto paga e lifestyle — **mycolbraga**
+- `d884f813` — test(balance): confronta paga Fabbrica e costo lifestyle — **mycolbraga**
+- `a7254797` — docs(balance): allinea il recupero della fatica settimanale — **mycolbraga**
+- `05eabcdc` — chore(cache): invalida bilanciamento fatica lavoro — **mycolbraga**
+- `bc323b96` — test(balance): blocca regressioni annuali della Fabbrica — **mycolbraga**
+- `dd02c8eb` — feat(balance): porta metriche Fabbrica nel rapporto globale — **mycolbraga**
+- `c3340147` — feat(balance): fotografa fatica paga e carriera del lavoro — **mycolbraga**
+- `a218dfa3` — chore(balance): espone stress test Fabbrica da npm — **mycolbraga**
+- `7d4bf192` — test(balance): aggiunge stress test annuale della Fabbrica — **mycolbraga**
+- `4f1b948b` — test(fabbrica): stressa fatica normale e sovraccarico annuale — **mycolbraga**
+- `ae61aa0c` — balance(fabbrica): stabilizza la fatica del normale 5 su 5 — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/package.json`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/bilanciamento/bot.js`
+- **Aggiunto:** `frontend/strumenti/bilanciamento/fabbrica.js`
+- **Modificato:** `frontend/strumenti/bilanciamento/rapporto.js`
+- **Aggiunto:** `frontend/test/unit/fabbrica-bilanciamento.test.js`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 9
+
+---
+
 <!-- merge:f672163c -->
 ## 02/10/26, 00:53 — task/fabbrica-progressione-carriera-ui → main
 
