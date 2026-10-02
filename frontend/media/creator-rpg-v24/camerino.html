@@ -537,16 +537,23 @@ input.disabled{opacity:.45}
   position:relative;
   width:100%;
   height:100%;
+  min-width:0;
+  min-height:0;
   overflow:hidden;
   background:#101014;
 }
-#avaturnFrameHost iframe{
+/* Avaturn crea e gestisce questo iframe. Dimensioniamo il contenitore e
+   applichiamo solo il minimo indispensabile al frame: niente min-size
+   forzate che possono creare un viewport virtuale più grande su mobile. */
+#avaturnFrameHost .avaturn-frame{
   width:100%!important;
   height:100%!important;
-  min-width:100%!important;
-  min-height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
   border:0!important;
   display:block!important;
+  pointer-events:auto!important;
+  touch-action:auto!important;
 }
 .avaturn-loading{
   position:absolute;
@@ -1476,16 +1483,57 @@ html,body,button,input,select{
   }
   .room-progress-step small{display:none!important}
 
-  /* Avaturn vero occupa tutto lo schermo; nessuna cornice desktop gigante. */
+  /* Avaturn vero occupa tutto lo schermo. Su mobile evitiamo anche
+     opacity/pointer-events animati sul genitore di un iframe cross-origin:
+     display on/off è più robusto per il touch nei browser mobili. */
+  .avaturn-overlay{
+    position:fixed!important;
+    inset:0!important;
+    display:none!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    touch-action:auto!important;
+    transition:none!important;
+  }
+  .avaturn-overlay.open{
+    display:block!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
   .avaturn-shell{
     inset:0!important;
+    width:100dvw!important;
+    height:100dvh!important;
+    min-width:0!important;
+    min-height:0!important;
     border:0!important;
     border-radius:0!important;
-    grid-template-rows:38px 1fr!important;
+    grid-template-rows:32px minmax(0,1fr)!important;
   }
   .avaturn-head{
+    min-width:0!important;
+    min-height:0!important;
     gap:7px!important;
     padding:0 7px 0 9px!important;
+  }
+  #avaturnFrameHost{
+    width:100%!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    touch-action:auto!important;
+  }
+  #avaturnFrameHost .avaturn-frame{
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    pointer-events:auto!important;
+    touch-action:auto!important;
   }
   .avaturn-head .av-brand,
   .avaturn-head .av-tip{
@@ -2140,6 +2188,20 @@ async function ensureSdk(){
       url:'https://demo.avaturn.dev',
       iframeClassName:'avaturn-frame'
     });
+
+    /* Il frame viene creato dal SDK. Su mobile deve restare un target touch
+       autonomo: nessuna dimensione minima ereditata dal vecchio layout e
+       scrolling esplicitamente consentito per i webview/browser più rigidi. */
+    const avaturnFrame=frameHost.querySelector('iframe');
+    if(avaturnFrame){
+      avaturnFrame.setAttribute('title','Editor Avaturn');
+      avaturnFrame.setAttribute('scrolling','yes');
+      avaturnFrame.style.setProperty('pointer-events','auto','important');
+      avaturnFrame.style.setProperty('touch-action','auto','important');
+      avaturnFrame.style.setProperty('min-width','0','important');
+      avaturnFrame.style.setProperty('min-height','0','important');
+    }
+
     $('avaturnLoading')?.remove();
 
     sdk.on('export',data=>{
