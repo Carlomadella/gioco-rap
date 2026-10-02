@@ -20,6 +20,7 @@ const CFG = Object.freeze({
   cooldown:Object.freeze({
     career:7,
     colleague:4,
+    social:5,
     music:6,
     crime:10,
     role:6,
@@ -28,6 +29,7 @@ const CFG = Object.freeze({
   }),
   chance:Object.freeze({
     colleague:.16,
+    social:.30,
     music:.14,
     crime:.12,
     role:.18,
@@ -59,6 +61,7 @@ const FAMILIES = Object.freeze({
   career:Object.freeze({id:"career",label:"Carriera"}),
   overtime:Object.freeze({id:"overtime",label:"Straordinari e richieste"}),
   colleague:Object.freeze({id:"colleague",label:"Colleghi"}),
+  social:Object.freeze({id:"social",label:"Socialità Pizzeria"}),
   role:Object.freeze({id:"role",label:"Responsabilità di ruolo"}),
   factory:Object.freeze({id:"factory",label:"Vita del posto di lavoro"}),
   music:Object.freeze({id:"music",label:"Opportunità musicali"}),
@@ -76,7 +79,7 @@ const CRIME_JOBS = new Set(["buttafuori","fattorino"]);
    disciplina, straordinari e conflitti Agenda restano fuori: sono conseguenze
    esplicite del gioco e non random encounter. */
 const INCIDENTAL_FAMILIES = Object.freeze([
-  "factory","colleague","role","music","physical","crime"
+  "factory","colleague","social","role","music","physical","crime"
 ]);
 let bypassConflict = null;
 
@@ -1569,6 +1572,190 @@ function showColleague(job,s,roll){
   return true;
 }
 
+
+/* ==================== SOCIALITÀ PIZZERIA ====================
+   La Pizzeria ha più tempo morto, più facce ricorrenti e più possibilità di
+   parlare. Questo non crea persone: usa esclusivamente i contatti persistenti
+   già nati da lavoroRete. Un incontro normale è una scelta sola; l'eventuale
+   autopromozione compare solo dopo che con quella persona hai già parlato
+   almeno una volta (o esiste già un rapporto) e solo per musica già uscita. */
+const PIZZERIA_SOCIAL_MUSIC_ROLES = new Set(["rapper","promoter","fonico","beatmaker","videomaker"]);
+const PIZZERIA_SOCIAL_PERSON_GAP = 8;
+
+function socialPeopleState(s){
+  if(!s.socialPeople || typeof s.socialPeople!=="object") s.socialPeople={};
+  return s.socialPeople;
+}
+
+function socialPersonState(s,p){
+  const all=socialPeopleState(s);
+  const id=String(p&&p.id||"");
+  if(!all[id] || typeof all[id]!=="object"){
+    all[id]={shown:0,talks:0,lastDay:null,heardSongs:{},lastPromoOutcome:null};
+  }
+  const st=all[id];
+  st.shown=Math.max(0,Number(st.shown||0));
+  st.talks=Math.max(0,Number(st.talks||0));
+  if(!st.heardSongs || typeof st.heardSongs!=="object") st.heardSongs={};
+  return st;
+}
+
+function socialSongKey(song){
+  if(!song) return "";
+  return String(song.seed || [song.t||"pezzo",Number(song.week||0),Number(song.q||0)].join("|"));
+}
+
+function socialPromoSong(s,p){
+  if(!p || !PIZZERIA_SOCIAL_MUSIC_ROLES.has(p.ruolo)) return null;
+  const st=socialPersonState(s,p);
+  if(st.talks<1 && Number(p.rel||0)<1) return null;
+  return (G.songs||[])
+    .filter(x=>x&&x.released&&!st.heardSongs[socialSongKey(x)])
+    .slice()
+    .sort((a,b)=>Number(b.week||0)-Number(a.week||0)||Number(b.q||0)-Number(a.q||0))[0] || null;
+}
+
+function socialPickPerson(job,s){
+  if(!job || workKey(job)!=="pizzeria") return null;
+  const people=currentContacts("pizzeria").filter(p=>p&&p.id);
+  if(!people.length) return null;
+
+  const oggi=absDay();
+  const distanti=people.filter(p=>{
+    const st=socialPersonState(s,p);
+    return st.lastDay==null || oggi-Number(st.lastDay)>=PIZZERIA_SOCIAL_PERSON_GAP;
+  });
+  const pool=distanti.length ? distanti : (people.length===1 ? people : people.slice().sort((a,b)=>{
+    const sa=socialPersonState(s,a), sb=socialPersonState(s,b);
+    return Number(sa.lastDay||-99999)-Number(sb.lastDay||-99999);
+  }).slice(0,Math.max(1,Math.ceil(people.length/2))));
+  return pool[Math.floor(Math.random()*pool.length)] || null;
+}
+
+function socialRoleLine(p){
+  if(!p) return "Vi fermate due minuti a parlare.";
+  if(p.ruolo==="rapper") return "Fra una cosa e l'altra tornate a parlare di musica e di come incastrarla con il resto.";
+  if(p.ruolo==="promoter") return "Il discorso finisce su locali, serate e gente che gira davvero in zona.";
+  if(p.ruolo==="fonico") return "Da una battuta sul servizio finite a parlare di come suonano i pezzi fuori da qui.";
+  return "A fine servizio avete due minuti veri senza comande, rumore o qualcuno che vi corre dietro.";
+}
+
+function socialTalkResult(p,st){
+  st.talks+=1;
+  relation(p,1);
+  addNetwork(.1);
+  if(p.ruolo==="rapper")
+    return "Avete parlato di musica senza trasformarla in una gara. Con <b>"+p.n+"</b> adesso c'è un pezzo di rapporto in più.";
+  if(p.ruolo==="promoter")
+    return "<b>"+p.n+"</b> ti ha raccontato due cose che stanno girando. Nessuna promessa, ma la conversazione esiste.";
+  if(p.ruolo==="fonico")
+    return "Avete parlato di suono e di gente che registra. <b>"+p.n+"</b> adesso non è più soltanto una faccia del servizio.";
+  return "Avete parlato un po' fuori dal lavoro. Con <b>"+p.n+"</b> il rapporto cresce senza dover produrre per forza qualcosa.";
+}
+
+function socialPromoScore(p,song,st,roll){
+  const ruolo=p&&p.ruolo;
+  const bias=ruolo==="rapper" ? 5 : ruolo==="promoter" ? 2 : ruolo==="fonico" ? 3 : 0;
+  const rapporto=Math.max(0,Number(p&&p.rel||0))*6;
+  const confidenza=Math.min(6,Math.max(0,Number(st&&st.talks||0))*2);
+  const dado=(Number.isFinite(Number(roll))?Number(roll):Math.random())*24-12;
+  const troppoPresto=(Number(st&&st.talks||0)<2 && Number(p&&p.rel||0)<1) ? -5 : 0;
+  return Number(song&&song.q||0)+bias+rapporto+confidenza+dado+troppoPresto;
+}
+
+function socialPromoReaction(p,song,st,roll){
+  const score=socialPromoScore(p,song,st,roll);
+  const key=socialSongKey(song);
+  st.heardSongs[key]=absDay();
+  st.lastPromoSong=key;
+  st.lastPromoTitle=song.t||"il pezzo";
+
+  let outcome="cold", deltaRel=0, deltaRete=0, text="";
+  if(score>=76){
+    outcome="good"; deltaRel=2; deltaRete=.2;
+    if(p.ruolo==="promoter")
+      text:"";
+    text=p.ruolo==="promoter"
+      ? "«<b>"+song.t+"</b>» lo ascolta fino alla fine. «Questa ha senso. Non ti prometto serate, ma questa me la ricordo.»"
+      : p.ruolo==="fonico"
+        ? "«<b>"+song.t+"</b>» lo incuriosisce davvero. Ti indica anche due cose che gli piacciono del suono."
+        : "«<b>"+song.t+"</b>» gli prende bene. Stavolta non è cortesia: vi mettete a parlarne davvero.";
+  }else if(score>=55){
+    outcome="neutral";
+    text="Ascolta «<b>"+song.t+"</b>» senza fare scena. «Ci sta. Non è proprio la roba che metterei io, ma si sente che è finita.»";
+  }else{
+    outcome="cold";
+    if(score<42) deltaRel=-1;
+    text=score<42
+      ? "Gli fai sentire «<b>"+song.t+"</b>», ma la conversazione non stava andando lì. Lo ascolta a metà e cambia argomento."
+      : "Ascolta «<b>"+song.t+"</b>» e non gli scatta niente. Nessun dramma: semplicemente non è il pezzo giusto per lui.";
+  }
+
+  if(deltaRel) relation(p,deltaRel);
+  if(deltaRete) addNetwork(deltaRete);
+  st.lastPromoOutcome=outcome;
+  return {outcome,score,relationDelta:deltaRel,networkDelta:deltaRete,text};
+}
+
+function showPizzeriaSocial(job,s,roll){
+  if(!job || workKey(job)!=="pizzeria") return false;
+  if(!familyReady(s,"social") || Number(roll)>=CFG.chance.social) return false;
+
+  const p=socialPickPerson(job,s);
+  if(!p || !claim("work-social:pizzeria")) return false;
+
+  const st=socialPersonState(s,p);
+  st.shown+=1;
+  st.lastDay=absDay();
+  const song=socialPromoSong(s,p);
+
+  record(s,"social",{
+    status:"shown",personId:p.id,role:p.ruolo,
+    visit:st.shown,talks:st.talks,promoAvailable:!!song,
+    song:song&&song.t||null
+  });
+  if(typeof showEvent!=="function") return false;
+
+  const opts=[
+    {n:"Fermati a parlare",d:"+rapporto · +0,1 rete",run(){
+      const testo=socialTalkResult(p,st);
+      record(s,"social",{status:"talked",personId:p.id,role:p.ruolo,talks:st.talks});
+      return {t:testo,c:"good"};
+    }}
+  ];
+
+  if(song){
+    opts.push({
+      n:"Fagli sentire «"+song.t+"»",
+      d:"Autopromozione: può piacere, lasciare freddo o risultare forzata",
+      run(){
+        const out=socialPromoReaction(p,song,st);
+        record(s,"social",{
+          status:"promoted",personId:p.id,role:p.ruolo,
+          songKey:socialSongKey(song),songTitle:song.t||null,
+          songQuality:Number(song.q||0),outcome:out.outcome,score:out.score,
+          relationDelta:out.relationDelta,networkDelta:out.networkDelta
+        });
+        return {t:out.text,c:out.outcome==="good"?"good":out.outcome==="cold"?"bad":""};
+      }
+    });
+  }
+
+  opts.push({n:"Saluta e vai",d:"Nessun effetto",run(){
+    record(s,"social",{status:"brief",personId:p.id,role:p.ruolo});
+    return {t:"Vi salutate e finisce lì. Non ogni incontro deve diventare qualcosa.",c:""};
+  }});
+
+  showEvent({
+    k:"Pizzeria · Due minuti",
+    t:p.n+" si ferma a parlare",
+    d:socialRoleLine(p),
+    annulla(){},
+    opts
+  });
+  return true;
+}
+
 /* ==================== 5. OPPORTUNITÀ MUSICALI ==================== */
 
 function musicPeople(job){
@@ -1943,6 +2130,7 @@ function afterShift(payload,rolls){
     factory:()=>showWorkplaceFloor(job,s,r("factory")),
     crime:()=>showCrime(job,s,r("crime")),
     colleague:()=>showColleague(job,s,r("colleague")),
+    social:()=>showPizzeriaSocial(job,s,r("social")),
     physical:()=>showPhysical(job,s,r("physical"))
   };
   const giro=incidentalOrder(s);
