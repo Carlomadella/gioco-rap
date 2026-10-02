@@ -37,8 +37,13 @@ qui, cambiala anche lì.
 - Le dipendenze si possono usare: ognuna si sceglie, si motiva in una riga e si può
   togliere. Le regole e il registro stanno in `documentazione/dipendenze.md`.
 - **Quando non è un fix, un file nuovo collegato** a quelli che ci sono, non un file già
-  grosso che si gonfia. E **la parte smartphone sta separata** dal resto (`telefono*.js`,
-  `telefono*.css`).
+  grosso che si gonfia.
+- **Desktop e mobile non si correggono a vicenda.** Il gioco, il gameplay, i dati e il
+  backend sono condivisi; UI, layout, gesture e runtime specifici del telefono restano
+  separati (`telefono*.js`, `telefono*.css` o moduli mobile dedicati). **Una cosa che
+  funziona su PC non si modifica per farla funzionare sul telefono.** Un file condiviso
+  si cambia per un problema mobile solo se il problema è davvero comune e la modifica è
+  verificata anche su desktop.
 
 ## Prima di chiudere
 
