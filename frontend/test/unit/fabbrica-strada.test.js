@@ -204,6 +204,48 @@ describe("Fabbrica × Strada", () => {
     expect(fallimento).toEqual({bonusPct:40,heatDelta:7,repDelta:-3});
   });
 
+  it("può nascere anche fuori dal lavoro e usa un cooldown dedicato", () => {
+    const {ctx,G} = contestoStrada({
+      job:null,
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{
+          lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]
+        }
+      }
+    });
+
+    const proposta=vm.runInContext('stradaTentaOpportunita("mondo",0,0)',ctx);
+    expect(proposta).not.toBeNull();
+    expect(proposta.trigger).toBe("mondo");
+    expect(G.strada.crimeOpportunity.nextOfferAbsoluteDay).toBe(15);
+
+    vm.runInContext("stradaRifiutaOpportunita()",ctx);
+    G.week=2; G.day=7; // giorno assoluto 14
+    expect(vm.runInContext('stradaTentaOpportunita("mondo",0,0)',ctx)).toBeNull();
+
+    G.week=3; G.day=1; // giorno assoluto 15
+    expect(vm.runInContext('stradaTentaOpportunita("mondo",0,0)',ctx)).not.toBeNull();
+  });
+
+  it("i controlli Fabbrica e mondo non si bruciano a vicenda nello stesso giorno", () => {
+    const {ctx} = contestoStrada({
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{
+          lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]
+        }
+      }
+    });
+
+    expect(vm.runInContext('stradaTentaOpportunita("mondo",.99,0)',ctx)).toBeNull();
+    const dallaFabbrica=vm.runInContext('stradaTentaOpportunita("fabbrica",0,0)',ctx);
+    expect(dallaFabbrica).not.toBeNull();
+    expect(dallaFabbrica.trigger).toBe("fabbrica");
+  });
+
   it("rifiutare non dà effetti ma applica il cooldown di 14 giorni", () => {
     const {ctx, G} = contestoStrada({
       strada:{
@@ -280,13 +322,16 @@ describe("Fabbrica × Strada", () => {
     expect(eventi).toContain("function adfFactoryStreetAfterShift()");
     expect(eventi).toContain('k:"Fuori dalla Fabbrica"');
     expect(eventi).toContain('n:"Sentiamo"');
-    expect(eventi).toContain("function adfFactoryStreetDecision(proposta)");
+    expect(eventi).toContain("function adfStreetOpportunityDecision(proposta)");
     expect(eventi).toContain('n:"Accetta"');
     expect(eventi).toContain('claimAutoEvent("factory-street")');
     expect(eventi).toContain("stradaAggiornaPropostaFabbrica(false)");
     expect(eventi).toContain('const streetShown = a.id==="turno" && !overtimeShown');
     expect(eventi).toContain("!overtimeShown && !streetShown && !workFamilyShown && !contactShown");
     expect(eventi).toContain("Il lavoro non c'entra: è semplicemente dove vi siete incrociati.");
+    expect(eventi).toContain("function adfStreetOpportunityAfterAction(a)");
+    expect(eventi).toContain('stradaTentaOpportunita("mondo",Math.random(),Math.random())');
+    expect(eventi).toContain('const streetOpportunityShown = a.id!=="turno"');
 
     expect(strada).toContain("const STRADA_OPPORTUNITA = Object.freeze([");
     expect(strada).toContain("stradaChanceConOpportunita");
