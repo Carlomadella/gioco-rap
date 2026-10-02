@@ -89,6 +89,8 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.gente[0].ruolo).toBe("rider");
     expect(G.gente[0].strada.known).toBe(true);
     expect(G.gente[0].strada.sources).toContain("intro");
+    expect(G.gente[0].strada.fiducia).toBe(13);
+    expect(vm.runInContext("stradaFiduciaEtichetta(G.gente[0])",ctx)).toBe("ti conosce");
     expect(G.gente[0].circoloSbloccato).toBe(true);
     expect(G.strada.badgeSbloccato).toBe(false);
     expect(G.strada.arresto).toBeNull();
@@ -105,6 +107,7 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.traphone.sourcePersonId).toBe("p1");
     expect(G.strada.traphone.sourceName).toBe("Milo");
     expect(G.strada.traphone.source).toBe("intro");
+    expect(G.gente[0].strada.fiducia).toBe(10);
     expect(G.strada.arresto).toBeNull();
     expect(G.strada.precedenti).toBe(0);
   });
@@ -163,6 +166,30 @@ describe("Strada · ingresso nascosto",()=>{
     expect(p.ruolo).toBe("rider");
     expect(p.strada.known).toBe(true);
     expect(p.circoloSbloccato).toBe(true);
+  });
+
+  it("amicizia e fiducia criminale restano separate",()=>{
+    const {ctx,G}=contesto({
+      gente:[
+        {id:"social",n:"Amico",ruolo:"collega",rel:5,pt:99,via:false,
+          strada:{known:true,key:"street:social",sources:["opportunity"],opportunityIds:[],fiducia:8}},
+        {id:"trusted",n:"Fidato",ruolo:"strada",rel:0,pt:0,via:false,
+          strada:{known:true,key:"street:trusted",sources:["opportunity"],opportunityIds:[],fiducia:25}}
+      ]
+    });
+    const ids=vm.runInContext("stradaPersoneSquadra().map(p=>p.id)",ctx);
+    expect(ids).toEqual(["trusted"]);
+    expect(vm.runInContext("stradaFiduciaEtichetta(G.gente[0])",ctx)).toBe("appena entrati in contatto");
+    expect(vm.runInContext("stradaFiduciaEtichetta(G.gente[1])",ctx)).toBe("si fida");
+  });
+
+  it("i contatti legacy migrano la fiducia solo da fatti criminali già salvati",()=>{
+    const {ctx,G}=contesto({
+      gente:[{id:"old",n:"Old",ruolo:"strada",rel:5,pt:99,via:false,
+        strada:{known:true,key:"street:old",sources:["intro"],opportunityIds:["a","b"]}}]
+    });
+    expect(vm.runInContext("stradaFiduciaValore(G.gente[0])",ctx)).toBe(30);
+    expect(G.gente[0].strada.fiduciaEventi).toEqual([]);
   });
 
   it("il TrapPhone e la sua UI rispettano il possesso reale",()=>{
