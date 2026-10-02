@@ -440,12 +440,12 @@ function lfCartellinoLavoro(luogo){
 function lfFabbricaCartellino(){ return lfCartellinoLavoro("fabbrica"); }
 function lfPizzeriaCartellino(){ return lfCartellinoLavoro("pizzeria"); }
 
-function lfFabbricaFerie(){
-  const r=typeof lavoroFerieRiepilogo==="function" ? lavoroFerieRiepilogo("fabbrica") : null;
+function lfFerieLavoro(luogo,nome){
+  const r=typeof lavoroFerieRiepilogo==="function" ? lavoroFerieRiepilogo(luogo) : null;
   if(!r) return '<div class="stvuoto">Ferie non disponibili.</div>';
 
   const candidati=typeof lavoroFerieCandidati==="function"
-    ? lavoroFerieCandidati("fabbrica",35)
+    ? lavoroFerieCandidati(luogo,35)
     : [];
   const ciclo=typeof lavoroCicloCorrente==="function" ? lavoroCicloCorrente() : null;
   const prenotate=(r.future||[]).slice(0,4).map(x=>
@@ -457,22 +457,27 @@ function lfFabbricaFerie(){
       (ciclo!=null && Number(x.cycle)!==Number(ciclo) ? ' · prossimo ciclo' : '')+
     '</option>'
   ).join("");
+  const max=Math.max(0,Number(r.maxPerCiclo||0));
+  const quota=max===1 ? "1 giorno ogni 4 settimane" : max+" giorni ogni 4 settimane";
 
   return '<div class="lfferie">'+
     '<div class="lfferie-head"><span>Disponibili questo ciclo</span><b>'+
-      Number(r.disponibiliCiclo||0)+'/'+Number(r.maxPerCiclo||0)+'</b></div>'+
+      Number(r.disponibiliCiclo||0)+'/'+max+'</b></div>'+
     (r.oggi ? '<div class="lfferie-today">Oggi sei in ferie.</div>' : '')+
     (prenotate ? '<div class="lfferie-list"><small>Prenotate</small>'+prenotate+'</div>' : '')+
     '<label class="lfferie-pick"><span>Richiedi un giorno</span>'+
-      '<select data-ferie-select="fabbrica" '+(options?'':'disabled')+'>'+
+      '<select data-ferie-select="'+lfEsc(luogo)+'" '+(options?'':'disabled')+'>'+
         (options || '<option>Nessun giorno disponibile</option>')+
       '</select></label>'+
-    '<button type="button" class="lfferie-btn" data-ferie-request="fabbrica" '+(options?'':'disabled')+'>Chiedi ferie</button>'+
-    '<p>Massimo 2 giorni ogni 4 settimane. La richiesta va fatta almeno il giorno prima; il giorno stesso non si recupera.</p>'+
+    '<button type="button" class="lfferie-btn" data-ferie-request="'+lfEsc(luogo)+'" '+(options?'':'disabled')+'>Chiedi ferie</button>'+
+    '<p>Massimo '+quota+'. La richiesta va fatta almeno il giorno prima; il giorno stesso non si recupera.</p>'+
   '</div>';
 }
 
-function lfRichiediFerieFabbrica(targetAbsoluteDay){
+function lfFabbricaFerie(){ return lfFerieLavoro("fabbrica","Fabbrica"); }
+function lfPizzeriaFerie(){ return lfFerieLavoro("pizzeria","Pizzeria"); }
+
+function lfRichiediFerieLavoro(luogo,nome,targetAbsoluteDay){
   if(typeof lavoroFerieRichiedi!=="function") return;
   const target=Number(targetAbsoluteDay);
   const label=typeof lavoroFerieEtichetta==="function"
@@ -480,13 +485,13 @@ function lfRichiediFerieFabbrica(targetAbsoluteDay){
     : "giorno scelto";
 
   showEvent({
-    k:"Fabbrica · Ferie",
+    k:nome+" · Ferie",
     t:"Chiedere ferie?",
     d:"Vuoi usare un giorno di ferie per <b>"+lfEsc(label)+"</b>? Quel giorno non farai il turno e non verrà contato come assenza.",
     annulla(){},
     opts:[
       {n:"Conferma ferie",d:"La richiesta viene registrata adesso",run(){
-        const out=lavoroFerieRichiedi("fabbrica",target);
+        const out=lavoroFerieRichiedi(luogo,target);
         if(!out || !out.ok)
           return {t:out&&out.reason ? out.reason : "La richiesta non è disponibile.",c:"bad"};
         if(typeof pushLog==="function")
@@ -499,6 +504,13 @@ function lfRichiediFerieFabbrica(targetAbsoluteDay){
       {n:"Annulla",d:"Non usi nessun giorno",run(){ return null; }}
     ]
   });
+}
+
+function lfRichiediFerieFabbrica(targetAbsoluteDay){
+  return lfRichiediFerieLavoro("fabbrica","Fabbrica",targetAbsoluteDay);
+}
+function lfRichiediFeriePizzeria(targetAbsoluteDay){
+  return lfRichiediFerieLavoro("pizzeria","Pizzeria",targetAbsoluteDay);
 }
 
 function lfDimissioniLavoro(luogo, nome){
@@ -942,6 +954,7 @@ function lfPizzeria(){
     "orologio");
 
   const dx = lfPan("Settimane in cucina", lfPizzeriaCartellino(), "orologio") +
+    (mio ? lfPan("Ferie", lfPizzeriaFerie(), "orologio") : "") +
     (mio ? lfPan("Carriera", lfPizzeriaCarriera(), "spunta") : "");
 
   return {sx:sx, mid:mid, dx:dx};
@@ -1093,11 +1106,15 @@ if($("luogo")){
       return;
     }
     const ferie = e.target.closest("[data-ferie-request]");
-    if(ferie && !ferie.disabled && ferie.dataset.ferieRequest==="fabbrica"){
-      const select=$("luogo").querySelector('[data-ferie-select="fabbrica"]');
-      const target=select ? Number(select.value) : NaN;
-      if(Number.isFinite(target)) lfRichiediFerieFabbrica(target);
-      return;
+    if(ferie && !ferie.disabled){
+      const luogoFerie=ferie.dataset.ferieRequest;
+      if(luogoFerie==="fabbrica" || luogoFerie==="pizzeria"){
+        const select=$("luogo").querySelector('[data-ferie-select="'+luogoFerie+'"]');
+        const target=select ? Number(select.value) : NaN;
+        const nomeFerie=luogoFerie==="fabbrica" ? "Fabbrica" : "Pizzeria";
+        if(Number.isFinite(target)) lfRichiediFerieLavoro(luogoFerie,nomeFerie,target);
+        return;
+      }
     }
     const dimissioni = e.target.closest("[data-dimissioni]");
     if(dimissioni && !dimissioni.disabled){
