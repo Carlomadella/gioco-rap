@@ -6,6 +6,39 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:decae0bd -->
+## 02/10/26, 23:24 — feature/strada-punto10-finestre-relazioni → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `decae0bd`
+
+### Cosa è entrato
+
+- `9179439f` — fix(strada): preserva reveal Fabbrica e null nei rientri — **mycolbraga**
+- `da0e12e0` — fix(strada): non riaggancia automaticamente contatti fuori dal giro — **mycolbraga**
+- `2fec6240` — fix(audit): usa sorgente eventi corretta nel punto 10 — **mycolbraga**
+- `d76ac040` — chore(frontend): aggiorna cache Strada punto 10 — **mycolbraga**
+- `e6dcdbc1` — test(audit): verifica relazioni criminali punto 10 — **mycolbraga**
+- `7bccb286` — test(strada): copri decadimento e riemersione relazioni punto 10 — **mycolbraga**
+- `9e54cb41` — feat(eventi): distingui offerte ignorate da rifiuti espliciti — **mycolbraga**
+- `9db62581` — fix(strada): separa ignore giocatore da cancellazione tecnica — **mycolbraga**
+- `027c79ac` — feat(strada): aggiorna relazioni criminali nel ciclo settimanale e UI — **mycolbraga**
+- `e854d639` — feat(strada): collega offerte e risposte al decadimento relazioni — **mycolbraga**
+- `a19e33da` — feat(strada): applica disponibilita contatti a favori crew e coperture — **mycolbraga**
+- `5b1a5586` — feat(strada): aggiungi lifecycle delle relazioni criminali — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Aggiunto:** `frontend/test/unit/strada-relazioni.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:aa17b9b0 -->
 ## 02/10/26, 23:06 — feature/strada-punto9-tempo-colpi → main
 
