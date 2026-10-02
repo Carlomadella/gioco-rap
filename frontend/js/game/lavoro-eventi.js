@@ -1332,13 +1332,142 @@ const FACTORY_FLOOR_EVENTS = Object.freeze([
   })
 ]);
 
-function showFactoryFloor(job,s,roll){
-  if(!job || workKey(job)!=="fabbrica") return false;
-  if(!familyReady(s,"factory") || Number(roll)>=CFG.chance.factory) return false;
-  if(!claim("work-factory-floor")) return false;
 
+const PIZZERIA_FLOOR_EVENTS = Object.freeze([
+  Object.freeze({
+    id:"rush-improvviso",
+    t:"Entrano ordini tutti insieme",
+    d:"Per dieci minuti il locale cambia ritmo. Puoi provare a mettere ordine o limitarti alla tua corsia.",
+    opts:Object.freeze([
+      Object.freeze({n:"Aiuti a coordinare",load:"mental",fx:{reliability:1,lucidita:-1,rete:.1},
+        result:"Il picco passa senza trasformarsi in caos. Hai speso un po' di testa, non la serata intera."}),
+      Object.freeze({n:"Tieni pulita la tua parte",fx:{wellbeing:1},
+        result:"Hai evitato di farti risucchiare dal casino generale. La tua parte è rimasta solida."})
+    ])
+  }),
+  Object.freeze({
+    id:"comanda-sbagliata",
+    t:"Una comanda torna indietro",
+    d:"Qualcosa è uscito diverso da come era stato chiesto. Il cliente aspetta e la cucina deve recuperare.",
+    opts:Object.freeze([
+      Object.freeze({n:"La rifai subito",fx:{reliability:1,wellbeing:-1},
+        result:"Hai chiuso l'errore in fretta. Un piccolo costo, non una tragedia."}),
+      Object.freeze({n:"Ricostruisci prima dov'è nato l'errore",fx:{lucidita:1},
+        result:"Hai capito il passaggio storto prima di rifare tutto. La seconda uscita è stata pulita."})
+    ])
+  }),
+  Object.freeze({
+    id:"forno-capriccioso",
+    roles:Object.freeze(["aiuto_pizzaiolo","pizzaiolo"]),
+    t:"Il forno oggi non tiene il solito ritmo",
+    d:"Non è rotto, ma devi correggere tempi e posizione più del normale.",
+    opts:Object.freeze([
+      Object.freeze({n:"Lo gestisci a occhio",load:"mental",fx:{reliability:1,lucidita:-1},
+        result:"Hai compensato per tutto il servizio senza bruciare il ritmo."}),
+      Object.freeze({n:"Chiami qualcuno a controllare",fx:{rete:.1,lucidita:1},
+        result:"Avete verificato insieme e tolto il dubbio. Meno pressione sulle tue spalle."})
+    ])
+  }),
+  Object.freeze({
+    id:"ingrediente-finito",
+    t:"Un ingrediente finisce prima del previsto",
+    d:"Va deciso subito cosa togliere, cosa sostituire e cosa comunicare davanti.",
+    opts:Object.freeze([
+      Object.freeze({n:"Riorganizzi il servizio",fx:{reliability:1,lucidita:-1},
+        result:"Avete cambiato il giro senza lasciare ordini sospesi."}),
+      Object.freeze({n:"Passi subito l'informazione a tutti",fx:{rete:.1,lucidita:1},
+        result:"Niente improvvisazioni sparse: per una volta tutti sanno la stessa cosa nello stesso momento."})
+    ])
+  }),
+  Object.freeze({
+    id:"cliente-difficile",
+    roles:Object.freeze(["aiuto_cucina","aiuto_pizzaiolo","pizzaiolo"]),
+    t:"Un cliente continua a rimandare indietro richieste",
+    d:"La tensione arriva fino in cucina. Puoi entrare nella questione o proteggere il tuo lavoro.",
+    opts:Object.freeze([
+      Object.freeze({n:"Dai una mano a trovare una soluzione",load:"mental",fx:{rete:.1,lucidita:-1},
+        result:"Hai aiutato a chiudere la situazione senza trasformarla in una guerra personale."}),
+      Object.freeze({n:"Lasci gestire davanti",fx:{wellbeing:1},
+        result:"Hai tenuto il problema fuori dalla cucina e continuato il servizio."})
+    ])
+  }),
+  Object.freeze({
+    id:"cliente-simpatico",
+    roles:Object.freeze(["aiuto_cucina","aiuto_pizzaiolo","pizzaiolo"]),
+    t:"Un cliente abituale scherza con lo staff",
+    d:"C'è un minuto leggero mentre aspetta. Puoi starci dentro oppure continuare a lavorare.",
+    opts:Object.freeze([
+      Object.freeze({n:"Stai al gioco",fx:{rete:.1,wellbeing:1},
+        result:"Una battuta, una faccia riconoscibile in più. Nessuna ricompensa automatica."}),
+      Object.freeze({n:"Continui il servizio",fx:{lucidita:1},
+        result:"Hai lasciato la socialità agli altri e tenuto il tuo ritmo."})
+    ])
+  }),
+  Object.freeze({
+    id:"rider-in-coda",
+    t:"Si accumulano tre rider davanti",
+    d:"Gli ordini ci sono, ma il ritiro si sta incastrando male. Puoi aiutare a rimettere ordine oppure stare sulla tua postazione.",
+    opts:Object.freeze([
+      Object.freeze({n:"Aiuti a riorganizzare i ritiri",fx:{reliability:1,rete:.1},
+        result:"La coda si scioglie e qualche faccia ti associa finalmente a qualcosa di diverso dal ritardo."}),
+      Object.freeze({n:"Resti sul tuo lavoro",fx:{wellbeing:1},
+        result:"Hai evitato di aggiungere una seconda mansione dentro un turno corto."})
+    ])
+  }),
+  Object.freeze({
+    id:"momento-morto",
+    t:"Per venti minuti non entra quasi niente",
+    d:"Capita anche questo. Puoi usarlo per parlare con gli altri o portarti avanti col lavoro.",
+    opts:Object.freeze([
+      Object.freeze({n:"Resti a parlare con lo staff",fx:{rete:.2,wellbeing:1},
+        result:"Un momento morto diventa un pezzo di rapporto. Non hai guadagnato un contatto: hai conosciuto meglio chi è già lì."}),
+      Object.freeze({n:"Ti porti avanti",fx:{reliability:1},
+        result:"Hai usato il buco per rendere più semplice il rush successivo."})
+    ])
+  }),
+  Object.freeze({
+    id:"chiusura-tranquilla",
+    t:"La chiusura stasera è sorprendentemente calma",
+    d:"Non c'è nessuno che corre. Restano dieci minuti in cui si parla mentre si sistema.",
+    opts:Object.freeze([
+      Object.freeze({n:"Resti nel giro",fx:{rete:.2,wellbeing:1},
+        result:"Hai chiuso parlando con gli altri. È il tipo di tempo che in un part-time può diventare socialità vera."}),
+      Object.freeze({n:"Sistemi e vai",fx:{lucidita:1},
+        result:"Hai chiuso pulito e salvato il resto della serata per te."})
+    ])
+  }),
+  Object.freeze({
+    id:"tavolata-compleanno",
+    t:"Arriva una tavolata che riempie mezza sala",
+    d:"Per un'ora il locale sembra un altro. Il rischio è farsi trascinare dal caos più che dal lavoro.",
+    opts:Object.freeze([
+      Object.freeze({n:"Spingi sul coordinamento",load:"mental",fx:{reliability:1,lucidita:-1,rete:.1},
+        result:"La serata resta intensa ma leggibile. Hai parlato con più persone del solito senza perdere il servizio."}),
+      Object.freeze({n:"Mantieni un ritmo normale",fx:{wellbeing:1},
+        result:"Non hai provato a fare l'eroe. La tavolata è uscita con qualche minuto in più e basta."})
+    ])
+  })
+]);
+
+function floorEventsForJob(job){
+  if(!job) return null;
+  const key=workKey(job);
+  if(key==="fabbrica") return FACTORY_FLOOR_EVENTS;
+  if(key==="pizzeria") return PIZZERIA_FLOOR_EVENTS;
+  return null;
+}
+
+function showWorkplaceFloor(job,s,roll){
+  if(!job) return false;
+  const key=workKey(job);
+  if(key!=="fabbrica" && key!=="pizzeria") return false;
+  if(!familyReady(s,"factory") || Number(roll)>=CFG.chance.factory) return false;
+  if(!claim("work-floor:"+key)) return false;
+
+  const source=floorEventsForJob(job);
+  if(!source || !source.length) return false;
   if(!Array.isArray(s.factoryRecent)) s.factoryRecent=[];
-  const adatti=FACTORY_FLOOR_EVENTS.filter(x=>!Array.isArray(x.roles) || x.roles.includes(job.id));
+  const adatti=source.filter(x=>!Array.isArray(x.roles) || x.roles.includes(job.id));
   if(!adatti.length) return false;
   const disponibili=adatti.filter(x=>!s.factoryRecent.includes(x.id));
   const pool=disponibili.length?disponibili:adatti;
@@ -1346,32 +1475,41 @@ function showFactoryFloor(job,s,roll){
 
   s.factoryRecent.unshift(scena.id);
   if(s.factoryRecent.length>4) s.factoryRecent.length=4;
-  record(s,"factory",{status:"shown",eventId:scena.id,roleId:job.id});
+  record(s,"factory",{status:"shown",workplace:key,eventId:scena.id,roleId:job.id});
 
   if(typeof showEvent!=="function") return false;
   showEvent({
-    k:"Fabbrica · Reparto",
+    k:key==="fabbrica" ? "Fabbrica · Reparto" : "Pizzeria · Cucina",
     t:scena.t,
     d:scena.d,
     annulla(){},
     opts:scena.opts.map(opt=>{
-      const adjustedFx=factoryFloorFx(job,opt);
+      const adjustedFx=workplaceFloorFx(job,opt);
       return {
-      n:opt.n,
-      d:factoryFxLabel(adjustedFx),
-      run(){
-        const fx=applyFactoryRoleFx(adjustedFx);
-        record(s,"factory",{
-          status:"resolved",eventId:scena.id,roleId:job.id,choice:opt.n,effects:fx
-        });
-        const saldo=Number(fx.reliability||0)+Number(fx.wellbeing||0)+
-          Number(fx.lucidita||0)+Number(fx.rete||0);
-        return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
-      }
-    };
+        n:opt.n,
+        d:opt.d || factoryFxLabel(adjustedFx),
+        run(){
+          const fx=applyWorkRoleFx(job,adjustedFx);
+          record(s,"factory",{
+            status:"resolved",workplace:key,eventId:scena.id,roleId:job.id,
+            choice:opt.n,effects:fx
+          });
+          const saldo=Number(fx.reliability||0)+Number(fx.wellbeing||0)+
+            Number(fx.lucidita||0)+Number(fx.rete||0);
+          return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
+        }
+      };
     })
   });
   return true;
+}
+
+function showFactoryFloor(job,s,roll){
+  return workKey(job)==="fabbrica" ? showWorkplaceFloor(job,s,roll) : false;
+}
+
+function showPizzeriaFloor(job,s,roll){
+  return workKey(job)==="pizzeria" ? showWorkplaceFloor(job,s,roll) : false;
 }
 
 /* ==================== 4. COLLEGHI ==================== */
@@ -1609,7 +1747,7 @@ function consumeCrimeLead(success){
 /* ==================== 8. CONSEGUENZE FISICHE / MENTALI ==================== */
 
 function showPhysical(job,s,roll){
-  const roleProfile=factoryRoleEventLoad(job);
+  const roleProfile=workRoleEventLoad(job);
   const wellbeing=Number(G.wellbeing==null?100:G.wellbeing);
   const lucidita=Number(G.lucidita==null?100:G.lucidita);
   /* La lucidità bassa diventa un trigger aggiuntivo solo per i ruoli Fabbrica,
@@ -1801,8 +1939,8 @@ function afterShift(payload,rolls){
 
   const handlers={
     music:()=>showMusic(job,s,r("music")),
-    role:()=>showFactoryRole(job,s,r("role")),
-    factory:()=>showFactoryFloor(job,s,r("factory")),
+    role:()=>showWorkRole(job,s,r("role")),
+    factory:()=>showWorkplaceFloor(job,s,r("factory")),
     crime:()=>showCrime(job,s,r("crime")),
     colleague:()=>showColleague(job,s,r("colleague")),
     physical:()=>showPhysical(job,s,r("physical"))
