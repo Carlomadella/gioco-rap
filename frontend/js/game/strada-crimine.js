@@ -480,8 +480,10 @@ function stradaAnnullaOpportunita(){
   if(!st.pending) return null;
   const proposta=st.pending;
   st.pending=null;
-  if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay))
+  if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay)){
     st.lastOfferAbsoluteDay=null;
+    st.nextOfferAbsoluteDay=null;
+  }
   return proposta;
 }
 function stradaAnnullaPropostaFabbrica(){ return stradaAnnullaOpportunita(); }
