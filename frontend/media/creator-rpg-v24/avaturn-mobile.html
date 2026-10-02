@@ -9,6 +9,7 @@
     color-scheme:dark;
     --gold:#d3aa5e;
     --paper:#f1eadb;
+    --muted:#aaa397;
   }
   *{box-sizing:border-box}
   html,body{
@@ -20,6 +21,7 @@
     background:#0b0b0d;
     overscroll-behavior:none;
   }
+  button{font:inherit}
   #avaturn{
     position:fixed;
     inset:0;
@@ -43,45 +45,103 @@
     text-align:center;
   }
   #loading[hidden]{display:none}
-  #controls{
+
+  #close{
     position:fixed;
-    z-index:30;
+    z-index:70;
     top:max(8px,env(safe-area-inset-top,0px));
     right:max(8px,env(safe-area-inset-right,0px));
-    display:flex;
-    gap:7px;
-    pointer-events:none;
-  }
-  #controls button{
-    pointer-events:auto;
-    min-height:40px;
+    width:40px;
+    height:40px;
     border:1px solid rgba(255,255,255,.16);
     border-radius:10px;
-    padding:0 12px;
     background:rgba(12,12,15,.84);
     color:var(--paper);
-    font:900 9px/1 Inter,Arial,sans-serif;
-    letter-spacing:.08em;
-    text-transform:uppercase;
+    font:400 19px/1 Arial,sans-serif;
     backdrop-filter:blur(10px);
     touch-action:manipulation;
     -webkit-tap-highlight-color:transparent;
   }
-  #confirm{
-    border-color:rgba(211,170,94,.48)!important;
-    background:rgba(211,170,94,.16)!important;
-    color:#f3d9a6!important;
+
+  #orientationGate{
+    position:fixed;
+    inset:0;
+    z-index:60;
+    display:grid;
+    place-items:center;
+    padding:
+      max(28px,env(safe-area-inset-top,0px))
+      max(24px,env(safe-area-inset-right,0px))
+      max(28px,env(safe-area-inset-bottom,0px))
+      max(24px,env(safe-area-inset-left,0px));
+    background:
+      radial-gradient(70% 90% at 50% 15%,rgba(211,170,94,.10),transparent 65%),
+      #0b0b0d;
+    color:var(--paper);
+    text-align:center;
   }
-  #confirm:disabled{opacity:.42}
-  #close{
-    width:40px;
-    padding:0!important;
-    font-size:18px!important;
-    letter-spacing:0!important;
+  #orientationGate[hidden]{display:none}
+  .rotate-card{
+    width:min(430px,88vw);
+    padding:24px 22px 22px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:20px;
+    background:rgba(18,17,20,.94);
+    box-shadow:0 24px 70px rgba(0,0,0,.48);
   }
+  .rotate-icon{
+    position:relative;
+    width:54px;
+    height:82px;
+    margin:0 auto 18px;
+    border:3px solid var(--gold);
+    border-radius:11px;
+    transform:rotate(-90deg);
+  }
+  .rotate-icon::before{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:5px;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--gold);
+    transform:translateX(-50%);
+  }
+  .rotate-arrow{
+    display:block;
+    margin:-4px 0 4px;
+    color:var(--gold);
+    font:900 22px/1 Arial,sans-serif;
+  }
+  .rotate-kicker{
+    color:var(--gold);
+    font:900 9px/1.2 Inter,Arial,sans-serif;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+  }
+  .rotate-card h1{
+    margin:8px 0 8px;
+    font:900 clamp(22px,6vw,32px)/1.05 Inter,Arial,sans-serif;
+    letter-spacing:-.035em;
+  }
+  .rotate-card p{
+    margin:0 auto;
+    max-width:330px;
+    color:#c4bdb1;
+    font:600 13px/1.5 Inter,Arial,sans-serif;
+  }
+  .rotate-card small{
+    display:block;
+    margin-top:12px;
+    color:#817b72;
+    font:700 10px/1.4 Inter,Arial,sans-serif;
+  }
+
   #error{
     position:fixed;
-    z-index:35;
+    z-index:75;
     left:50%;
     bottom:max(10px,env(safe-area-inset-bottom,0px));
     transform:translateX(-50%);
@@ -100,22 +160,31 @@
 </head>
 <body>
 <div id="avaturn" aria-label="Editor Avaturn"></div>
-<div id="loading">Carico Avaturn…</div>
-<div id="controls">
-  <button id="confirm" type="button" disabled>Conferma</button>
-  <button id="close" type="button" aria-label="Chiudi Avaturn">×</button>
+<div id="loading" hidden>Carico Avaturn…</div>
+
+<div id="orientationGate" role="status" aria-live="polite">
+  <div class="rotate-card">
+    <div class="rotate-icon" aria-hidden="true"></div>
+    <span class="rotate-arrow" aria-hidden="true">↻</span>
+    <div class="rotate-kicker">Configurazione Avaturn</div>
+    <h1>Ruota il telefono in verticale</h1>
+    <p>Avaturn è più comodo e funziona correttamente in verticale. Appena ruoti il telefono, l’editor si apre da solo.</p>
+    <small>Terminata la configurazione puoi tornare al gioco in orizzontale.</small>
+  </div>
 </div>
+
+<button id="close" type="button" aria-label="Chiudi Avaturn">×</button>
 <div id="error" role="status"></div>
 
 <script type="module">
-import { AvaturnSDK } from "https://cdn.jsdelivr.net/npm/@avaturn/sdk/dist/index.js";
-
 const container=document.getElementById("avaturn");
 const loading=document.getElementById("loading");
-const confirmBtn=document.getElementById("confirm");
 const closeBtn=document.getElementById("close");
 const errorBox=document.getElementById("error");
+const orientationGate=document.getElementById("orientationGate");
+
 let sdk=null;
+let sdkPromise=null;
 let finishing=false;
 
 function showError(message){
@@ -144,46 +213,72 @@ function cancel(){
   try{ window.close(); }catch(e){}
 }
 
-closeBtn.addEventListener("click",cancel);
-
-confirmBtn.addEventListener("click",async()=>{
-  if(!sdk || finishing) return;
-  confirmBtn.disabled=true;
-  confirmBtn.textContent="Esporto…";
-  errorBox.classList.remove("on");
-  try{
-    const data=await sdk.exportAvatar();
-    finish(data);
-  }catch(err){
-    console.error(err);
-    confirmBtn.disabled=false;
-    confirmBtn.textContent="Conferma";
-    showError("Non riesco a esportare l'avatar. Riprova dopo aver completato le modifiche.");
-  }
-});
-
-try{
-  sdk=new AvaturnSDK();
-
-  /* Integrazione mobile volutamente minimale: il container è l'unico elemento
-     che dimensioniamo. Il frame creato da Avaturn resta con i suoi stili
-     originali, come raccomandato dalla documentazione ufficiale. */
-  await sdk.init(container,{url:"https://demo.avaturn.dev"});
-
-  loading.hidden=true;
-  confirmBtn.disabled=false;
-
-  sdk.on("export",data=>finish(data));
-}catch(err){
-  console.error(err);
-  loading.hidden=true;
-  confirmBtn.disabled=true;
-  showError("Avaturn non si è caricato. Chiudi e riprova.");
+function isPortrait(){
+  return !!(
+    (window.matchMedia && window.matchMedia("(orientation: portrait)").matches) ||
+    innerHeight > innerWidth
+  );
 }
 
+async function startAvaturn(){
+  if(sdk || sdkPromise) return sdkPromise;
+
+  loading.hidden=false;
+  errorBox.classList.remove("on");
+
+  sdkPromise=(async()=>{
+    const mod=await import("https://cdn.jsdelivr.net/npm/@avaturn/sdk/dist/index.js");
+    const instance=new mod.AvaturnSDK();
+
+    /* Avaturn viene inizializzato solo dopo che il telefono è verticale.
+       Dimensioniamo esclusivamente il container; il frame resta gestito dal SDK. */
+    await instance.init(container,{url:"https://demo.avaturn.dev"});
+
+    sdk=instance;
+    loading.hidden=true;
+    sdk.on("export",data=>finish(data));
+    return sdk;
+  })().catch(err=>{
+    console.error(err);
+    sdkPromise=null;
+    loading.hidden=true;
+    showError("Avaturn non si è caricato. Chiudi e riprova.");
+    throw err;
+  });
+
+  return sdkPromise;
+}
+
+function syncOrientation(){
+  const portrait=isPortrait();
+  orientationGate.hidden=portrait;
+
+  if(portrait){
+    startAvaturn().catch(()=>{});
+  }
+}
+
+closeBtn.addEventListener("click",cancel);
+
+const portraitQuery=window.matchMedia
+  ? window.matchMedia("(orientation: portrait)")
+  : null;
+
+if(portraitQuery){
+  if(typeof portraitQuery.addEventListener==="function"){
+    portraitQuery.addEventListener("change",syncOrientation);
+  }else if(typeof portraitQuery.addListener==="function"){
+    portraitQuery.addListener(syncOrientation);
+  }
+}
+
+window.addEventListener("resize",syncOrientation,{passive:true});
+window.addEventListener("orientationchange",syncOrientation,{passive:true});
 window.addEventListener("beforeunload",()=>{
   try{ sdk?.destroy?.(); }catch(e){}
 });
+
+syncOrientation();
 </script>
 </body>
 </html>
