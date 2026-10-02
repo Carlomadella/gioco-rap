@@ -6,6 +6,33 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:d2867ebf -->
+## 02/10/26, 22:56 — feature/strada-punto8-preparazione-v2 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `d2867ebf`
+
+### Cosa è entrato
+
+- `23c0f59c` — test(strada): aggiungi copertura punto 8 su main aggiornato — **mycolbraga**
+- `538db5d8` — feat(strada): riallinea punto 8 su main aggiornato — **mycolbraga**
+- `af6c6447` — feat(strada): riallinea punto 8 su main aggiornato — **mycolbraga**
+- `2b8fe0c6` — feat(strada): riallinea punto 8 su main aggiornato — **mycolbraga**
+- `823a755d` — feat(strada): riallinea punto 8 su main aggiornato — **mycolbraga**
+- `9be2966b` — feat(strada): riallinea punto 8 su main aggiornato — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+- **Aggiunto:** `frontend/test/unit/strada-preparazione.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:6890fd99 -->
 ## 02/10/26, 22:40 — feature/strada-punto7-pool-colpi → main
 
