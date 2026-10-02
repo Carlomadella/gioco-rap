@@ -6,6 +6,32 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:bbc0a744 -->
+## 02/10/26, 11:09 — task/fabbrica-eventi-pacing → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `bbc0a744`
+
+### Cosa è entrato
+
+- `f9036095` — Merge pull request #59 from Carlomadella/main — **mycolbraga**
+- `81df0dc4` — test(fabbrica): allinea eventi al nuovo pacing — **mycolbraga**
+- `a0f96795` — Merge pull request #55 from Carlomadella/main — **mycolbraga**
+- `3d4bf610` — docs(fabbrica): documenta pacing eventi lavoro — **mycolbraga**
+- `2bbf0ea2` — chore(cache): invalida pacing eventi lavoro — **mycolbraga**
+- `ce46b762` — test(fabbrica): protegge pacing e rotazione eventi — **mycolbraga**
+- `58174245` — feat(fabbrica): regola pacing e rotazione eventi lavoro — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:d01ea2eb -->
 ## 02/10/26, 10:42 — task/fabbrica-playtest-doppia-vita → main
 
