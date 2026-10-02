@@ -224,11 +224,16 @@ Due punti che stavano nel foglio dei punti (CARLO 12 e 14) e non erano task ma r
   nati `studio-elementi.js`, `luoghi-foto.js`, `transizioni-video.js`, `guardaroba.js`:
   ognuno accanto al file che lo chiama, con in testa il perché. Un fix invece si fa dove
   sta il baco.
-- **La parte smartphone sta separata dal resto.** «Tieni tutto ciò che riguarda la parte
-  smartphone separata dal resto del progetto.» Il telefono è `telefono.js` e
-  `telefono.css`; il telefono quando lo schermo è un telefono è `telefono-stretto.js` e
-  `telefono-stretto.css`, che gli altri file conoscono solo per due funzioni. Quello che
-  riguarda il telefono non si sparge negli altri file.
+- **Desktop e mobile sono due superfici dello stesso gioco, non due giochi e non una sola
+  UI adattata a forza.** Gameplay, stato, economia, eventi, salvataggi e backend restano
+  condivisi. UI, layout, gesture, navigazione e runtime specifici del telefono restano
+  isolati in file/moduli mobile (`telefono*.js`, `telefono*.css` o equivalenti dedicati).
+  **Regola di Carlo del 02/10/2026: una cosa che funziona su PC non si modifica per farla
+  andare sul telefono.** Se il problema esiste solo su mobile, la correzione deve essere
+  mobile. Si tocca codice condiviso solo quando la causa è realmente comune; in quel caso
+  la modifica va verificata anche su desktop prima di chiudere la task. Questo evita che
+  un fix touch, un layout verticale o un caricamento pensato per rete/device mobile crei
+  regressioni nella versione PC.
 
 ## Le dipendenze
 

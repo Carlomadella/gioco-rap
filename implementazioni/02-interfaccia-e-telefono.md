@@ -2943,3 +2943,24 @@ Shop schiacciato sul Circolo); più uniformi non si può senza spostare Strada, 
 Palestra, che stanno sui loro palazzi. I tragitti seguono: Studio↔Shop da 45 a 30 minuti,
 il resto uguale. Nessun cartello sopra un altro o sopra il palazzo di un altro posto, da
 1024 × 768 a 1920 × 1080 e sul telefono.
+
+## Regola architetturale · PC e mobile non si devono rompere a vicenda
+
+**DECISO (02/10/2026)** — Anni di Fame resta un solo gioco: gameplay, stato, economia,
+eventi, salvataggi e backend sono condivisi. Lo sviluppo mobile, però, può richiedere
+layout, gesture, navigazione, controller, caricamenti e runtime diversi dal desktop.
+
+La regola è vincolante: **una cosa che funziona su PC non si modifica per farla funzionare
+sul telefono**. Se un difetto esiste solo su mobile, la soluzione va confinata al layer
+mobile. Codice condiviso si modifica solo quando la causa è realmente comune; in quel
+caso la modifica deve essere verificata anche su desktop prima di essere considerata
+chiusa.
+
+Questo non crea due giochi né due copie della logica. Crea due superfici separate sopra
+lo stesso motore: desktop e mobile possono divergere nella presentazione e nel runtime
+specifico senza divergere nelle regole del gioco.
+
+**Primo test reale su telefono (02/10/2026):** il trascinamento delle pagine funziona.
+Il timeout del primo caricamento MakeHuman resta invece un problema distinto da risolvere
+nel percorso mobile senza cambiare il comportamento desktop che già funziona.
+
