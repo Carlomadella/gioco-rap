@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3b581dea -->
+## 02/10/26, 11:28 — fix/pizzeria-hours-badge → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `3b581dea`
+
+### Cosa è entrato
+
+- `651e6b54` — docs: registra fix orario Pizzeria — **mycolbraga**
+- `456d4d49` — chore(cache): aggiorna versione orari — **mycolbraga**
+- `59bd96af` — test(hours): blocca regressione orario Pizzeria — **mycolbraga**
+- `346d0a65` — fix(hours): allinea apertura Pizzeria alle 17 — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:8663aedd -->
 ## 02/10/26, 11:21 — task/fabbrica-capoturno-terminale → main
 
