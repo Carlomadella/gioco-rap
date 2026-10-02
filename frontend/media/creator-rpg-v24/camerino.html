@@ -2233,11 +2233,26 @@ function closeEditor(){
   overlay.setAttribute('aria-hidden','true');
 }
 
+function mobileAvaturnTopLevelEnabled(){
+  return !!(
+    window.parent!==window &&
+    window.matchMedia &&
+    window.matchMedia('(orientation:landscape) and (max-width:980px) and (max-height:520px)').matches
+  );
+}
+
 $('openAvaturn').onclick=()=>{
   if(currentSource!=='avaturn' && currentSource!=='local'){
     toast('Editor del personaggio non determinato'); return;
   }
-  if(currentSource==='avaturn'){ openEditor(); return; }
+  if(currentSource==='avaturn'){
+    if(mobileAvaturnTopLevelEnabled()){
+      window.parent.postMessage({type:'adf-avatar-room-avaturn-mobile-open'},'*');
+      return;
+    }
+    openEditor();
+    return;
+  }
   if(window.parent!==window){
     window.parent.postMessage({type:'adf-avatar-room-edit-request',source:'local'},'*'); return;
   }
@@ -2421,7 +2436,25 @@ function applyParentInit(msg){
 
 window.addEventListener('message',e=>{
   const msg=e.data||{};
-  if(msg.type==='adf-avatar-room-init') applyParentInit(msg);
+  if(msg.type==='adf-avatar-room-init'){
+    applyParentInit(msg);
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-export'){
+    const saved=saveExport(msg.data||{});
+    if(saved?.url){
+      loadAvatar(saved,true);
+      toast('Avatar aggiornato');
+    }
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-fallback'){
+    openEditor();
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-cancel'){
+    return;
+  }
 });
 
 initViewer();

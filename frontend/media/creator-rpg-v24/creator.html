@@ -2598,7 +2598,7 @@ body::before{
     </section>
 
     <section class="page" id="pageDressingRoom">
-      <iframe class="dressing-room-frame" id="dressingRoomFrame" src="camerino.html?v=3" title="Camerino personaggio"></iframe>
+      <iframe class="dressing-room-frame" id="dressingRoomFrame" src="camerino.html?v=4" title="Camerino personaggio"></iframe>
     </section>
 
     <section class="page" id="pageIdentity">
@@ -3622,6 +3622,25 @@ window.addEventListener('message', e=>{
       startQuickMakeHuman();
       return;
     }
+    if(msg.type==='adf-rpg-v24-avaturn-mobile-export'){
+      frame?.contentWindow?.postMessage({
+        type:'adf-avatar-room-avaturn-mobile-export',
+        data:msg.data||{}
+      },'*');
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-avaturn-mobile-cancel'){
+      frame?.contentWindow?.postMessage({
+        type:'adf-avatar-room-avaturn-mobile-cancel'
+      },'*');
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-avaturn-mobile-fallback'){
+      frame?.contentWindow?.postMessage({
+        type:'adf-avatar-room-avaturn-mobile-fallback'
+      },'*');
+      return;
+    }
     /* «Fallo a mano» dalla schermata d'attesa del gioco: l'avvio rapido si
        spegne — il camerino si chiude col suo cartello, e un risultato che
        arrivasse dopo non applica più un preset a caso sotto le mani di chi
@@ -3780,6 +3799,14 @@ window.addEventListener('message', e=>{
   if(!frame || e.source!==frame.contentWindow) return;
   if(msg.type==='adf-avatar-room-ready'){
     sendDressingRoomInit(false);
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-open'){
+    if(window.parent!==window){
+      window.parent.postMessage({type:'adf-rpg-v24-avaturn-mobile-open'},'*');
+    }else{
+      frame.contentWindow.postMessage({type:'adf-avatar-room-avaturn-mobile-fallback'},'*');
+    }
     return;
   }
   if(msg.type==='adf-avatar-room-continue'){
