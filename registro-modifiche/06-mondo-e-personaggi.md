@@ -6,6 +6,26 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:93c76aae -->
+## 02/10/26, 14:20 — task/pizzeria-coperture-narrative → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `93c76aae`
+
+### Cosa è entrato
+
+- `48f277aa` — test(pizzeria): copre motivi e ruoli delle coperture extra — **mycolbraga**
+- `2f6904d6` — feat(pizzeria): mostra il motivo della copertura accettata — **mycolbraga**
+- `e806e43b` — feat(pizzeria): rende narrative e role-aware le coperture extra — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:2919c0b3 -->
 ## 02/10/26, 14:05 — task/pizzeria-sociale-autopromozione → main
 
