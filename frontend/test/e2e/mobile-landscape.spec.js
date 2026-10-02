@@ -105,7 +105,8 @@ test("landscape mobile: Inizia mostra tutte le voci senza blocco nero", async ({
   const box = await pannello.boundingBox();
   expect(box).not.toBeNull();
   expect(box.y).toBeGreaterThanOrEqual(-1);
-  const vh = await page.evaluate(() => innerHeight);\n  expect(box.y + box.height).toBeLessThanOrEqual(vh + 1);
+  const vh = await page.evaluate(() => innerHeight);
+  expect(box.y + box.height).toBeLessThanOrEqual(vh + 1);
 });
 
 test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", async ({ page }) => {
