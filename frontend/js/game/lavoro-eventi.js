@@ -1150,11 +1150,21 @@ function applyFactoryRoleFx(fx){
   return applyWorkRoleFx({id:"operaio",place:"fabbrica"},fx);
 }
 
-function showFactoryRole(job,s,roll){
-  if(!job || workKey(job)!=="fabbrica") return false;
-  const pool=FACTORY_ROLE_EVENTS[job.id];
+function roleEventsForJob(job){
+  if(!job) return null;
+  const key=workKey(job);
+  if(key==="fabbrica") return FACTORY_ROLE_EVENTS[job.id] || null;
+  if(key==="pizzeria") return PIZZERIA_ROLE_EVENTS[job.id] || null;
+  return null;
+}
+
+function showWorkRole(job,s,roll){
+  if(!job) return false;
+  const key=workKey(job);
+  if(key!=="fabbrica" && key!=="pizzeria") return false;
+  const pool=roleEventsForJob(job);
   if(!pool || !pool.length || !familyReady(s,"role")) return false;
-  if(Number(roll)>=CFG.chance.role || !claim("work-role:"+job.id)) return false;
+  if(Number(roll)>=CFG.chance.role || !claim("work-role:"+key+":"+job.id)) return false;
 
   if(!Array.isArray(s.roleRecent)) s.roleRecent=[];
   const disponibili=pool.filter(x=>!s.roleRecent.includes(x.id));
@@ -1163,25 +1173,38 @@ function showFactoryRole(job,s,roll){
   s.roleRecent.unshift(scena.id);
   if(s.roleRecent.length>4) s.roleRecent.length=4;
 
-  record(s,"role",{status:"shown",roleId:job.id,eventId:scena.id});
+  record(s,"role",{status:"shown",workplace:key,roleId:job.id,eventId:scena.id});
   if(typeof showEvent!=="function") return false;
 
   showEvent({
-    k:"Fabbrica · "+(job.n||"Ruolo"),
+    k:(key==="fabbrica"?"Fabbrica":"Pizzeria")+" · "+(job.n||"Ruolo"),
     t:scena.t,
     d:scena.d,
     annulla(){},
     opts:scena.opts.map(opt=>({
       n:opt.n,
-      d:opt.d,
+      d:opt.d || factoryFxLabel(opt.fx),
       run(){
-        const fx=applyFactoryRoleFx(opt.fx);
-        record(s,"role",{status:"resolved",roleId:job.id,eventId:scena.id,choice:opt.n,effects:fx});
-        return {t:opt.result,c:fx.reliability>0?"good":fx.reliability<0?"bad":""};
+        const fx=applyWorkRoleFx(job,opt.fx);
+        record(s,"role",{
+          status:"resolved",workplace:key,roleId:job.id,eventId:scena.id,
+          choice:opt.n,effects:fx
+        });
+        const saldo=Number(fx.reliability||0)+Number(fx.wellbeing||0)+
+          Number(fx.lucidita||0)+Number(fx.rete||0);
+        return {t:opt.result,c:saldo>0?"good":saldo<0?"bad":""};
       }
     }))
   });
   return true;
+}
+
+function showFactoryRole(job,s,roll){
+  return workKey(job)==="fabbrica" ? showWorkRole(job,s,roll) : false;
+}
+
+function showPizzeriaRole(job,s,roll){
+  return workKey(job)==="pizzeria" ? showWorkRole(job,s,roll) : false;
 }
 
 /* ==================== VITA DI FABBRICA ====================
