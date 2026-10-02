@@ -6,6 +6,30 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:aa7a9c80 -->
+## 02/10/26, 10:11 — task/fabbrica-contratto-maggiorazioni → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `aa7a9c80`
+
+### Cosa è entrato
+
+- `bf487385` — Merge pull request #47 from Carlomadella/main — **mycolbraga**
+- `89f8d73e` — docs(fabbrica): documenta maggiorazioni contrattuali — **mycolbraga**
+- `c6b3c45c` — chore(cache): invalida contratto Fabbrica aggiornato — **mycolbraga**
+- `e4d01bab` — test(fabbrica): protegge maggiorazioni nel contratto — **mycolbraga**
+- `e99a4217` — fix(fabbrica): esplicita maggiorazioni nel contratto — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:63e6420a -->
 ## 02/10/26, 10:02 — task/via-agente-telefono → main
 
