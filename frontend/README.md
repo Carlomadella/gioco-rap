@@ -152,13 +152,18 @@ il guscio nativo.
 
 ### 5. L'interfaccia sul telefono — il lavoro più grosso
 
-La plancia è disegnata alla misura del concept (1536×1024) e rimpicciolita tutta insieme.
-Su un monitor va benissimo, su un telefono in verticale no: serve una disposizione sua
-(profilo, mappa e telefono uno sotto l'altro invece che affiancati), aree da toccare di
-almeno 44 punti, niente `hover`, e i testi che restano leggibili senza zoom.
+La plancia è disegnata alla misura del concept (1536×1024), ma sul telefono non va
+semplicemente rimpicciolita. Dal 02/10/2026 il **landscape è la modalità mobile di
+riferimento**: è quella su cui si preservano composizione, sfondi, mappa e informazioni a
+schermo. Il portrait resta supportato e deve restare usabile e leggibile, ma non è più il
+vincolo che decide la struttura delle schermate e non giustifica la rimozione di contenuti
+o la sostituzione della grafica con controlli più poveri.
 
-Non è una riscrittura: sono i CSS e qualche pezzo di `hub.js`. Ma è il lavoro più lungo di
-tutta la lista, ed è quello da provare su un telefono vero il prima possibile.
+Restano invariati i requisiti di interazione: aree da toccare di almeno 44 punti, niente
+`hover` indispensabili e testi leggibili senza zoom. Il layout non forza la rotazione:
+quando il telefono è in verticale può suggerire il landscape, ma l'utente può continuare.
+Le regressioni mobile vanno provate almeno a 844×390 (landscape), 390×844 (portrait) e
+360×640 (stretto piccolo).
 
 ### 6. Le cose che si notano solo quando è tardi
 
