@@ -2875,6 +2875,74 @@ saltaGiorni=function(n){
 };
 
 /* -------------------- action hooks -------------------- */
+function adfWorkFamilyShiftSummary(job){
+  if(!job || !window.ADF_WORK_EVENTS || typeof ADF_WORK_EVENTS.stateForJob!=="function")
+    return null;
+  const s=ADF_WORK_EVENTS.stateForJob(job);
+  const row=s && Array.isArray(s.history) ? s.history[0] : null;
+  if(!row || Number(row.absoluteDay)!==Number(absDay())) return null;
+  const fam=ADF_WORK_EVENTS.families && ADF_WORK_EVENTS.families[row.family];
+  return {
+    type:"work-"+String(row.family||"event"),
+    title:fam && fam.label ? fam.label : "Evento di fine turno",
+    detail:row.choice || row.eventId || ""
+  };
+}
+
+function adfShiftOutcomeEvent(luogo,jobBefore,flags){
+  if(!luogo || typeof lavoroSegnaEventoEsitoTurno!=="function") return;
+  flags=flags||{};
+  let event=null;
+
+  if(flags.overtime){
+    const st=typeof lavoroStraordinarioStato==="function" ? lavoroStraordinarioStato(luogo) : null;
+    const p=st && st.pendingOffer;
+    event={
+      type:"overtime",
+      title:"Richiesta di straordinario",
+      detail:p
+        ? ((p.targetLabel||"turno extra")+(p.scenarioLabel ? " · "+p.scenarioLabel : ""))
+        : "Turno extra proposto a fine turno"
+    };
+  }else if(flags.street){
+    const p=G.strada && G.strada.fabbricaLead && G.strada.fabbricaLead.pending;
+    event={
+      type:"street",
+      title:"Dritta fuori dalla Fabbrica",
+      detail:p && p.label ? p.label : "Una proposta ti aspetta fuori dal cancello"
+    };
+  }else if(flags.workFamily){
+    event=adfWorkFamilyShiftSummary(G.job||jobBefore);
+  }else if(flags.contact){
+    const sede=G.workplaces && G.workplaces[luogo];
+    const row=sede && sede.network && Array.isArray(sede.network.history)
+      ? sede.network.history[0] : null;
+    const p=row && (G.gente||[]).find(x=>x && x.id===row.personId);
+    event={
+      type:"contact",
+      title:"Contatto dopo il turno",
+      detail:p ? p.n : "Una conoscenza nata sul lavoro"
+    };
+  }else{
+    const s=window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.stateForJob==="function"
+      ? ADF_WORK_EVENTS.stateForJob(G.job||jobBefore)
+      : null;
+    const row=s && Array.isArray(s.history) ? s.history[0] : null;
+    if(row && Number(row.absoluteDay)===Number(absDay()) && row.family==="conflict"){
+      event={
+        type:"conflict",
+        title:"Agenda sacrificata al turno",
+        detail:row.appointmentName || "Un appuntamento segnato è stato perso"
+      };
+    }else{
+      event={type:"none",title:"Nessun evento extra",detail:"Turno chiuso senza imprevisti."};
+    }
+  }
+
+  lavoroSegnaEventoEsitoTurno(luogo,event);
+  try{ if(typeof renderLuogo==="function") renderLuogo(); }catch(_){}
+}
+
 function adfCompletaHookAzione(a,jobBefore,endedAt){
   const shiftPayload = a.id==="turno" && jobBefore ? {
     action_id:"turno",
@@ -2899,6 +2967,16 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
     ? adfWorkContactAfterShift()
     : false;
+
+  if(a.id==="turno" && shiftPayload && shiftPayload.workplace){
+    adfShiftOutcomeEvent(shiftPayload.workplace,jobBefore,{
+      overtime:overtimeShown,
+      street:streetShown,
+      workFamily:workFamilyShown,
+      contact:contactShown
+    });
+  }
+
   if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown)
     emitHook("after_action",{action_id:a.id});
   if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
