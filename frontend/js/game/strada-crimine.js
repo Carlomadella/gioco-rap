@@ -267,6 +267,7 @@ function stAvviaColpo(colpoId){
    migrati da prove criminali già presenti nello stato. */
 function stradaGiroAvviato(){
   const s=G.strada||{};
+  if(!stradaAttivitaSbloccate()) return false;
   if(s.giroAvviato===true)return true;
   if(s.giroAvviato===false)return false;
 
@@ -295,6 +296,249 @@ function stradaAbsDay(){
     ((Number(G.year || 1) - 1) * 52 + (Number(G.week || 1) - 1)) * 7 +
     Math.max(1, Math.min(7, Number(G.day || 1)))
   );
+}
+
+
+/* ==================== INGRESSO NELLA STRADA ====================
+   Punto 1 della revisione 02/10/2026.
+   Una nuova partita non mostra Attività criminali. Prima serve una persona
+   reale già presente in G.gente, poi due piccoli favori introduttivi. In questa
+   fase si possono perdere soldi, energia e accumulare attenzione, ma non si
+   può finire in carcere. */
+const STRADA_INGRESSO = Object.freeze({
+  colpiRichiesti:2,
+  chanceProposta:.12,
+  cooldownRifiutoGiorni:7,
+  cooldownTraColpiGiorni:3,
+  energia:[10,14],
+  riuscita:[.74,.66],
+  min:[120,220],
+  max:[240,420],
+  heatSuccesso:[2,3],
+  heatFallimento:[4,6]
+});
+
+function stradaEvidenzaCriminaleLegacy(){
+  const s=G.strada||{};
+  const attive=Object.values(s.attivita||{}).some(Boolean);
+  const riciclato=!!(s.lavaggio&&Number(s.lavaggio.used)>0);
+  return s.giroAvviato===true ||
+    Number(s.precedenti)>0 ||
+    Number(s.sporchi)>0 ||
+    Number(s.uomini)>0 ||
+    Number(s.prot)>0 ||
+    !!s.ferro ||
+    !!s.avvocato ||
+    !!s.arresto ||
+    !!s.carcere ||
+    attive ||
+    riciclato ||
+    Number(s.rep)>0 ||
+    Number(s.heat)>0 ||
+    Number(G.diario&&G.diario.colpi)>0;
+}
+
+function stradaIngressoStato(){
+  const s=G.strada||(G.strada={});
+
+  /* badgeSbloccato è NON_COMPLETARE in state.js: se manca davvero stiamo
+     caricando un salvataggio precedente a questo sistema. In quel caso non
+     nascondiamo la Strada a chi aveva già una carriera criminale. */
+  if(typeof s.badgeSbloccato!=="boolean")
+    s.badgeSbloccato=!!stradaEvidenzaCriminaleLegacy();
+
+  if(!s.ingressoFase)
+    s.ingressoFase=s.badgeSbloccato?"unlocked":"locked";
+  if(!Number.isFinite(Number(s.ingressoTentativi)))
+    s.ingressoTentativi=0;
+  s.ingressoTentativi=Math.max(0,Math.floor(Number(s.ingressoTentativi)||0));
+
+  if(s.badgeSbloccato) s.ingressoFase="unlocked";
+  return s;
+}
+
+function stradaAttivitaSbloccate(){
+  return stradaIngressoStato().badgeSbloccato===true;
+}
+
+function stradaPersonaIngressoValida(p){
+  if(!p || p.via || !p.id || !p.n || p.ruolo==="giornalista") return false;
+  /* Contatti del lavoro: esistono perché li hai incontrati davvero.
+     Contatti del Circolo: devono essere già stati visti/conosciuti, non una
+     faccia appena generata dal pool della Sala. Il punto 2 raffinerà fiducia
+     e percorsi; qui impediamo soltanto proposte da sconosciuti virtuali. */
+  if(p.origineLuogo==="fabbrica" || p.origineLuogo==="pizzeria" || p.origine==="lavoro")
+    return true;
+  return !!p.visto || !!p.numero || Number(p.rel)>0 || Number(p.pt)>0;
+}
+
+function stradaPersonaIngresso(variantRoll){
+  const s=stradaIngressoStato();
+  if(s.ingressoPersonaId){
+    const stessa=(G.gente||[]).find(p=>p && p.id===s.ingressoPersonaId && !p.via);
+    if(stessa) return stessa;
+  }
+
+  const pool=(G.gente||[]).filter(stradaPersonaIngressoValida);
+  if(!pool.length) return null;
+
+  /* Un rapporto già iniziato pesa più di una conoscenza appena nata, senza
+     trasformarlo ancora nel sistema di fiducia criminale del punto 4. */
+  pool.sort((a,b)=>
+    (Number(b.rel||0)*10+Number(b.pt||0)+(b.numero?4:0)) -
+    (Number(a.rel||0)*10+Number(a.pt||0)+(a.numero?4:0))
+  );
+  const fascia=pool.slice(0,Math.max(1,Math.ceil(pool.length/2)));
+  const r=Number.isFinite(Number(variantRoll))
+    ? Math.max(0,Math.min(.999999,Number(variantRoll)))
+    : Math.random();
+  return fascia[Math.floor(r*fascia.length)] || fascia[0] || null;
+}
+
+function stradaTentaIngresso(roll,variantRoll){
+  const s=stradaIngressoStato();
+  if(s.badgeSbloccato || s.arresto) return null;
+
+  /* Una proposta già comparsa resta la stessa finché il giocatore non decide:
+     non rigeneriamo persona e testo a ogni render/azione. */
+  if(s.ingressoPending && typeof s.ingressoPending==="object")
+    return Object.assign({},s.ingressoPending);
+
+  const oggi=stradaAbsDay();
+  if(s.ingressoNextOfferAbsoluteDay!=null &&
+     oggi<Number(s.ingressoNextOfferAbsoluteDay)) return null;
+  if(Number(s.ingressoLastCheckAbsoluteDay)===oggi) return null;
+
+  const persona=stradaPersonaIngresso(variantRoll);
+  if(!persona) return null;
+
+  s.ingressoLastCheckAbsoluteDay=oggi;
+  const r=Number.isFinite(Number(roll))
+    ? Math.max(0,Math.min(.999999,Number(roll)))
+    : Math.random();
+  if(r>=STRADA_INGRESSO.chanceProposta) return null;
+
+  const step=Math.min(
+    STRADA_INGRESSO.colpiRichiesti,
+    Math.max(1,Number(s.ingressoTentativi||0)+1)
+  );
+  const seconda=step>1;
+  const proposta={
+    kind:"crime-intro",
+    step,
+    personId:persona.id,
+    persona:persona.n,
+    titolo:seconda?"Un altro favore":"Una strana proposta",
+    intro:seconda
+      ?"«L'altra volta non sei scappato. Ho un'altra cosa piccola, se ti interessa.»"
+      :"«Mi serve uno che porti una cosa da un punto all'altro. Niente domande.»",
+    pitch:seconda
+      ?"È ancora roba piccola, ma stavolta ti espone un po' di più. Se accetti, entri davvero nel radar del giro."
+      :"È un favore breve e chiaramente losco. Non sai ancora abbastanza per vedere il resto del giro.",
+    energia:Number(STRADA_INGRESSO.energia[step-1]||10)
+  };
+
+  s.ingressoPersonaId=persona.id;
+  s.ingressoPersonaNome=persona.n;
+  s.ingressoFase="offered";
+  s.ingressoPending=Object.assign({},proposta);
+  return Object.assign({},proposta);
+}
+
+function stradaRifiutaIngresso(){
+  const s=stradaIngressoStato();
+  if(!s.ingressoPending) return null;
+  const out=Object.assign({},s.ingressoPending,{status:"declined"});
+  s.ingressoPending=null;
+  s.ingressoFase=s.ingressoTentativi>0?"contact":"locked";
+  s.ingressoNextOfferAbsoluteDay=stradaAbsDay()+STRADA_INGRESSO.cooldownRifiutoGiorni;
+  if(typeof save==="function") save();
+  return out;
+}
+
+function stradaAccettaIngresso(successRoll,rewardRoll){
+  const s=stradaIngressoStato();
+  const proposta=s.ingressoPending;
+  if(!proposta || s.badgeSbloccato) return null;
+
+  const step=Math.max(1,Math.min(
+    STRADA_INGRESSO.colpiRichiesti,
+    Number(proposta.step)||1
+  ));
+  const energia=Number(STRADA_INGRESSO.energia[step-1]||10);
+  if(Number(G.energy||0)<energia){
+    return {ok:false,reason:"Ti servono "+energia+" energia per prenderti questo favore.",proposal:Object.assign({},proposta)};
+  }
+
+  G.energy=Math.max(0,Number(G.energy||0)-energia);
+  s.ingressoFase="accepted";
+
+  const r=Number.isFinite(Number(successRoll))
+    ? Math.max(0,Math.min(.999999,Number(successRoll)))
+    : Math.random();
+  const successo=r<Number(STRADA_INGRESSO.riuscita[step-1]||.7);
+  const rr=Number.isFinite(Number(rewardRoll))
+    ? Math.max(0,Math.min(.999999,Number(rewardRoll)))
+    : Math.random();
+
+  let pulito=0,sporco=0,multa=0;
+  if(successo){
+    const min=Number(STRADA_INGRESSO.min[step-1]||120);
+    const max=Number(STRADA_INGRESSO.max[step-1]||240);
+    const grezzo=Math.round(min+(max-min)*rr);
+    pulito=Math.round(grezzo*.4);
+    sporco=grezzo-pulito;
+    G.money=Number(G.money||0)+pulito;
+    s.sporchi=Number(s.sporchi||0)+sporco;
+    s.rep=clamp(Number(s.rep||0)+(step===1?1:2),0,100);
+    s.heat=clamp(Number(s.heat||0)+Number(STRADA_INGRESSO.heatSuccesso[step-1]||2),0,100);
+  }else{
+    multa=Math.round(Number(STRADA_INGRESSO.min[step-1]||120)*.45);
+    G.money=Math.max(0,Number(G.money||0)-multa);
+    s.heat=clamp(Number(s.heat||0)+Number(STRADA_INGRESSO.heatFallimento[step-1]||4),0,100);
+    /* Regola esplicita del punto 1: nessun precedente e nessuna detenzione
+       durante l'ingresso. Il fallimento resta reale tramite soldi/heat. */
+  }
+
+  s.ingressoTentativi=Math.max(Number(s.ingressoTentativi||0),step);
+  s.ingressoPending=null;
+  const sbloccato=s.ingressoTentativi>=STRADA_INGRESSO.colpiRichiesti;
+  if(sbloccato){
+    s.badgeSbloccato=true;
+    s.ingressoFase="unlocked";
+    s.giroAvviato=true;
+    s.ingressoSbloccatoAbsoluteDay=stradaAbsDay();
+  }else{
+    s.ingressoFase="contact";
+    s.ingressoNextOfferAbsoluteDay=stradaAbsDay()+STRADA_INGRESSO.cooldownTraColpiGiorni;
+  }
+
+  if(typeof diarioBordo==="function") diarioBordo().colpi++;
+  if(typeof pushLog==="function"){
+    const nome=proposta.persona||s.ingressoPersonaNome||"Un contatto";
+    pushLog(
+      successo
+        ? "<b>"+nome+"</b>: il favore è andato bene. "+fmt(pulito)+" € puliti e "+fmt(sporco)+" € sporchi."
+        : "<b>"+nome+"</b>: il favore è saltato. Hai perso "+fmt(multa)+" € e attirato attenzione, ma non sei finito dentro.",
+      successo?"good":""
+    );
+    if(sbloccato)
+      pushLog("<b>Attività criminali sbloccate.</b> Adesso sai dove andare e con chi parlare.", "big");
+  }
+  if(typeof save==="function") save();
+  return {
+    ok:true,
+    success:successo,
+    step,
+    unlocked:sbloccato,
+    personId:proposta.personId||s.ingressoPersonaId,
+    persona:proposta.persona||s.ingressoPersonaNome,
+    energia,
+    pulito,
+    sporco,
+    multa,
+    heat:Number(s.heat||0)
+  };
 }
 
 function stradaOpportunitaStato(){
@@ -578,7 +822,7 @@ function stradaTenta(colpoId, approccioId){
   if(approccio.serveUomo && s.uomini <= 0){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve avere almeno un uomo con te."); return; }
   if(approccio.serveFerro && !s.ferro){ STRADA_SCENA = stScenaAvviso(colpo, "Ti serve il ferro, e non ce l'hai ancora."); return; }
 
-  s.giroAvviato=true;
+  if(stradaAttivitaSbloccate()) s.giroAvviato=true;
   G.energy -= colpo.energia;
   const opportunita = stradaOpportunitaAttiva(colpoId);
   const leadLavoro = !opportunita && window.ADF_WORK_EVENTS &&
@@ -641,8 +885,15 @@ function stradaTenta(colpoId, approccioId){
           "tu sei rientrato pulito, lui no. Un uomo in meno." + notaLeadFallita,
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
+      const ingressoProtetto = !stradaAttivitaSbloccate();
       const primaVolta = s.precedenti === 0 && approccio.id !== "ferro" && colpo.difficolta <= .3;
-      if(primaVolta && Math.random() < .6){
+      if(ingressoProtetto){
+        const multa = Math.max(40, Math.round(colpo.min * .45));
+        G.money = Math.max(0, G.money - multa);
+        STRADA_SCENA = {k:"Com'è andata", titolo:"Saltato, ma sei fuori", testo:"<b>" + colpo.n + "</b> è saltato. " +
+            "Perdi " + fmt(multa) + " € e attiri attenzione, ma in questa fase nessuno ha abbastanza per mandarti dentro." + notaLeadFallita,
+          opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
+      }else if(primaVolta && Math.random() < .6){
         const multa = Math.round(colpo.min * .8);
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
