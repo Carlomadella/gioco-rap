@@ -202,6 +202,15 @@ altri): due giorni ogni ciclo di quattro settimane, chiesti almeno il giorno pri
 di ferie non è un turno e non è un'assenza, copre la quota del contratto senza malus e non si
 sovrappone agli straordinari. «Ferie in Fabbrica» in `05-carriera-e-tempo.md`.
 
+**FATTO (02/10/2026)** — **Pizzeria v1 chiusa**: contratto part-time da 4 servizi,
+carriera lenta fino a Pizzaiolo, ferie mensili, disciplina dedicata, eventi per ruolo e di
+cucina, coperture narrative, rete persistente a maggioranza non musicale, contatti normali
+(cliente abituale, rider, fornitore), dialoghi ricorrenti, micro-storyline brevi e
+autopromozione contestuale su musica già pubblicata. L'anti-farming della rete è limitato
+alla Pizzeria e usa rendimenti per-persona decrescenti; i playtest dedicati coprono 24
+servizi, landscape mobile e il flusso musica → spostamento → conflitto Agenda → turno.
+Le espansioni narrative ulteriori restano evoluzione futura, non requisito della v1.
+
 **Manca**:
 
 - l'energia che cresce col livello, e livelli che vogliano dire qualcosa — *«L'energia
