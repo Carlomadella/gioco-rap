@@ -15,11 +15,12 @@ function helperStradaFabbrica(){
   const cfgEnd = source.indexOf("/* ==================== LA SCENA IN CORSO", cfgStart);
   const giroStart = source.indexOf("function stradaGiroAvviato(){");
   const chanceStart = source.indexOf("function stradaChance", giroStart);
+  const chanceEnd = source.indexOf("function stradaLavaggioStato", chanceStart);
 
-  if(cfgStart < 0 || cfgEnd < 0 || giroStart < 0 || chanceStart < 0)
+  if(cfgStart < 0 || cfgEnd < 0 || giroStart < 0 || chanceStart < 0 || chanceEnd < 0)
     throw new Error("helper proposta Fabbrica/Strada non trovato");
 
-  return source.slice(cfgStart, cfgEnd) + "\n" + source.slice(giroStart, chanceStart);
+  return source.slice(cfgStart, cfgEnd) + "\n" + source.slice(giroStart, chanceEnd);
 }
 
 function contestoStrada(overrides = {}){
@@ -58,6 +59,7 @@ function contestoStrada(overrides = {}){
     Math,
     Array,
     Set,
+    clamp:(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0)),
     lavoroLuogo: job => job && job.place || null,
     pushLog:(msg, cls) => logs.push({msg, cls})
   };
@@ -100,15 +102,106 @@ describe("Fabbrica × Strada", () => {
     });
 
     const proposta = vm.runInContext("stradaTentaPropostaFabbrica(0,0)", ctx);
+    expect(proposta.id).toBe("giro-breve");
     expect(proposta.colpoId).toBe("consegne");
-    expect(proposta.bonusPct).toBe(20);
-    expect(proposta.extraHeat).toBe(2);
+    expect(proposta.bonusPct).toBe(15);
+    expect(proposta.chanceDelta).toBeCloseTo(.08);
+    expect(proposta.successHeat).toBe(1);
+    expect(proposta.failureHeat).toBe(2);
+    expect(proposta.successRep).toBe(1);
+    expect(proposta.failureRep).toBe(-1);
 
     const attiva = vm.runInContext("stradaAccettaPropostaFabbrica()", ctx);
     expect(attiva.status).toBe("active");
     expect(attiva.expiresAbsoluteDay).toBe(12);
     expect(G.strada.fabbricaLead.pending).toBeNull();
     expect(G.strada.fabbricaLead.active.colpoId).toBe("consegne");
+  });
+
+  it("usa un pool generale ampio e non lega le offerte alla mansione", () => {
+    const {ctx} = contestoStrada({
+      strada:{
+        rep:60,heat:5,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{
+          lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]
+        }
+      }
+    });
+
+    const pool = vm.runInContext("STRADA_OPPORTUNITA.map(x=>({id:x.id,colpoId:x.colpoId,minRep:x.minRep}))", ctx);
+    expect(pool).toHaveLength(10);
+    expect(new Set(pool.map(x=>x.colpoId))).toEqual(new Set(["consegne","scotta","cassa","macchina"]));
+
+    const testo = vm.runInContext("stradaDescriviOpportunita(STRADA_OPPORTUNITA[0])", ctx);
+    expect(testo).toContain("guadagno");
+    expect(testo).toContain("riuscita");
+    expect(testo).toContain("attenzione");
+    expect(testo).toContain("reputazione");
+  });
+
+  it("evita di riproporre subito la stessa opportunità", () => {
+    const {ctx,G} = contestoStrada({
+      strada:{
+        rep:30,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{
+          lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]
+        }
+      }
+    });
+
+    const prima=vm.runInContext("stradaTentaPropostaFabbrica(0,0)",ctx);
+    expect(prima.id).toBe("giro-breve");
+    vm.runInContext("stradaRifiutaPropostaFabbrica()",ctx);
+
+    G.week=3; G.day=5;
+    const seconda=vm.runInContext("stradaTentaPropostaFabbrica(0,0)",ctx);
+    expect(seconda.id).not.toBe(prima.id);
+    expect(G.strada.crimeOpportunity.recentIds).toContain(prima.id);
+  });
+
+  it("i modificatori cambiano davvero riuscita e conseguenze del colpo", () => {
+    const {ctx} = contestoStrada({
+      strada:{
+        rep:20,heat:0,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{
+          lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]
+        }
+      }
+    });
+
+    const base=vm.runInContext(`
+      stradaChance(
+        {difficolta:.30},
+        {riuscita:0}
+      )
+    `,ctx);
+    const conBonus=vm.runInContext(`
+      stradaChanceConOpportunita(
+        {difficolta:.30},
+        {riuscita:0},
+        {chanceDelta:.10}
+      )
+    `,ctx);
+    expect(conBonus).toBeCloseTo(base+.10);
+
+    const successo=vm.runInContext(`
+      stradaEffettiOpportunita({
+        source:"street-opportunity",bonusPct:40,
+        successHeat:4,failureHeat:7,successRep:4,failureRep:-3
+      },true)
+    `,ctx);
+    const fallimento=vm.runInContext(`
+      stradaEffettiOpportunita({
+        source:"street-opportunity",bonusPct:40,
+        successHeat:4,failureHeat:7,successRep:4,failureRep:-3
+      },false)
+    `,ctx);
+
+    expect(successo).toEqual({bonusPct:40,heatDelta:4,repDelta:4});
+    expect(fallimento).toEqual({bonusPct:40,heatDelta:7,repDelta:-3});
   });
 
   it("rifiutare non dà effetti ma applica il cooldown di 14 giorni", () => {
@@ -176,7 +269,7 @@ describe("Fabbrica × Strada", () => {
     G.day = 6; // giorno assoluto 13, oltre la scadenza 12
     expect(vm.runInContext("stradaAggiornaPropostaFabbrica(false)", ctx)).toBeNull();
     expect(G.strada.fabbricaLead.active).toBeNull();
-    expect(logs.some(x => x.msg.includes("proposta fuori dalla Fabbrica è scaduta"))).toBe(true);
+    expect(logs.some(x => x.msg.includes("opportunità della Strada è scaduta"))).toBe(true);
   });
 
   it("collega popup fuori dal cancello, timer e bonus al colpo reale", () => {
@@ -186,16 +279,23 @@ describe("Fabbrica × Strada", () => {
 
     expect(eventi).toContain("function adfFactoryStreetAfterShift()");
     expect(eventi).toContain('k:"Fuori dalla Fabbrica"');
-    expect(eventi).toContain('t:"Ti aspetta al cancello"');
+    expect(eventi).toContain('n:"Sentiamo"');
+    expect(eventi).toContain("function adfFactoryStreetDecision(proposta)");
+    expect(eventi).toContain('n:"Accetta"');
     expect(eventi).toContain('claimAutoEvent("factory-street")');
     expect(eventi).toContain("stradaAggiornaPropostaFabbrica(false)");
     expect(eventi).toContain('const streetShown = a.id==="turno" && !overtimeShown');
     expect(eventi).toContain("!overtimeShown && !streetShown && !workFamilyShown && !contactShown");
+    expect(eventi).toContain("Il lavoro non c'entra: è semplicemente dove vi siete incrociati.");
 
-    expect(strada).toContain("moltiplicatoreLead");
-    expect(strada).toContain("rumoreLead");
-    expect(strada).toContain('"Dritta fuori dalla Fabbrica"');
-    expect(strada).toContain("stradaConsumaPropostaFabbrica(colpoId, successo)");
+    expect(strada).toContain("const STRADA_OPPORTUNITA = Object.freeze([");
+    expect(strada).toContain("stradaChanceConOpportunita");
+    expect(strada).toContain("stradaEffettiOpportunita");
+    expect(strada).toContain("successRep");
+    expect(strada).toContain("failureRep");
+    expect(strada).toContain("successHeat");
+    expect(strada).toContain("failureHeat");
+    expect(strada).toContain("stradaConsumaOpportunita(colpoId, successo)");
     expect(stato).toContain("fabbricaLead:{lastCheckAbsoluteDay:null");
   });
 });
