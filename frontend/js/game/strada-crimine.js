@@ -1346,6 +1346,18 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
           (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
         s.precedenti++;
+        if(approccio.id==="ferro" && s.ferro){
+          const ferroSt=stradaFerroStato();
+          s.ferro=false;
+          ferroSt.history.push({
+            status:"seized-on-crime",
+            sourcePersonId:ferroSt.sourcePersonId||null,
+            sourceName:ferroSt.sourceName||null,
+            closedAbsoluteDay:stradaAbsDay()
+          });
+          if(ferroSt.history.length>12) ferroSt.history.shift();
+          ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
+        }
         s.arresto = {settimane:settimane, colpo:colpo.n};
         STRADA_SCENA = {k:"Com'è andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
@@ -1913,6 +1925,7 @@ function stradaSettimana(){
         closedAbsoluteDay:stradaAbsDay()
       });
       if(ferroSt.history.length>12) ferroSt.history.shift();
+      ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
       const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
       s.precedenti++; s.arresto = {settimane:settimane, colpo:"perquisizione"};
       pushLog("<b>Controllo alle sei del mattino.</b> Trovano il ferro: viene sequestrato e la situazione diventa penale.", "bad");
