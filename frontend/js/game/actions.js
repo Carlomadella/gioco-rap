@@ -1779,9 +1779,23 @@ function lavoroDeltaFaticaSettimanale(turni){
 function lavoroAggiornaFaticaSettimanale(turni){
   const n=Math.max(0,Math.floor(Number(turni)||0));
   const prima=lavoroFaticaCorrente();
-  const dopo=clamp(prima+lavoroDeltaFaticaSettimanale(n),0,100);
+
+  /* Il recupero settimanale evita che il contratto normale 5/5 diventi,
+     da solo, una condanna inevitabile dopo qualche mese. A cinque turni la
+     fatica si assesta sotto la soglia del malus globale; il 6° e 7° turno,
+     invece, accumulano più in fretta di quanto il weekend riesca a smaltire.
+     Se torni a un ritmo normale dopo un periodo pesante, il residuo scende
+     gradualmente: il sovraccarico lungo resta una conseguenza, non un flag. */
+  const recupero=Math.round(prima*.25);
+  const dopo=clamp(prima+lavoroDeltaFaticaSettimanale(n)-recupero,0,100);
   G.workFatigue=dopo;
-  return {turni:n,prima:prima,dopo:dopo,delta:dopo-prima};
+  return {
+    turni:n,
+    prima:prima,
+    dopo:dopo,
+    delta:dopo-prima,
+    recupero:recupero
+  };
 }
 
 function lavoroQualitaFattore(turni,fatica){
