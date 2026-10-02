@@ -70,7 +70,7 @@ describe("MakeHuman mobile separato dal desktop",()=>{
     const pagina=leggi("pagine/gioco.html");
     const bridge=pagina.indexOf("js/creator/rpg-v24-bridge.js");
     const mobile=pagina.indexOf("js/mobile/makehuman-mobile.js");
-    const ingresso=pagina.indexOf("js/gioco-ingresso.js");
+    const ingresso=pagina.indexOf('<script src="js/gioco-ingresso.js');
 
     expect(bridge).toBeGreaterThan(-1);
     expect(mobile).toBeGreaterThan(bridge);
