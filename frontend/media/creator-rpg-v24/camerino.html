@@ -1699,6 +1699,18 @@ let initializedByParent = false;
 let currentSource = null;
 let previewOnlyMode = false;
 
+function isMobileLandscapeRoom(){
+  return !!(
+    window.matchMedia &&
+    window.matchMedia('(orientation:landscape) and (max-width:980px) and (max-height:520px)').matches
+  );
+}
+
+/* Nel camerino mobile l'avatar arriva da un editor che mostra già il corpo
+   intero: qui il controllo utile di default è il volto. Sul desktop conserviamo
+   la vista intera storica. */
+let currentView = isMobileLandscapeRoom() ? 'face' : 'full';
+
 let renderer, scene, camera, controls, avatarRoot = null;
 let bones = {}, rest = {};
 let currentUrl = '';
@@ -1791,7 +1803,7 @@ function initViewer(){
   if(typeof ResizeObserver !== 'undefined'){
     const viewerResizeObserver = new ResizeObserver(()=>{
       resize();
-      if(avatarRoot) fitFull();
+      if(avatarRoot) applyRoomView(currentView,{syncButtons:false});
     });
     viewerResizeObserver.observe(viewer);
   }
@@ -1915,6 +1927,14 @@ function applyRoomVisualCenter(){
 
   camera.clearViewOffset?.();
 
+  /* In mobile landscape il canvas occupa già soltanto la metà libera a sinistra
+     della sidebar. Applicare anche il viewOffset calcolato sul viewport intero
+     spostava una seconda volta l'avatar verso sinistra. */
+  if(isMobileLandscapeRoom()){
+    camera.updateProjectionMatrix();
+    return;
+  }
+
   const sidebar=document.querySelector('.room-tools');
   if(!sidebar){
     camera.updateProjectionMatrix();
@@ -1996,6 +2016,25 @@ function fitFace({visualCenter=true}={}){
     camera.updateProjectionMatrix();
   }
   controls.update();
+}
+
+function syncViewButtons(){
+  document.querySelectorAll('[data-view]').forEach(btn=>{
+    btn.classList.toggle('on',btn.dataset.view===currentView);
+  });
+}
+
+function applyRoomView(view,{syncButtons=true}={}){
+  currentView=view==='face' ? 'face' : 'full';
+  if(syncButtons) syncViewButtons();
+  if(!avatarRoot) return;
+  currentView==='face' ? fitFace() : fitFull();
+}
+
+function applyDefaultRoomView(){
+  currentView=isMobileLandscapeRoom() ? 'face' : 'full';
+  syncViewButtons();
+  if(avatarRoot) applyRoomView(currentView,{syncButtons:false});
 }
 
 /* ADF_AVATURN_DETERMINISTIC_PROPIC_V1
@@ -2154,7 +2193,7 @@ async function loadAvatar(data,force=false){
     avatarDot.classList.add('ok');
     avatarMeta.textContent=[currentSource==='local'?'Locale':(currentSource==='avaturn'?'Avaturn':'Avatar'),data.gender||'',data.bodyId||'',data.avatarId?'ID salvato':''].filter(Boolean).join(' · ') || 'Avatar pronto';
     statusTop.textContent=(currentSource==='local' ? 'LOCALE' : (currentSource==='avaturn' ? 'AVATURN' : 'AVATAR'))+' · avatar pronto · camerino';
-    fitFull();
+    applyDefaultRoomView();
   },undefined,err=>{
     if(loadGeneration!==avatarLoadGeneration) return;
     console.error(err);
@@ -2294,14 +2333,14 @@ document.addEventListener('keydown',e=>{
 
 document.querySelectorAll('[data-view]').forEach(btn=>{
   btn.onclick=()=>{
-    document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('on',x===btn));
-    btn.dataset.view==='face' ? fitFace() : fitFull();
+    applyRoomView(btn.dataset.view);
   };
 });
 
 $('resetCamera').onclick=()=>{
-  document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('on',x.dataset.view==='full'));
-  fitFull();
+  /* "Centra" mantiene l'inquadratura scelta: su mobile non deve riportare
+     automaticamente alla figura intera. */
+  applyRoomView(currentView);
 };
 
 function optionHtml(items, current){
@@ -2411,7 +2450,7 @@ function applyParentInit(msg){
     resize();
     requestAnimationFrame(()=>{
       resize();
-      if(avatarRoot) fitFull();
+      if(avatarRoot) applyRoomView(currentView);
     });
   });
   roomMode=msg.mode==='edit' ? 'edit' : 'new';
@@ -2497,6 +2536,7 @@ window.addEventListener('message',e=>{
   }
 });
 
+syncViewButtons();
 initViewer();
 resetRoomVisual();
 window.parent.postMessage({type:'adf-avatar-room-ready'},'*');
