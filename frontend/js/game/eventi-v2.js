@@ -2553,7 +2553,7 @@ function adfStreetIntroDecision(proposta){
           return {
             t:out.success
               ? "Il favore va a buon fine. <b>"+(out.persona||"Il contatto")+" ti mette in mano un TrapPhone</b>: da ora le cose che non passano faccia a faccia arrivano lì. <b>Attività criminali è comparso sulla mappa.</b>"
-              : "Il favore salta e ti costa, ma non finisci dentro. <b>"+(out.persona||"Il contatto")+" ti consegna comunque un TrapPhone</b>: ormai sei dentro abbastanza da ricevere le dritta. <b>Attività criminali è comparso sulla mappa.</b>",
+              : "Il favore salta e ti costa, ma non finisci dentro. <b>"+(out.persona||"Il contatto")+" ti consegna comunque un TrapPhone</b>: ormai sei dentro abbastanza da ricevere le dritte. <b>Attività criminali è comparso sulla mappa.</b>",
             c:out.success?"good":"bad"
           };
         }
