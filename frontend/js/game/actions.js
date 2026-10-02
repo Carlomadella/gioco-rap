@@ -270,13 +270,16 @@ const ADF_PIZZERIA_CARRIERA = Object.freeze({
     cicliPerfettiNelRuolo:2
   }),
   disciplina:Object.freeze({
+    /* Part-time: una singola assenza pesa, ma non deve trasformare la Pizzeria
+       in una Fabbrica in miniatura. Il licenziamento arriva solo dopo una
+       recidiva chiara; un ciclo perfetto recupera rapidamente un richiamo. */
     assenzeLieveMax:1,
     assenzeRichiamoMin:2,
-    richiamiPrimaLicenziamento:2,
+    richiamiPrimaLicenziamento:3,
     bloccoRiassunzioneSettimane:4,
     recuperoRichiamoCicliPerfetti:1,
-    malusLieveAffidabilita:4,
-    malusRichiamoAffidabilita:8
+    malusLieveAffidabilita:2,
+    malusRichiamoAffidabilita:6
   }),
   straordinari:Object.freeze({
     /* Le coperture extra devono esistere, non dominare il part-time. */

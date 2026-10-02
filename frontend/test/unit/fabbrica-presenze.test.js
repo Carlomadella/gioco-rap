@@ -1683,7 +1683,7 @@ describe("Pizzeria strutturata", () => {
     expect(paga.etichetta).toBe("5° giorno");
   });
 
-  it("due assenze su quattro generano il richiamo Pizzeria e -8 affidabilità", () => {
+  it("due assenze su quattro generano il richiamo Pizzeria e -6 affidabilità", () => {
     const ctx = ctxBase({day:7});
     vm.runInContext(`
       G.workplaces = {
@@ -1702,7 +1702,7 @@ describe("Pizzeria strutturata", () => {
     expect(out.warningAdded).toBe(1);
     expect(out.dismissed).toBe(false);
     expect(vm.runInContext('lavoroCarriera("pizzeria").warnings', ctx)).toBe(1);
-    expect(vm.runInContext('lavoroCarriera("pizzeria").reliability', ctx)).toBe(42);
+    expect(vm.runInContext('lavoroCarriera("pizzeria").reliability', ctx)).toBe(44);
   });
 
   it("un ciclo 4/4 perfetto Pizzeria vale +8 affidabilità", () => {
