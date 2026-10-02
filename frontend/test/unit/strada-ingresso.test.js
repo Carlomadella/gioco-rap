@@ -41,7 +41,17 @@ function contesto(overrides={}){
     window:{},
     STRADA_FERRO_REP_MIN:20,
     STRADA_FERRO_FIDUCIA_MIN:50,
-    STRADA_FERRO_COSTO:1200
+    STRADA_FERRO_COSTO:1200,
+    STRADA_PROT:[
+      {n:"Nessuna",costo:0},
+      {n:"Occhi in giro",costo:260},
+      {n:"Uomini fissi",costo:620},
+      {n:"Scorta",costo:1450}
+    ],
+    STRADA_AVVOCATO_COSTO:320,
+    renderStrada:()=>{},
+    renderGioco:()=>{},
+    stToast:()=>{}
   };
   vm.createContext(ctx);
   vm.runInContext(helperIngresso(),ctx);
@@ -311,6 +321,97 @@ describe("Strada · ingresso nascosto",()=>{
     expect(eventi).toContain("adfStreetFerroAfterAction");
     expect(eventi).toContain("stradaAccettaFerro()");
     expect(eventi).toContain("TRAPHONE16.receiveStorySms");
+  });
+
+  it("la protezione richiede una persona reale abbastanza fidata e paga la prima settimana subito",()=>{
+    const {ctx,G}=contesto({
+      money:2000,
+      gente:[{id:"p1",n:"Luca",ruolo:"collega",via:false,
+        strada:{known:true,key:"intro:p1",sources:["intro"],opportunityIds:[],fiducia:55,colpiInsieme:2}}],
+      strada:{
+        rep:30,heat:0,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,badgeSbloccato:true,
+        protezioneStato:{providerPersonId:null,providerName:null,level:0,source:null,prepaidWeekKey:null,history:[]}
+      }
+    });
+    const out=vm.runInContext('stImpostaProtezione(2,"p1")',ctx);
+    expect(out).toContain("Luca");
+    expect(G.strada.prot).toBe(2);
+    expect(G.strada.protezioneStato.providerPersonId).toBe("p1");
+    expect(G.strada.protezioneStato.providerName).toBe("Luca");
+    expect(G.strada.protezioneStato.source).toBe("trusted-contact");
+    expect(G.strada.protezioneStato.prepaidWeekKey).toBe("1-1");
+    expect(G.money).toBe(1380);
+  });
+
+  it("senza reputazione o fiducia non puoi attivare protezione avanzata",()=>{
+    const {ctx,G}=contesto({
+      money:5000,
+      gente:[{id:"p1",n:"Luca",ruolo:"strada",via:false,
+        strada:{known:true,key:"street:luca",sources:[],opportunityIds:[],fiducia:49,colpiInsieme:2}}],
+      strada:{
+        rep:24,heat:0,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,badgeSbloccato:true,
+        protezioneStato:{providerPersonId:null,providerName:null,level:0,source:null,prepaidWeekKey:null,history:[]}
+      }
+    });
+    const out=vm.runInContext('stImpostaProtezione(2,"p1")',ctx);
+    expect(out).toContain("nome non gira ancora abbastanza");
+    expect(G.strada.prot).toBe(0);
+    G.strada.rep=30;
+    const out2=vm.runInContext('stImpostaProtezione(2,"p1")',ctx);
+    expect(out2).toContain("Non hai una persona");
+    expect(G.strada.prot).toBe(0);
+  });
+
+  it("l'avvocato privato è una persona conosciuta e non un toggle",()=>{
+    const {ctx,G}=contesto({
+      money:1000,
+      gente:[{id:"law1",n:"Avv. Riva",ruolo:"avvocato",via:false,rel:2,pt:0}],
+      strada:{
+        rep:15,heat:0,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,badgeSbloccato:true,
+        avvocatoStato:{personId:null,name:null,retained:false,source:null,prepaidWeekKey:null,history:[]}
+      }
+    });
+    expect(vm.runInContext("stradaAvvocatiConosciuti().map(p=>p.id)",ctx)).toEqual(["law1"]);
+    const out=vm.runInContext('stIncaricaAvvocato("law1")',ctx);
+    expect(out).toContain("Avv. Riva");
+    expect(G.strada.avvocato).toBe(true);
+    expect(G.strada.avvocatoStato.personId).toBe("law1");
+    expect(G.strada.avvocatoStato.name).toBe("Avv. Riva");
+    expect(G.strada.avvocatoStato.source).toBe("relationship");
+    expect(G.strada.avvocatoStato.prepaidWeekKey).toBe("1-1");
+    expect(G.gente[0].numero).toBe(true);
+    expect(G.money).toBe(680);
+  });
+
+  it("protezione e avvocato legacy vengono migrati senza sparire",()=>{
+    const {ctx,G}=contesto();
+    G.strada.prot=2;
+    G.strada.avvocato=true;
+    delete G.strada.protezioneStato;
+    delete G.strada.avvocatoStato;
+    expect(vm.runInContext("stradaProtezioneStato().source",ctx)).toBe("legacy");
+    expect(vm.runInContext("stradaAvvocatoStato().source",ctx)).toBe("legacy");
+    expect(G.strada.prot).toBe(2);
+    expect(G.strada.avvocato).toBe(true);
+  });
+
+  it("UI e carcere non usano più protezione o avvocato come shop istantanei",()=>{
+    const strada=leggi("js/game/strada-crimine.js");
+    const posto=leggi("js/game/posto.js");
+    const circolo=leggi("js/game/circolo-stanze.js");
+    expect(strada).toContain("function stScenaProtezione()");
+    expect(strada).toContain("function stScenaAvvocato()");
+    expect(strada).toContain("difensore d'ufficio");
+    expect(strada).toContain("Math.random()<.35");
+    expect(strada).toContain("Il primo costo si paga subito");
+    expect(strada).not.toContain('stImpostaProtezione((G.strada.prot + 1) % STRADA_PROT.length)');
+    expect(strada).not.toContain('G.strada.avvocato = !G.strada.avvocato');
+    expect(posto).toContain('avvocato: {n:"Avvocato"');
+    expect(posto).toContain('p.ruolo!=="avvocato"');
+    expect(circolo).toContain("avvocato:{aperto:");
   });
 
   it("hub e colpo rapido rispettano lo stesso gate",()=>{

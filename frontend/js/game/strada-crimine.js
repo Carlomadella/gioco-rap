@@ -81,7 +81,7 @@ const STRADA_ATTIVITA = [
 const STRADA_PROT = [
   {n:"Nessuna", costo:0},
   {n:"Occhi in giro", costo:260},
-  {n:"Uomini fissi", costo:620},
+  {n:"Presenza fissa", costo:620},
   {n:"Scorta", costo:1450}
 ];
 
@@ -527,6 +527,202 @@ function stradaPersonaSquadra(id){
 function stradaBonusFiduciaSquadra(p){
   if(!p) return 0;
   return clamp(stradaFiduciaValore(p)/100*.10,.03,.10);
+}
+
+const STRADA_PROTEZIONE_REQ = Object.freeze([
+  Object.freeze({rep:0,fiducia:0}),
+  Object.freeze({rep:8,fiducia:25}),
+  Object.freeze({rep:25,fiducia:50}),
+  Object.freeze({rep:45,fiducia:75})
+]);
+const STRADA_AVVOCATO_REL_MIN = 2;
+
+function stradaWeekKey(){
+  return String(Number(G.year||1))+"-"+String(Number(G.week||1));
+}
+
+function stradaProtezioneStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.protezioneStato || typeof s.protezioneStato!=="object"){
+    s.protezioneStato={
+      providerPersonId:null,providerName:null,level:Number(s.prot||0),
+      source:Number(s.prot||0)>0?"legacy":null,prepaidWeekKey:null,history:[]
+    };
+  }
+  const st=s.protezioneStato;
+  if(!Array.isArray(st.history)) st.history=[];
+  if(Number(s.prot||0)>0 && !st.source){
+    st.level=Number(s.prot||0);
+    st.source="legacy";
+  }
+  st.level=Number(s.prot||0);
+  return st;
+}
+
+function stradaProtezioneProvider(livello){
+  const req=STRADA_PROTEZIONE_REQ[livello];
+  if(!req || livello<=0 || Number(G.strada&&G.strada.rep||0)<req.rep) return null;
+  return (G.gente||[])
+    .filter(p=>p && !p.via && p.strada && p.strada.known &&
+      stradaFiduciaValore(p)>=req.fiducia)
+    .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
+      Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0))[0] || null;
+}
+
+function stradaProtezioneDisponibile(livello,personId){
+  const req=STRADA_PROTEZIONE_REQ[livello];
+  if(!req || livello<=0) return null;
+  if(Number(G.strada&&G.strada.rep||0)<req.rep) return null;
+  const p=personId ? stradaPersonaDaId(personId) : stradaProtezioneProvider(livello);
+  if(!p || !p.strada || !p.strada.known || stradaFiduciaValore(p)<req.fiducia) return null;
+  return p;
+}
+
+function stradaAvvocatoStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.avvocatoStato || typeof s.avvocatoStato!=="object"){
+    s.avvocatoStato={
+      personId:null,name:null,retained:!!s.avvocato,
+      source:s.avvocato?"legacy":null,prepaidWeekKey:null,history:[]
+    };
+  }
+  const st=s.avvocatoStato;
+  if(!Array.isArray(st.history)) st.history=[];
+  if(s.avvocato && !st.retained){
+    st.retained=true;
+    st.source=st.source||"legacy";
+  }
+  s.avvocato=!!st.retained;
+  return st;
+}
+
+function stradaHaAvvocatoPrivato(){
+  return stradaAvvocatoStato().retained===true;
+}
+
+function stradaAvvocatiConosciuti(){
+  return (G.gente||[])
+    .filter(p=>p && !p.via && p.ruolo==="avvocato" &&
+      Number(p.rel||0)>=STRADA_AVVOCATO_REL_MIN)
+    .sort((a,b)=>Number(b.rel||0)-Number(a.rel||0) || Number(b.pt||0)-Number(a.pt||0));
+}
+
+function stImpostaProtezione(livello,personId){
+  const s=G.strada,st=stradaProtezioneStato();
+  livello=clamp(Number(livello)||0,0,STRADA_PROT.length-1);
+  if(livello===0){
+    if(st.providerPersonId){
+      const old=stradaPersonaDaId(st.providerPersonId);
+      if(old) stradaModificaFiducia(old,-1,"protezione-chiusa");
+    }
+    st.history.push({status:"closed",level:Number(s.prot||0),providerPersonId:st.providerPersonId||null,
+      providerName:st.providerName||null,absoluteDay:stradaAbsDay()});
+    if(st.history.length>12)st.history.shift();
+    s.prot=0;st.level=0;st.providerPersonId=null;st.providerName=null;st.source=null;st.prepaidWeekKey=null;
+    save();renderStrada();renderGioco();
+    return "Hai chiuso l'accordo di protezione.";
+  }
+
+  const p=stradaProtezioneDisponibile(livello,personId);
+  const req=STRADA_PROTEZIONE_REQ[livello];
+  if(!p){
+    if(Number(s.rep||0)<req.rep) return "Il tuo nome non gira ancora abbastanza per questo tipo di copertura.";
+    return "Non hai una persona che si fidi abbastanza da garantirti questa copertura.";
+  }
+  const costo=Number(STRADA_PROT[livello].costo||0);
+  if(Number(G.money||0)<costo) return "Ti servono "+fmt(costo)+" € per coprire la prima settimana dell'accordo.";
+
+  G.money-=costo;
+  s.prot=livello;
+  st.level=livello;
+  st.providerPersonId=p.id;
+  st.providerName=p.n;
+  st.source="trusted-contact";
+  st.prepaidWeekKey=stradaWeekKey();
+  st.history.push({status:"started",level:livello,providerPersonId:p.id,providerName:p.n,
+    absoluteDay:stradaAbsDay(),cost:costo});
+  if(st.history.length>12)st.history.shift();
+  stradaModificaFiducia(p,1,"protezione-accordo");
+  save();renderStrada();renderGioco();
+  return p.n+" ti copre con «"+STRADA_PROT[livello].n+"». Prima settimana pagata: "+fmt(costo)+" €.";
+}
+
+function stScenaProtezione(){
+  const s=G.strada,st=stradaProtezioneStato();
+  const opts=[];
+  if(Number(s.prot||0)>0){
+    opts.push({n:"Chiudi l'accordo",d:(st.providerName?"Con "+st.providerName+" · ":"")+"rinunci alla copertura",hot:true,
+      run(){const t=stImpostaProtezione(0);STRADA_SCENA=null;stToast(t);}});
+  }
+  for(let livello=1;livello<STRADA_PROT.length;livello++){
+    const p=stradaProtezioneProvider(livello),req=STRADA_PROTEZIONE_REQ[livello],cfg=STRADA_PROT[livello];
+    opts.push({
+      n:cfg.n,
+      d:p ? p.n+" · "+fmt(cfg.costo)+" €/sett." :
+        "Serve rep "+req.rep+" e una persona con fiducia "+req.fiducia,
+      no:!p || Number(G.money||0)<Number(cfg.costo||0),
+      run(){
+        const t=stImpostaProtezione(livello,p&&p.id);
+        STRADA_SCENA=null;stToast(t);
+      }
+    });
+  }
+  opts.push({n:"Torna indietro",d:"Non cambi niente",run(){STRADA_SCENA=null;}});
+  return {k:"Chi ti copre",titolo:"Protezione",testo:"La copertura non è un interruttore: qualcuno deve mettere il proprio nome e la propria rete dietro di te. Il primo costo si paga subito.",opts};
+}
+
+function stIncaricaAvvocato(personId){
+  const s=G.strada,st=stradaAvvocatoStato();
+  if(st.retained) return "Hai già un avvocato privato.";
+  const p=(G.gente||[]).find(x=>x&&x.id===personId&&!x.via&&x.ruolo==="avvocato")||null;
+  if(!p || Number(p.rel||0)<STRADA_AVVOCATO_REL_MIN)
+    return "Con questo avvocato non hai ancora un rapporto abbastanza solido.";
+  if(Number(G.money||0)<STRADA_AVVOCATO_COSTO)
+    return "Ti servono "+fmt(STRADA_AVVOCATO_COSTO)+" € per la prima settimana.";
+
+  G.money-=STRADA_AVVOCATO_COSTO;
+  s.avvocato=true;
+  st.personId=p.id;st.name=p.n;st.retained=true;st.source="relationship";st.prepaidWeekKey=stradaWeekKey();
+  st.history.push({status:"retained",personId:p.id,name:p.n,absoluteDay:stradaAbsDay(),cost:STRADA_AVVOCATO_COSTO});
+  if(st.history.length>12)st.history.shift();
+  p.numero=true;
+  p.circoloSbloccato=true;
+  save();renderStrada();renderGioco();
+  return p.n+" è diventato il tuo avvocato. Prima settimana pagata: "+fmt(STRADA_AVVOCATO_COSTO)+" €.";
+}
+
+function stRevocaAvvocato(){
+  const s=G.strada,st=stradaAvvocatoStato();
+  if(!st.retained) return "Non hai un avvocato privato da revocare.";
+  st.history.push({status:"revoked",personId:st.personId||null,name:st.name||null,absoluteDay:stradaAbsDay()});
+  if(st.history.length>12)st.history.shift();
+  s.avvocato=false;st.retained=false;st.prepaidWeekKey=null;
+  save();renderStrada();renderGioco();
+  return "Hai chiuso l'incarico con "+(st.name||"il tuo avvocato")+".";
+}
+
+function stScenaAvvocato(){
+  const st=stradaAvvocatoStato();
+  if(st.retained){
+    return {k:"Legale",titolo:st.name||"Avvocato privato",
+      testo:"È il tuo legale di fiducia. Il rapporto esiste perché lo hai conosciuto e incaricato, non perché hai acceso un bonus.",
+      opts:[
+        {n:"Mantieni l'incarico",d:fmt(STRADA_AVVOCATO_COSTO)+" €/sett.",run(){STRADA_SCENA=null;}},
+        {n:"Chiudi l'incarico",d:"Resterai con la difesa d'ufficio in caso di arresto",hot:true,
+          run(){const t=stRevocaAvvocato();STRADA_SCENA=null;stToast(t);}}
+      ]};
+  }
+  const candidati=stradaAvvocatiConosciuti();
+  return {k:"Legale",titolo:"Avvocato",
+    testo:candidati.length
+      ? "Conosci qualcuno abbastanza bene da potergli affidare stabilmente i tuoi problemi legali."
+      : "Se finisci dentro hai comunque un difensore d'ufficio. Per avere un legale tuo devi prima conoscere davvero un avvocato nel mondo.",
+    opts:[
+      ...candidati.map(p=>({n:"Incarica "+p.n,d:"Rapporto "+Number(p.rel||0)+" · "+fmt(STRADA_AVVOCATO_COSTO)+" €/sett.",
+        no:Number(G.money||0)<STRADA_AVVOCATO_COSTO,
+        run(){const t=stIncaricaAvvocato(p.id);STRADA_SCENA=null;stToast(t);}})),
+      {n:"Torna indietro",d:"Non cambi niente",run(){STRADA_SCENA=null;}}
+    ]};
 }
 
 function stradaFerroStato(){
@@ -1344,7 +1540,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId){
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
-          (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
+          (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
         s.precedenti++;
         if(approccio.id==="ferro" && s.ferro){
           const ferroSt=stradaFerroStato();
@@ -1422,13 +1618,6 @@ function stAssumiUomo(){
 function stLicenziaUomo(){
   return "Le persone del giro non sono un organico da licenziare: i rapporti cambiano attraverso quello che succede fra voi.";
 }
-function stImpostaProtezione(livello){
-  G.strada.prot = clamp(livello, 0, STRADA_PROT.length - 1);
-  save(); renderStrada(); renderGioco();
-  const p = STRADA_PROT[G.strada.prot];
-  return G.strada.prot === 0 ? "Niente protezione: da qui in poi sei scoperto."
-    : "Protezione: " + p.n.toLowerCase() + ", " + fmt(p.costo) + " €/sett.";
-}
 function stCompraFerro(){
   if(G.strada.ferro) return "Il ferro ce l'hai già.";
   const st=stradaFerroStato();
@@ -1440,10 +1629,7 @@ function stCompraFerro(){
   return "Non è merce da scaffale. Se "+p.n+" decide di aprirti quella porta, la proposta arriverà sul TrapPhone.";
 }
 function stToggleAvvocato(){
-  G.strada.avvocato = !G.strada.avvocato;
-  save(); renderStrada(); renderGioco();
-  return G.strada.avvocato ? "Avvocato preso: " + fmt(STRADA_AVVOCATO_COSTO) + " €/sett."
-    : "Avvocato mandato via.";
+  return "L'avvocato non è più un toggle: devi conoscerne uno e affidargli davvero l'incarico.";
 }
 function stCompraAttivita(id){
   const a = STRADA_ATTIVITA.find(x => x.id === id);
@@ -1587,7 +1773,7 @@ const CARCERE_EVENTI = [
      {n:"Contesti il rapporto",d:"Se reggi la versione eviti la sanzione, altrimenti peggiora",
       run(){const p=(G.skills&&Number(G.skills.presenza))||0;if(p>=35||Math.random()<.42){carcereLuc(1);return {t:"Il rapporto non regge abbastanza per toglierti il cortile. Lucidità +1.",c:"good"};}const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+4;G.wellbeing=clamp(G.wellbeing-3,0,100);return {t:"Hai contestato e non è servito: quattro giorni senza ora d'aria, benessere -3.",c:"bad"};}},
      {n:"Fai intervenire il legale",d:"Il legale riduce il danno amministrativo",
-      when:()=>!!G.strada.avvocato,
+      when:()=>stradaHaAvvocatoPrivato(),
       run(){const c=carcereStato();c.airBlockedUntil=carcereSerialeGiorno()+1;carcereLuc(2);return {t:"Il legale riduce la sanzione a un giorno senza ora d'aria. Lucidità +2.",c:"good"};}}
    ]},
   {id:"jail_high_quando_esci",n:"Ti aspettano quando esci",cat:"high",tier:"high",weight:1,minDays:21,minRep:35,minWeeks:3,once:true,
@@ -1634,7 +1820,7 @@ function carcereCtx(){
   const c=carcereStato(),s=G.strada,a=s&&s.arresto;
   return {state:c,street:s,arrest:a,day:carcereSerialeGiorno(),days:c?Math.max(0,carcereSerialeGiorno()-c.startedDay):0,
     weeks:a?Math.max(0,Number(a.settimane)||0):0,rep:s?Number(s.rep)||0:0,precedents:s?Number(s.precedenti)||0:0,
-    fans:Number(G.fans)||0,lawyer:!!(s&&s.avvocato)};
+    fans:Number(G.fans)||0,lawyer:stradaHaAvvocatoPrivato()};
 }
 function carcereEligible(e,ctx){
   if(e.minDays!=null&&ctx.days<e.minDays)return false;
@@ -1759,7 +1945,8 @@ function carcereAzioni(){
   const s=G.strada,a=s.arresto,pending=!!c.pendingHigh;
   let rem=9999;try{if(typeof GAME_TIME!=="undefined")rem=GAME_TIME.remaining();}catch(_){}
   const airDays=carcereAirDays(c),ariaUsata=!!c.daily.aria,giroUsato=!!c.weekly.giro;
-  const legaleNoSoldi=!s.avvocato&&Number(G.money)<STRADA_AVVOCATO_COSTO,legaleFine=(Number(a.settimane)||0)<=1;
+  const privato=stradaHaAvvocatoPrivato(),avvSt=stradaAvvocatoStato();
+  const legaleFine=(Number(a.settimane)||0)<=1;
   return [
     {id:"aria",n:"Ora d'aria",d:"60 min · recuperi un po' di testa e benessere",
      disabled:pending||airDays>0||ariaUsata||rem<60,
@@ -1767,10 +1954,12 @@ function carcereAzioni(){
     {id:"giro",n:"Parla con il giro",d:"45 min · una volta a settimana · reputazione di strada",
      disabled:pending||giroUsato||rem<45,
      reason:pending?"Decisione in sospeso":giroUsato?"Già fatto questa settimana":rem<45?"Troppo tardi oggi":""},
-    {id:"avvocato",n:s.avvocato?"Parla con l'avvocato":"Chiama un avvocato",
-     d:(s.avvocato?"30 min · ricorso incluso nell'incarico":"30 min · 320 € per incaricarlo")+" · può togliere 1 settimana",
-     disabled:pending||!!c.ricorsoUsato||legaleNoSoldi||legaleFine||rem<30,
-     reason:pending?"Decisione in sospeso":c.ricorsoUsato?"Ricorso già usato in questa detenzione":legaleNoSoldi?"Non hai 320 €":legaleFine?"Ti resta solo 1 settimana":rem<30?"Troppo tardi oggi":""}
+    {id:"avvocato",n:privato?"Parla con "+(avvSt.name||"il tuo avvocato"):"Parla col difensore d'ufficio",
+     d:privato
+       ?"30 min · il tuo legale prova il ricorso · esito affidabile"
+       :"30 min · gratuito · può tentare un riesame, ma senza garanzie",
+     disabled:pending||!!c.ricorsoUsato||legaleFine||rem<30,
+     reason:pending?"Decisione in sospeso":c.ricorsoUsato?"Ricorso già usato in questa detenzione":legaleFine?"Ti resta solo 1 settimana":rem<30?"Troppo tardi oggi":""}
   ];
 }
 function carcereAzione(id){
@@ -1796,14 +1985,23 @@ function carcereAzione(id){
   if(id==="avvocato"){
     if(c.ricorsoUsato)return {ok:false,t:"Hai già usato il ricorso in questa detenzione."};
     if((Number(a.settimane)||0)<=1)return {ok:false,t:"Con una sola settimana residua non c'è più margine per il ricorso."};
-    if(!s.avvocato&&Number(G.money)<STRADA_AVVOCATO_COSTO)return {ok:false,t:"Ti servono "+STRADA_AVVOCATO_COSTO+" € per incaricare l'avvocato."};
     const tempo=carcereTempo(30,id);if(!tempo.ok)return tempo;
-    if(!s.avvocato){G.money-=STRADA_AVVOCATO_COSTO;s.avvocato=true;}
-    a.settimane=Math.max(1,(Number(a.settimane)||1)-1);c.ricorsoUsato=true;carcereLuc(2);
-    const t="Il legale ottiene una revisione: 1 settimana in meno sulla pena residua. Lucidità +2.";
-    carcereRegistra("azione_avvocato","Parla con l'avvocato",t,"azione");
-    if(typeof pushLog==="function")pushLog("<b>Dal carcere: ricorso accolto.</b> Una settimana in meno.","good");
-    carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"good"};
+    const privato=stradaHaAvvocatoPrivato(),avvSt=stradaAvvocatoStato();
+    const accolto=privato || Math.random()<.35;
+    c.ricorsoUsato=true;
+    if(accolto){
+      a.settimane=Math.max(1,(Number(a.settimane)||1)-1);carcereLuc(privato?2:1);
+      const t=privato
+        ? (avvSt.name||"Il tuo avvocato")+" ottiene una revisione: 1 settimana in meno sulla pena residua. Lucidità +2."
+        : "Il difensore d'ufficio riesce a ottenere il riesame: 1 settimana in meno. Lucidità +1.";
+      carcereRegistra("azione_avvocato",privato?"Avvocato privato":"Difensore d'ufficio",t,"azione");
+      if(typeof pushLog==="function")pushLog("<b>Dal carcere: ricorso accolto.</b> Una settimana in meno.","good");
+      carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"good"};
+    }
+    carcereLuc(-1);
+    const t="Il difensore d'ufficio presenta il riesame, ma viene respinto. La pena non cambia. Lucidità -1.";
+    carcereRegistra("azione_avvocato","Difensore d'ufficio",t,"azione");
+    carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:"bad"};
   }
   return {ok:false,t:"Azione carcere sconosciuta."};
 }
@@ -1832,12 +2030,30 @@ function stradaSettimana(){
     const persi = Math.round(G.fans * rnd(.06, .13));
     if(persi > 0){ G.fans = Math.max(0, G.fans - persi); pushLog(fmt(persi) + " fan spariti mentre eri dentro.", "bad"); }
     G.hype = clamp(G.hype * .72, 0, (typeof hypeCap==="function"?hypeCap():100));
-    /* dentro si paga di più: l'avvocato, i pacchi, le telefonate, sopra alle
-       spese di fuori che advanceWeek() ha già tolto. Prima non lo diceva
-       nessuno e il resoconto ne mostrava una sola (giro del 27/09, voce 61) */
+    /* Il legale privato resta un incarico vero anche mentre sei dentro.
+       La protezione esterna resta invece sospesa come prima. */
+    const avvStDentro=stradaAvvocatoStato();
+    if(avvStDentro.retained){
+      if(avvStDentro.prepaidWeekKey===stradaWeekKey()){
+        avvStDentro.prepaidWeekKey=null;
+      }else if(Number(G.money||0)>=STRADA_AVVOCATO_COSTO){
+        G.money-=STRADA_AVVOCATO_COSTO;
+      }else{
+        const legale=avvStDentro.personId?(G.gente||[]).find(p=>p&&p.id===avvStDentro.personId&&!p.via):null;
+        if(legale) legale.rel=Math.max(0,Number(legale.rel||0)-1);
+        s.avvocato=false;avvStDentro.retained=false;avvStDentro.prepaidWeekKey=null;
+        avvStDentro.history.push({status:"unpaid-in-jail",personId:avvStDentro.personId||null,
+          name:avvStDentro.name||null,absoluteDay:stradaAbsDay()});
+        if(avvStDentro.history.length>12)avvStDentro.history.shift();
+        pushLog("<b>Il legale privato ha lasciato l'incarico.</b> Da ora ti segue il difensore d'ufficio.", "bad");
+      }
+    }
+
+    /* Dentro si paga comunque di più per pacchi, telefonate e gestione della
+       vita fuori; il legale privato è contabilizzato separatamente sopra. */
     const dentro = Math.round(weeklyCosts() * .6);
     G.money -= dentro;
-    pushLog("Da dentro costa: <b>−" + fmt(dentro) + " €</b> fra avvocato, pacchi e telefonate, oltre alle spese di fuori.", "bad");
+    pushLog("Da dentro costa: <b>−" + fmt(dentro) + " €</b> fra pacchi, telefonate e spese extra, oltre alle spese di fuori.", "bad");
     if(G.contract && Math.random() < .20){
       pushLog("<b>L'etichetta ha rescisso.</b> I giornali ci sono andati pesante.", "bad");
       G.contract = null;
@@ -1875,27 +2091,58 @@ function stradaSettimana(){
     s.sporchi += Math.round(a.resa * .55);
   }
 
-  /* Dal punto 4 gli uomini numerici non vengono più comprati/usati come crew.
-     Restano nel save solo per compatibilità fino al punto 6 e non costano più.
-     Protezione e avvocato mantengono invece la loro logica attuale. */
-  if(s.prot > 0){
-    const costoProt = STRADA_PROT[s.prot].costo;
-    if(G.money >= costoProt) G.money -= costoProt;
-    else{
-      s.prot = 0;
-      pushLog("<b>Protezione saltata.</b> Non avevi abbastanza per pagarla questa settimana.", "bad");
+  /* Punto 6: protezione e avvocato sono accordi con persone reali.
+     La prima settimana viene pagata al momento dell'accordo e non viene
+     addebitata due volte alla chiusura della stessa settimana. */
+  const protSt=stradaProtezioneStato();
+  if(s.prot>0){
+    const provider=protSt.providerPersonId?stradaPersonaDaId(protSt.providerPersonId):null;
+    const legacy=protSt.source==="legacy";
+    if(!legacy && (!provider || provider.via)){
+      protSt.history.push({status:"provider-lost",level:Number(s.prot||0),absoluteDay:stradaAbsDay()});
+      if(protSt.history.length>12)protSt.history.shift();
+      s.prot=0;protSt.level=0;protSt.providerPersonId=null;protSt.providerName=null;protSt.source=null;protSt.prepaidWeekKey=null;
+      pushLog("<b>Protezione saltata.</b> La persona che garantiva per te non c'è più.", "bad");
+    }else if(protSt.prepaidWeekKey===stradaWeekKey()){
+      protSt.prepaidWeekKey=null;
+    }else{
+      const costoProt=Number(STRADA_PROT[s.prot].costo||0);
+      if(Number(G.money||0)>=costoProt) G.money-=costoProt;
+      else{
+        if(provider) stradaModificaFiducia(provider,-5,"protezione-non-pagata");
+        protSt.history.push({status:"unpaid",level:Number(s.prot||0),providerPersonId:protSt.providerPersonId||null,
+          providerName:protSt.providerName||null,absoluteDay:stradaAbsDay()});
+        if(protSt.history.length>12)protSt.history.shift();
+        s.prot=0;protSt.level=0;protSt.providerPersonId=null;protSt.providerName=null;protSt.source=null;protSt.prepaidWeekKey=null;
+        pushLog("<b>Protezione saltata.</b> Non avevi abbastanza per pagarla questa settimana.", "bad");
+      }
     }
   }
-  if(s.avvocato){
-    if(G.money >= STRADA_AVVOCATO_COSTO) G.money -= STRADA_AVVOCATO_COSTO;
-    else{
-      s.avvocato = false;
+
+  const avvSt=stradaAvvocatoStato();
+  if(avvSt.retained){
+    const legale=avvSt.personId?(G.gente||[]).find(p=>p&&p.id===avvSt.personId&&!p.via):null;
+    const legacy=avvSt.source==="legacy";
+    if(!legacy && !legale){
+      s.avvocato=false;avvSt.retained=false;avvSt.prepaidWeekKey=null;
+      avvSt.history.push({status:"lost-contact",personId:avvSt.personId||null,name:avvSt.name||null,absoluteDay:stradaAbsDay()});
+      if(avvSt.history.length>12)avvSt.history.shift();
+      pushLog("<b>Il tuo avvocato non è più disponibile.</b> In caso di arresto torni alla difesa d'ufficio.", "bad");
+    }else if(avvSt.prepaidWeekKey===stradaWeekKey()){
+      avvSt.prepaidWeekKey=null;
+    }else if(Number(G.money||0)>=STRADA_AVVOCATO_COSTO){
+      G.money-=STRADA_AVVOCATO_COSTO;
+    }else{
+      s.avvocato=false;avvSt.retained=false;avvSt.prepaidWeekKey=null;
+      if(legale) legale.rel=Math.max(0,Number(legale.rel||0)-1);
+      avvSt.history.push({status:"unpaid",personId:avvSt.personId||null,name:avvSt.name||null,absoluteDay:stradaAbsDay()});
+      if(avvSt.history.length>12)avvSt.history.shift();
       pushLog("<b>L'avvocato si è tirato indietro.</b> La parcella non era coperta.", "bad");
     }
   }
 
-  /* attenzione: scende ~6% a settimana, ~12% con l'avvocato */
-  s.heat = clamp(s.heat * (1 - (s.avvocato ? .12 : .06)), 0, 100);
+  /* attenzione: scende ~6% a settimana, ~12% con un avvocato privato */
+  s.heat = clamp(s.heat * (1 - (stradaHaAvvocatoPrivato() ? .12 : .06)), 0, 100);
   /* la reputazione si sgonfia un po' se non ti fai vedere */
   s.rep = clamp(s.rep - .6, 0, 100);
 
@@ -1926,7 +2173,7 @@ function stradaSettimana(){
       });
       if(ferroSt.history.length>12) ferroSt.history.shift();
       ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
-      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (s.avvocato ? .55 : 1)));
+      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
       s.precedenti++; s.arresto = {settimane:settimane, colpo:"perquisizione"};
       pushLog("<b>Controllo alle sei del mattino.</b> Trovano il ferro: viene sequestrato e la situazione diventa penale.", "bad");
     }else pushLog("Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.", "");
@@ -2105,9 +2352,9 @@ function stOcchiAddosso(){
 }
 function stCopertura(){
   const s = G.strada;
-  /* Gli uomini numerici sono solo compatibilità legacy fino al punto 6:
-     non sono più una copertura acquistabile né un costo invisibile. */
-  return STRADA_PROT[s.prot].costo + (s.avvocato ? STRADA_AVVOCATO_COSTO : 0);
+  /* Gli uomini numerici sono solo compatibilità legacy e non costano più.
+     Qui mostriamo solo gli accordi realmente attivi. */
+  return STRADA_PROT[s.prot].costo + (stradaHaAvvocatoPrivato() ? STRADA_AVVOCATO_COSTO : 0);
 }
 
 /* ---- la testata e la colonna di sinistra ---- */
@@ -2209,9 +2456,12 @@ function renderStColpi(){
 function renderStCopre(){
   const s = G.strada;
   const prot = STRADA_PROT[s.prot];
+  const protSt=stradaProtezioneStato();
+  const avvSt=stradaAvvocatoStato();
   const contatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
   const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const avvConosciuti=stradaAvvocatiConosciuti();
   $("st-tab-copre").innerHTML =
     '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ')</strong>' +
       '<span>' + (fidati.length
@@ -2225,8 +2475,11 @@ function renderStCopre(){
       '</div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
-      '<span>Riduce il rischio quando la zona si scalda.</span></div>' +
-      '<div class="pills"><button class="pill' + (s.prot > 0 ? " on" : "") + '" data-stprot>' + prot.n + '</button></div></div>' +
+      '<span>' + (s.prot>0
+        ? (protSt.providerName ? protSt.providerName+' garantisce per te · ' : '') + fmt(prot.costo) + ' €/sett.'
+        : 'Non si attiva da sola: serve qualcuno del giro disposto a metterci il proprio nome.') + '</span></div>' +
+      '<div class="pills"><button class="pill' + (s.prot > 0 ? " on" : "") + '" data-stprot>' +
+      (s.prot>0 ? prot.n : "Gestisci") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Il ferro</strong>' +
       '<span>' + (s.ferro
@@ -2236,15 +2489,19 @@ function renderStCopre(){
       (s.ferro ? "Ce l\'hai" : "Serve un contatto") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Avvocato</strong>' +
-      '<span>' + fmt(STRADA_AVVOCATO_COSTO) + ' €/sett. · l\'attenzione cala più in fretta.</span></div>' +
-      '<div class="pills"><button class="pill' + (s.avvocato ? " on" : "") + '" data-stavvocato>' +
-      (s.avvocato ? "Ce l'hai" : "Prendilo") + '</button></div></div>' +
+      '<span>' + (avvSt.retained
+        ? (avvSt.name||"Avvocato privato") + ' · ' + fmt(STRADA_AVVOCATO_COSTO) + ' €/sett.'
+        : avvConosciuti.length
+          ? 'Conosci un legale abbastanza bene da potergli affidare l\'incarico.'
+          : 'Di base hai solo la difesa d\'ufficio. Un legale privato va prima conosciuto nel mondo.') + '</span></div>' +
+      '<div class="pills"><button class="pill' + (avvSt.retained ? " on" : "") + '" data-stavvocato>' +
+      (avvSt.retained ? "Gestisci" : avvConosciuti.length ? "Incarica" : "Serve un contatto") + '</button></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Costo copertura</strong>' +
-      '<span>Quello che ti esce di tasca ogni settimana.</span></div>' +
+      '<span>Quello che ti esce di tasca ogni settimana per gli accordi attivi.</span></div>' +
       '<div class="pills"><span class="pill on">' + fmt(stCopertura()) + ' €/sett.</span></div></div>' +
 
-    '<div class="street-note">Nel giro non compri sicurezza. Compri solo qualche minuto in più prima che qualcosa vada storto.</div>';
+    '<div class="street-note">Nel giro non compri sicurezza. Compri relazioni, favori e persone disposte a esporsi per te.</div>';
 }
 
 function renderStAttivita(){
@@ -2335,10 +2592,12 @@ $("st-tab-copre").addEventListener("click", ev => {
   const uomo = ev.target.closest("[data-stuomo]");
   if(uomo){ hubTap(); stToast(uomo.dataset.stuomo === "piu" ? stAssumiUomo() : stLicenziaUomo()); return; }
   if(ev.target.closest("[data-stprot]")){
-    hubTap(); stToast(stImpostaProtezione((G.strada.prot + 1) % STRADA_PROT.length)); return;
+    hubTap(); STRADA_SCENA=stScenaProtezione(); renderStScheda(); return;
   }
   if(ev.target.closest("[data-stferro]")){ hubTap(); stToast(stCompraFerro()); return; }
-  if(ev.target.closest("[data-stavvocato]")){ hubTap(); stToast(stToggleAvvocato()); return; }
+  if(ev.target.closest("[data-stavvocato]")){
+    hubTap(); STRADA_SCENA=stScenaAvvocato(); renderStScheda(); return;
+  }
 });
 
 $("st-tab-attivita").addEventListener("click", ev => {

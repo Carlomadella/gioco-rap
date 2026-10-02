@@ -154,7 +154,9 @@ const POSTO_RUOLI = {
   collega: {n:"Collega", k:"#94A3B8",
     d:"Una persona conosciuta sul posto di lavoro. Non è per forza dentro alla musica."},
   strada: {n:"Conoscenza della Strada", k:"#F97316",
-    d:"Una persona legata al giro della Strada. Compare solo se quel giro lo hai già avviato."}
+    d:"Una persona legata al giro della Strada. Compare solo se quel giro lo hai già avviato."},
+  avvocato: {n:"Avvocato", k:"#E2E8F0",
+    d:"Un professionista che può diventare il tuo legale di fiducia. Conoscerlo non significa automaticamente averlo a libro paga."}
 };
 
 const POSTO_NOMI = {
@@ -168,7 +170,8 @@ const POSTO_NOMI = {
   fornitore: ["Stefano", "Mauro", "Claudia", "Fabio", "Enzo", "Lucia"],
   rider: ["Leo", "Sam", "Noemi", "Teo", "Miki", "Ari"],
   collega: ["Luca", "Marco", "Simo", "Vale", "Ale", "Marta", "Nico", "Sara"],
-  strada: ["Cobra", "Lupo", "Moro", "Zero", "Nox", "Rami"]
+  strada: ["Cobra", "Lupo", "Moro", "Zero", "Nox", "Rami"],
+  avvocato: ["Avv. Ferri", "Avv. Riva", "Avv. Sala", "Avv. Conti", "Avv. Greco", "Avv. Villa"]
 };
 
 const CARATTERI = [
@@ -499,8 +502,8 @@ function nuovaPersona(ruolo){
   /* punto 65: un'età vera, non un numero a caso — i fonici e i giornalisti
      sono il mestiere di chi ha già fatto qualche anno di gavetta, gli altri
      due partono dalla stessa fascia del giocatore */
-  const etaMin = {fonico:26, giornalista:28, videomaker:22}[ruolo] || 18;
-  const etaMax = {fonico:52, giornalista:58, videomaker:45}[ruolo] || 32;
+  const etaMin = {fonico:26, giornalista:28, videomaker:22, avvocato:30}[ruolo] || 18;
+  const etaMax = {fonico:52, giornalista:58, videomaker:45, avvocato:62}[ruolo] || 32;
   return {
     id: "p" + Math.floor(Math.random() * 1e9),
     ruolo: ruolo,
@@ -631,7 +634,9 @@ function genteDellaSala(){
   /* Punto 3: dal conteggio generativo escludiamo in più i contatti Strada già
      scoperti. Possono comunque comparire in presentiOggi(): semplicemente non
      sostituiscono beatmaker/rapper/fonici che sistemaGente deve garantire. */
-  return genteBaseDellaSala().filter(p => !(p.strada && p.strada.known));
+  return genteBaseDellaSala().filter(p =>
+    !(p.strada && p.strada.known) && p.ruolo!=="avvocato"
+  );
 }
 function sistemaGente(){
   if(!G.gente) G.gente = [];
@@ -649,6 +654,24 @@ function sistemaGente(){
     else if(n >= 4 && POSTO_RUOLI.giornalista.da(G) &&
        !G.gente.some(p => p.ruolo === "giornalista")) r = "giornalista";
     G.gente.push(nuovaPersona(r));
+  }
+
+  /* Punto Strada 6: il legale privato è una persona del mondo, non un toggle.
+     Dopo essere entrato davvero nella Strada e aver costruito un minimo di
+     reputazione, può comparire una volta al Circolo senza rubare slot al cast
+     musicale. Conoscerlo non equivale ancora ad assumerlo. */
+  const puoConoscereLegale=!!(G.strada&&G.strada.badgeSbloccato) &&
+    (Number(G.strada.rep||0)>=8 || Number(G.strada.precedenti||0)>0);
+  if(puoConoscereLegale && !G.gente.some(p=>p&&p.ruolo==="avvocato"&&!p.via)){
+    const legale=nuovaPersona("avvocato");
+    legale.origine="circolo";
+    legale.origineLuogo=null;
+    legale.origineDettaglio="conosciuto al Circolo";
+    legale.storia="Vi siete conosciuti al Circolo, fuori dal contesto di un arresto.";
+    legale.circoloSbloccato=true;
+    legale.numero=false;
+    legale.numDa=null;
+    G.gente.push(legale);
   }
 }
 
