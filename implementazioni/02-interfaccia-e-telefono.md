@@ -3010,3 +3010,19 @@ controllo nuovo nell'audit.
 Con la regola del 02/10 «mobile isolato dal desktop», arrivata mentre la pagina si faceva, quello che
 serve solo al telefono (sotto i 760 punti: card una per riga, titolo e atmosfera in pila) sta nel modulo
 mobile `frontend/css/circolo-bancone-mobile.css`, non nel foglio condiviso.
+
+### Correzione dopo il primo test reale
+
+**TEST FALLITO (02/10/2026)** — la prima versione è andata comunque in timeout a **2:01**.
+La causa era nel relay mobile: il keepalive veniva acceso solo quando una fase conteneva
+`targets.bin`. Il runtime MakeHuman, però, prima passa da body, resources e cataloghi; su
+rete mobile anche una di quelle fetch può restare silenziosa oltre i 120 secondi del
+watchdog condiviso.
+
+**CORRETTO (02/10/2026)** — nell'avvio rapido mobile il relay parte con `quick=1` e tiene
+vivo l'intero bootstrap ogni 10 secondi, senza dipendere dal nome della risorsa corrente.
+Il keepalive prosegue anche dopo `adf-makehuman-ready`, perché a quel punto deve ancora
+essere applicato e renderizzato il preset; si ferma solo su risultato o errore del preset.
+Dopo sei minuti il percorso mobile produce un errore esplicito. Il desktop non usa
+`quick=1` e non è stato modificato.
+
