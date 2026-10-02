@@ -31,6 +31,21 @@ test("landscape mobile: landing e hub restano utilizzabili al tocco", async ({ p
   await expect(page.locator(".pspot").first()).toBeVisible();
 });
 
+test("landscape mobile: landing termina alla barra e mostra copyright minimale", async ({ page }) => {
+  await page.goto("/pagine/landing.html");
+
+  await expect(page.locator("#s-menu > .menu")).toBeHidden();
+  await expect(page.locator(".land-mobile-copy")).toBeVisible();
+  await expect(page.locator(".land-mobile-copy")).toHaveText("© 2026 La Fame Studio");
+
+  const continua = page.locator("#m-play");
+  const dock = page.locator(".land-dock");
+  const [continuaBox, dockBox] = await Promise.all([continua.boundingBox(), dock.boundingBox()]);
+  expect(continuaBox).not.toBeNull();
+  expect(dockBox).not.toBeNull();
+  expect(continuaBox.bottom).toBeLessThanOrEqual(dockBox.top + 1);
+});
+
 test("landscape mobile: il suggerimento di rotazione non copre il gioco", async ({ page }) => {
   await page.goto("/pagine/landing.html");
   await page.waitForFunction(() => window.ADF_MOBILE_ORIENTATION_HINT);
