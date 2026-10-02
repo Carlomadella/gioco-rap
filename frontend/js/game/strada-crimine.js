@@ -317,6 +317,17 @@ function stradaOpportunitaStato(){
   if(!Array.isArray(st.recentIds)) st.recentIds=[];
   if(!st.lastCheckByTrigger || typeof st.lastCheckByTrigger!=="object")
     st.lastCheckByTrigger={};
+  /* Migrazione UNA SOLA VOLTA del vecchio contatore giornaliero. Prima veniva
+     reinterpretato a ogni tentativo: un check "mondo" fallito aggiornava
+     lastCheckAbsoluteDay e il successivo check Fabbrica dello stesso giorno
+     sembrava falsamente un dato legacy, bruciando la seconda occasione. */
+  if(st.triggerChecksMigrated!==true){
+    if(st.lastCheckAbsoluteDay!=null &&
+       st.lastCheckByTrigger.fabbrica==null &&
+       st.lastCheckByTrigger.mondo==null)
+      st.lastCheckByTrigger.fabbrica=Number(st.lastCheckAbsoluteDay);
+    st.triggerChecksMigrated=true;
+  }
   if(st.nextOfferAbsoluteDay==null && st.lastOfferAbsoluteDay!=null)
     st.nextOfferAbsoluteDay=Number(st.lastOfferAbsoluteDay)+Number(STRADA_FABBRICA_LEAD.cooldownGiorni||14);
   /* alias legacy finché tutti i salvataggi non sono passati dal nuovo runtime */
@@ -389,9 +400,6 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
 
   /* Ogni contesto può controllare una volta al giorno: fallire il roll del
      mondo al mattino non deve bruciare la chance Fabbrica della sera. */
-  if(trigger==="fabbrica" && st.lastCheckByTrigger[trigger]==null &&
-     st.lastCheckAbsoluteDay!=null)
-    st.lastCheckByTrigger[trigger]=Number(st.lastCheckAbsoluteDay);
   if(Number(st.lastCheckByTrigger[trigger])===oggi) return null;
   st.lastCheckByTrigger[trigger]=oggi;
   st.lastCheckAbsoluteDay=oggi; /* alias legacy */
