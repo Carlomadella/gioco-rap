@@ -12,16 +12,21 @@ test.use({
 test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async ({ page }) => {
   let richiestaRelay = "";
 
-  await page.route(
-    /\/media\/makehuman-mobile-v1\/index\.html(?:\?.*)?$/,
-    async route => {
-      richiestaRelay = route.request().url();
-      await route.fulfill({
-        status: 200,
-        contentType: "text/html; charset=utf-8",
-        body: "<!doctype html><html><body>relay mobile intercettato dal test</body></html>"
-      });
+  page.on("request", request => {
+    if(request.url().includes("/media/makehuman-mobile-v1/index.html?v=3")){
+      richiestaRelay = request.url();
     }
+  });
+
+  /* Il relay mobile gira davvero; blocchiamo soltanto il camerino pesante che
+     il relay contiene, così il test non scarica il modello/targets. */
+  await page.route(
+    /\/media\/makehuman-camerino-v1\/index\.html(?:\?.*)?$/,
+    route => route.fulfill({
+      status: 200,
+      contentType: "text/html; charset=utf-8",
+      body: "<!doctype html><html><body>MakeHuman pesante sostituito dal test</body></html>"
+    })
   );
 
   await page.goto("/pagine/gioco.html?nuova=rapido");
@@ -29,7 +34,7 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
   await page.waitForFunction(() =>
     window.ADF_MAKEHUMAN_MOBILE?.attivo === true &&
     window.ADF_MAKEHUMAN_MOBILE?.quick === true &&
-    window.ADF_MAKEHUMAN_MOBILE?.watchdog === "top-level-v3"
+    window.ADF_MAKEHUMAN_MOBILE?.watchdog === "top-level-v4-relay-ping"
   );
 
   const creator = page.frameLocator("#adf-rpg-v24-frame");

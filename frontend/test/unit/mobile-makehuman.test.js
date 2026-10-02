@@ -61,14 +61,17 @@ describe("MakeHuman mobile separato dal desktop",()=>{
 
     expect(mobile).toContain("HEARTBEAT_MS=10000");
     expect(mobile).toContain("QUICK_MAX_MS=360000");
-    expect(mobile).toContain('watchdog:"top-level-v3"');
-    expect(mobile).toContain('new MessageEvent("message"');
-    expect(mobile).toContain('source:frame.contentWindow');
+    expect(mobile).toContain('watchdog:"top-level-v4-relay-ping"');
+    expect(mobile).toContain('type:"adf-mobile-watchdog-ping"');
+    expect(mobile).toContain('editor.contentWindow.postMessage');
+    expect(mobile).not.toContain('new MessageEvent("message"');
     expect(mobile).toContain('"adf-rpg-v24-quick-makehuman-progress"');
     expect(mobile).toContain('"adf-rpg-v24-quick-makehuman-error"');
 
     expect(relay).toContain("../makehuman-camerino-v1/index.html?v=mobile-3");
     expect(relay).not.toContain("setInterval");
+    expect(relay).toContain('msg.type==="adf-mobile-watchdog-ping"');
+    expect(relay).toContain('event.source===parent.parent');
     expect(relay).not.toContain("BOOTSTRAP_HEARTBEAT_MS");
     expect(relay).not.toContain("QUICK_MAX_MS");
   });

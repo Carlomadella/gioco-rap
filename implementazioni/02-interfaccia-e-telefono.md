@@ -3043,3 +3043,10 @@ sorgente logica del creator; dopo sei minuti emette l'errore mobile esplicito. I
 `media/makehuman-mobile-v1/index.html` non contiene più timer: inoltra soltanto i messaggi
 fra creator e camerino. Il desktop continua a uscire subito dal modulo mobile e non cambia.
 
+**CORREZIONE DEL CONTROLLO DIRETTO (02/10/2026)** — per mantenere il percorso desktop
+intatto non è stato aggiunto nessun hook a `creator.html`. Il timer top-level manda invece
+un ping al relay mobile `localEditorFrame`; il relay genera un normale
+`adf-makehuman-progress` verso il creator, che usa il suo inoltro già esistente. Il test
+Playwright esegue il relay vero e sostituisce soltanto il camerino MakeHuman pesante con una
+pagina vuota: così verifica il percorso completo del keepalive senza scaricare i 145 MB.
+

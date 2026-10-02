@@ -31,6 +31,29 @@ iframe{display:block;width:100%;height:100%;border:0;background:#050609}
   });
 
   window.addEventListener("message",event=>{
+    const msg=event.data||{};
+
+    /* Ping del watchdog che vive nella pagina visibile. Questo relay e' il
+       localEditorFrame reale: rimandando il messaggio al creator da qui,
+       creator.html lo vede con la stessa source di un progresso MakeHuman. */
+    if(
+      msg.type==="adf-mobile-watchdog-ping" &&
+      event.source===parent.parent
+    ){
+      if(msg.kind==="error"){
+        parent.postMessage({
+          type:"adf-makehuman-quick-preset-error",
+          message:String(msg.message||"")
+        },"*");
+      }else{
+        parent.postMessage({
+          type:"adf-makehuman-progress",
+          message:String(msg.message||"")
+        },"*");
+      }
+      return;
+    }
+
     if(event.source===parent){
       if(innerCaricato){
         try{ inner.contentWindow.postMessage(event.data,"*"); }catch(e){}

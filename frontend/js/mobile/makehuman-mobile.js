@@ -51,22 +51,25 @@
     watchdogFrame=null;
   }
 
-  function eventoDalCreator(frame,type,message,extra={}){
-    if(!frame?.contentWindow) return false;
+  function pingRelayMobile(frame,kind,message){
+    try{
+      const doc=frame?.contentDocument;
+      const editor=doc?.getElementById("localEditorFrame");
+      if(!editor?.contentWindow) return false;
 
-    const ev=new MessageEvent("message",{
-      data:{
-        type,
-        message,
-        mobileHeartbeat:true,
-        ...extra
-      },
-      origin:location.origin,
-      source:frame.contentWindow
-    });
-
-    window.dispatchEvent(ev);
-    return true;
+      /* Il timer resta nel documento principale visibile; il messaggio passa
+         però dal relay mobile reale. Così creator.html riceve un vero evento
+         con source === localEditorFrame.contentWindow e lo rilancia al gioco
+         con source === frame.contentWindow, esattamente come MakeHuman. */
+      editor.contentWindow.postMessage({
+        type:"adf-mobile-watchdog-ping",
+        kind,
+        message
+      },"*");
+      return true;
+    }catch(e){
+      return false;
+    }
   }
 
   function avviaWatchdog(frame){
@@ -85,18 +88,18 @@
       }
 
       if(Date.now()-watchdogStart>=QUICK_MAX_MS){
-        eventoDalCreator(
+        pingRelayMobile(
           watchdogFrame,
-          "adf-rpg-v24-quick-makehuman-error",
+          "error",
           "MakeHuman sul telefono non ha completato l'avvio entro sei minuti."
         );
         fermaWatchdog();
         return;
       }
 
-      eventoDalCreator(
+      pingRelayMobile(
         watchdogFrame,
-        "adf-rpg-v24-quick-makehuman-progress",
+        "progress",
         ultimaFase+" · caricamento ancora in corso"
       );
     },HEARTBEAT_MS);
@@ -108,11 +111,10 @@
     const msg=e.data||{};
 
     if(
-      msg.type==="adf-rpg-v24-quick-makehuman-progress" &&
-      !msg.mobileHeartbeat
+      msg.type==="adf-rpg-v24-quick-makehuman-progress"
     ){
       const testo=String(msg.message||"").trim();
-      if(testo) ultimaFase=testo;
+      if(testo && !testo.endsWith(" · caricamento ancora in corso")) ultimaFase=testo;
       return;
     }
 
@@ -189,6 +191,6 @@
     attivo:true,
     quick:QUICK,
     source:MOBILE_MAKEHUMAN_SRC,
-    watchdog:"top-level-v3"
+    watchdog:"top-level-v4-relay-ping"
   };
 })();
