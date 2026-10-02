@@ -354,6 +354,9 @@ composizione, sfondi, mappa e informazioni senza impoverire l'esperienza. Il por
 è una seconda disposizione del gioco: mostra l'invito a ruotare il dispositivo, senza forzare
 la rotazione a livello di sistema. Restano obbligatori bersagli da almeno 44 punti, niente `hover` indispensabili e
 testi leggibili senza zoom. Il giro mobile di gameplay copre 844×390; in portrait si controlla soltanto l'avviso di rotazione.
+**FATTO (02/10/2026)** — il layout orizzontale ha un foglio suo, `css/mobile-landscape.css`,
+con le prove su scala e viewport (pull request #41), e le Impostazioni in orizzontale si
+impilano e restano leggibili (#42): segnati dal push degli altri.
 
 *«Responsività di tutto il gioco»* — **il giro sugli `:hover` è fatto (08/09/2026)**: tutte
 le regole `:hover` dei 24 fogli che ne avevano stanno dentro a `@media (hover:hover)`, e un
