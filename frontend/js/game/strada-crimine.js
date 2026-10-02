@@ -584,6 +584,12 @@ function stradaTentaPropostaFerro(roll){
   return Object.assign({},st.pending);
 }
 
+function stradaAnnullaPropostaFerro(){
+  const st=stradaFerroStato();
+  st.pending=null;
+  return true;
+}
+
 function stradaRifiutaFerro(){
   const st=stradaFerroStato();
   if(!st.pending) return null;
