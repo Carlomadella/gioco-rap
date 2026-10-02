@@ -46,6 +46,8 @@ const USCITE = [
   {id:"strada", chiudi(){ return uscitaStrada(); }},
   {id:"drawer", chiudi(){ closeDiary(); return true; }},
   {id:"report", chiudi(){ $("report").classList.remove("on"); return true; }},
+  /* il recap di fine giornata (recap-giornata.js) */
+  {id:"recap", chiudi(){ $("recap").classList.remove("on"); return true; }},
   {id:"scena", chiudi(){ $("scena").classList.remove("on"); return true; }}
 ];
 const aperto = id => { const el = $(id); return el && el.classList.contains("on"); };

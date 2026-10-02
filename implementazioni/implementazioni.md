@@ -327,15 +327,20 @@ che costava troppo._
 
 <!-- 6. togli il parametro «lucidità» e tutto ciò che ne consegue -->
 
+_«mettere un recap giornaliero con in aggiunta gli highlights» è chiuso il 02/10/2026, in
+`05-carriera-e-tempo.md` («Il recap di fine giornata»)._
+
 7. aggiungere la legacy cioè quanto sei influente sulle generazioni future o più piccole di artisti
 
 8. non sempre far scorrere una giornata ti ridà l'energia
 
-9. mettere un recap giornaliero con in aggiunta gli highlights.
+9. le trasferte di lavoro in altre città ci stanno già dalla prima città, i concerti in giro per l'italia da Milano
 
-10. le trasferte di lavoro in altre città ci stanno già dalla prima città, i concerti in giro per l'italia da Milano
+10. bisogna cambiare le immagini nelle transizioni
 
-11. bisogna cambiare le immagini nelle transizioni
+11. in alto a dx della mappa dopo che hai fatto uscire un tot di brani spawna la casa discografica, dove puoi firmare contratti, creare mixtape, ep. o album, trovare beat di qualità maggiore ecc. questa idea è ancora da sviluppare
+
+12. le trasferte non devono essere istantanee ma programmate
 
 #### Studio (16/09/2026)
 

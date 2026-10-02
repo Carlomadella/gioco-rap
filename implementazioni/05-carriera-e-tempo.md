@@ -533,3 +533,41 @@ anche sull'arbitro, non soltanto sul numero di scene.
 Il test automatico simula 20 turni su quattro settimane con tutte le famiglie
 abilitate: verifica massimo due eventi incidentali a settimana e almeno cinque
 famiglie diverse effettivamente raggiunte.
+
+---
+
+## Il recap di fine giornata
+
+> «mettere un recap giornaliero con in aggiunta gli highlights di cosa è successo durante
+> il giorno» — CARLO, «Da fare»
+
+**FATTO (02/10/2026)** — branch `task/recap-giornaliero`. Quando chiudi la giornata col
+«+1 giorno» esce una finestra, «Giornata chiusa · Martedì · Settimana 4», con:
+
+- **i numeri del giorno**: soldi, fan, hype e benessere rispetto a stamattina, e l'energia
+  spesa (la lucidità, se si è mossa, in una riga);
+- **le mosse** fatte, contate («Scrivi barre ×2 · Registra il pezzo»);
+- **gli highlights**: le righe del diario scritte da stamattina, compresa la notte appena
+  passata. Se sono più di cinque si scelgono per peso — prima quelle grosse (un disco
+  d'oro), poi le belle e le brutte, poi il resto — e si leggono in ordine di tempo, con un
+  pallino che dice di che tipo sono; le altre si contano («e 2 altre cose, nel diario»).
+  Una giornata senza mosse e senza niente nel diario lo dice in una riga.
+
+Non esce il settimo giorno (c'è il rapporto della settimana, e due finestre una
+sull'altra sono un fastidio), sui salti lunghi (+7, +28), quando la notte si ferma su un
+evento, né in carcere. Finché è aperto gli eventi aspettano, e si chiude con «Domani», con
+ESC o con un clic fuori. Si spegne con «Non mostrarlo più» o dalle Impostazioni, in Gioco
+(«Recap di fine giornata», `SET.gioco.recap`), per chi salta i giorni uno alla volta.
+
+Il codice sta in un file nuovo, `frontend/js/game/recap-giornata.js`, con
+`css/recap-giornata.css` (la finestra è quella del rapporto della settimana; a 390 punti
+d'altezza si stringe e il tasto resta in vista). Gli agganci: `pushLog` in `sim.js` conta le
+righe del diario (`G.logN`, il diario ne tiene solo 80 e scrive in testa), `avviaAzioneDiretta`
+in `ui.js` conta le mosse, `saltaGiorni` in `eventi-v2.js` prende i numeri prima del cambio
+giorno e apre il recap dopo, `uscita.js` lo registra fra le finestre. Cinque prove in
+`frontend/test/unit/recap-giornata.test.js`, due e2e in `test/e2e/recap-giornata.spec.js`
+(anche a 844 × 390); le due e2e che premono «+1 giorno» in fila adesso chiudono anche il recap.
+
+Le mosse fatte fuori dalla plancia — i turni dentro la pagina della Fabbrica, la serata al
+Circolo — non passano da `avviaAzioneDiretta`: nel recap compaiono come righe del diario,
+non nel conto delle mosse.

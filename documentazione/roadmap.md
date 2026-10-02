@@ -195,6 +195,11 @@ fatica solo sul carico lungo, il conflitto fra turno e musica leggibile, e la re
 separata per ruolo (`frontend/js/game/lavoro-eventi.js`, `actions.js`, `posto.js`).
 Con la pull request #43 (stesso giorno, segnata dal push degli altri) gli eventi per ruolo sono
 di più, quelli di linea non capitano più ai ruoli alti e anche gli straordinari seguono il ruolo.
+**FATTO (02/10/2026)** — **il recap di fine giornata**: chiusa la giornata, una finestra coi
+numeri del giorno (soldi, fan, hype, benessere, energia spesa), le mosse e gli highlights
+del diario scelti per peso; non il settimo giorno (c'è il rapporto della settimana), né sui
+salti lunghi. Si spegne dalle Impostazioni. «Il recap di fine giornata» in
+`05-carriera-e-tempo.md`.
 **FATTO (02/10/2026)** — le **ferie in Fabbrica** (pull request #39, segnate dal push degli
 altri): due giorni ogni ciclo di quattro settimane, chiesti almeno il giorno prima; il giorno
 di ferie non è un turno e non è un'assenza, copre la quota del contratto senza malus e non si

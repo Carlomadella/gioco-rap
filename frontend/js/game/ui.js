@@ -145,6 +145,8 @@ function avviaAzioneDiretta(id){
     if(!overlayAperto()) azioneFatta();
     if(a.luc) addLuc(a.luc);
     if(msg) pushLog(msg, "");
+    /* la mossa entra nel recap di fine giornata (recap-giornata.js) */
+    if(typeof recapMossa === "function") recapMossa(a);
 
     G.wellbeing = clamp(G.wellbeing, 0, 100);
 

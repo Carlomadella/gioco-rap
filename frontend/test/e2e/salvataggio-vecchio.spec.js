@@ -36,7 +36,8 @@ test("un salvataggio con gli oggetti annidati a metà gioca le sue settimane", a
       for(let k = 0; k < 6; k++){
         await new Promise(res => setTimeout(res, 120));
         const b = document.querySelector("#modal.on #m-opts button"); if(b){ b.click(); continue; }
-        for(const id of ["report", "scena", "adf-result-overlay"]){
+        /* «recap»: la finestra di fine giornata, dal 02/10/2026 */
+        for(const id of ["report", "recap", "scena", "adf-result-overlay"]){
           const el = document.getElementById(id); if(el) el.classList.remove("on");
         }
       }

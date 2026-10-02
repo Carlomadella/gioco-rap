@@ -212,7 +212,7 @@ function overlayBusy(){
    Conserviamo invece il blocco per vere scene/decisioni/modal. */
 function skipOverlayBusy(){
   const detenuto=!!(G.strada&&G.strada.arresto);
-  const ids=["modal","report","writer","piazza","scena","crimeModal","adf-result-overlay","adf-social-overlay"];
+  const ids=["modal","report","recap","writer","piazza","scena","crimeModal","adf-result-overlay","adf-social-overlay"];
   for(const id of ids){
     if(id==="report" && detenuto) continue;
     const el=document.getElementById(id);
@@ -2848,6 +2848,9 @@ saltaGiorni=function(n){
   if(!weekOpen) openWeek();
   const detenutoPrimaDelSalto=!!(G.strada&&G.strada.arresto);
   const before=weekOpen, costiSettimana=weeklyCosts();
+  /* il recap di fine giornata (recap-giornata.js): quello che dopo il cambio
+     giorno non si legge più si prende adesso */
+  const recapPrima=(n===1 && typeof recapPrepara==="function") ? recapPrepara() : null;
   const lucPrima=luc(), wellPrima=G.wellbeing;
   /* let: se un giorno si disfa (tornaAllaFoto) G.eventiV2 è un oggetto nuovo
      e va riletto, se no notifiche e skip1Chain finiscono in quello vecchio */
@@ -2960,6 +2963,15 @@ saltaGiorni=function(n){
 
   const rimasti=n-done;
   const interrotto=!!(SALTO_STOP||adfStop);
+  /* Il recap esce solo per la fine giornata di tutti i giorni: non il
+     settimo (c'è il rapporto della settimana), non sui salti lunghi, non se
+     la notte si è fermata su un evento, non in carcere. E la giornata nuova
+     riparte comunque da una fotografia nuova. */
+  if(typeof recapFoto==="function"){
+    if(recapPrima && done===1 && weeks===0 && !errore && !interrotto &&
+       !detenutoPrimaDelSalto && !adfInJail()) recapMostra(recapPrima);
+    recapFoto();
+  }
   if(interrotto){
     s.runtime.lastSkipInterruptedDay=absDay();
     s.runtime.lastSkipInterruptedAfter=done;
