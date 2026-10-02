@@ -60,7 +60,7 @@ const FAMILIES = Object.freeze({
   overtime:Object.freeze({id:"overtime",label:"Straordinari e richieste"}),
   colleague:Object.freeze({id:"colleague",label:"Colleghi"}),
   role:Object.freeze({id:"role",label:"Responsabilità di ruolo"}),
-  factory:Object.freeze({id:"factory",label:"Vita di Fabbrica"}),
+  factory:Object.freeze({id:"factory",label:"Vita del posto di lavoro"}),
   music:Object.freeze({id:"music",label:"Opportunità musicali"}),
   crime:Object.freeze({id:"crime",label:"Opportunità criminali"}),
   conflict:Object.freeze({id:"conflict",label:"Conflitto lavoro/musica"}),
@@ -751,6 +751,242 @@ const FACTORY_ROLE_EVENTS = Object.freeze({
           result:"Hai tenuto il punto sui carichi e perso un po' di credito sul numero, ma sotto di te se ne accorgono."}),
         Object.freeze({n:"Spingi la produzione",d:"+2 affidabilità · −3 lucidità",fx:{reliability:2,lucidita:-3},
           result:"Il numero sale. Per farlo hai passato il turno a rincorrere ogni reparto e a mettere pressione ovunque."})
+      ])
+    })
+  ])
+});
+
+
+/* ==================== RUOLO IN PIZZERIA ====================
+   Stesso motore della Fabbrica, contenuti diversi: il part-time pesa meno
+   su benessere/lucidità e usa più spesso piccoli effetti di rete. La rete
+   qui rappresenta familiarità ed esposizione sociale, non contatti regalati. */
+const PIZZERIA_ROLE_EVENTS = Object.freeze({
+  lavapiatti:Object.freeze([
+    Object.freeze({
+      id:"chiusura-lavaggio",
+      t:"A fine servizio resta una montagna di roba",
+      d:"Il grosso è finito ma il retro è ancora pieno. Un collega ti chiede una mano per chiudere prima.",
+      opts:Object.freeze([
+        Object.freeze({n:"Resti a dargli una mano",fx:{rete:.2,wellbeing:-1},
+          result:"Avete chiuso insieme senza farla diventare un'impresa. Da domani non sei più solo quello del lavaggio."}),
+        Object.freeze({n:"Finisci il tuo e vai",fx:{lucidita:1},
+          result:"Hai chiuso la tua parte e sei uscito in orario. Il turno resta un part-time, non una seconda vita."})
+      ])
+    }),
+    Object.freeze({
+      id:"rider-porta-retro",
+      t:"Un rider aspetta vicino alla porta del retro",
+      d:"L'ordine non è ancora pronto. Hai due minuti veri prima che riparta il servizio.",
+      opts:Object.freeze([
+        Object.freeze({n:"Scambi due parole",fx:{rete:.2},
+          result:"Due minuti, niente di epocale. Però una faccia in più adesso ti riconosce."}),
+        Object.freeze({n:"Rientri subito",fx:{reliability:1},
+          result:"Hai lasciato la chiacchiera e sei tornato alla postazione prima che si accumulasse altro."})
+      ])
+    }),
+    Object.freeze({
+      id:"nuovo-al-lavaggio",
+      t:"Arriva uno nuovo al lavaggio",
+      d:"Non sa ancora dove va niente e continua a chiedere. Puoi mostrargli il giro oppure lasciarlo prendere il ritmo da solo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli fai vedere come gira",fx:{rete:.2,reliability:1},
+          result:"Gli hai evitato mezz'ora di caos e da subito avete un rapporto meno anonimo."}),
+        Object.freeze({n:"Lo lasci imparare",fx:{wellbeing:1},
+          result:"Non ti sei caricato anche il suo turno. Alla fine ha trovato da solo il suo ritmo."})
+      ])
+    }),
+    Object.freeze({
+      id:"mano-alla-prep",
+      t:"Dalla prep chiedono una mano",
+      d:"Per dieci minuti sono corti e tu sei l'unico che può staccarsi senza bloccare tutto.",
+      opts:Object.freeze([
+        Object.freeze({n:"Vai a dare una mano",fx:{reliability:1,wellbeing:-1},
+          result:"Hai coperto il buco e poi sei tornato al lavaggio. Poco glamour, ma utile davvero."}),
+        Object.freeze({n:"Resti sulla tua postazione",fx:{lucidita:1},
+          result:"Hai evitato di spezzare il tuo ritmo per rincorrere un problema che non era tuo."})
+      ])
+    }),
+    Object.freeze({
+      id:"pausa-retro",
+      t:"Cinque minuti fuori dalla porta",
+      d:"Due colleghi escono a prendere aria. Puoi unirti o usare il buco per stare un attimo per conto tuo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Esci con loro",fx:{rete:.2,wellbeing:1},
+          result:"Avete parlato del turno e di altro. Piccolo rapporto, nessuna ricompensa magica."}),
+        Object.freeze({n:"Ti isoli un attimo",fx:{lucidita:1},
+          result:"Cinque minuti senza rumore ti sono bastati per rientrare più pulito di testa."})
+      ])
+    })
+  ]),
+  aiuto_cucina:Object.freeze([
+    Object.freeze({
+      id:"comande-accavallate",
+      t:"Le comande si accavallano tutte insieme",
+      d:"Per qualche minuto nessuno capisce più cosa deve uscire prima. Puoi coordinarti con gli altri o chiuderti sulla tua prep.",
+      opts:Object.freeze([
+        Object.freeze({n:"Metti ordine con gli altri",fx:{reliability:1,lucidita:-1,rete:.1},
+          result:"Avete rimesso una sequenza alle comande. Hai speso un po' di testa, ma il servizio ha ripreso forma."}),
+        Object.freeze({n:"Proteggi la tua prep",fx:{wellbeing:1},
+          result:"Hai tenuto pulita la tua parte senza caricarti anche il caos del resto della cucina."})
+      ])
+    }),
+    Object.freeze({
+      id:"fornitore-consegna",
+      t:"Arriva una consegna mentre siete nel pieno",
+      d:"Manca qualcuno per controllare e sistemare la merce. Puoi occupartene tu oppure lasciare la cosa al responsabile.",
+      opts:Object.freeze([
+        Object.freeze({n:"Dai una mano alla consegna",fx:{reliability:1,rete:.2},
+          result:"Hai sistemato la consegna e scambiato due parole con chi passa qui ogni settimana."}),
+        Object.freeze({n:"Resti sulla cucina",fx:{lucidita:1},
+          result:"Hai lasciato la consegna a chi la gestisce di solito e tenuto la tua testa sul servizio."})
+      ])
+    }),
+    Object.freeze({
+      id:"cambio-postazione",
+      t:"Un collega ti chiede di scambiarvi per un po'",
+      d:"È in difficoltà sulla sua postazione e ti propone un cambio fino alla fine del rush.",
+      opts:Object.freeze([
+        Object.freeze({n:"Accetti il cambio",fx:{rete:.2,wellbeing:-1},
+          result:"Gli hai tolto pressione e vi siete capiti al volo. Tu, a fine rush, senti un po' di più il turno."}),
+        Object.freeze({n:"Proponi una rotazione",fx:{lucidita:1,rete:.1},
+          result:"Avete diviso il pezzo difficile invece di spostarlo tutto da una parte sola."})
+      ])
+    }),
+    Object.freeze({
+      id:"richiesta-fuori-menu",
+      t:"Arriva una richiesta fuori dal solito",
+      d:"Il cliente vuole una modifica che complica la preparazione. Puoi gestirla tu oppure far decidere davanti.",
+      opts:Object.freeze([
+        Object.freeze({n:"La gestisci tu",fx:{reliability:1,lucidita:-1},
+          result:"Hai trovato un modo semplice per farla uscire senza scombinare il resto."}),
+        Object.freeze({n:"Passi la decisione davanti",fx:{wellbeing:1},
+          result:"Hai evitato di trasformare una modifica in un problema di tutta la cucina."})
+      ])
+    }),
+    Object.freeze({
+      id:"pizza-staff",
+      t:"A chiusura resta una pizza per lo staff",
+      d:"Gli altri si fermano dieci minuti prima di andare. Puoi restare con loro oppure uscire subito.",
+      opts:Object.freeze([
+        Object.freeze({n:"Resti a mangiare con gli altri",fx:{rete:.2,wellbeing:1},
+          result:"Dieci minuti normali, ma sono proprio quelli in cui i colleghi smettono di essere solo colleghi."}),
+        Object.freeze({n:"Vai a casa",fx:{lucidita:1},
+          result:"Hai preferito tenerti il resto della serata. Nessuno se l'è presa."})
+      ])
+    })
+  ]),
+  aiuto_pizzaiolo:Object.freeze([
+    Object.freeze({
+      id:"impasto-indietro",
+      t:"L'impasto pronto è meno del previsto",
+      d:"Se il ritmo continua così finite corti. Puoi recuperare subito oppure chiedere aiuto e distribuire il problema.",
+      opts:Object.freeze([
+        Object.freeze({n:"Recuperi tu",fx:{reliability:1,lucidita:-1},
+          result:"Hai rimesso margine nel servizio senza fermare il forno, ma sei rimasto concentrato fino all'ultimo."}),
+        Object.freeze({n:"Chiami una mano",fx:{rete:.2},
+          result:"Avete sistemato il problema in due. Meno eroismo, più squadra."})
+      ])
+    }),
+    Object.freeze({
+      id:"rider-in-attesa",
+      t:"Un rider è di nuovo qui ad aspettare",
+      d:"Lo hai già visto altre volte. L'ordine ha ancora qualche minuto prima di uscire.",
+      opts:Object.freeze([
+        Object.freeze({n:"Ci scambi due parole",fx:{rete:.2},
+          result:"La faccia adesso ha anche una conversazione attaccata. Non è un contatto utile per forza: è una persona che ti conosce."}),
+        Object.freeze({n:"Prepari il prossimo ordine",fx:{reliability:1},
+          result:"Hai usato quei minuti per portarti avanti invece di riempirli per forza."})
+      ])
+    }),
+    Object.freeze({
+      id:"cliente-al-banco",
+      t:"Un cliente si ferma due secondi al banco",
+      d:"Vuole sapere cosa state preparando e non sembra avere fretta. Puoi rispondere o lasciare la conversazione davanti.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli rispondi tu",fx:{rete:.2},
+          result:"Due battute sul cibo e la serata riparte. Niente premio: semplicemente, ti ha visto e ti ricorderà."}),
+        Object.freeze({n:"Resti sul servizio",fx:{reliability:1},
+          result:"Hai lasciato il banco a chi deve gestirlo e tenuto gli occhi sul forno."})
+      ])
+    }),
+    Object.freeze({
+      id:"collega-prova-forno",
+      t:"Un collega vuole capire meglio il forno",
+      d:"Ti chiede un trucco sui tempi mentre c'è un momento di calma.",
+      opts:Object.freeze([
+        Object.freeze({n:"Glielo fai vedere",fx:{rete:.2,reliability:1},
+          result:"Gli hai fatto vedere due cose concrete. Il prossimo rush sarete un po' meno dipendenti da te."}),
+        Object.freeze({n:"Fai tu e basta",fx:{lucidita:1},
+          result:"Hai tenuto il lavoro semplice e il momento di calma è rimasto davvero calmo."})
+      ])
+    }),
+    Object.freeze({
+      id:"tavolata-tempi",
+      t:"Una tavolata vuole uscire tutta insieme",
+      d:"Le pizze sono tante e i tempi non si incastrano da soli. Puoi coordinare il pass oppure semplificare il ritmo.",
+      opts:Object.freeze([
+        Object.freeze({n:"Coordini le uscite",fx:{reliability:1,lucidita:-1,rete:.1},
+          result:"Avete fatto uscire quasi tutto insieme. Ti sei preso un po' di pressione, ma la squadra ha seguito."}),
+        Object.freeze({n:"Tieni un ritmo regolare",fx:{wellbeing:1},
+          result:"Non hai trasformato la tavolata in un'emergenza. Le pizze sono uscite bene, solo meno teatralmente."})
+      ])
+    })
+  ]),
+  pizzaiolo:Object.freeze([
+    Object.freeze({
+      id:"cliente-abituale",
+      t:"Un cliente abituale ti saluta dal banco",
+      d:"Lo hai visto diverse volte. Stavolta ti chiama direttamente mentre aspetta.",
+      opts:Object.freeze([
+        Object.freeze({n:"Scambi due parole",fx:{rete:.2},
+          result:"Avete parlato un minuto. Il valore è quello: una relazione che esiste, non un premio automatico."}),
+        Object.freeze({n:"Resti sul forno",fx:{lucidita:1},
+          result:"Hai salutato e continuato il servizio. Il rapporto non sparisce perché stasera hai lavorato."})
+      ])
+    }),
+    Object.freeze({
+      id:"fornitore-ingrediente",
+      t:"Il fornitore ti chiede come sta andando un ingrediente nuovo",
+      d:"Sei abbastanza dentro al lavoro da avere un'opinione utile. Puoi fermarti un minuto oppure chiudere la consegna e basta.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli dai un feedback vero",fx:{reliability:1,rete:.2},
+          result:"Avete parlato da persone che lavorano sullo stesso prodotto, non da cliente e consegnatore."}),
+        Object.freeze({n:"Chiudi la consegna",fx:{wellbeing:1},
+          result:"Hai evitato di aggiungere una riunione improvvisata dentro un turno che era già pieno."})
+      ])
+    }),
+    Object.freeze({
+      id:"collega-da-formare",
+      t:"Ti affidano un collega da far crescere",
+      d:"Non è una promozione: semplicemente sei quello che sa far girare meglio il forno.",
+      opts:Object.freeze([
+        Object.freeze({n:"Gli insegni davvero",fx:{rete:.3,lucidita:-1},
+          result:"Hai rallentato un po' il tuo automatismo per spiegargli il perché delle cose. Il rapporto cambia."}),
+        Object.freeze({n:"Gli fai vedere e basta",fx:{reliability:1},
+          result:"Ha visto come fai tu e il servizio non ha perso ritmo. Imparerà il resto col tempo."})
+      ])
+    }),
+    Object.freeze({
+      id:"rush-delega",
+      t:"Il rush cresce e non puoi fare tutto da solo",
+      d:"Puoi distribuire pezzi del lavoro oppure tenerti addosso ogni passaggio critico.",
+      opts:Object.freeze([
+        Object.freeze({n:"Deleghi con chiarezza",fx:{rete:.2,lucidita:1},
+          result:"Hai dato compiti chiari e il forno ha respirato. Anche gli altri hanno sentito che ti fidi di loro."}),
+        Object.freeze({n:"Ti prendi tutto tu",fx:{reliability:1,wellbeing:-1},
+          result:"Hai tenuto il controllo totale. Il servizio è uscito, tu un po' più cotto."})
+      ])
+    }),
+    Object.freeze({
+      id:"fine-serata-staff",
+      t:"A fine serata nessuno ha fretta di uscire",
+      d:"Il locale è chiuso e per dieci minuti si resta tutti lì a parlare. Puoi fermarti oppure tenerti il resto della notte.",
+      opts:Object.freeze([
+        Object.freeze({n:"Resti dieci minuti",fx:{rete:.3,wellbeing:1},
+          result:"Non è networking costruito: è semplicemente tempo passato con persone che ormai fanno parte del tuo giro."}),
+        Object.freeze({n:"Saluti e vai",fx:{lucidita:1},
+          result:"Hai chiuso il turno e tenuto spazio per il resto della tua vita. Anche questo è il senso del part-time."})
       ])
     })
   ])
