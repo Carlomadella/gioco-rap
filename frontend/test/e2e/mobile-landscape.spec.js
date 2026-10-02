@@ -227,7 +227,7 @@ test("landscape mobile: scelta Avaturn/MakeHuman si ridimensiona e scorre davver
   await expect(frame.locator("#avatarSelectionNote")).toBeVisible();
 });
 
-test("landscape mobile: il camerino mostra Indietro in alto e toccabile", async ({ page }) => {
+test("landscape mobile: nella scelta avatar Indietro e' compatto e integrato a destra", async ({ page }) => {
   await page.goto("/media/creator-rpg-v24/creator.html");
 
   const indietro = page.locator("#creatorExitGame");
@@ -235,19 +235,42 @@ test("landscape mobile: il camerino mostra Indietro in alto e toccabile", async 
 
   const dati = await indietro.evaluate(el => {
     const r = el.getBoundingClientRect();
-    const pseudo = getComputedStyle(el, "::after").content;
+    const before = getComputedStyle(el, "::before");
+    const after = getComputedStyle(el, "::after");
+    const topbar = document.querySelector(".topbar").getBoundingClientRect();
     return {
+      vw: innerWidth,
+      topbarTop: topbar.top,
+      topbarBottom: topbar.bottom,
+      left: r.left,
+      right: r.right,
       top: r.top,
+      bottom: r.bottom,
       height: r.height,
       width: r.width,
-      pseudo
+      hitTop: parseFloat(before.top),
+      hitRight: parseFloat(before.right),
+      hitBottom: parseFloat(before.bottom),
+      hitLeft: parseFloat(before.left),
+      pseudo: after.content
     };
   });
 
-  expect(dati.top).toBeLessThan(80);
-  expect(dati.height).toBeGreaterThanOrEqual(43.9);
-  expect(dati.width).toBeGreaterThanOrEqual(95);
+  expect(dati.right).toBeLessThanOrEqual(dati.vw - 10);
+  expect(dati.left).toBeGreaterThan(dati.vw * .75);
+  expect(dati.top).toBeGreaterThanOrEqual(dati.topbarTop);
+  expect(dati.bottom).toBeLessThanOrEqual(dati.topbarBottom + 1);
+  expect(dati.height).toBeGreaterThanOrEqual(37);
+  expect(dati.height).toBeLessThanOrEqual(40);
+  expect(dati.width).toBeGreaterThanOrEqual(77);
+  expect(dati.width).toBeLessThanOrEqual(94);
+  expect(dati.hitTop).toBeLessThanOrEqual(-3);
+  expect(dati.hitRight).toBeLessThanOrEqual(-3);
+  expect(dati.hitBottom).toBeLessThanOrEqual(-3);
+  expect(dati.hitLeft).toBeLessThanOrEqual(-3);
   expect(dati.pseudo).toContain("Indietro");
+
+  await indietro.tap();
 });
 
 
