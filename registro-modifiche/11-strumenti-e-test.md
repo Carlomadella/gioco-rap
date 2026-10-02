@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4cb22db3 -->
+## 02/10/26, 00:39 — task/bancone-neon → main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4cb22db3`
+
+### Cosa è entrato
+
+- `196a9f8a` — La roadmap si aggiorna al push di chiunque: le opportunità criminali della Strada (#30) — **Carlomadella**
+- `3fae710b` — Il Bancone uguale al riferimento nuovo — il telefono nel suo modulo mobile — **Carlomadella**
+- `8ae2e8fc` — Il Bancone uguale al riferimento nuovo — le voci 92 e 93 del giro di fine task — **Carlomadella**
+- `08c0b13f` — Il Bancone uguale al riferimento nuovo — **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:6bad7f1d -->
 ## 02/10/26, 00:35 — task/strada-incontri-criminali-gameplay → main
 

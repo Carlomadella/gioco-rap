@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:4cb22db3 -->
+## 02/10/26, 00:39 — task/bancone-neon → main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `4cb22db3`
+
+### Cosa è entrato
+
+- `196a9f8a` — La roadmap si aggiorna al push di chiunque: le opportunità criminali della Strada (#30) — **Carlomadella**
+- `3fae710b` — Il Bancone uguale al riferimento nuovo — il telefono nel suo modulo mobile — **Carlomadella**
+- `8ae2e8fc` — Il Bancone uguale al riferimento nuovo — le voci 92 e 93 del giro di fine task — **Carlomadella**
+- `08c0b13f` — Il Bancone uguale al riferimento nuovo — **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Aggiunto:** `frontend/css/circolo-bancone-mobile.css`
+- **Aggiunto:** `frontend/css/circolo-bancone.css`
+- **Modificato:** `frontend/css/circolo-stanze.css`
+- **Modificato:** `frontend/css/stretto.css`
+- **Modificato:** `frontend/js/game/circolo-stanze.js`
+- **Modificato:** `frontend/js/game/circolo.js`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/bancone-ascolta.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/bancone-attacca.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/bancone-bevi.jpg`
+- **Aggiunto:** `frontend/media/photo/circolo/stanze/bancone-presentati.jpg`
+- **Modificato:** `frontend/media/photo/schermate_luoghi/schermate_luoghi_con_elementi_HTML/bancone.png`
+- **Modificato:** `frontend/pagine/gioco.html`
+
+**File interessati in questa categoria:** 15
+
+---
+
 <!-- merge:6bad7f1d -->
 ## 02/10/26, 00:35 — task/strada-incontri-criminali-gameplay → main
 
