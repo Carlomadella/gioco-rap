@@ -177,9 +177,10 @@ giornate e skip di quanto vuoi; le classifiche settimanali con le frecce; **FATT
 (20/09/2026)** i prezzi dei beat su tre fasce per fama del beatmaker (100–250 / 300–1000 /
 1000–2000, `BEAT_FASCE` in `beats.js`), la partenza con tutti i parametri a 1.
 **AGGIORNATO (02/10/2026)** — nei lavori strutturati (Fabbrica e Pizzeria) si può ora
-dare volontariamente le dimissioni dalla schermata del luogo: il contratto si chiude,
-lo storico resta, mentre il licenziamento per disciplina rimane una conseguenza distinta
-e può bloccare temporaneamente la riassunzione.
+dare volontariamente le dimissioni dalla schermata del luogo: il contratto si chiude e
+lo storico del rapporto resta archiviato, ma la progressione lavorativa corrente si azzera.
+Anche il licenziamento resetta la carriera interna e, in più, può bloccare temporaneamente
+la riassunzione.
 **FATTO (29/09/2026)** il simulatore di bilanciamento: `npm run bilanciamento` gioca mille
 carriere da un anno con sei strategie (chi lavora, chi spinge la promo, chi fa crimini, chi
 sta fermo, chi fa a caso, il musicista) e scrive un rapporto con le curve che sembrano
