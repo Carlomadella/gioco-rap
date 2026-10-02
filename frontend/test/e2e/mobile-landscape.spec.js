@@ -243,6 +243,63 @@ test("landscape mobile: Avaturn e MakeHuman si aprono direttamente al tap", asyn
   await expect(page.locator("#pageDressingRoom")).toHaveClass(/on/);
 });
 
+test("landscape mobile: landing instrada MakeHuman nel relay mobile", async ({ page }) => {
+  await page.goto("/pagine/landing.html");
+  await page.waitForFunction(() => window.ADF_RPG_V24);
+  await page.evaluate(() => ADF_RPG_V24.open());
+
+  const creator=page.frameLocator("#adf-rpg-v24-frame");
+  await creator.getByRole("button",{name:/MakeHuman/i}).tap();
+
+  const src=await creator.locator("#localEditorFrame").getAttribute("src");
+  expect(src).toContain("makehuman-mobile-v1/index.html?v=3");
+  await expect(creator.locator("#creatorExitGame")).toBeHidden();
+});
+
+test("landscape mobile: MakeHuman separa avatar e controlli senza coprirli", async ({ page }) => {
+  await page.goto("/media/makehuman-camerino-v1/index.html?v=mobile-3&mobile=1");
+
+  const sidebar=page.locator("#editorSidebar");
+  const camera=page.locator(".camera-switcher");
+  const actions=page.locator(".bottom-bar");
+
+  await expect(sidebar).toBeVisible();
+  await expect(camera).toBeVisible();
+  await expect(actions).toBeVisible();
+
+  const layout=await page.evaluate(() => {
+    const sidebar=document.querySelector("#editorSidebar").getBoundingClientRect();
+    const camera=document.querySelector(".camera-switcher").getBoundingClientRect();
+    const actions=document.querySelector(".bottom-bar").getBoundingClientRect();
+    const scroll=document.querySelector(".editor-scroll");
+    const stage=getComputedStyle(document.querySelector("#stage"));
+    return {
+      vw:innerWidth,vh:innerHeight,
+      mobile:document.documentElement.classList.contains("adf-mobile"),
+      sidebar:{left:sidebar.left,right:sidebar.right,top:sidebar.top,bottom:sidebar.bottom},
+      camera:{left:camera.left,right:camera.right,top:camera.top,bottom:camera.bottom},
+      actions:{left:actions.left,right:actions.right,top:actions.top,bottom:actions.bottom},
+      scrollOverflow:getComputedStyle(scroll).overflowY,
+      scrollTouch:getComputedStyle(scroll).touchAction,
+      stageTransform:stage.transform,
+      stageClip:stage.clipPath
+    };
+  });
+
+  expect(layout.mobile).toBe(true);
+  expect(layout.sidebar.left).toBeGreaterThanOrEqual(layout.vw*.44);
+  expect(layout.sidebar.right).toBeLessThanOrEqual(layout.vw+1);
+  expect(layout.sidebar.bottom).toBeLessThan(layout.actions.top);
+  expect(layout.camera.right).toBeLessThanOrEqual(layout.vw*.45+2);
+  expect(layout.actions.left).toBeGreaterThanOrEqual(layout.vw*.44);
+  expect(layout.actions.right).toBeLessThanOrEqual(layout.vw+1);
+  expect(layout.actions.bottom).toBeLessThanOrEqual(layout.vh+1);
+  expect(layout.scrollOverflow).toBe("auto");
+  expect(layout.scrollTouch).toBe("pan-y");
+  expect(layout.stageTransform).toBe("none");
+  expect(layout.stageClip).not.toBe("none");
+});
+
 test("landscape mobile: camerino parte su Volto e Centra non torna a Intero", async ({ page }) => {
   await page.goto("/media/creator-rpg-v24/camerino.html");
 
