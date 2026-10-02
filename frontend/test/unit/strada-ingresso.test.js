@@ -128,6 +128,17 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.traphone.source).toBe("legacy");
   });
 
+  it("il TrapPhone e la sua UI rispettano il possesso reale",()=>{
+    const ui=leggi("js/game/strada-crimine-ui.js");
+    const trap=leggi("js/game/traphone16.js");
+    expect(ui).toContain('trapDock.hidden=!trapOwned');
+    expect(ui).toContain('hasTrapPhone:');
+    expect(trap).toContain("function trapOwned()");
+    expect(trap).toContain("function acquire(meta)");
+    expect(trap).toContain("if(!trapOwned()) return null");
+    expect(trap).toContain("acquire,");
+  });
+
   it("hub e colpo rapido rispettano lo stesso gate",()=>{
     const hub=leggi("js/game/hub.js");
     const strada=leggi("js/game/strada-crimine.js");
