@@ -107,6 +107,23 @@ test("landscape mobile: Inizia mostra tutte le voci senza blocco nero", async ({
   expect(box.y).toBeGreaterThanOrEqual(-1);
   const vh = await page.evaluate(() => innerHeight);
   expect(box.y + box.height).toBeLessThanOrEqual(vh + 1);
+
+  /* Regressione #57: Playwright puo' auto-scrollare una voce prima di
+     verificarne la visibilita'. Qui invece controlliamo che il menu iniziale
+     stia davvero tutto insieme nel viewport, senza essere tagliato dal dock. */
+  const misure = await pannello.evaluate(el => {
+    const rett = el.getBoundingClientRect();
+    const controlli = [...el.querySelectorAll(".avv-close-mobile,.avv-riga,.avv-importa")]
+      .map(n => n.getBoundingClientRect());
+    return {
+      clientHeight: el.clientHeight,
+      scrollHeight: el.scrollHeight,
+      pannelloBottom: rett.bottom,
+      ultimoBottom: Math.max(...controlli.map(r => r.bottom))
+    };
+  });
+  expect(misure.scrollHeight).toBeLessThanOrEqual(misure.clientHeight + 1);
+  expect(misure.ultimoBottom).toBeLessThanOrEqual(misure.pannelloBottom + 1);
 });
 
 test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", async ({ page }) => {
