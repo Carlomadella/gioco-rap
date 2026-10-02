@@ -1305,20 +1305,10 @@ function stradaRipulisci(){
 
 /* ==================== CHI TI COPRE ==================== */
 function stAssumiUomo(){
-  const s = G.strada;
-  if(s.uomini >= STRADA_UOMO_MAX) return "Hai già cinque uomini: di più non se ne tengono.";
-  if(G.money < STRADA_UOMO_COSTO) return "Non hai " + fmt(STRADA_UOMO_COSTO) + " € per prenderne un altro.";
-  G.money -= STRADA_UOMO_COSTO; s.uomini++;
-  pushLog("Hai preso un uomo in più: ora sono " + s.uomini + ".", "");
-  save(); renderStrada(); renderGioco();
-  return "Uno dei tuoi si è unito al giro: ora siete in " + s.uomini + ".";
+  return "Non puoi comprare la fiducia di qualcuno: per portarlo a un colpo devi costruire un rapporto nel giro.";
 }
 function stLicenziaUomo(){
-  const s = G.strada;
-  if(s.uomini <= 0) return "Non hai nessuno da mandare via.";
-  s.uomini--;
-  save(); renderStrada(); renderGioco();
-  return "Uno se n'è andato. Ne restano " + s.uomini + ".";
+  return "Le persone del giro non sono un organico da licenziare: i rapporti cambiano attraverso quello che succede fra voi.";
 }
 function stImpostaProtezione(livello){
   G.strada.prot = clamp(livello, 0, STRADA_PROT.length - 1);
@@ -2091,12 +2081,20 @@ function renderStColpi(){
 function renderStCopre(){
   const s = G.strada;
   const prot = STRADA_PROT[s.prot];
-  const pieno = s.uomini >= STRADA_UOMO_MAX, caro = G.money < STRADA_UOMO_COSTO;
+  const contatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via)
+    .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
   $("st-tab-copre").innerHTML =
-    '<div class="cover-row"><div class="t"><strong>Uomini (' + s.uomini + '/' + STRADA_UOMO_MAX + ')</strong>' +
-      '<span>' + fmt(STRADA_UOMO_COSTO) + ' € all\'ingresso · ' + fmt(STRADA_UOMO_UPKEEP) + ' €/sett.</span></div>' +
-      '<div class="pills"><button class="pill' + (pieno || caro ? " no" : "") + '" data-stuomo="piu">+ Prendi</button>' +
-      (s.uomini > 0 ? '<button class="pill" data-stuomo="meno">Manda via</button>' : '') + '</div></div>' +
+    '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ')</strong>' +
+      '<span>' + (fidati.length
+        ? fidati.length + ' ' + (fidati.length===1?'si fida':'si fidano') + ' abbastanza da muoversi con te.'
+        : 'Conosci gente, ma nessuno si fida ancora abbastanza da venire a un colpo con te.') + '</span></div>' +
+      '<div class="pills">' +
+        (contatti.slice(0,3).map(p=>'<span class="pill' +
+          (stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
+          p.n + ' · ' + stradaFiduciaEtichetta(p) + '</span>').join('') ||
+          '<span class="pill no">Nessun contatto</span>') +
+      '</div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
       '<span>Riduce il rischio quando la zona si scalda.</span></div>' +
