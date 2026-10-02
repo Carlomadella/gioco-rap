@@ -381,9 +381,12 @@ touch 390×844 che verifica nel browser reale che `ADF_MAKEHUMAN_MOBILE` sia att
 il creator richieda davvero `media/makehuman-mobile-v1/index.html?v=3`, senza scaricare i
 145 MB. Il primo run del controllo diretto ha confermato il percorso mobile ma ha anche
 mostrato che il primo ping poteva partire mentre il relay stava ancora navigando. Ora il
-`load` del relay invia subito un ping reale e poi resta il ciclo da 10 s; il test lascia
-muto soltanto il MakeHuman pesante interno e deve vedere entro 15 s «caricamento ancora in
-corso» nella schermata «Preparo il tuo artista». Resta la nuova prova su telefono reale
+`load` del relay invia subito un ping reale e poi resta il ciclo da 10 s. Il controllo
+successivo ha isolato anche il filtro sulla source del ping annidato: il protocollo
+`adf-mobile-watchdog-ping`, che esiste solo nel relay mobile, non dipende più da
+`parent.parent`. Il modulo espone inoltre contatori diagnostici di load/ping. Il test
+aspetta il relay realmente `complete`, lascia muto solo il MakeHuman pesante interno e
+deve vedere entro 15 s «caricamento ancora in corso». Resta la prova sul telefono reale
 prima di chiudere il punto.
 
 ### H · Los Angeles _(da fare)_

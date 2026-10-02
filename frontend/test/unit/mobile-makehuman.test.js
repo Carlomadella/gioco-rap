@@ -61,7 +61,7 @@ describe("MakeHuman mobile separato dal desktop",()=>{
 
     expect(mobile).toContain("HEARTBEAT_MS=10000");
     expect(mobile).toContain("QUICK_MAX_MS=360000");
-    expect(mobile).toContain('watchdog:"top-level-v4-relay-ping"');
+    expect(mobile).toContain('watchdog:"top-level-v5-relay-ping"');
     expect(mobile).toContain('type:"adf-mobile-watchdog-ping"');
     expect(mobile).toContain('editor.contentWindow.postMessage');
     expect(mobile).toContain('makehumanMobileWatchdogBound');
@@ -73,7 +73,10 @@ describe("MakeHuman mobile separato dal desktop",()=>{
     expect(relay).toContain("../makehuman-camerino-v1/index.html?v=mobile-3");
     expect(relay).not.toContain("setInterval");
     expect(relay).toContain('msg.type==="adf-mobile-watchdog-ping"');
-    expect(relay).toContain('event.source===parent.parent');
+    expect(relay).not.toContain('event.source===parent.parent');
+    expect(mobile).toContain("heartbeatCount+=1");
+    expect(mobile).toContain("relayLoads+=1");
+    expect(mobile).toContain("diagnostica()");
     expect(relay).not.toContain("BOOTSTRAP_HEARTBEAT_MS");
     expect(relay).not.toContain("QUICK_MAX_MS");
   });

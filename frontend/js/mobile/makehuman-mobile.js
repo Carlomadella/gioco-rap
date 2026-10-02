@@ -41,6 +41,9 @@
   let watchdogStart=0;
   let watchdogFrame=null;
   let ultimaFase="Avvio MakeHuman sul telefono…";
+  let heartbeatCount=0;
+  let relayLoads=0;
+  let lastPingAt=0;
 
   function fermaWatchdog(){
     if(watchdogTimer){
@@ -66,6 +69,8 @@
         kind,
         message
       },"*");
+      heartbeatCount+=1;
+      lastPingAt=Date.now();
       return true;
     }catch(e){
       return false;
@@ -142,6 +147,7 @@
       if(editor.dataset.makehumanMobileWatchdogBound!=="1"){
         editor.dataset.makehumanMobileWatchdogBound="1";
         editor.addEventListener("load",()=>{
+          relayLoads+=1;
           try{
             if(!String(editor.src||"").includes("/makehuman-mobile-v1/index.html")) return;
           }catch(e){ return; }
@@ -209,6 +215,15 @@
     attivo:true,
     quick:QUICK,
     source:MOBILE_MAKEHUMAN_SRC,
-    watchdog:"top-level-v4-relay-ping"
+    watchdog:"top-level-v5-relay-ping",
+    diagnostica(){
+      return {
+        heartbeatCount,
+        relayLoads,
+        lastPingAt,
+        ultimaFase,
+        watchdogAttivo:!!watchdogTimer
+      };
+    }
   };
 })();

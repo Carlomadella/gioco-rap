@@ -34,7 +34,7 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
   await page.waitForFunction(() =>
     window.ADF_MAKEHUMAN_MOBILE?.attivo === true &&
     window.ADF_MAKEHUMAN_MOBILE?.quick === true &&
-    window.ADF_MAKEHUMAN_MOBILE?.watchdog === "top-level-v4-relay-ping"
+    window.ADF_MAKEHUMAN_MOBILE?.watchdog === "top-level-v5-relay-ping"
   );
 
   const creator = page.frameLocator("#adf-rpg-v24-frame");
@@ -50,6 +50,20 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
   await expect.poll(() => richiestaRelay, { timeout: 10000 })
     .toContain("/media/makehuman-mobile-v1/index.html?v=3");
 
+  await expect.poll(
+    () => page.frames().some(frame =>
+      frame.url().includes("/media/makehuman-mobile-v1/index.html?v=3")
+    ),
+    { timeout: 10000 }
+  ).toBe(true);
+
+  const relayFrame = page.frames().find(frame =>
+    frame.url().includes("/media/makehuman-mobile-v1/index.html?v=3")
+  );
+  expect(relayFrame).toBeTruthy();
+  await expect.poll(() => relayFrame.evaluate(() => document.readyState))
+    .toBe("complete");
+
   const srcReale = await editor.evaluate(el => el.src);
   expect(srcReale).toContain("/media/makehuman-mobile-v1/index.html?v=3");
 
@@ -60,4 +74,9 @@ test("l'avvio rapido mobile seleziona davvero il relay MakeHuman mobile", async 
     "caricamento ancora in corso",
     { timeout: 15000 }
   );
+
+  const diag = await page.evaluate(() => ADF_MAKEHUMAN_MOBILE.diagnostica());
+  expect(diag.relayLoads).toBeGreaterThanOrEqual(1);
+  expect(diag.heartbeatCount).toBeGreaterThanOrEqual(1);
+  expect(diag.watchdogAttivo).toBe(true);
 });
