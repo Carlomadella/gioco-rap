@@ -6,6 +6,24 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:f3132f30 -->
+## 02/10/26, 00:12 — docs/mobile-desktop-isolation-rule → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `f3132f30`
+
+### Cosa è entrato
+
+- `0d4feaa3` — docs: separa in modo vincolante sviluppo mobile e desktop — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:7fe740c -->
 ## 01/10/26, 21:37 — task/widget-meteo-click-perimetro → main
 
