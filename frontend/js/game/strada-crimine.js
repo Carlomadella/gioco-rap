@@ -1452,7 +1452,12 @@ function stradaSegnaPersona(p,meta){
   const st=stradaPersonaMeta(p);
   const eraConosciuto=!!st.known;
   st.known=true;
-  if(!eraConosciuto && stradaFiduciaValore(p)<5) st.fiducia=5;
+  if(!eraConosciuto){
+    if(stradaFiduciaValore(p)<5) st.fiducia=5;
+    st.streetStatus="active";
+    st.lastPlayerStreetInteractionAbsoluteDay=stradaAbsDay();
+    st.ignoredStreetOffers=0;
+  }
   if(!st.key && meta.key) st.key=String(meta.key);
   if(st.firstLinkedAbsoluteDay==null) st.firstLinkedAbsoluteDay=stradaAbsDay();
   if(meta.source && !st.sources.includes(meta.source)) st.sources.push(meta.source);
@@ -1528,17 +1533,20 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
      l'offerta, lo storico e ogni ricomparsa futura. */
   if(trigger!=="fabbrica" || legacy===true){
     const key=variante.contactKey||stradaContattoKey(variante.persona);
-    return stradaCreaContatto(variante.persona,key,{
+    const p=stradaCreaContatto(variante.persona,key,{
       source:legacy===true?"legacy-opportunity":"opportunity",
       opportunityId:variante.id,
       introducedByPersonId:(G.strada&&G.strada.ingressoPersonaId)||null
     });
+    return p && stradaRelazioneDisponibile(p) ? p : null;
   }
 
   /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Una dritta
      post-turno può esistere solo se in quel posto c'è già una persona reale
      che il giocatore ha scoperto essere collegata alla Strada. */
-  const candidati=stradaContattiLuogo("fabbrica").sort((a,b)=>{
+  const candidati=stradaContattiLuogo("fabbrica")
+    .filter(stradaRelazioneDisponibile)
+    .sort((a,b)=>{
     const ak=a.strada&&a.strada.known?1:0;
     const bk=b.strada&&b.strada.known?1:0;
     return (bk-ak) ||
@@ -1868,6 +1876,7 @@ function stradaFabbricaLeadVariante(roll){ return stradaScegliOpportunita(roll);
 
 function stradaTentaOpportunita(trigger,roll,variantRoll){
   if(!stradaGiroAvviato() || (G.strada&&G.strada.arresto)) return null;
+  stradaAggiornaRelazioniCriminali(true);
   /* Le dritte "dal mondo" viaggiano sul TrapPhone. Gli incontri Fabbrica
      restano faccia a faccia e non dipendono dal dispositivo. */
   if(trigger==="mondo" && !stradaHaTrapPhone()) return null;
@@ -1900,6 +1909,7 @@ function stradaTentaOpportunita(trigger,roll,variantRoll){
   variante.personId=persona.id;
   variante.persona=persona.n;
   variante.contactKey=(persona.strada&&persona.strada.key)||stradaContattoKey(persona.n);
+  stradaRegistraTentativoContatto(persona,"opportunity:"+String(variante.id||""));
 
   st.lastOfferAbsoluteDay=oggi;
   st.nextOfferAbsoluteDay=oggi+Number(cfg.cooldownGiorni||10);
@@ -1927,6 +1937,8 @@ function stradaTentaPropostaFabbrica(roll,variantRoll){
 function stradaAccettaOpportunita(){
   const st=stradaOpportunitaStato();
   if(!st.pending) return null;
+  const persona=stradaPersonaDaId(st.pending.personId);
+  if(persona) stradaRegistraInterazione(persona,"opportunity-accepted");
   const oggi=stradaAbsDay();
   const lead=Object.assign({},st.pending,{
     status:"active",
@@ -1957,6 +1969,8 @@ function stradaAccettaPropostaFabbrica(){ return stradaAccettaOpportunita(); }
 function stradaRifiutaOpportunita(){
   const st=stradaOpportunitaStato();
   if(!st.pending) return null;
+  const persona=stradaPersonaDaId(st.pending.personId);
+  if(persona) stradaRegistraInterazione(persona,"opportunity-declined");
   const proposta=Object.assign({},st.pending,{status:"declined",declinedAbsoluteDay:stradaAbsDay()});
   st.pending=null;
   st.history.push({
@@ -1975,6 +1989,8 @@ function stradaAnnullaOpportunita(){
   const st=stradaOpportunitaStato();
   if(!st.pending) return null;
   const proposta=st.pending;
+  const persona=stradaPersonaDaId(proposta.personId);
+  if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
   st.pending=null;
   if(Number(st.lastOfferAbsoluteDay)===Number(proposta.offeredAbsoluteDay)){
     st.lastOfferAbsoluteDay=null;
@@ -1995,6 +2011,8 @@ function stradaConsumaOpportunita(colpoId,successo){
     consumedAbsoluteDay:stradaAbsDay(),
     success:!!successo
   });
+  const persona=stradaPersonaDaId(usata.personId);
+  if(persona) stradaRegistraInterazione(persona,"opportunity-consumed");
   st.active=null;
   st.history.push({
     type:"consumed",
