@@ -13,6 +13,9 @@ const ROOT = path.resolve(__dirname, "../..");
 const ACTIONS = path.join(ROOT, "js/game/actions.js");
 const LIFESTYLE = path.join(ROOT, "js/game/lifestyle.js");
 const WORK_EVENTS = path.join(ROOT, "js/game/lavoro-eventi.js");
+const TEMPO = path.join(ROOT, "js/game/tempo.js");
+const ORARI = path.join(ROOT, "js/game/orari.js");
+const AGENDA = path.join(ROOT, "js/game/agenda.js");
 
 function helperLavoro(){
   const source = fs.readFileSync(ACTIONS, "utf8");
@@ -340,6 +343,141 @@ function simulaOperativo(){
   };
 }
 
+function leggiCostantiTempo(){
+  const source=fs.readFileSync(TEMPO,"utf8");
+  const start=source.indexOf("const DURATE = Object.freeze({");
+  const end=source.indexOf("let AZIONE_ID_CATTURATA",start);
+  if(start<0 || end<0) throw new Error("costanti tempo non trovate");
+  const ctx={Object};
+  vm.createContext(ctx);
+  vm.runInContext(source.slice(start,end)+
+    "\nthis.__tempo={durate:DURATE,lavoro:DURATE_LUOGO_LAVORO};",ctx);
+  return ctx.__tempo;
+}
+
+function leggiOrariFabbrica(){
+  const source=fs.readFileSync(ORARI,"utf8");
+  const start=source.indexOf("const PLACE_HOURS = Object.freeze({");
+  const end=source.indexOf("function parseClock",start);
+  if(start<0 || end<0) throw new Error("costanti orari non trovate");
+  const ctx={Object};
+  vm.createContext(ctx);
+  vm.runInContext(source.slice(start,end)+
+    "\nthis.__orari={place:PLACE_HOURS,actions:ACTION_HOURS,events:EVENT_HOURS};",ctx);
+  return ctx.__orari;
+}
+
+function leggiAgendaSettimanale(){
+  const source=fs.readFileSync(AGENDA,"utf8");
+  const start=source.indexOf("const SETTIMANALI = [");
+  const end=source.indexOf("function settimanali()",start);
+  if(start<0 || end<0) throw new Error("eventi settimanali Agenda non trovati");
+  const ctx={};
+  vm.createContext(ctx);
+  vm.runInContext(source.slice(start,end)+"\nthis.__agenda=SETTIMANALI;",ctx);
+  return Array.from(ctx.__agenda||[],x=>Object.assign({},x));
+}
+
+function minutiOra(v){
+  const m=/^(\d{1,2}):(\d{2})$/.exec(String(v||""));
+  if(!m) throw new Error("ora non valida: "+v);
+  let h=Number(m[1]), mm=Number(m[2]);
+  let out=h*60+mm;
+  if(out<8*60) out+=1440;
+  return out;
+}
+
+function giornataDoppiaVita(preWork,evento){
+  const tempo=leggiCostantiTempo();
+  const orari=leggiOrariFabbrica();
+  const fabbrica=orari.place.fabbrica;
+  const apertura=minutiOra(fabbrica.open);
+  const chiusura=minutiOra(fabbrica.close);
+  const turno=Number(tempo.lavoro.fabbrica||0);
+  const azioni=(preWork||[]).map(id=>({
+    id,
+    minuti:Number(tempo.durate[id]||0)
+  }));
+  const musicaPrima=azioni.reduce((n,x)=>n+x.minuti,0);
+  const inizioTurno=apertura+musicaPrima;
+  const fineTurno=inizioTurno+turno;
+  const turnoPossibile=fineTurno<=chiusura;
+  const at=evento?minutiOra(evento.ora):null;
+  const conflitto=!!(turnoPossibile && Number.isFinite(at) && at>=inizioTurno && at<fineTurno);
+
+  return {
+    preWork:azioni,
+    musicaPrima,
+    apertura,
+    chiusura,
+    turno,
+    inizioTurno,
+    fineTurno,
+    turnoPossibile,
+    evento:evento?{id:evento.id,giorno:evento.giorno,ora:evento.ora,minuti:at}:null,
+    conflitto
+  };
+}
+
+function scenarioSettimanaDoppiaVita(prePerGiorno){
+  const agenda=leggiAgendaSettimanale();
+  const giorni=[];
+  for(let giorno=1;giorno<=6;giorno++){
+    const evento=agenda.find(x=>Number(x.giorno)===giorno) || null;
+    const g=giornataDoppiaVita((prePerGiorno&&prePerGiorno[giorno])||[],evento);
+    giorni.push(Object.assign({giorno},g));
+  }
+  const lavorabili=giorni.filter(x=>x.turnoPossibile).length;
+  const richiesti=5;
+  return {
+    richiesti,
+    lavorabili,
+    margine:lavorabili-richiesti,
+    contrattoPossibile:lavorabili>=richiesti,
+    conflitti:giorni.filter(x=>x.conflitto).map(x=>({
+      giorno:x.giorno,eventId:x.evento&&x.evento.id,ora:x.evento&&x.evento.ora,
+      inizioTurno:x.inizioTurno,fineTurno:x.fineTurno
+    })),
+    giorni
+  };
+}
+
+function simulaDoppiaVita(){
+  const tempo=leggiCostantiTempo();
+  const agenda=leggiAgendaSettimanale();
+  const promo=agenda.find(x=>x.id==="promo") || null;
+
+  /* Tre gradini di playtest, senza inventare malus:
+     1) lavoro prima, musica dopo -> il 5/5 convive;
+     2) una mattina piena di musica toglie un giorno, ma il sabato recupera;
+     3) due mattine piene tolgono due giorni e il 5/5 non è più matematicamente
+        chiudibile: lì nasce una scelta vera fra contratto e carriera musicale. */
+  const base=scenarioSettimanaDoppiaVita({});
+  const registrazionePrima=giornataDoppiaVita(["registra"],promo);
+  const unaGiornataPiena=scenarioSettimanaDoppiaVita({
+    5:["scrivi","beat"]
+  });
+  const dueGiornatePiene=scenarioSettimanaDoppiaVita({
+    4:["scrivi","beat"],
+    5:["scrivi","beat"]
+  });
+
+  return {
+    fonti:{
+      turnoFabbrica:Number(tempo.lavoro.fabbrica||0),
+      scrivi:Number(tempo.durate.scrivi||0),
+      beat:Number(tempo.durate.beat||0),
+      registra:Number(tempo.durate.registra||0),
+      mixa:Number(tempo.durate.mixa||0),
+      promo:Number(tempo.durate.promo||0)
+    },
+    base,
+    registrazionePrima,
+    unaGiornataPiena,
+    dueGiornatePiene
+  };
+}
+
 function simulaCarrieraPerfetta(cicli=13){
   const G=statoCarriera(), r=runtime(G), storia=[];
   let pagaAnnua=0;
@@ -392,6 +530,7 @@ function esegui(){
   const recupero=simulaFatica("12 settimane da 6, poi 5",w=>w<=12?6:5);
   const carriera=simulaCarrieraPerfetta(13);
   const operativo=simulaOperativo();
+  const doppiaVita=simulaDoppiaVita();
   const lifestyleMax=costoLifestyleMassimo();
   const pagaTop=Number(carriera.finale.paga||0);
   const economia={
@@ -444,7 +583,24 @@ function esegui(){
         operativo.conflitti.musicaCritica.row.attendance.assenzeCreateDalConflitto===1 &&
         operativo.conflitti.scegliLavoro.row &&
         operativo.conflitti.scegliLavoro.row.choice==="work" &&
-        operativo.conflitti.scegliLavoro.missed===1}
+        operativo.conflitti.scegliLavoro.missed===1},
+    {nome:"la doppia vita è possibile all'inizio senza malus artificiale",
+      ok:doppiaVita.fonti.turnoFabbrica===480 &&
+        doppiaVita.base.contrattoPossibile===true &&
+        doppiaVita.base.margine===1 &&
+        doppiaVita.base.conflitti.length===0},
+    {nome:"una giornata musicale piena si recupera col sabato, due obbligano a scegliere",
+      ok:doppiaVita.unaGiornataPiena.contrattoPossibile===true &&
+        doppiaVita.unaGiornataPiena.margine===0 &&
+        doppiaVita.dueGiornatePiene.contrattoPossibile===false &&
+        doppiaVita.dueGiornatePiene.lavorabili===4},
+    {nome:"spostare tre ore di studio prima del turno può creare un conflitto reale",
+      ok:doppiaVita.registrazionePrima.turnoPossibile===true &&
+        doppiaVita.registrazionePrima.inizioTurno===11*60 &&
+        doppiaVita.registrazionePrima.fineTurno===19*60 &&
+        (!doppiaVita.registrazionePrima.evento ||
+         doppiaVita.registrazionePrima.evento.id!=="promo" ||
+         doppiaVita.registrazionePrima.conflitto===true)}
   ];
 
   return {
@@ -462,7 +618,8 @@ function esegui(){
       tappe:carriera.storia.filter(x=>x.evento)
     },
     economia,
-    operativo
+    operativo,
+    doppiaVita
   };
 }
 
@@ -490,6 +647,9 @@ function stampa(out){
     !!out.operativo.disciplina.gravi[out.operativo.disciplina.gravi.length-1].dismissed);
   console.log("Eventi ruolo unici in 5 settimane: "+
     Object.entries(out.operativo.eventi).map(([k,v])=>k+"="+v.unici).join(" · "));
+  console.log("Doppia vita: base "+out.doppiaVita.base.lavorabili+"/6 giorni lavorabili"+
+    " · 1 mattina piena "+out.doppiaVita.unaGiornataPiena.lavorabili+"/6"+
+    " · 2 mattine piene "+out.doppiaVita.dueGiornatePiene.lavorabili+"/6");
 }
 
 if(require.main===module){
@@ -500,6 +660,6 @@ if(require.main===module){
 
 module.exports={
   simulaFatica,simulaCarrieraPerfetta,simulaProfiliRuolo,simulaDisciplina,
-  simulaEventiRuolo,simulaConflittiMusica,simulaOperativo,
+  simulaEventiRuolo,simulaConflittiMusica,simulaOperativo,simulaDoppiaVita,
   costoLifestyleMassimo,esegui,stampa
 };
