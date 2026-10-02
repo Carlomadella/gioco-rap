@@ -141,32 +141,90 @@ test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", as
   await expect(page.locator("#m-play")).toBeVisible();
 });
 
-test("landscape mobile: scelta Avaturn/MakeHuman scorre con il dito", async ({ page }) => {
-  await page.goto("/media/creator-rpg-v24/creator.html");
+test("landscape mobile: scelta Avaturn/MakeHuman si ridimensiona e scorre davvero", async ({ page }) => {
+  await page.goto("/pagine/gioco.html");
+  await page.waitForFunction(() => window.ADF_RPG_V24);
+  await page.evaluate(() => ADF_RPG_V24.open());
 
-  const area = page.locator("#pageAppearance .layout");
+  const frame = page.frameLocator("#adf-rpg-v24-frame");
+  const area = frame.locator("#pageAppearance .layout");
   await expect(area).toBeVisible();
-  await expect(page.getByRole("button", { name: /Avaturn/i })).toBeVisible();
-  await expect(page.getByRole("button", { name: /MakeHuman/i })).toBeVisible();
+  await expect(frame.getByRole("button", { name: /Avaturn/i })).toBeVisible();
+  await expect(frame.getByRole("button", { name: /MakeHuman/i })).toBeVisible();
 
-  const misure = await area.evaluate(el => ({
-    clientHeight: el.clientHeight,
-    scrollHeight: el.scrollHeight,
-    overflowY: getComputedStyle(el).overflowY,
-    touchAction: getComputedStyle(el).touchAction
-  }));
+  const misure = await area.evaluate(el => {
+    const content = el.querySelector(".content");
+    const griglia = el.querySelector(".avatar-method-grid");
+    const cards = [...el.querySelectorAll(".avatar-method")];
+    const topbar = document.querySelector(".topbar").getBoundingClientRect();
+    const viewport = document.querySelector(".viewport").getBoundingClientRect();
+    const cs = getComputedStyle(griglia);
+    return {
+      innerHeight,
+      clientWidth: el.clientWidth,
+      scrollWidth: el.scrollWidth,
+      clientHeight: el.clientHeight,
+      scrollHeight: el.scrollHeight,
+      overflowY: getComputedStyle(el).overflowY,
+      touchAction: getComputedStyle(el).touchAction,
+      contentWidth: content.getBoundingClientRect().width,
+      colonne: cs.gridTemplateColumns.trim().split(/\s+/).filter(Boolean).length,
+      cardMaxHeight: Math.max(...cards.map(card => card.getBoundingClientRect().height)),
+      topbarBottom: topbar.bottom,
+      viewportTop: viewport.top,
+      viewportBottom: viewport.bottom
+    };
+  });
 
   expect(misure.overflowY).toBe("auto");
   expect(misure.touchAction).toContain("pan-y");
-  expect(misure.scrollHeight).toBeGreaterThan(misure.clientHeight);
+  expect(misure.scrollWidth).toBeLessThanOrEqual(misure.clientWidth + 1);
+  expect(misure.contentWidth).toBeLessThanOrEqual(misure.clientWidth + 1);
+  expect(misure.colonne).toBe(2);
+  expect(misure.cardMaxHeight).toBeLessThanOrEqual(132);
+  expect(Math.abs(misure.viewportTop - misure.topbarBottom)).toBeLessThanOrEqual(1);
+  expect(misure.viewportBottom).toBeLessThanOrEqual(misure.innerHeight + 1);
 
-  const prima = await area.evaluate(el => el.scrollTop);
-  await area.evaluate(el => { el.scrollTop = Math.min(160, el.scrollHeight - el.clientHeight); });
+  /* Regressione reale: su un viewport landscape piu' basso il contenuto deve
+     poter scorrere con un gesto touch nativo dentro l'iframe, non solo con
+     scrollTop assegnato da JavaScript. */
+  await page.setViewportSize({ width: 740, height: 320 });
+  await expect(area).toBeVisible();
+
+  const prima = await area.evaluate(el => ({
+    top: el.scrollTop,
+    clientHeight: el.clientHeight,
+    scrollHeight: el.scrollHeight
+  }));
+  expect(prima.scrollHeight).toBeGreaterThan(prima.clientHeight + 1);
+
+  const iframeBox = await page.locator("#adf-rpg-v24-frame").boundingBox();
+  expect(iframeBox).not.toBeNull();
+
+  const cdp = await page.context().newCDPSession(page);
+  const x = iframeBox.x + iframeBox.width * 0.52;
+  const y0 = iframeBox.y + iframeBox.height * 0.78;
+  const y1 = iframeBox.y + iframeBox.height * 0.28;
+
+  await cdp.send("Input.dispatchTouchEvent", {
+    type:"touchStart",
+    touchPoints:[{x,y:y0,radiusX:1,radiusY:1,force:1}]
+  });
+  for(let i=1;i<=5;i++){
+    const y = y0 + (y1-y0)*(i/5);
+    await cdp.send("Input.dispatchTouchEvent", {
+      type:"touchMove",
+      touchPoints:[{x,y,radiusX:1,radiusY:1,force:1}]
+    });
+  }
+  await cdp.send("Input.dispatchTouchEvent", { type:"touchEnd", touchPoints:[] });
+  await page.waitForTimeout(180);
+
   const dopo = await area.evaluate(el => el.scrollTop);
-  expect(dopo).toBeGreaterThan(prima);
+  expect(dopo).toBeGreaterThan(prima.top);
 
-  await page.locator("#avatarSelectionNote").scrollIntoViewIfNeeded();
-  await expect(page.locator("#avatarSelectionNote")).toBeVisible();
+  await frame.locator("#avatarSelectionNote").scrollIntoViewIfNeeded();
+  await expect(frame.locator("#avatarSelectionNote")).toBeVisible();
 });
 
 test("landscape mobile: il camerino mostra Indietro in alto e toccabile", async ({ page }) => {
