@@ -6,6 +6,28 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:e7463e6c -->
+## 02/10/26, 17:12 — fix/mobile-creator-cache-bust → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e7463e6c`
+
+### Cosa è entrato
+
+- `1f95a22d` — fix(cache): aggiorna bridge creator nel gioco — **mycolbraga**
+- `ac801195` — fix(cache): aggiorna bridge creator sulla landing — **mycolbraga**
+- `e645ea57` — fix(cache): forza nuova versione creator RPG — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/creator/rpg-v24-bridge.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:e460a62b -->
 ## 02/10/26, 14:31 — task/pizzeria-bilanciamento-playtest → main
 
