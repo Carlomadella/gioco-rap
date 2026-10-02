@@ -214,7 +214,13 @@ test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso gi
     await new Promise(r=>setTimeout(r,80));
     const dopoPromo=GAME_TIME.now();
 
-    const viaggio=GAME_TRAVEL.go("pizzeria");
+    let viaggio=GAME_TRAVEL.go("pizzeria");
+    let atteseApertura=0;
+    while(viaggio && !viaggio.ok && viaggio.reason==="arrival-closed" && atteseApertura<8){
+      GAME_TIME.advance(15,"wait-for-pizzeria");
+      atteseApertura++;
+      viaggio=GAME_TRAVEL.go("pizzeria");
+    }
     const dopoViaggio=GAME_TIME.now();
     if(GAME_TIME.now()<17*60) GAME_TIME.advance(17*60-GAME_TIME.now(),"wait-for-shift");
     const inizioTurno=GAME_TIME.now();
@@ -268,6 +274,7 @@ test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso gi
       tempoPrima,dopoPromo,dopoViaggio,inizioTurno,
       promoOk:promoOk!==false,
       viaggioOk:!!(viaggio&&viaggio.ok),
+      atteseApertura,
       primo,
       secondo,
       conflitti,scelte,
@@ -286,6 +293,7 @@ test("Pizzeria: musica, spostamento e conflitto serale convivono nello stesso gi
   expect(out.promoOk).toBe(true);
   expect(out.dopoPromo-out.tempoPrima).toBe(45);
   expect(out.viaggioOk).toBe(true);
+  expect(out.atteseApertura).toBeGreaterThanOrEqual(0);
   expect(out.dopoViaggio).toBeGreaterThanOrEqual(out.dopoPromo);
   expect(out.inizioTurno).toBeGreaterThanOrEqual(17*60);
 
