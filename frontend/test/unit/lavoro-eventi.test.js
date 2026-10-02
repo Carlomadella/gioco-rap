@@ -91,7 +91,7 @@ describe("famiglie eventi lavoro", () => {
   it("ogni ruolo Fabbrica ha cinque eventi propri e un anti-ripetizione coerente", () => {
     const src=leggi("js/game/lavoro-eventi.js");
     const start=src.indexOf("const FACTORY_ROLE_EVENTS");
-    const end=src.indexOf("const FACTORY_ROLE_EVENT_LOAD",start);
+    const end=src.indexOf("const PIZZERIA_ROLE_EVENTS",start);
     const block=src.slice(start,end);
     const ruoli=["operaio","operaio_esperto","capolinea","capoturno"];
 
