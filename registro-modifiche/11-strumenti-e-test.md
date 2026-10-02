@@ -6,6 +6,31 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:44a71b61 -->
+## 02/10/26, 13:30 — task/pizzeria-ferie-v2 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `44a71b61`
+
+### Cosa è entrato
+
+- `54b67ccc` — fix(test): cerca gli attributi ferie senza eseguire la UI — **mycolbraga**
+- `ef742ca6` — test(pizzeria): copre ferie mensili e disciplina — **mycolbraga**
+- `fc76c49a` — test(lavoro): allinea ferie Fabbrica alla UI condivisa — **mycolbraga**
+- `0f53bef6` — feat(pizzeria): riusa la UI ferie per entrambi i lavori — **mycolbraga**
+- `b9bb47d9` — feat(pizzeria): aggiunge un giorno di ferie per ciclo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Aggiunto:** `frontend/test/unit/pizzeria-ferie.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:20bcf021 -->
 ## 02/10/26, 13:27 — task/pizzeria-ui-carriera-turno-v2 → main
 
