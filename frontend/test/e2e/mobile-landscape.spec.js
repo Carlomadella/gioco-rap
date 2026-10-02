@@ -81,6 +81,24 @@ test("landscape mobile: il suggerimento di rotazione non copre il gioco", async 
 });
 
 
+test("landscape mobile: Inizia mostra tutte le voci senza blocco nero", async ({ page }) => {
+  await page.goto("/pagine/landing.html");
+  await page.locator("#m-play").tap();
+
+  const pannello = page.locator(".land-avvio");
+  await expect(pannello).toBeVisible();
+  await expect(pannello).toHaveCSS("transform", "none");
+  await expect(pannello.getByText("Nuova partita", { exact: true })).toBeVisible();
+  await expect(pannello.getByText("Avvio rapido", { exact: true })).toBeVisible();
+  await expect(pannello.getByText("Carica partita", { exact: true })).toBeVisible();
+  await expect(pannello.getByText("Importa partita", { exact: true })).toBeVisible();
+
+  const box = await pannello.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box.y).toBeGreaterThanOrEqual(-1);
+  const vh = await page.evaluate(() => innerHeight);\n  expect(box.y + box.height).toBeLessThanOrEqual(vh + 1);
+});
+
 test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", async ({ page }) => {
   await page.goto("/pagine/landing.html");
   await page.locator("#m-play").tap();
