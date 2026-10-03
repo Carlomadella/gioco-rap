@@ -10,10 +10,13 @@ const leggi = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 
 function helperIngresso(){
   const source=leggi("js/game/strada-crimine.js");
+  const gateStart=source.indexOf("function stradaUscitaStato(){");
+  const gateEnd=source.indexOf("function stradaProfonditaUscita(){",gateStart);
   const start=source.indexOf("function stradaAbsDay(){");
   const end=source.indexOf("function stradaOpportunitaStato(){",start);
-  if(start<0 || end<0) throw new Error("helper ingresso Strada non trovato");
-  return source.slice(start,end);
+  if(gateStart<0 || gateEnd<0 || start<0 || end<0)
+    throw new Error("helper ingresso Strada non trovato");
+  return source.slice(gateStart,gateEnd)+"\n"+source.slice(start,end);
 }
 
 function contesto(overrides={}){
