@@ -131,12 +131,13 @@ describe("Strada · pool e categorie dei colpi",()=>{
     for(const id of refs) expect(ids.has(id)).toBe(true);
   });
 
-  it("la UI usa le offerte del giorno e mostra la categoria",()=>{
+  it("la UI V2 usa le offerte del giorno coerenti con l'ora e mostra la categoria",()=>{
     const {source}=runtime();
-    expect(source).toContain("const offerte = stradaColpiDisponibili()");
-    expect(source).toContain("griglia.innerHTML = offerte.map");
-    expect(source).toContain("stradaCategoria(c).n");
-    expect(source).toContain("stradaCategoriaLabel(colpo)");
-    expect(source).not.toContain("griglia.innerHTML = STRADA_COLPI.map");
+    const ui=leggi("js/game/strada-crimine-ui.js");
+    expect(source).toContain("function stradaColpiDisponibiliAdesso()");
+    expect(ui).toContain('typeof stradaColpiDisponibiliAdesso==="function"');
+    expect(ui).toContain('typeof stradaCategoria==="function"?stradaCategoria(c).n');
+    expect(ui).toContain("Nessun lavoro gira adesso");
+    expect(ui).not.toContain('q("#crimes").innerHTML=STRADA_COLPI.map');
   });
 });

@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
+const crimeUi=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8");
 
 const start=crime.indexOf("const STRADA_CADUTA_FASCE");
 const end=crime.indexOf("function stradaHeatBruciaOpportunita",start);
@@ -128,10 +129,13 @@ describe("Strada · punto 23 soldi facili, cadute progressive",()=>{
     expect(high).toBeLessThanOrEqual(.24);
   });
 
-  it("la UI distingue probabilità di fallire e costo della caduta",()=>{
-    expect(crime).toContain("Rischio ' + stRischio(c).toLowerCase()");
-    expect(crime).toContain("Caduta ' + stradaCadutaProfilo(c).label");
-    expect(crime).toContain("stradaCadutaClasse(c)");
+  it("la UI V2 distingue probabilità di fallire e costo della caduta",()=>{
+    expect(crimeUi).toContain('typeof stRischio==="function"');
+    expect(crimeUi).toContain('typeof stClasseRischio==="function"');
+    expect(crimeUi).toContain('typeof stradaCadutaProfilo==="function"');
+    expect(crimeUi).toContain('typeof stradaCadutaClasse==="function"');
+    expect(crimeUi).toContain('Rischio ${esc(String(rischio).toLowerCase())}');
+    expect(crimeUi).toContain('Caduta ${esc(caduta.label)}');
   });
 
   it("l'arresto conserva il peso iniziale e il carcere lo usa per il contratto",()=>{

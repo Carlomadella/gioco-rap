@@ -6,6 +6,89 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:0613b420 -->
+## 03/10/26, 20:33 — fix/crime-ui-reaudit-v2 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `0613b420`
+
+### Cosa è entrato
+
+- `840fee87` — test: riallinea audit regressioni alla UI crime V2 — **mycolbraga**
+- `7a596182` — docs: chiarisci coerenza narrativa delle offerte crime — **mycolbraga**
+- `4e38461e` — test: correggi sorgente test reputazione V2 — **mycolbraga**
+- `e9bf7790` — test: rinomina il controllo capacità per il suo vero perimetro — **mycolbraga**
+- `911d71fa` — test: verifica reputazione e fiducia sulla UI crime V2 — **mycolbraga**
+- `06f79d71` — test: verifica il pool sulla UI crime V2 — **mycolbraga**
+- `4ca00d9f` — fix: distingue nome nel giro dalla fiducia personale — **mycolbraga**
+- `d593af44` — fix: riusa il layout esistente per gli stati senza colpi — **mycolbraga**
+- `77c6524f` — chore: aggiorna cache bust UI crime v8 — **mycolbraga**
+- `b1a774cd` — test: copri narrativa oraria, sistemi avanzati ed ex-giro nel browser — **mycolbraga**
+- `3c51f132` — test: copri orari narrativi e sistemi avanzati nella UI V2 — **mycolbraga**
+- `172137cd` — test: controlla gli shop sulla UI crime V2 — **mycolbraga**
+- `b89e9dac` — test: verifica stato ex-giro sulla UI crime V2 — **mycolbraga**
+- `07902801` — test: verifica intel sulla UI crime realmente visibile — **mycolbraga**
+- `917fd8df` — test: verifica fallout sulla UI crime realmente visibile — **mycolbraga**
+- `2f6668ff` — test: verifica heat sulla UI crime realmente visibile — **mycolbraga**
+- `e87aa487` — fix: porta nella UI V2 i sistemi crime avanzati e lo stato ex-giro — **mycolbraga**
+- `39e0dc57` — fix: filtra i colpi per coerenza narrativa e chiudi il legale ex-giro — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/e2e/crime-reaudit.spec.js`
+- **Modificato:** `frontend/test/unit/strada-colpi-pool.test.js`
+- **Modificato:** `frontend/test/unit/strada-fallout-progressivo.test.js`
+- **Modificato:** `frontend/test/unit/strada-heat-mondo.test.js`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+- **Modificato:** `frontend/test/unit/strada-intel-contestuale.test.js`
+- **Modificato:** `frontend/test/unit/strada-peso-capacita.test.js`
+- **Modificato:** `frontend/test/unit/strada-reaudit-integrazione.test.js`
+- **Modificato:** `frontend/test/unit/strada-reputazione-separata.test.js`
+- **Modificato:** `frontend/test/unit/strada-uscita-passato.test.js`
+
+**File interessati in questa categoria:** 14
+
+---
+
+<!-- merge:1c30983b -->
+## 03/10/26, 20:08 — fix/crime-reaudit-7-punti → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `1c30983b`
+
+### Cosa è entrato
+
+- `0b7eba85` — docs: documenta accesso crime 24/7 e finestre colpi — **mycolbraga**
+- `e04ba796` — docs: chiudi gap temporale del crime — **mycolbraga**
+- `7ed4e11f` — test: stabilizza setup E2E crime — **mycolbraga**
+- `d4e04a0f` — test: copri preparazione entro la finestra — **mycolbraga**
+- `f57ec3b7` — fix: non sprecare preparazione fuori finestra — **mycolbraga**
+- `798fc9b7` — chore: aggiorna cache bust UI crime — **mycolbraga**
+- `447e4d11` — test: aggiungi smoke E2E del reaudit crime — **mycolbraga**
+- `3e17e4af` — test: copri i sette rilievi del reaudit crime — **mycolbraga**
+- `b91e323a` — fix: aggiorna copy crime per accesso 24/7 — **mycolbraga**
+- `97c79697` — fix: lascia Attività criminali accessibile 24/7 — **mycolbraga**
+- `953df456` — fix: riallinea UI crime al core corrente — **mycolbraga**
+- `c6d51040` — fix: aggiungi finestre temporali ai singoli colpi — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/e2e/crime-reaudit.spec.js`
+- **Aggiunto:** `frontend/test/unit/strada-reaudit-integrazione.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:8e222dd6 -->
 ## 03/10/26, 12:21 — task/recap-giornaliero → main
 

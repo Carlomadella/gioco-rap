@@ -1264,10 +1264,23 @@ test("la Provincia usa un pool ampio e quattro offerte giornaliere non vincolate
   crime.includes("const STRADA_CATEGORIE_COLPO") &&
   crime.includes("function stradaGeneraOfferteColpi") &&
   crime.includes("function stradaColpiDisponibili") &&
-  crime.includes("const offerte = stradaColpiDisponibili()") &&
-  crime.includes("griglia.innerHTML = offerte.map") &&
+  crime.includes("return scored.slice(0,4).map") &&
   crime.includes("Nessun bonus per diversità categoria") &&
   (crime.match(/categoria:"/g)||[]).length>=30);
+test("la UI crime filtra per coerenza oraria senza inventare offerte sostitutive",
+  crime.includes("function stradaColpiDisponibiliAdesso()") &&
+  crime.includes("stradaColpiDisponibili().filter(c=>stradaFinestraColpoStato(c).ok)") &&
+  crimeui.includes('typeof stradaColpiDisponibiliAdesso==="function"') &&
+  crimeui.includes("Nessun lavoro gira adesso"));
+test("la UI crime visibile espone sistemi avanzati e stato ex-giro",
+  crimeui.includes('typeof stRischio==="function"') &&
+  crimeui.includes('typeof stradaCadutaProfilo==="function"') &&
+  crimeui.includes('typeof stradaOpportunitaAttiva==="function"') &&
+  crimeui.includes('typeof stradaHeatProfilo==="function"') &&
+  crimeui.includes('typeof lifestyleRiepilogoRischio==="function"') &&
+  crimeui.includes('q("#quit").textContent=partecipa?"Molla il giro":"Fuori dal giro"') &&
+  crimeui.includes('q("#launder").disabled=!partecipa') &&
+  crime.includes("non stai più affidando incarichi criminali a un legale privato"));
 test("le categorie dei colpi modificano davvero chance, resa, sporco, attenzione e reputazione",
   crime.includes("categoria.chance") &&
   crime.includes("effettiCategoria.guadagno") &&

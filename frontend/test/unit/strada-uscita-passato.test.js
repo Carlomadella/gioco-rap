@@ -9,6 +9,7 @@ const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 /* Su Windows i file escono in CRLF: senza i \r i toContain con dentro un a capo combaciano */
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8").replace(/\r\n/g,"\n");
+const crimeUi=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8").replace(/\r\n/g,"\n");
 const state=fs.readFileSync(path.join(ROOT,"js/game/state.js"),"utf8");
 const lifestyle=fs.readFileSync(path.join(ROOT,"js/game/lifestyle.js"),"utf8");
 const lavoroEventi=fs.readFileSync(path.join(ROOT,"js/game/lavoro-eventi.js"),"utf8");
@@ -174,10 +175,13 @@ describe("Strada · punto 21 uscita dal giro e memoria del passato",()=>{
     expect(lifestyle).toContain("!!stradaRischioCriminaleAttivo()");
   });
 
-  it("la UI rende evidente che sei fuori dal giro senza cancellare lo storico",()=>{
-    expect(crime).toContain("<b>Hai mollato il giro</b>");
-    expect(crime).toContain("Il passato però è ancora vicino");
-    expect(crime).toContain('molla.textContent=partecipa?"Molla il giro":"Fuori dal giro"');
-    expect(crime).toContain('molla.disabled=!partecipa||!!s.arresto');
+  it("la UI V2 rende evidente che sei fuori dal giro e blocca le azioni criminali",()=>{
+    expect(crimeUi).toContain("Hai mollato il giro");
+    expect(crimeUi).toContain("Il passato può ancora tornare a bussare");
+    expect(crimeUi).toContain('q("#quit").textContent=partecipa?"Molla il giro":"Fuori dal giro"');
+    expect(crimeUi).toContain('q("#quit").disabled=!partecipa||!!s.arresto');
+    expect(crimeUi).toContain('q("#launder").disabled=!partecipa');
+    expect(crimeUi).toContain('q("#lawyer").disabled=!partecipa');
+    expect(crime).toContain('if(!stradaPartecipazioneAttiva())\n    return "Hai mollato il giro: non stai più affidando incarichi criminali a un legale privato."');
   });
 });

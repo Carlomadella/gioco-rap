@@ -360,7 +360,9 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
   rilanciato sul codice corrente. **CHIUSO (03/10/2026)** anche il gap temporale emerso dal
   reaudit: Attività criminali resta accessibile 24/7 dopo lo sblocco, mentre ogni colpo
   usa una finestra coerente con il contesto (giorno/sera/notte/weekend) e verifica anche
-  che durata e preparazione possano concludersi dentro quella finestra;
+  che durata e preparazione possano concludersi dentro quella finestra. Le quattro offerte
+  del giorno restano stabili: la UI mostra solo quelle coerenti con l'ora corrente e non
+  rimpiazza artificialmente gli slot, quindi una fascia può anche non avere colpi disponibili;
   **FATTO in parte (03/10/2026)** — la Strada di Mycol, punti 9–24 (segnata dal push degli altri):
   il TrapPhone è uno sblocco del giro e non c'è più in una carriera nuova, l'heat cambia contatti e
   controlli, il rischio lifestyle confronta le spese con le entrate giustificabili, le persone del

@@ -399,8 +399,9 @@ describe("Strada · ingresso nascosto",()=>{
     expect(G.strada.avvocato).toBe(true);
   });
 
-  it("UI e carcere non usano più protezione o avvocato come shop istantanei",()=>{
+  it("UI V2 e carcere non usano più protezione o avvocato come shop istantanei",()=>{
     const strada=leggi("js/game/strada-crimine.js");
+    const crimeUi=leggi("js/game/strada-crimine-ui.js");
     const posto=leggi("js/game/posto.js");
     const circolo=leggi("js/game/circolo-stanze.js");
     expect(strada).toContain("function stScenaProtezione()");
@@ -408,8 +409,12 @@ describe("Strada · ingresso nascosto",()=>{
     expect(strada).toContain("difensore d'ufficio");
     expect(strada).toContain("Math.random()<.35");
     expect(strada).toContain("Il primo costo si paga subito");
-    expect(strada).not.toContain('stImpostaProtezione((G.strada.prot + 1) % STRADA_PROT.length)');
-    expect(strada).not.toContain('G.strada.avvocato = !G.strada.avvocato');
+    expect(crimeUi).toContain("stScenaProtezione()");
+    expect(crimeUi).toContain("stScenaAvvocato()");
+    expect(crimeUi).toContain("stCompraFerro()");
+    expect(crimeUi).not.toContain("stImpostaProtezione((before+1)%STRADA_PROT.length)");
+    expect(crimeUi).not.toContain("stToggleAvvocato()");
+    expect(crimeUi).not.toContain('id="gun" type="button">900 €');
     expect(posto).toContain('avvocato: {n:"Avvocato"');
     expect(posto).toContain('p.ruolo!=="avvocato"');
     expect(circolo).toContain("avvocato:{aperto:");
