@@ -107,7 +107,9 @@
           <div class="risk"><span>Contanti puliti</span><b id="clean">0 €</b></div>
           <div class="risk"><span>Precedenti</span><b id="precedents">0</b></div>
           <div class="risk pressure-row"><span>Occhi addosso</span><b class="hot" id="pressure">Bassi</b></div>
-          <div class="street-note">Più soldi sporchi tieni addosso, più ogni rumore fuori dalla porta sembra per te.</div>
+          <div class="street-note" id="pressureDetail">Più soldi sporchi tieni addosso, più ogni rumore fuori dalla porta sembra per te.</div>
+          <div class="risk"><span>Tenore di vita</span><b id="lifestyleRisk">Coerente</b></div>
+          <div class="street-note" id="lifestyleDetail">Quello che mostri fuori deve restare credibile rispetto alle entrate pulite.</div>
           <button class="quit" id="quit" type="button">Molla il giro</button>
         </aside>
         <section class="panel center" id="crimeCenter">
@@ -119,9 +121,9 @@
           <div class="tabs"><button class="tab on" data-tab="cover" type="button">Chi ti copre</button><button class="tab" data-tab="business" type="button">Attività</button></div>
           <div class="tabpane on" id="tab-cover">
             <div class="cover-row"><div class="t"><strong>Persone del giro <span id="menCount">(0)</span></strong><span id="peopleSummary">La fiducia si costruisce: nessuno si compra da questa schermata.</span></div><button class="pill" id="addMan" type="button">Rapporti</button></div>
-            <div class="cover-row"><div class="t"><strong>Protezione</strong><span>Serve una persona reale disposta a garantire per te.</span></div><button class="pill" id="prot" type="button">Gestisci</button></div>
-            <div class="cover-row"><div class="t"><strong>Il ferro</strong><span>Arriva tramite un contatto molto fidato e una proposta reale.</span></div><button class="pill danger" id="gun" type="button">Via contatto</button></div>
-            <div class="cover-row"><div class="t"><strong>Avvocato</strong><span>Va conosciuto nel mondo e poi incaricato.</span></div><button class="pill" id="lawyer" type="button">Gestisci</button></div>
+            <div class="cover-row"><div class="t"><strong>Protezione</strong><span id="protectionSummary">Serve una persona reale disposta a garantire per te.</span></div><button class="pill" id="prot" type="button">Gestisci</button></div>
+            <div class="cover-row"><div class="t"><strong>Il ferro</strong><span id="gunSummary">Arriva tramite un contatto molto fidato e una proposta reale.</span></div><button class="pill danger" id="gun" type="button">Via contatto</button></div>
+            <div class="cover-row"><div class="t"><strong>Avvocato</strong><span id="lawyerSummary">Va conosciuto nel mondo e poi incaricato.</span></div><button class="pill" id="lawyer" type="button">Gestisci</button></div>
             <div class="cover-row"><div class="t"><strong>Costo copertura</strong><span>Spesa fissa attuale.</span></div><button class="pill on" id="weekly" type="button" disabled>0 €/sett.</button></div>
             <div class="traphone-dock" id="traphoneDock">
               <div class="traphone-dock-head"><div><span>LINEA SEPARATA</span><b>TRAPHONE 16</b></div><em id="trapDockStatus">OFFLINE</em></div>
@@ -132,7 +134,7 @@
           </div>
           <div class="tabpane" id="tab-business"><div id="businessList"></div><div class="business-foot">Le attività generano resa settimanale e aumentano la capacità di ripulire il denaro sporco.</div></div>
         </aside>
-        <div class="citybar"><div class="city-note"><span>Più sali, più diventa difficile sparire.</span></div><div class="cities"><button class="city on" data-city="provincia" type="button"><span class="n">Provincia</span><span class="d">4 colpi disponibili</span></button><button class="city lock" data-city="milano" type="button"><span class="n">Milano</span><span class="d">4 colpi · livello 10</span></button><button class="city lock" data-city="la" type="button"><span class="n">Los Angeles</span><span class="d">3 colpi · da GOAT</span></button></div><div class="escape-help"><button class="map-return" id="mapReturn" type="button"><span class="arrow">←</span><span>Torna alla mappa</span></button></div></div>
+        <div class="citybar"><div class="city-note"><span>Più sali, più diventa difficile sparire.</span></div><div class="cities"><button class="city on" data-city="provincia" type="button"><span class="n">Provincia</span><span class="d">Offerte del giorno</span></button><button class="city lock" data-city="milano" type="button"><span class="n">Milano</span><span class="d">4 colpi · livello 10</span></button><button class="city lock" data-city="la" type="button"><span class="n">Los Angeles</span><span class="d">3 colpi · da GOAT</span></button></div><div class="escape-help"><button class="map-return" id="mapReturn" type="button"><span class="arrow">←</span><span>Torna alla mappa</span></button></div></div>
       </main>
       <div class="modal" id="crimeModal"><div class="sheet"><div class="sheet-head"><div><span class="k" id="sceneK">Come vuoi muoverti?</span><h2 id="mTitle">—</h2><p id="mDesc">—</p></div><button class="closemodal" id="closeCrimeModal" type="button">×</button></div><div class="approaches" id="crimeOptions"></div></div></div>
       <div class="toast" id="crimeToast"></div><div class="trap-toast" id="trapToast"></div>
@@ -443,14 +445,60 @@
   function chooseBackground(immediate){const all=window.CRIME_BACKGROUNDS_LOCAL||[];if(!all.length)return;const s=crimeVisualState(),band=careerBand(s),mult=[1,band>=1?1.25:.45,band>=2?1.25:.28,band>=3?1.25:.18],pool=[];for(const bg of all){if(!unlocked(bg,s))continue;let w=tagBoost(bg,s)*mult[bg.tier];if(bgHistory.includes(bg.id))w*=.12;pool.push([bg,Math.max(.02,w)])}let total=pool.reduce((a,x)=>a+x[1],0),r=Math.random()*total,bg=pool[0]&&pool[0][0];for(const x of pool){r-=x[1];if(r<=0){bg=x[0];break}}if(!bg)return;const layers=[q("#bgA"),q("#bgB")],next=immediate?layers[0]:layers[1-activeBg];next.style.backgroundImage=`url("${bg.url}")`;next.style.backgroundPosition=bg.position||"center 48%";next.classList.add("on");if(!immediate){layers[activeBg].classList.remove("on");activeBg=1-activeBg}else activeBg=0;bgHistory.push(bg.id);if(bgHistory.length>6)bgHistory.shift();window.__CRIME_BG_TAGS=Array.isArray(bg.tags)?bg.tags.slice():[];try{if(window.refreshCrimeCaption)window.refreshCrimeCaption(!!immediate)}catch(_){}}
 
   function renderCrimes(){
-    const s=street();
-    const offerte=typeof stradaColpiDisponibili==="function"?stradaColpiDisponibili():STRADA_COLPI.slice(0,4);
-    q("#crimes").innerHTML=offerte.map((c,i)=>{
+    const s=street(),partecipa=typeof stradaPartecipazioneAttiva!=="function"||stradaPartecipazioneAttiva();
+    const box=q("#crimes");
+    if(!partecipa){
+      const u=typeof stradaUscitaStato==="function"?stradaUscitaStato():null;
+      const giorni=u&&typeof stradaAbsDay==="function"
+        ? Math.max(0,Number(u.memoryUntilAbsoluteDay||0)-stradaAbsDay())
+        : 0;
+      box.innerHTML='<div class="crime-empty"><b>Hai mollato il giro</b><p>Non accetti più colpi e non ricicli denaro. '+
+        (giorni>0
+          ? 'Il passato può ancora tornare a bussare per circa '+giorni+' giorni.'
+          : 'Persone, precedenti e storia restano parte del personaggio.')+
+        '</p></div>';
+      return;
+    }
+
+    const offerte=typeof stradaColpiDisponibiliAdesso==="function"
+      ? stradaColpiDisponibiliAdesso()
+      : (typeof stradaColpiDisponibili==="function"?stradaColpiDisponibili():STRADA_COLPI.slice(0,4))
+          .filter(c=>crimeWindow(c.id).ok);
+
+    if(!offerte.length){
+      box.innerHTML='<div class="crime-empty"><b>Nessun lavoro gira adesso</b><p>Le offerte del giorno restano le stesse, ma in questa fascia oraria nessuna è coerente con il contesto. Torna più tardi.</p></div>';
+      return;
+    }
+
+    const leadIncontro=typeof stradaOpportunitaAttiva==="function"?stradaOpportunitaAttiva():null;
+    const leadLavoro=window.ADF_WORK_EVENTS&&typeof ADF_WORK_EVENTS.crimeLeadActive==="function"
+      ? ADF_WORK_EVENTS.crimeLeadActive()
+      : null;
+
+    box.innerHTML=offerte.map((c,i)=>{
       const finestra=crimeWindow(c.id);
       const ok=G.energy>=c.energia&&canDoCrime(c.id)&&!s.arresto;
       const categoria=typeof stradaCategoria==="function"?stradaCategoria(c).n:"";
-      const finestraTxt=finestra&&finestra.ok?(finestra.label||""):(finestra&&finestra.message||"Non disponibile ora");
-      return `<button class="crime${ok?"":" disabled"}" data-crime="${esc(c.id)}" type="button" ${ok?"":"disabled"}><span class="num">0${i+1}</span><b>${esc(c.n)}</b><p>${esc(c.d)}</p><div class="chips">${categoria?`<span class="chip">${esc(categoria)}</span>`:""}<span class="chip money">${money(c.min)}–${money(c.max)} €</span><span class="chip">${c.energia} energia</span><span class="chip">${window.GAME_TIME?GAME_TIME.formatDuration(durationFor(c.id)):""}</span>${finestraTxt?`<span class="chip">${esc(finestraTxt)}</span>`:""}</div><span class="go">→</span></button>`;
+      const rischio=typeof stRischio==="function"?stRischio(c):null;
+      const rischioClasse=typeof stClasseRischio==="function"?stClasseRischio(c):"";
+      const caduta=typeof stradaCadutaProfilo==="function"?stradaCadutaProfilo(c):null;
+      const cadutaClasse=typeof stradaCadutaClasse==="function"?stradaCadutaClasse(c):"";
+      const leadIncontroQui=leadIncontro&&leadIncontro.colpoId===c.id?leadIncontro:null;
+      const lead=leadIncontroQui||leadLavoro;
+      const giorniLead=lead&&typeof stradaAbsDay==="function"
+        ? Math.max(1,Number(lead.expiresAbsoluteDay)-stradaAbsDay())
+        : 0;
+      const fonteLead=leadIncontroQui
+        ? (leadIncontroQui.titolo||"Opportunità")
+        : (lead&&lead.sourceLabel?"Dritta "+lead.sourceLabel:"Dritta lavoro");
+      const bonusLead=lead
+        ? fonteLead+" "+(Number(lead.bonusPct||0)>=0?"+":"")+Number(lead.bonusPct||0)+"%"+
+          (lead.source==="street-opportunity"&&typeof stradaSegnoPct==="function"
+            ?" · "+stradaSegnoPct(lead.chanceDelta)+" riuscita"
+            :"")+
+          (giorniLead?" · "+giorniLead+(giorniLead===1?" giorno":" giorni"):"")
+        : "";
+      return `<button class="crime${ok?"":" disabled"}" data-crime="${esc(c.id)}" type="button" ${ok?"":"disabled"}><span class="num">0${i+1}</span><b>${esc(c.n)}</b><p>${esc(c.d)}</p><div class="chips">${categoria?`<span class="chip">${esc(categoria)}</span>`:""}<span class="chip money">${money(c.min)}–${money(c.max)} €</span><span class="chip">${c.energia} energia</span><span class="chip">${window.GAME_TIME?GAME_TIME.formatDuration(durationFor(c.id)):""}</span>${finestra&&finestra.label?`<span class="chip">${esc(finestra.label)}</span>`:""}${rischio?`<span class="chip ${esc(rischioClasse)}">Rischio ${esc(String(rischio).toLowerCase())}</span>`:""}${caduta?`<span class="chip ${esc(cadutaClasse)}">Caduta ${esc(caduta.label)}</span>`:""}${bonusLead?`<span class="chip money">${esc(bonusLead)}</span>`:""}</div><span class="go">→</span></button>`;
     }).join("");
   }
   function renderBusinesses(){
@@ -477,7 +525,138 @@
     }).join("");
     modal.classList.add("on");
   }
-  function sync(){const s=street(),art=window.ARTIST||{},city=(String(art.city||art.citta||"").trim()||"Provincia");q("#crimeCity").textContent=city;q("#crimeWhere").textContent="IL GIRO // "+city.toUpperCase();q("#dirty").textContent=money(s.sporchi)+" €";q("#clean").textContent=money(G.money)+" €";q("#energy").textContent=Math.round(G.energy)+" / "+Math.round(G.maxEnergy||100);q("#repN").textContent=Math.round(s.rep);q("#repBar").style.width=clampN(s.rep,0,100)+"%";q("#heatN").textContent=Math.round(s.heat);q("#heatBar").style.width=clampN(s.heat,0,100)+"%";q("#precedents").textContent=Math.round(s.precedenti||0);q("#pressure").textContent=pressure(s.heat);const fidati=typeof stradaPersoneSquadra==="function"?stradaPersoneSquadra():[],contatti=typeof stradaNpcPersone==="function"?stradaNpcPersone().filter(p=>p&&p.strada&&p.strada.known&&!p.via):[];q("#menCount").textContent=`(${contatti.length} attivi · ${fidati.length} fidati)`;q("#peopleSummary").textContent=fidati.length?(fidati.length+(fidati.length===1?" persona si fida":" persone si fidano")+" abbastanza da muoversi con te."):"Nessuno si fida ancora abbastanza da venire a un colpo con te.";q("#addMan").disabled=typeof stradaPartecipazioneAttiva==="function"&&!stradaPartecipazioneAttiva();const launderCap=typeof stradaCapienza==="function"?stradaCapienza():400;const launderMin=window.GAME_TIME&&GAME_TIME.durationFor?GAME_TIME.durationFor("ricicla"):45;const launderTime=window.GAME_TIME&&GAME_TIME.formatDuration?GAME_TIME.formatDuration(launderMin):launderMin+" min";q("#launder").textContent=launderCap>0?"Ripulisci fino a "+money(launderCap)+" € · "+launderTime:"Limite settimanale raggiunto";q("#launder").disabled=s.sporchi<=0||launderCap<=0||!!s.arresto;const ferroSt=typeof stradaFerroStato==="function"?stradaFerroStato():null,avvSt=typeof stradaAvvocatoStato==="function"?stradaAvvocatoStato():null,protSt=typeof stradaProtezioneStato==="function"?stradaProtezioneStato():null;q("#gun").textContent=s.ferro?"Ce l'hai":(ferroSt&&ferroSt.pending?"Proposta aperta":"Via contatto");q("#gun").classList.toggle("on",!!s.ferro);q("#gun").disabled=!!s.ferro;q("#lawyer").textContent=avvSt&&avvSt.retained?(avvSt.name||"Incaricato"):"Gestisci";q("#lawyer").classList.toggle("on",!!(avvSt&&avvSt.retained));q("#prot").textContent=s.prot>0?((protSt&&protSt.providerName?protSt.providerName+" · ":"")+(STRADA_PROT[s.prot]||STRADA_PROT[0]).n):"Gestisci";q("#prot").classList.toggle("on",s.prot>0);q("#weekly").textContent=money(weeklyCost())+" €/sett.";q("#crimeWeek").textContent=String(G.week||1).padStart(2,"0");q("#crimeClock").textContent=timeText();const tc=q("#trapClock");if(tc)tc.textContent=timeText();const trapOwned=typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned);const trapDock=q("#traphoneDock");if(trapDock)trapDock.hidden=!trapOwned;const ar=!!s.arresto;q("#crimeCenter").classList.toggle("locked",ar);q("#crimeLock").style.display=ar?"flex":"";if(ar){q("#lockTitle").textContent="Sei dentro.";q("#lockReq").textContent=(s.arresto.settimane||0)+" settimane rimaste · "+(s.arresto.colpo||"arresto")};renderCrimes();renderBusinesses();renderScene();try{if(window.TRAPHONE16&&trapOwned){const snap=TRAPHONE16.snapshot();q("#trapDockStatus").textContent=(snap.unread||0)+" NON LETTI"}}catch(_){} }
+  function sync(){
+    const s=street(),art=window.ARTIST||{},city=(String(art.city||art.citta||"").trim()||"Provincia");
+    const partecipa=typeof stradaPartecipazioneAttiva!=="function"||stradaPartecipazioneAttiva();
+
+    if(typeof stradaAggiornaRelazioniCriminali==="function")stradaAggiornaRelazioniCriminali(true);
+    if(typeof stradaHeatSincronizzaPersone==="function")stradaHeatSincronizzaPersone();
+
+    q("#crimeCity").textContent=city;
+    q("#crimeWhere").textContent="IL GIRO // "+city.toUpperCase();
+    q("#dirty").textContent=money(s.sporchi)+" €";
+    q("#clean").textContent=money(G.money)+" €";
+    q("#energy").textContent=Math.round(G.energy)+" / "+Math.round(G.maxEnergy||100);
+    q("#repN").textContent=Math.round(s.rep);
+    q("#repBar").style.width=clampN(s.rep,0,100)+"%";
+    q("#heatN").textContent=Math.round(s.heat);
+    q("#heatBar").style.width=clampN(s.heat,0,100)+"%";
+    q("#precedents").textContent=Math.round(s.precedenti||0);
+
+    const heatMondo=typeof stradaHeatProfilo==="function"
+      ? stradaHeatProfilo()
+      : {id:"basso",label:pressure(s.heat),occhi:pressure(s.heat),mondo:"La pressione resta locale."};
+    q("#pressure").textContent=heatMondo.occhi||heatMondo.label||pressure(s.heat);
+    q("#pressure").classList.toggle("hot",heatMondo.id==="alto"||heatMondo.id==="critico"||Number(s.heat)>=50);
+    q("#pressureDetail").textContent=heatMondo.mondo||"La pressione del giro cambia come reagiscono persone e controlli.";
+
+    const tenore=typeof lifestyleRiepilogoRischio==="function"
+      ? lifestyleRiepilogoRischio()
+      : {id:"coerente",label:"Coerente",testo:"Il tuo tenore di vita è compatibile con le entrate giustificabili.",entrate:Number(G._entratePulite||0),visibile:typeof lifeCost==="function"?lifeCost():0};
+    q("#lifestyleRisk").textContent=tenore.label||"Coerente";
+    q("#lifestyleRisk").classList.toggle("hot",tenore.id!=="coerente"&&tenore.id!=="tirato");
+    q("#lifestyleDetail").textContent=(tenore.testo||"")+" · circa "+money(tenore.entrate)+" €/sett. giustificabili contro "+money(tenore.visibile)+" €/sett. visibili.";
+
+    const tutti=typeof stradaNpcPersone==="function"
+      ? stradaNpcPersone().filter(p=>p&&p.strada&&p.strada.known&&!p.via)
+      : [];
+    const contatti=typeof stradaRelazioneDisponibile==="function"
+      ? tutti.filter(stradaRelazioneDisponibile)
+      : tutti;
+    const prudenti=typeof stradaHeatPersonaCauta==="function"?contatti.filter(stradaHeatPersonaCauta):[];
+    const rivali=typeof stradaRivalitaAttiva==="function"?tutti.filter(stradaRivalitaAttiva):[];
+    const dormienti=typeof stradaRelazioneDisponibile==="function"
+      ? tutti.filter(p=>!stradaRelazioneDisponibile(p)&&!(typeof stradaRivalitaAttiva==="function"&&stradaRivalitaAttiva(p)))
+      : [];
+    const fidati=typeof stradaPersoneSquadra==="function"?stradaPersoneSquadra():[];
+
+    q("#menCount").textContent=`(${contatti.length} attivi · ${fidati.length} fidati)`;
+    q("#peopleSummary").textContent=(fidati.length
+      ? fidati.length+(fidati.length===1?" persona si fida":" persone si fidano")+" abbastanza da muoversi con te."
+      : "Nessuno si fida ancora abbastanza da venire a un colpo con te.")+
+      (prudenti.length?" · "+prudenti.length+(prudenti.length===1?" contatto si tiene basso.":" contatti si tengono bassi."):"")+
+      (dormienti.length?" · "+dormienti.length+(dormienti.length===1?" contatto è fuori dal giro per ora.":" contatti sono fuori dal giro per ora."):"")+
+      (rivali.length?" · "+rivali.length+(rivali.length===1?" rapporto è diventato una rivalità.":" rapporti sono diventati rivalità."):"");
+
+    const launderCap=typeof stradaCapienza==="function"?stradaCapienza():400;
+    const launderMin=window.GAME_TIME&&GAME_TIME.durationFor?GAME_TIME.durationFor("ricicla"):45;
+    const launderTime=window.GAME_TIME&&GAME_TIME.formatDuration?GAME_TIME.formatDuration(launderMin):launderMin+" min";
+    q("#launder").textContent=!partecipa
+      ? "Fuori dal giro: riciclaggio chiuso"
+      : launderCap>0
+        ? "Ripulisci fino a "+money(launderCap)+" € · "+launderTime
+        : "Limite settimanale raggiunto";
+    q("#launder").disabled=!partecipa||s.sporchi<=0||launderCap<=0||!!s.arresto;
+
+    const ferroSt=typeof stradaFerroStato==="function"?stradaFerroStato():null;
+    const avvSt=typeof stradaAvvocatoStato==="function"?stradaAvvocatoStato():null;
+    const protSt=typeof stradaProtezioneStato==="function"?stradaProtezioneStato():null;
+
+    q("#addMan").disabled=!partecipa;
+    q("#prot").disabled=!partecipa;
+    q("#gun").disabled=!partecipa||!!s.ferro;
+    q("#lawyer").disabled=!partecipa;
+
+    q("#gun").textContent=s.ferro?"Ce l'hai":(ferroSt&&ferroSt.pending?"Proposta aperta":"Via contatto");
+    q("#gun").classList.toggle("on",!!s.ferro);
+    q("#lawyer").textContent=avvSt&&avvSt.retained?(avvSt.name||"Incaricato"):(partecipa?"Gestisci":"Fuori dal giro");
+    q("#lawyer").classList.toggle("on",!!(avvSt&&avvSt.retained));
+    q("#prot").textContent=s.prot>0?((protSt&&protSt.providerName?protSt.providerName+" · ":"")+(STRADA_PROT[s.prot]||STRADA_PROT[0]).n):(partecipa?"Gestisci":"Fuori dal giro");
+    q("#prot").classList.toggle("on",s.prot>0);
+
+    q("#protectionSummary").textContent=!partecipa
+      ? "Gli accordi criminali sono chiusi; le persone che conoscevi restano nel mondo."
+      : s.prot>0
+        ? ((protSt&&protSt.providerName?protSt.providerName+" garantisce per te. ":"")+money((STRADA_PROT[s.prot]||STRADA_PROT[0]).costo)+" €/sett.")
+        : "Serve una persona reale disposta a garantire per te.";
+    q("#gunSummary").textContent=!partecipa
+      ? "Hai lasciato il giro: non cerchi nuove armi tramite la rete."
+      : s.ferro
+        ? "Lo possiedi: aumenta le possibilità, ma rende più pesante un controllo."
+        : "Arriva tramite un contatto molto fidato e una proposta reale.";
+    q("#lawyerSummary").textContent=!partecipa
+      ? "I rapporti restano, ma non mantieni un incarico privato per la Strada."
+      : avvSt&&avvSt.retained
+        ? (avvSt.name||"Avvocato privato")+" · "+money(typeof STRADA_AVVOCATO_COSTO!=="undefined"?STRADA_AVVOCATO_COSTO:320)+" €/sett."
+        : "Va conosciuto nel mondo e poi incaricato.";
+
+    q("#weekly").textContent=money(weeklyCost())+" €/sett.";
+    q("#quit").textContent=partecipa?"Molla il giro":"Fuori dal giro";
+    q("#quit").disabled=!partecipa||!!s.arresto;
+
+    q("#crimeWeek").textContent=String(G.week||1).padStart(2,"0");
+    q("#crimeClock").textContent=timeText();
+    const tc=q("#trapClock");if(tc)tc.textContent=timeText();
+    const trapOwned=typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned);
+    const trapDock=q("#traphoneDock");if(trapDock)trapDock.hidden=!trapOwned;
+
+    const caption=q("#crimeCaption");
+    if(caption&&!partecipa){
+      const u=typeof stradaUscitaStato==="function"?stradaUscitaStato():null;
+      const giorni=u&&typeof stradaAbsDay==="function"?Math.max(0,Number(u.memoryUntilAbsoluteDay||0)-stradaAbsDay()):0;
+      caption.textContent=giorni>0
+        ? "Hai mollato il giro. Il passato è ancora vicino, ma non stai più cercando nuovi colpi."
+        : "Hai mollato il giro. La storia resta, le attività criminali attive no.";
+    }
+
+    const ar=!!s.arresto;
+    q("#crimeCenter").classList.toggle("locked",ar);
+    q("#crimeLock").style.display=ar?"flex":"";
+    if(ar){
+      q("#lockTitle").textContent="Sei dentro.";
+      q("#lockReq").textContent=(s.arresto.settimane||0)+" settimane rimaste · "+(s.arresto.colpo||"arresto");
+    }
+
+    renderCrimes();
+    renderBusinesses();
+    renderScene();
+    try{
+      if(window.TRAPHONE16&&trapOwned){
+        const snap=TRAPHONE16.snapshot();
+        q("#trapDockStatus").textContent=(snap.unread||0)+" NON LETTI";
+      }
+    }catch(_){}
+  }
 
   function close(){root.classList.remove("on");try{window.dispatchEvent(new CustomEvent("crime-ui:closed"))}catch(_){} }
   function open(){if(street().arresto)return openJail();if(typeof hubTap==="function")hubTap();STRADA_SCENA=null;sync();root.classList.add("on");chooseBackground(!q("#bgA").style.backgroundImage);if(!bgTimer)bgTimer=setInterval(()=>{if(root.classList.contains("on"))chooseBackground(false)},15000); }
