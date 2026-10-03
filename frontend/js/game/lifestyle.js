@@ -69,6 +69,7 @@ function lifestyleRischioStato(){
     st.fonti={};
     st.speseExtra=0;
     st.speseFonti={};
+    G._entratePulite=0;
   }
   return st;
 }
@@ -158,6 +159,16 @@ function lifestyleClassificaRischio(media){
   return {id:"esposto",label:"Troppo esposto",gap};
 }
 
+function lifestyleTestoClasse(id){
+  return id==="coerente"
+    ? "Il tuo tenore di vita è compatibile con quello che puoi giustificare."
+    : id==="tirato"
+      ? "Stai iniziando a vivere sopra quello che riesci a giustificare."
+      : id==="sopra"
+        ? "Il tuo tenore di vita è chiaramente sopra le entrate giustificabili."
+        : "Stai mostrando e spendendo molto più di quanto puoi giustificare.";
+}
+
 function lifestyleRiepilogoRischio(){
   const st=lifestyleRischioStato();
   const media=lifestyleMediaRischio(true,false);
@@ -168,13 +179,7 @@ function lifestyleRiepilogoRischio(){
     visibile:media.visibile,
     settimane:media.settimane,
     ostentazione:lifestyleOstentazione(),
-    testo:classe.id==="coerente"
-      ? "Il tuo tenore di vita è compatibile con quello che puoi giustificare."
-      : classe.id==="tirato"
-        ? "Stai iniziando a vivere sopra quello che riesci a giustificare."
-        : classe.id==="sopra"
-          ? "Il tuo tenore di vita è chiaramente sopra le entrate giustificabili."
-          : "Stai mostrando e spendendo molto più di quanto puoi giustificare.",
+    testo:lifestyleTestoClasse(classe.id),
     last:st.last||null
   };
 }
@@ -195,7 +200,7 @@ function lifestyleChiudiSettimanaRischio(){
     heatDelta=Math.max(.6,Math.min(8,.7+classe.gap/130+lifestyleOstentazione()*.28));
     G.strada.heat=clamp(Number(G.strada.heat||0)+heatDelta,0,100);
     if(typeof pushLog==="function"){
-      pushLog("<b>Tenore di vita: "+classe.label+".</b> "+lifestyleRiepilogoRischio().testo+
+      pushLog("<b>Tenore di vita: "+classe.label+".</b> "+lifestyleTestoClasse(classe.id)+
         " Attenzione +"+heatDelta.toFixed(1)+".","bad");
     }
   }
