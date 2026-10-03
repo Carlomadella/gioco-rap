@@ -3714,6 +3714,8 @@ function stCompraAttivita(id){
   const a = stradaAttivitaDef(id);
   if(!a) return "";
   if(G.strada.attivita[id]) return a.n + " è già tua.";
+  if(!stradaPartecipazioneAttiva())
+    return "Hai mollato il giro: le attività che possiedi restano imprese normali, ma non ne rilevi di nuove attraverso la Strada.";
   if(G.money < a.costo) return "Non hai " + fmt(a.costo) + " € per rilevare " + a.n.toLowerCase() + ".";
   G.money -= a.costo;
   G.strada.attivita[id] = true;
@@ -4520,27 +4522,34 @@ function stScenaAttivita(id){
   const contatto=stradaAttivitaContattoIncontro(id);
   const week=stradaAttivitaWeekIndex();
   const fermata=!stradaAttivitaOperativa(id);
+  const partecipa=stradaPartecipazioneAttiva();
   const rischio=a.rischio<.07?"basso":a.rischio<.1?"medio":"alto";
   const opts=[];
   if(st.issue) opts.push({n:"Problema aperto",d:(stradaAttivitaProblemaDef(st.issue.id)||{}).n||"Da gestire",
     hot:true,run(){STRADA_SCENA=stScenaProblemaAttivita(id);renderStScheda();}});
-  if(!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)
+  if(partecipa&&!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)
     opts.push({n:"Fai passare soldi",d:"Residuo "+fmt(residuo)+" € · scegli tu l'importo",
       run(){STRADA_SCENA=stScenaLavaggioCanale(id);renderStScheda();}});
-  if(!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)
+  if(partecipa&&!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)
     opts.push({n:"Fissa un incontro con "+contatto.n,d:"45 min · usa l'attività come luogo reale della rete",
       run(){const t=stradaAttivitaIncontro(id);STRADA_SCENA=stScenaAttivita(id);renderStScheda();stToast(t);}});
   opts.push({n:"Chiudi",d:"Torna alle attività",run(){STRADA_SCENA=null;}});
 
   return {
-    k:"Attività di copertura",titolo:a.n,
+    k:partecipa?"Attività di copertura":"Impresa",titolo:a.n,
     testo:(fermata?"<b>FERMA questa settimana.</b> ":"")+
       "Ricavi normali "+fmt(a.ricavoPulito)+" € − "+fmt(a.gestione)+" € di gestione. "+
-      "Capienza "+fmt(a.capienza)+" €, rischio "+rischio+". "+
+      (partecipa
+        ? "Capienza "+fmt(a.capienza)+" €, rischio "+rischio+". "
+        : "<b>Hai mollato il giro:</b> resta la gestione ordinaria, senza riciclaggio né incontri criminali. ")+
       (persone.partner?"Responsabile: <b>"+persone.partner.n+"</b>. ":"")+
       (persone.employee?"Dipendente: <b>"+persone.employee.n+"</b>.":""),
-    stats:[
+    stats:partecipa?[
       {t:"passati "+fmt(usato)+" €"},
+      {t:"pressione "+Math.round(Number(st.pressione||0))+"/100"},
+      {t:st.issue?"problema aperto":"operativa"}
+    ]:[
+      {t:"impresa normale"},
       {t:"pressione "+Math.round(Number(st.pressione||0))+"/100"},
       {t:st.issue?"problema aperto":"operativa"}
     ],
@@ -5144,6 +5153,7 @@ function renderStCopre(){
 
 function renderStAttivita(){
   const s = G.strada;
+  const partecipa=stradaPartecipazioneAttiva();
   $("st-tab-attivita").innerHTML =
     STRADA_ATTIVITA.map(a => {
       const tua=!!s.attivita[a.id];
@@ -5152,8 +5162,11 @@ function renderStAttivita(){
         return '<div class="activity">' +
           '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+fmt(a.costo)+' €</span></div>' +
           '<p>Ricavi normali '+fmt(a.ricavoPulito)+' €/sett. · −'+fmt(a.gestione)+' € gestione · '+
-            'capienza '+fmt(a.capienza)+' € · rischio '+rischio+'.</p>' +
-          '<button class="pill'+(G.money<a.costo?" no":"")+'" data-stattivita="'+a.id+'">Rileva</button>' +
+            (partecipa
+              ? 'capienza '+fmt(a.capienza)+' € · rischio '+rischio+'.'
+              : 'non rilevabile dalla Strada dopo che hai mollato il giro.')+'</p>' +
+          '<button class="pill'+(!partecipa||G.money<a.costo?" no":"")+'" data-stattivita="'+a.id+'"'+
+            (!partecipa?' disabled':'')+'>'+(partecipa?'Rileva':'Fuori dal giro')+'</button>' +
           '</div>';
       }
 
@@ -5165,12 +5178,16 @@ function renderStAttivita(){
         '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+stato+'</span></div>' +
         '<p>'+(persone.partner?persone.partner.n+' · ':'')+
           'netto normale '+fmt(Math.max(0,a.ricavoPulito-a.gestione))+' €/sett. · '+
-          'riciclaggio residuo '+fmt(residuo)+' € · pressione '+Math.round(Number(st.pressione||0))+'/100'+
+          (partecipa?'riciclaggio residuo '+fmt(residuo)+' € · ':'lato criminale chiuso · ')+
+          'pressione '+Math.round(Number(st.pressione||0))+'/100'+
           (st.issue?' · <b>'+(stradaAttivitaProblemaDef(st.issue.id)||{}).n+'</b>':'')+'.</p>' +
         '<button class="pill'+(st.issue?" danger":"")+'" data-stgestione="'+a.id+'">Gestisci</button>' +
         '</div>';
     }).join("") +
-    '<div class="business-foot">Sono imprese vere: producono reddito pulito, hanno persone e problemi. Il denaro sporco passa solo quando decidi tu quanto esporle.</div>';
+    '<div class="business-foot">'+(partecipa
+      ? 'Sono imprese vere: producono reddito pulito, hanno persone e problemi. Il denaro sporco passa solo quando decidi tu quanto esporle.'
+      : 'Le attività che possedevi restano imprese vere e continuano a produrre reddito pulito. Il lato criminale è chiuso.')+
+    '</div>';
 }
 
 /* ---- in basso: le tre città ---- */
