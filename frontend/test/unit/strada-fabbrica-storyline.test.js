@@ -98,7 +98,7 @@ describe("Strada · punto 14 Fabbrica come storyline parallela",()=>{
 
   it("la proposta post-turno spiega che il crimine non appartiene alla Fabbrica",()=>{
     expect(eventi).toContain("Non è la Fabbrica che ti sta offrendo un crimine");
-    expect(eventi).toContain("non è un crimine della Fabbrica");
+    expect(eventi).toContain("Non è un crimine della Fabbrica");
     expect(eventi).toContain("Fuori dal cancello");
   });
 
