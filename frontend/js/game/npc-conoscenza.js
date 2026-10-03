@@ -38,12 +38,17 @@
 
     let id=null;
     if(tipo!=="provenienza") id=testo(f.id,"id");
-    return Object.freeze({tipo,id});
+    let valore=null;
+    if(tipo==="legame-tipo" || tipo==="legame-percezione" || tipo==="legame-sottotipo")
+      valore=testo(f.valore,"valore");
+    return Object.freeze({tipo,id,valore});
   }
 
   function chiave(f){
     const n=normalizzaFatto(f);
-    return n.tipo+(n.id==null?"":":"+n.id);
+    return n.tipo+
+      (n.id==null?"":":"+n.id)+
+      (n.valore==null?"":":"+n.valore);
   }
 
   function trattiReali(p){
@@ -86,15 +91,15 @@
         return !!legameReale(p,n.id);
       case "legame-tipo":{
         const r=legameReale(p,n.id);
-        return !!(r&&typeof r.tipo==="string"&&r.tipo);
+        return !!(r&&typeof r.tipo==="string"&&r.tipo===n.valore);
       }
       case "legame-percezione":{
         const r=legameReale(p,n.id);
-        return !!(r&&typeof r.percezione==="string"&&r.percezione);
+        return !!(r&&typeof r.percezione==="string"&&r.percezione===n.valore);
       }
       case "legame-sottotipo":{
         const r=legameReale(p,n.id);
-        return !!(r&&typeof r.sottotipo==="string"&&r.sottotipo);
+        return !!(r&&typeof r.sottotipo==="string"&&r.sottotipo===n.valore);
       }
       case "provenienza":
         return provenienzaReale(p);
@@ -204,11 +209,14 @@
       seen.add(id);
 
       const item={personId:id};
-      if(sa(p,{tipo:"legame-tipo",id}) && typeof r.tipo==="string")
+      if(typeof r.tipo==="string" &&
+         sa(p,{tipo:"legame-tipo",id,valore:r.tipo}))
         item.tipo=r.tipo;
-      if(sa(p,{tipo:"legame-percezione",id}) && typeof r.percezione==="string")
+      if(typeof r.percezione==="string" &&
+         sa(p,{tipo:"legame-percezione",id,valore:r.percezione}))
         item.percezione=r.percezione;
-      if(sa(p,{tipo:"legame-sottotipo",id}) && typeof r.sottotipo==="string")
+      if(typeof r.sottotipo==="string" &&
+         sa(p,{tipo:"legame-sottotipo",id,valore:r.sottotipo}))
         item.sottotipo=r.sottotipo;
       out.push(Object.freeze(item));
     }
