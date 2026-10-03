@@ -1515,7 +1515,8 @@ test("punto 18: il rischio lifestyle ha un registro settimanale e una media mobi
   state.includes("rischioLifestyle:{key:null,entrate:0,fonti:{}") &&
   lifestyle.includes("function lifestyleRischioStato()") &&
   lifestyle.includes("function lifestyleMediaRischio(includiCorrente,correnteCompleta)") &&
-  lifestyle.includes("st.history.slice(-3)") &&\n  lifestyle.includes("const progresso=completa ? 1") &&
+  lifestyle.includes("st.history.slice(-3)") &&
+  lifestyle.includes("const progresso=completa ? 1") &&
   lifestyle.includes("function lifestyleClassificaRischio(media)"));
 test("punto 18: il giocatore vede un giudizio leggibile, non una dichiarazione fiscale",
   lifestyle.includes('"coerente",label:"Coerente"') &&
