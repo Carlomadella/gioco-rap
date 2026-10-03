@@ -71,6 +71,11 @@ const START = () => ({
        di abbassare il profilo, controlli). La cautela delle persone resta
        invece sulla persona stessa, non duplicata qui. */
     heatMondo:{lastStopRequestAbsoluteDay:null,history:[]},
+    /* Punto Strada 21: mollare il giro ferma la partecipazione, non cancella
+       la storia. La memoria residua viene misurata in giorni assoluti e può
+       durare da pochi mesi a diversi anni in base a quanto eri coinvolto. */
+    uscitaGiro:{mollato:false,leftAbsoluteDay:null,profondita:0,memoryUntilAbsoluteDay:null,
+      lastKnockAbsoluteDay:null,history:[]},
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
