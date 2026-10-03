@@ -3793,12 +3793,17 @@ function carcerePersonaMeta(p){
     p.carcere={
       conosciuto:true,rapporto:0,interazioni:[],jailIds:[],
       currentJailId:null,profilo:null,firstMetAbsoluteDay:null,lastMetAbsoluteDay:null,
-      linkedStreet:false,releasedAbsoluteDay:null
+      linkedStreet:false,releasedAbsoluteDay:null,returnAfterAbsoluteDay:null,
+      outsideFollowupDone:false
     };
   }
   if(!Array.isArray(p.carcere.interazioni)) p.carcere.interazioni=[];
   if(!Array.isArray(p.carcere.jailIds)) p.carcere.jailIds=[];
   if(!Number.isFinite(Number(p.carcere.rapporto))) p.carcere.rapporto=0;
+  if(p.carcere.returnAfterAbsoluteDay!=null &&
+     !Number.isFinite(Number(p.carcere.returnAfterAbsoluteDay)))
+    p.carcere.returnAfterAbsoluteDay=null;
+  p.carcere.outsideFollowupDone=!!p.carcere.outsideFollowupDone;
   return p.carcere;
 }
 
@@ -3926,6 +3931,8 @@ function carcereScarcerazioneRelazioni(c){
       st.fiducia=Math.max(Number(st.fiducia||0),Math.min(35,5+rapporto*3));
       st.lastPlayerStreetInteractionAbsoluteDay=stradaAbsDay();
       m.linkedStreet=true;
+      m.returnAfterAbsoluteDay=null;
+      m.outsideFollowupDone=true;
       contatti.push(p);
       stradaRegistraConseguenzaPersona(p,"jail-contact-released",{jailId:c.jailId,rapporto});
     }else if(rapporto<=-4){
@@ -3933,7 +3940,17 @@ function carcereScarcerazioneRelazioni(c){
       const st=stradaPersonaMeta(p);
       st.fiducia=Math.min(Number(st.fiducia||5),10);
       stradaModificaTensionePersona(p,2,"carcere-conto-uscita");
+      m.returnAfterAbsoluteDay=null;
+      m.outsideFollowupDone=true;
       rivali.push(p);
+    }else{
+      /* Un rapporto non abbastanza forte da diventare subito contatto non
+         sparisce dal gioco. Dopo settimane o mesi quella stessa faccia può
+         ricomparire fuori; il giocatore deciderà allora se riaprire il filo. */
+      const ritardo=rapporto>=2?42:rapporto>=1?56:rapporto===0?84:63;
+      m.linkedStreet=false;
+      m.returnAfterAbsoluteDay=stradaAbsDay()+ritardo;
+      m.outsideFollowupDone=false;
     }
   }
   return {contatti,rivali};
