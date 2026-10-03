@@ -25,7 +25,7 @@ const START = () => ({
   life:{casa:0, auto:0, look:0, uscite:0, crew:0}, gear:{}, contract:null, obligation:null,
   offersSeen:{}, goals:{}, log:[], streak:0,
   phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
-  rivals:[], gente:[], chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[], lafamegramGente:[],
+  rivals:[], gente:[], npcGruppi:[], chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[], lafamegramGente:[],
   /* Sputa, la seconda app per postare (sputa.js): le barre tue, e a quali
      degli altri hai messo il fuoco */
   sputaMiei:[], sputaFuoco:{},
