@@ -119,11 +119,13 @@
         <aside class="panel right">
           <div class="tabs"><button class="tab on" data-tab="cover" type="button">Chi ti copre</button><button class="tab" data-tab="business" type="button">Attività</button></div>
           <div class="tabpane on" id="tab-cover">
-            <div class="cover-row"><div class="t"><strong>Persone fidate <span id="menCount">(0)</span></strong><span>Entrano dai rapporti: non si comprano.</span></div><button class="pill" id="addMan" type="button">Rapporti</button></div>
+            <div class="cover-row"><div class="t"><strong>Persone del giro <span id="menCount">(0)</span></strong><span id="peopleSummary">Entrano dai rapporti: non si comprano.</span></div><button class="pill" id="addMan" type="button">Rapporti</button></div>
             <div class="cover-row"><div class="t"><strong>Protezione</strong><span>Serve una persona reale disposta a metterci nome e rete.</span></div><button class="pill" id="prot" type="button">Scegli</button></div>
             <div class="cover-row"><div class="t"><strong>Il ferro</strong><span>Arriva tramite un contatto fidato e una proposta reale.</span></div><button class="pill danger" id="gun" type="button">Via contatto</button></div>
             <div class="cover-row"><div class="t"><strong>Avvocato</strong><span>Va conosciuto e incaricato: non è un bonus da attivare.</span></div><button class="pill" id="lawyer" type="button">Scegli</button></div>
             <div class="cover-row"><div class="t"><strong>Costo copertura</strong><span>Spesa fissa attuale.</span></div><button class="pill on" id="weekly" type="button" disabled>0 €/sett.</button></div>
+            <div class="cover-row"><div class="t"><strong>Pressione sul giro</strong><span id="heatWorld">Il mondo reagisce all’heat, non solo la barra.</span></div><button class="pill" id="heatBand" type="button" disabled>Bassa</button></div>
+            <div class="cover-row"><div class="t"><strong>Tenore di vita</strong><span id="lifestyleRisk">Spese visibili ed entrate giustificabili devono restare coerenti.</span></div><button class="pill" id="lifestyleBand" type="button" disabled>Coerente</button></div>
             <div class="traphone-dock" id="traphoneDock">
               <div class="traphone-dock-head"><div><span>LINEA SEPARATA</span><b>TRAPHONE 16</b></div><em id="trapDockStatus">OFFLINE</em></div>
               <div class="trap-wrap" id="trapWrap" aria-label="Trap phone"><div class="trap-led" id="trapLed"></div><div class="trap-phone-badge" id="trapBadge">0</div><div class="trap-hint trap-hint-hidden"><b>TRAPHONE 16</b><br>Solo chiamate e messaggi.</div><div class="trap-phone"><div class="trap-speaker"></div><div class="trap-brand">TRAPHONE <b>16</b></div><div class="trap-screen-bezel"><div class="trap-screen" id="trapScreen"><div class="trap-status"><span class="trap-signal">▂▄▆█</span><span id="trapClock">08:00</span><span><span class="trap-battery"><i></i></span></span></div><div class="trap-view" id="trapView"></div><div class="trap-softline"><span id="trapSoftL">MENU</span><span id="trapSoftR">ESCI</span></div></div></div><div class="trap-modelplate"><span>TRAPHONE</span><b>16</b><i>DUAL BAND</i></div><div class="trap-controls"><div class="trap-softkeys"><button class="trap-key trap-soft" id="trapLeft" type="button">—</button><div class="trap-nav"><button class="up" data-trap-nav="up" type="button">▲</button><button class="down" data-trap-nav="down" type="button">▼</button><button class="left" data-trap-nav="left" type="button">◀</button><button class="right" data-trap-nav="right" type="button">▶</button><button class="ok" id="trapOk" type="button">OK</button></div><button class="trap-key trap-soft" id="trapRight" type="button">—</button></div><div class="trap-callrow"><button class="trap-key trap-call green" id="trapGreen" type="button">☎</button><button class="trap-key trap-call red" id="trapRed" type="button">●</button></div><div class="trap-numpad"><button class="trap-key trap-num" data-num="1" type="button">1<small>.,?</small></button><button class="trap-key trap-num" data-num="2" type="button">2<small>ABC</small></button><button class="trap-key trap-num" data-num="3" type="button">3<small>DEF</small></button><button class="trap-key trap-num" data-num="4" type="button">4<small>GHI</small></button><button class="trap-key trap-num" data-num="5" type="button">5<small>JKL</small></button><button class="trap-key trap-num" data-num="6" type="button">6<small>MNO</small></button><button class="trap-key trap-num" data-num="7" type="button">7<small>PQRS</small></button><button class="trap-key trap-num" data-num="8" type="button">8<small>TUV</small></button><button class="trap-key trap-num" data-num="9" type="button">9<small>WXYZ</small></button><button class="trap-key trap-num" data-num="*" type="button">*</button><button class="trap-key trap-num" data-num="0" type="button">0<small>+</small></button><button class="trap-key trap-num" data-num="#" type="button">#</button></div></div></div></div>
@@ -144,7 +146,7 @@
   function gameState(){ return G; }
   function street(){ return G.strada; }
   function crimeVisualState(){
-    const s=street(), a=(typeof A!=="undefined"&&A)||{};
+    const s=street(), art=window.ARTIST||{};
     const persone=typeof stradaPersoneSquadra==="function" ? stradaPersoneSquadra() : [];
     const avvocato=typeof stradaHaAvvocatoPrivato==="function" ? stradaHaAvvocatoPrivato() : !!s.avvocato;
     return {
@@ -153,7 +155,7 @@
       arrest:!!s.arresto,arresto:s.arresto,owned:s.attivita||{},
       businessCount:Object.values(s.attivita||{}).filter(Boolean).length,
       hasTrapPhone:(typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned)),
-      trapPhone:s.traphone||null,city:String(a.city||a.citta||"provincia").toLowerCase(),
+      trapPhone:s.traphone||null,city:String(art.city||art.citta||"provincia").toLowerCase(),
       level:(typeof livello==="function"?livello().lvl:1),fame:+G.fans||0,hype:+G.hype||0,
       goat:(typeof livello==="function"?livello().lvl>=60:false)
     };
@@ -462,11 +464,28 @@
       ? stradaColpiDisponibili()
       : (typeof STRADA_COLPI!=="undefined"?STRADA_COLPI.slice(0,4):[]);
     const partecipa=typeof stradaPartecipazioneAttiva!=="function"||stradaPartecipazioneAttiva();
+    const leadIncontro=typeof stradaOpportunitaAttiva==="function"?stradaOpportunitaAttiva():null;
+    const leadLavoro=window.ADF_WORK_EVENTS&&typeof ADF_WORK_EVENTS.crimeLeadActive==="function"
+      ? ADF_WORK_EVENTS.crimeLeadActive()
+      : null;
     q("#crimes").innerHTML=offerte.map((colpo,i)=>{
       const ok=partecipa&&G.energy>=colpo.energia&&canDoCrime(colpo.id)&&!s.arresto;
       const categoria=typeof stradaCategoriaLabel==="function"
         ? stradaCategoriaLabel(colpo)
         : ((typeof stradaCategoria==="function"&&stradaCategoria(colpo).n)||"");
+      const rischio=typeof stRischio==="function"?stRischio(colpo):"";
+      const caduta=typeof stradaCadutaProfilo==="function"?stradaCadutaProfilo(colpo):null;
+      const leadIncontroQui=leadIncontro&&leadIncontro.colpoId===colpo.id?leadIncontro:null;
+      const lead=leadIncontroQui||leadLavoro;
+      const giorniLead=lead&&lead.expiresAbsoluteDay!=null&&typeof stradaAbsDay==="function"
+        ? Math.max(1,Number(lead.expiresAbsoluteDay)-stradaAbsDay())
+        : 0;
+      const fonteLead=leadIncontroQui
+        ? (leadIncontroQui.titolo||"Opportunità")
+        : (lead&&lead.sourceLabel?"Dritta "+lead.sourceLabel:"Dritta");
+      const bonusLead=lead&&Number.isFinite(Number(lead.bonusPct))
+        ? " · "+(Number(lead.bonusPct)>=0?"+":"")+Number(lead.bonusPct)+"%"
+        : "";
       return `<button class="crime${ok?"":" disabled"}" data-crime="${esc(colpo.id)}" type="button" ${ok?"":"disabled"}>
         <span class="num">0${i+1}</span><b>${esc(colpo.n)}</b><p>${esc(colpo.d)}</p>
         <div class="chips">
@@ -474,23 +493,36 @@
           <span class="chip money">${money(colpo.min)}–${money(colpo.max)} €</span>
           <span class="chip">${colpo.energia} energia</span>
           <span class="chip">${window.GAME_TIME?GAME_TIME.formatDuration(durationFor(colpo.id)):""}</span>
+          ${rischio?`<span class="chip">Rischio ${esc(String(rischio).toLowerCase())}</span>`:""}
+          ${caduta&&caduta.label?`<span class="chip">Caduta ${esc(caduta.label)}</span>`:""}
+          ${lead?`<span class="chip money">${esc(fonteLead+bonusLead+(giorniLead?" · "+giorniLead+(giorniLead===1?" giorno":" giorni"):""))}</span>`:""}
         </div><span class="go">→</span>
       </button>`;
     }).join("");
   }
   function renderBusinesses(){
     const s=street();
+    const partecipa=typeof stradaPartecipazioneAttiva!=="function"||stradaPartecipazioneAttiva();
     q("#businessList").innerHTML=STRADA_ATTIVITA.map(a=>{
       const own=!!s.attivita[a.id];
       const ricavo=Number(a.ricavoPulito!=null?a.ricavoPulito:(a.resa||0));
-      return `<div class="activity ${own?"owned":""}">
-        <div class="a-top"><strong>${esc(a.n)}</strong><span class="price">${own?"TUA":money(a.costo)+" €"}</span></div>
-        <p>${own
-          ? `Ricavi normali ${money(ricavo)} €/sett. · gestione ${money(a.gestione||0)} €. Persone, pressione e problemi si gestiscono qui.`
-          : `Resa ${money(ricavo)} €/sett. · aumenta la capacità di riciclaggio.`}</p>
-        ${own
-          ? `<button class="pill" data-business="${esc(a.id)}" type="button">Gestisci</button>`
-          : `<button class="pill" data-buy="${esc(a.id)}" type="button" ${G.money<a.costo?"disabled":""}>Rileva</button>`}
+      if(!own){
+        return `<div class="activity">
+          <div class="a-top"><strong>${esc(a.n)}</strong><span class="price">${money(a.costo)} €</span></div>
+          <p>Ricavi normali ${money(ricavo)} €/sett. · gestione ${money(a.gestione||0)} €. ${partecipa?"Aumenta la capacità di riciclaggio.":"Fuori dal giro non ne rilevi di nuove attraverso la Strada."}</p>
+          <button class="pill" data-buy="${esc(a.id)}" type="button" ${!partecipa||G.money<a.costo?"disabled":""}>${partecipa?"Rileva":"Fuori dal giro"}</button>
+        </div>`;
+      }
+      const st=typeof stradaAttivitaStato==="function"?stradaAttivitaStato(a.id,true):null;
+      const persone=typeof stradaAttivitaPersone==="function"?stradaAttivitaPersone(a.id):{};
+      const fermata=typeof stradaAttivitaOperativa==="function"?!stradaAttivitaOperativa(a.id):false;
+      const problema=st&&st.issue&&typeof stradaAttivitaProblemaDef==="function"?stradaAttivitaProblemaDef(st.issue.id):null;
+      const residuo=typeof stradaLavaggioResiduoCanale==="function"?stradaLavaggioResiduoCanale(a.id):0;
+      const stato=fermata?"FERMA":problema?"PROBLEMA":"OPERATIVA";
+      return `<div class="activity owned">
+        <div class="a-top"><strong>${esc(a.n)}</strong><span class="price">${stato}</span></div>
+        <p>${persone&&persone.partner?esc(persone.partner.n)+" · ":""}netto normale ${money(Math.max(0,ricavo-Number(a.gestione||0)))} €/sett. · ${partecipa?"riciclaggio residuo "+money(residuo)+" € · ":"lato criminale chiuso · "}pressione ${Math.round(Number(st&&st.pressione||0))}/100${problema?" · "+esc(problema.n||"problema aperto"):""}.</p>
+        <button class="pill ${problema?"danger":""}" data-business="${esc(a.id)}" type="button">Gestisci</button>
       </div>`;
     }).join("");
   }
@@ -505,7 +537,7 @@
     q("#mDesc").innerHTML=(STRADA_SCENA.testo||"")+stats;
     q("#crimeOptions").innerHTML=(STRADA_SCENA.opts||[]).map((o,i)=>{
       const meta=[o.sx,o.dx].filter(Boolean).map(x=>'<span class="chip">'+esc(x)+'</span>').join("");
-      return `<button class="approach ${o.hot?"hot":""}" data-scene-opt="${i}" type="button" ${o.no?"disabled":""}>
+      return `<button class="approach ${o.hot?"hot":""}${o.no?" no":""}" data-scene-opt="${i}" type="button" ${o.no?"disabled":""}>
         <span class="a-num">0${i+1}</span><b>${esc(o.n)}</b><p>${esc(o.d||"")}</p>
         ${meta?`<div class="chips">${meta}</div>`:""}
       </button>`;
@@ -533,7 +565,20 @@
     q("#precedents").textContent=Math.round(s.precedenti||0);
     q("#pressure").textContent=pressure(s.heat);
 
-    q("#menCount").textContent=`(${fidati.length} fidati)`;
+    const tuttiContatti=typeof stradaNpcPersone==="function"
+      ? stradaNpcPersone().filter(p=>p&&p.strada&&p.strada.known&&!p.via)
+      : [];
+    const contatti=typeof stradaRelazioneDisponibile==="function"
+      ? tuttiContatti.filter(stradaRelazioneDisponibile)
+      : tuttiContatti;
+    const prudenti=typeof stradaHeatPersonaCauta==="function"?contatti.filter(stradaHeatPersonaCauta):[];
+    const rivali=typeof stradaRivalitaAttiva==="function"?tuttiContatti.filter(stradaRivalitaAttiva):[];
+    const nomi=contatti.slice(0,3).map(p=>p.n).filter(Boolean);
+    q("#menCount").textContent=`(${contatti.length} attivi · ${fidati.length} fidati)`;
+    q("#peopleSummary").textContent=(nomi.length?nomi.join(", ")+" · ":"")+
+      (fidati.length?fidati.length+" abbastanza fidati per muoversi con te.":"Nessuno si fida ancora abbastanza da venire a un colpo.")+
+      (prudenti.length?" "+prudenti.length+" si tengono bassi per l’heat.":"")+
+      (rivali.length?" "+rivali.length+" rapporti sono rivalità.":"");
     q("#addMan").textContent=fidati.length?"Rapporti":"Da costruire";
     q("#addMan").disabled=!partecipa;
 
@@ -558,6 +603,22 @@
       : "Scegli";
     q("#prot").classList.toggle("on",s.prot>0);
     q("#weekly").textContent=money(weeklyCost())+" €/sett.";
+
+    const heatMondo=typeof stradaHeatProfilo==="function"?stradaHeatProfilo():null;
+    if(heatMondo){
+      q("#heatWorld").textContent=heatMondo.mondo||"La pressione modifica persone, controlli e opportunità.";
+      q("#heatBand").textContent=heatMondo.label||"—";
+      q("#heatBand").classList.toggle("danger",heatMondo.id==="alto"||heatMondo.id==="critico");
+      q("#heatBand").classList.toggle("on",heatMondo.id==="basso");
+    }
+    const tenore=typeof lifestyleRiepilogoRischio==="function"?lifestyleRiepilogoRischio():null;
+    if(tenore){
+      q("#lifestyleRisk").textContent=(tenore.testo||"")+
+        " · "+money(tenore.entrate||0)+" €/sett. giustificabili contro "+money(tenore.visibile||0)+" €/sett. visibili.";
+      q("#lifestyleBand").textContent=tenore.label||"—";
+      q("#lifestyleBand").classList.toggle("danger",tenore.id==="esposto"||tenore.id==="insostenibile");
+      q("#lifestyleBand").classList.toggle("on",tenore.id==="coerente");
+    }
 
     q("#quit").textContent=partecipa?"Molla il giro":"Fuori dal giro";
     q("#quit").disabled=!partecipa||ar;
