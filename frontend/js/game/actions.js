@@ -382,40 +382,46 @@ const ADF_LAVORO_RETE = Object.freeze({
     })
   }),
   pizzeria:Object.freeze({
-    /* La Pizzeria paga meno della Fabbrica ma espone a piu' persone.
-       L'esposizione cresce col ruolo senza trasformarsi in una macchina
-       automatica di contatti: restano cooldown, cap e molti colleghi normali. */
-    chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
+    /* Punto 15: la Pizzeria vale soprattutto come esposizione sociale.
+       Tante facce quotidiane, pochi contatti immediatamente "utili": cliente,
+       rider, fornitore e collega devono pesare piu' di rapper/promoter/fonici.
+       Nessun ruolo Strada nasce direttamente da qui. */
+    chanceIncontro:0.24, cooldownGiorni:4, minTurni:1, maxContatti:6,
     reteBonusIncontro:0.10,
-    ruoli:Object.freeze(["collega","collega","rider","cliente","rapper","promoter"]),
+    socialOnly:true,
+    ruoli:Object.freeze(["collega","collega","rider","cliente","cliente","fornitore","rapper","promoter"]),
     dettaglio:"persona conosciuta durante il servizio in Pizzeria",
     storia:"Vi siete conosciuti lavorando nello stesso giro della Pizzeria.",
     perRuolo:Object.freeze({
       lavapiatti:Object.freeze({
-        chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
+        chanceIncontro:0.24, cooldownGiorni:4, minTurni:1, maxContatti:6,
         reteBonusIncontro:0.10,
-        ruoli:Object.freeze(["collega","collega","collega","rapper","promoter"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","collega","collega","rider","cliente","cliente"]),
         dettaglio:"persona conosciuta nel retro della Pizzeria",
         storia:"Vi siete conosciuti tra cucina, lavaggio e fine servizio."
       }),
       aiuto_cucina:Object.freeze({
-        chanceIncontro:0.24, cooldownGiorni:5, minTurni:1, maxContatti:6,
+        chanceIncontro:0.26, cooldownGiorni:4, minTurni:1, maxContatti:7,
         reteBonusIncontro:0.12,
-        ruoli:Object.freeze(["collega","collega","fornitore","rider","cliente","rapper","fonico"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","collega","fornitore","rider","cliente","cliente","rapper"]),
         dettaglio:"persona conosciuta muovendoti tra cucina e servizio",
         storia:"Vi siete conosciuti mentre davi una mano tra preparazioni e servizio."
       }),
       aiuto_pizzaiolo:Object.freeze({
-        chanceIncontro:0.26, cooldownGiorni:4, minTurni:1, maxContatti:7,
+        chanceIncontro:0.28, cooldownGiorni:4, minTurni:1, maxContatti:8,
         reteBonusIncontro:0.15,
-        ruoli:Object.freeze(["collega","fornitore","rider","cliente","cliente","rapper","promoter","fonico"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","fornitore","rider","rider","cliente","cliente","cliente","rapper","promoter"]),
         dettaglio:"persona conosciuta durante il servizio in Pizzeria",
         storia:"Vi siete conosciuti mentre lavoravi vicino al banco e al forno."
       }),
       pizzaiolo:Object.freeze({
-        chanceIncontro:0.28, cooldownGiorni:4, minTurni:1, maxContatti:8,
+        chanceIncontro:0.30, cooldownGiorni:3, minTurni:1, maxContatti:9,
         reteBonusIncontro:0.18,
-        ruoli:Object.freeze(["collega","fornitore","rider","cliente","cliente","cliente","rapper","promoter","fonico"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","fornitore","rider","rider","cliente","cliente","cliente","cliente","rapper","promoter"]),
         dettaglio:"persona conosciuta come riferimento del servizio",
         storia:"Vi siete conosciuti mentre eri uno dei riferimenti della Pizzeria durante il servizio."
       })
@@ -490,8 +496,13 @@ function lavoroReteDef(job){
 
 function lavoroReteRuoli(job, cfg){
   const ruoli = Array.isArray(cfg && cfg.ruoli) ? cfg.ruoli.slice() : [];
-  /* I lavori possono esporre alla Strada, ma non devono avviare quella
-     carriera al posto del giocatore. */
+  /* Punto 15: la Pizzeria resta sociale anche se il giocatore e' gia' nella
+     Strada. Conoscere piu' persone non significa generare automaticamente
+     "conoscenze della Strada". */
+  if(lavoroReteChiave(job)==="pizzeria" || (cfg&&cfg.socialOnly===true))
+    return ruoli.filter(r => r !== "strada");
+  /* Gli altri lavori possono esporre alla Strada, ma non devono avviarla al
+     posto del giocatore. */
   if(!(G.strada && G.strada.giroAvviato))
     return ruoli.filter(r => r !== "strada");
   return ruoli;
