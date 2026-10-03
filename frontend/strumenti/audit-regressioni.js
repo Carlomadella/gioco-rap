@@ -1648,6 +1648,11 @@ test("punto 20: il reincontro fuori può chiudere un favore rimasto dal carcere"
   posto.includes('source:\"carcere-reunion\"') &&
   posto.includes('stradaModificaFiducia(p,4,\"carcere-favore-fuori\")') &&
   posto.includes('stradaAggiungiFavore(p,1,\"carcere-favore-fuori\")'));
+test("punto 20: una rivalità nata dentro riappare fuori come conto aperto",
+  crime.includes("m.returnAfterAbsoluteDay=stradaAbsDay()+28") &&
+  posto.includes('jailOutside:\"rival\"') &&
+  posto.includes('\"jail-rival-reunion\"') &&
+  posto.includes('stradaModificaTensionePersona(p,1,\"carcere-rivale-reincontro\")'));
 
 test("punto 21: mollare è uno stato persistente separato dall'essere entrato nel giro",
   state.includes("uscitaGiro:{mollato:false") &&
