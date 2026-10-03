@@ -1561,6 +1561,27 @@ test("punto 23: il giocatore vede separati rischio di fallire e costo della cadu
   crime.includes("Caduta ' + stradaCadutaProfilo(c).label") &&
   crime.includes("stradaCadutaClasse(c)"));
 
+test("punto 24: chiedere informazioni produce intel concreto e temporaneo sul colpo",
+  crime.includes("const STRADA_INTEL_TIPI=Object.freeze({") &&
+  crime.includes("function stradaIntelStato()") &&
+  crime.includes("function stradaIntelCrea(colpo,source,persona)") &&
+  crime.includes("function stradaIntelPerColpo(colpoId)") &&
+  crime.includes('intelId:String(stradaAbsDay())+":"+key'));
+test("punto 24: la dritta modifica realmente chance e attenzione solo se l'approccio la sfrutta",
+  crime.includes("function stradaPreparazioneEffetti(ctx,approccio)") &&
+  crime.includes("usa?baseChance:Math.min(.02,baseChance*.3)") &&
+  crime.includes("usa?baseHeat:1-(1-baseHeat)*.25") &&
+  crime.includes("intelSfruttata:usa"));
+test("punto 24: informazione e sotterfugio diventano una decisione leggibile, non un bonus nascosto",
+  crime.includes('...(intel?[{t:"Intel: "+(typeof stradaIntelDescrizione==="function"') &&
+  crime.includes('"Stima "+stima+"% · "+(usaIntel?"sfrutta la dritta":baseDx)') &&
+  crime.includes("stradaChanceConOpportunita(colpo,a,lead,personaStima,preparazione)"));
+test("punto 24: l'intel nasce da tempo, osservazione o persone reali e viene consumato sul colpo",
+  crime.includes('stradaIntelCrea(colpo,"contatto",p)') &&
+  crime.includes('stradaIntelCrea(colpo,prep.id,null)') &&
+  crime.includes('source==="finestra" ? "Osservazione sul posto" : "Informazioni raccolte"') &&
+  crime.includes("stradaIntelConsuma(colpo.id);"));
+
 
 test("punto 18: il rischio lifestyle ha un registro settimanale e una media mobile",
   state.includes("rischioLifestyle:{key:null,entrate:0,fonti:{}") &&
