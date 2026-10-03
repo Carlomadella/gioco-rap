@@ -1460,11 +1460,11 @@ test("punto 16: le opportunità del mondo hanno una causa narrativa persistente"
   crime.includes("function stradaCausaOpportunita(variante,trigger)") &&
   crime.includes("networkCauseText") &&
   crime.includes("introducedByPersonId") &&
-  crime.includes('postoCollegaPersone(causa.introducedBy,p,"strada-introduzione")'));
+  crime.includes('stradaNpcCollega(causa.introducedBy,p,"strada-introduzione")'));
 test("punto 16: nome dato e ponte costruiscono davvero la rete tra persone",
-  crime.includes('postoCollegaPersone(requester,candidato,"strada-nome")') &&
-  crime.includes('postoCollegaPersone(a,b,"strada-ponte")') &&
-  crime.includes('postoCollegaPersone(persona,nuovo,"strada-referral")'));
+  crime.includes('stradaNpcCollega(requester,candidato,"strada-nome")') &&
+  crime.includes('stradaNpcCollega(a,b,"strada-ponte")') &&
+  crime.includes('stradaNpcCollega(persona,nuovo,"strada-referral")'));
 test("punto 16: la UI spiega perché una persona si fa viva",
   ev.includes("Come ci sei arrivato:") &&
   ev.includes("Perché ti cerca:") &&
@@ -1486,7 +1486,7 @@ test("punto 17: ogni attività posseduta crea persone reali persistenti",
   crime.includes('p.attivita={id:a.id,ruolo}') &&
   crime.includes("partnerPersonId") &&
   crime.includes("employeePersonId") &&
-  crime.includes('postoCollegaPersone(partner,employee,"attivita-lavoro")'));
+  crime.includes('stradaNpcCollega(partner,employee,"attivita-lavoro")'));
 test("punto 17: il riciclaggio è per canale e importo scelto dal giocatore",
   crime.includes("function stradaCanaliLavaggio()") &&
   crime.includes("function stradaRipulisci(importo,canaleId)") &&
@@ -1509,7 +1509,33 @@ test("punto 17: problemi operativi, dipendenti e controlli hanno conseguenze rea
 test("punto 17: un'attività può diventare punto d'incontro della rete",
   crime.includes("function stradaAttivitaIncontro(id)") &&
   crime.includes('GAME_TIME.spend(45,"crime:business-meeting"') &&
-  crime.includes('postoCollegaPersone(persone.partner,contatto,"attivita-incontro")'));
+  crime.includes('stradaNpcCollega(persone.partner,contatto,"attivita-incontro")'));
+
+test("punto 22: il crime espone un contratto NPC opzionale senza possedere il sistema PERSONA",
+  crime.includes("const STRADA_NPC_CONTRACT_VERSION = 1") &&
+  crime.includes("window.ADF_CRIME_NPC_CONTRACT") &&
+  crime.includes('adapterGlobal:"ADF_CRIME_NPC"') &&
+  crime.includes('"personById","findPerson","createPerson","people"') &&
+  crime.includes('"linkPeople","cityOf","groupsForPerson","markContext"'));
+test("punto 22: senza il nuovo manager la Strada continua a usare G.gente e nuovaPersona",
+  crime.includes("return (G.gente||[]).find(p=>p&&p.id===id&&!p.via) || null") &&
+  crime.includes('if(typeof nuovaPersona!=="function") return {person:null,managed:false}') &&
+  crime.includes('const p=nuovaPersona(request.roleHint||"strada")'));
+test("punto 22: col nuovo manager ricerca, creazione e legami passano dal bridge crime",
+  crime.includes('typeof a.findPerson==="function"') &&
+  crime.includes('typeof a.createPerson==="function"') &&
+  crime.includes('typeof adapter.linkPeople==="function"') &&
+  crime.includes("let p=stradaNpcTrovaPersona({crimeKey:key,name:nome,cityId})") &&
+  crime.includes("stradaNpcCollega(a,b,reason)"));
+test("punto 22: città e gruppi NPC entrano solo come contesto della rete criminale",
+  crime.includes("function stradaNpcCittaPersona(p)") &&
+  crime.includes("function stradaNpcGruppiPersona(p)") &&
+  crime.includes("function stradaNpcContestoPersona(p,cityId)") &&
+  crime.includes("variante.networkCityId=stradaCittaContesto()") &&
+  crime.includes("variante.networkGroupIds=introCtx.groupIds") &&
+  crime.includes("firstLinkedCityId:null") &&
+  crime.includes("lastLinkedCityId:null"));
+
 
 test("punto 18: il rischio lifestyle ha un registro settimanale e una media mobile",
   state.includes("rischioLifestyle:{key:null,entrate:0,fonti:{}") &&
