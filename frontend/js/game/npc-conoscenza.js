@@ -71,6 +71,21 @@
     return p.reteLegami.find(x=>x&&String(x.personId)===personId)||null;
   }
 
+  function tipiLegameReali(r){
+    if(!r) return [];
+    const out=[];
+    const add=v=>{
+      if(typeof v==="string" && v.trim() && !out.includes(v.trim()))
+        out.push(v.trim());
+    };
+    if(Array.isArray(r.tipi)) r.tipi.forEach(add);
+    add(r.tipo);
+    /* Compatibilità punto 11: un arco legacy senza tipo esplicito è una
+       conoscenza generica, non un rapporto ignoto. */
+    if(!out.length) out.push("conoscenza");
+    return out;
+  }
+
   function provenienzaReale(p){
     return !!(p.identita&&p.identita.provenienza);
   }
@@ -91,7 +106,7 @@
         return !!legameReale(p,n.id);
       case "legame-tipo":{
         const r=legameReale(p,n.id);
-        return !!(r&&typeof r.tipo==="string"&&r.tipo===n.valore);
+        return !!r && tipiLegameReali(r).includes(n.valore);
       }
       case "legame-percezione":{
         const r=legameReale(p,n.id);
@@ -209,9 +224,12 @@
       seen.add(id);
 
       const item={personId:id};
-      if(typeof r.tipo==="string" &&
-         sa(p,{tipo:"legame-tipo",id,valore:r.tipo}))
-        item.tipo=r.tipo;
+      const tipiNoti=tipiLegameReali(r)
+        .filter(t=>sa(p,{tipo:"legame-tipo",id,valore:t}));
+      if(tipiNoti.length){
+        item.tipi=Object.freeze(tipiNoti.slice());
+        if(tipiNoti.length===1) item.tipo=tipiNoti[0];
+      }
       if(typeof r.percezione==="string" &&
          sa(p,{tipo:"legame-percezione",id,valore:r.percezione}))
         item.percezione=r.percezione;
@@ -229,8 +247,11 @@
     const id=testo(personId,"personId");
     const d=dettagli&&typeof dettagli==="object"?dettagli:{};
     const fatti=[{tipo:"legame-esistenza",id}];
-
-    if(d.tipo!=null) fatti.push({tipo:"legame-tipo",id,valore:testo(d.tipo,"tipo legame")});
+    const tipiRichiesti=[];
+    if(Array.isArray(d.tipi)) d.tipi.forEach(x=>tipiRichiesti.push(testo(x,"tipo legame")));
+    if(d.tipo!=null) tipiRichiesti.push(testo(d.tipo,"tipo legame"));
+    for(const t of [...new Set(tipiRichiesti)])
+      fatti.push({tipo:"legame-tipo",id,valore:t});
     if(d.percezione!=null)
       fatti.push({tipo:"legame-percezione",id,valore:testo(d.percezione,"percezione legame")});
     if(d.sottotipo!=null)
