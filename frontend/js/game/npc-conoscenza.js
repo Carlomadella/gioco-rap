@@ -226,9 +226,10 @@
       const item={personId:id};
       const tipiNoti=tipiLegameReali(r)
         .filter(t=>sa(p,{tipo:"legame-tipo",id,valore:t}));
-      if(tipiNoti.length){
+      if(tipiNoti.length===1){
+        item.tipo=tipiNoti[0];
+      }else if(tipiNoti.length>1){
         item.tipi=Object.freeze(tipiNoti.slice());
-        if(tipiNoti.length===1) item.tipo=tipiNoti[0];
       }
       if(typeof r.percezione==="string" &&
          sa(p,{tipo:"legame-percezione",id,valore:r.percezione}))
