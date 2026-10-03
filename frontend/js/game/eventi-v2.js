@@ -2574,6 +2574,11 @@ function adfStreetIntroDecision(proposta){
 
 function adfStreetIntroAfterAction(a){
   if(!a || typeof stradaTentaIngresso!=="function") return false;
+  /* Punto 14: dopo un turno Fabbrica l'unico accesso criminale ammesso è la
+     storyline dedicata del collega reale. Niente proposta generica che cada
+     casualmente proprio all'uscita dallo stabilimento. */
+  if(a.id==="turno" && G.job && typeof lavoroLuogo==="function" &&
+     lavoroLuogo(G.job)==="fabbrica") return false;
   if(typeof stradaAttivitaSbloccate==="function" && stradaAttivitaSbloccate()) return false;
 
   const stato=st();
