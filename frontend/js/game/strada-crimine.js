@@ -461,6 +461,8 @@ function stradaPresentazioneDopoSuccesso(persona,roll,variantRoll){
     }
   );
   if(!nuovo) return null;
+  if(typeof postoCollegaPersone==="function")
+    postoCollegaPersone(persona,nuovo,"strada-referral");
 
   st.lastReferralAbsoluteDay=oggi;
   stradaModificaFiducia(nuovo,3,"presentazione-da-"+persona.id);
@@ -1790,11 +1792,14 @@ function stradaCreaContatto(nome,key,meta){
     p.n=String(nome||p.n||"Contatto");
     p.origine="strada";
     p.origineDettaglio="conoscenza della Strada";
-    p.storia="L'hai conosciuto attraverso il giro della Strada.";
+    p.storia=meta.story||"L'hai conosciuto attraverso il giro della Strada.";
     p.circoloSbloccato=true;
     p.numero=false; /* il TrapPhone non equivale al numero personale */
     p.numDa=null;
     G.gente.push(p);
+  }else if(meta.story &&
+           (!p.storia || p.storia==="L'hai conosciuto attraverso il giro della Strada.")){
+    p.storia=meta.story;
   }
 
   return stradaSegnaPersona(p,{
@@ -1806,6 +1811,88 @@ function stradaCreaContatto(nome,key,meta){
   });
 }
 
+/* Punto 16: prima di creare una proposta dal "mondo" costruiamo il perché.
+   Il tiro resta interno, ma il risultato arriva sempre attraverso una faccia
+   già vista, un contatto che fa il tuo nome o, nei vecchi salvataggi privi di
+   relazioni ricostruibili, il passaparola generato dalla reputazione. */
+function stradaCausaOpportunita(variante,trigger){
+  if(!variante || trigger==="fabbrica") return null;
+  const key=variante.contactKey||stradaContattoKey(variante.persona);
+  const esistente=(G.gente||[]).find(x=>x && !x.via &&
+    ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
+
+  if(esistente){
+    if(esistente.strada&&esistente.strada.known){
+      const circolo=Number(esistente.circoloPresenze||0)>0 || esistente.origine==="circolo";
+      return {
+        type:circolo?"recontact-circolo":"recontact",
+        person:esistente,
+        introducedBy:null,
+        text:circolo
+          ?"Hai già incrociato <b>"+esistente.n+"</b> al Circolo. Stavolta è lui a farsi vivo."
+          :"<b>"+esistente.n+"</b> fa già parte dei contatti che hai costruito nel giro. Non arriva dal nulla.",
+        label:circolo?"Ricontatto dal Circolo":"Ricontatto"
+      };
+    }
+
+    const giaNelMondo=Number(esistente.circoloPresenze||0)>0 || esistente.visto ||
+      esistente.numero || Number(esistente.rel||0)>0 || Number(esistente.pt||0)>0;
+    if(giaNelMondo){
+      let dove="nel giro";
+      if(Number(esistente.circoloPresenze||0)>0 || esistente.origine==="circolo") dove="al Circolo";
+      else if(esistente.origineLuogo==="pizzeria") dove="in Pizzeria";
+      else if(esistente.origineLuogo) dove="al lavoro";
+      return {
+        type:"known-face",
+        person:esistente,
+        introducedBy:null,
+        text:"Hai già conosciuto <b>"+esistente.n+"</b> "+dove+". Stavolta il discorso prende un'altra piega.",
+        label:"Faccia già conosciuta"
+      };
+    }
+  }
+
+  let candidati=stradaContattiAttivi().filter(p=>
+    p && !p.via && (!esistente || p.id!==esistente.id) &&
+    (!variante.persona || p.n!==variante.persona)
+  ).sort((a,b)=>
+    stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
+    stradaFavoriValore(b)-stradaFavoriValore(a) ||
+    Number(b.rel||0)-Number(a.rel||0)
+  );
+
+  if(!candidati.length && G.strada&&G.strada.ingressoPersonaId){
+    const ingresso=stradaPersonaDaId(G.strada.ingressoPersonaId);
+    if(ingresso && (!esistente || ingresso.id!==esistente.id)) candidati=[ingresso];
+  }
+
+  let introducer=null;
+  if(candidati.length){
+    const seed=String(variante.id||variante.persona||"rete")+":"+String(stradaAbsDay());
+    let n=0;
+    for(let i=0;i<seed.length;i++) n=(n+seed.charCodeAt(i)*(i+1))>>>0;
+    introducer=candidati[n%Math.min(3,candidati.length)]||candidati[0];
+  }
+
+  if(introducer){
+    return {
+      type:"referral",
+      person:esistente,
+      introducedBy:introducer,
+      text:"<b>"+introducer.n+"</b> ha fatto il tuo nome a <b>"+(variante.persona||"un suo contatto")+"</b>. È così che ti arriva la proposta.",
+      label:"Passaparola di "+introducer.n
+    };
+  }
+
+  return {
+    type:"reputation",
+    person:esistente,
+    introducedBy:null,
+    text:"Il tuo nome ha iniziato a girare nel sottobosco. <b>"+(variante.persona||"Un contatto")+"</b> arriva a te per passaparola.",
+    label:"Passaparola"
+  };
+}
+
 function stradaRisolviContattoOpportunita(variante,trigger,legacy){
   if(!variante) return null;
 
@@ -1814,15 +1901,29 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
      l'offerta, lo storico e ogni ricomparsa futura. */
   if(trigger!=="fabbrica" || legacy===true){
     const key=variante.contactKey||stradaContattoKey(variante.persona);
-    const esistente=(G.gente||[]).find(x=>x && !x.via &&
+    const causa=stradaCausaOpportunita(variante,trigger);
+    const esistente=causa&&causa.person ? causa.person : (G.gente||[]).find(x=>x && !x.via &&
       ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
     if(esistente && esistente.strada && esistente.strada.known &&
        !stradaRelazioneDisponibile(esistente)) return null;
+
+    variante.networkCause=causa?causa.type:null;
+    variante.networkCauseText=causa?causa.text:null;
+    variante.networkSourceLabel=causa?causa.label:null;
+    variante.introducedByPersonId=causa&&causa.introducedBy?causa.introducedBy.id:null;
+    variante.introducedByName=causa&&causa.introducedBy?causa.introducedBy.n:null;
+
+    const storia=causa&&causa.introducedBy
+      ?"Te l'ha presentato "+causa.introducedBy.n+": ha fatto il tuo nome nel giro."
+      : null;
     const p=stradaCreaContatto(variante.persona,key,{
       source:legacy===true?"legacy-opportunity":"opportunity",
       opportunityId:variante.id,
-      introducedByPersonId:(G.strada&&G.strada.ingressoPersonaId)||null
+      introducedByPersonId:variante.introducedByPersonId,
+      story:storia
     });
+    if(p && causa&&causa.introducedBy && typeof postoCollegaPersone==="function")
+      postoCollegaPersone(causa.introducedBy,p,"strada-introduzione");
     return p && stradaRelazioneDisponibile(p) ? p : null;
   }
 
@@ -2185,7 +2286,7 @@ function stradaPreparaPropostaOpportunita(variante,trigger,cfg,oggi){
   if(!persona) return null;
   const proposta=Object.assign({
     source:"street-opportunity",
-    sourceLabel:"Incontro della Strada",
+    sourceLabel:variante.networkSourceLabel||"Incontro della Strada",
     trigger:trigger||"unknown",
     status:"offered",
     offeredAbsoluteDay:oggi,
@@ -2566,6 +2667,8 @@ function stradaRisolviEventoRete(personId){
     stradaModificaFiducia(requester,2,"rete-nome-dato");
     stradaModificaFiducia(candidato,2,"rete-presentato");
     stradaAggiungiFavore(requester,1,"rete-nome-dato");
+    if(typeof postoCollegaPersone==="function")
+      postoCollegaPersone(requester,candidato,"strada-nome");
     st.connectionsMade++;
     st.history.push({
       type:"name-given",absoluteDay:oggi,
@@ -2585,6 +2688,8 @@ function stradaRisolviEventoRete(personId){
     stradaModificaFiducia(b,3,"rete-ponte");
     stradaAggiungiFavore(a,1,"rete-ponte");
     stradaAggiungiFavore(b,1,"rete-ponte");
+    if(typeof postoCollegaPersone==="function")
+      postoCollegaPersone(a,b,"strada-ponte");
     st.connectionsMade++;
     st.history.push({
       type:"bridge-made",absoluteDay:oggi,
