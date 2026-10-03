@@ -257,11 +257,121 @@ const STRADA_PREPARAZIONI = Object.freeze([
    documento). Il documento non fissa costo d'acquisto né resa esatta per la
    provincia (lo fa solo per il tipo di reparto, 45% pulito/55% sporco): i
    numeri sotto sono un punto di partenza credibile, da tarare. */
+/* Punto Strada 17: le attività di copertura non sono più moltiplicatori
+   astratti. Ognuna è una piccola impresa con ricavi normali, capacità di
+   assorbire denaro sporco, rischio diverso e persone reali collegate.
+   `resa` resta come alias della capacità per compatibilità con strumenti e
+   salvataggi precedenti. */
 const STRADA_ATTIVITA = [
-  {id:"lavanderia", n:"Lavanderia", costo:1200, resa:90, gestione:15},
-  {id:"autolavaggio", n:"Autolavaggio", costo:1800, resa:130, gestione:20},
-  {id:"minimarket", n:"Minimarket", costo:2600, resa:190, gestione:30}
+  {id:"lavanderia", n:"Lavanderia", costo:1200, resa:150, capienza:150,
+    ricavoPulito:80, gestione:25, rischio:.05, heatMax:1.6, efficienza:.72,
+    nota:"piccoli importi, poca esposizione"},
+  {id:"autolavaggio", n:"Autolavaggio", costo:1800, resa:240, capienza:240,
+    ricavoPulito:120, gestione:35, rischio:.08, heatMax:2.2, efficienza:.78,
+    nota:"più volume, più occhi addosso"},
+  {id:"minimarket", n:"Minimarket", costo:2600, resa:330, capienza:330,
+    ricavoPulito:170, gestione:50, rischio:.12, heatMax:3.0, efficienza:.82,
+    nota:"molto volume, attività più esposta"}
 ];
+
+const STRADA_ATTIVITA_PROBLEMI = Object.freeze([
+  Object.freeze({id:"cassa", n:"La cassa non torna", tipo:"dipendente",
+    testo:"Qualcuno ha iniziato a fare domande sui movimenti che non riconosce.",
+    costo:120, heatIgnora:1.5}),
+  Object.freeze({id:"fornitore", n:"Fornitore bloccato", tipo:"operativo",
+    testo:"Una consegna saltata sta rallentando l'attività e il socio vuole una decisione.",
+    costo:90, heatIgnora:.5}),
+  Object.freeze({id:"controllo", n:"Controllo amministrativo", tipo:"controllo",
+    testo:"Sono passati a verificare documenti e contabilità. Finché la situazione non è chiusa conviene tenere il profilo basso.",
+    costo:180, heatIgnora:2.5})
+]);
+
+function stradaAttivitaDef(id){
+  return STRADA_ATTIVITA.find(x=>x.id===id)||null;
+}
+
+function stradaAttivitaPersonaNuova(a,ruolo){
+  if(!a) return null;
+  G.gente=Array.isArray(G.gente)?G.gente:[];
+  let p=null;
+  if(typeof nuovaPersona==="function"){
+    p=nuovaPersona(ruolo==="socio"?"fornitore":"collega");
+  }else{
+    p={
+      id:"p"+Math.floor(Math.random()*1e9),
+      ruolo:ruolo==="socio"?"fornitore":"collega",
+      n:(ruolo==="socio"?"Socio ":"Dipendente ")+a.n,
+      rel:0,pt:0,ult:-1,via:false
+    };
+  }
+  p.origine="attivita";
+  p.origineLuogo="attivita-"+a.id;
+  p.origineDettaglio=(ruolo==="socio"?"socio/responsabile della ":"dipendente della ")+a.n;
+  p.storia=(ruolo==="socio"
+    ?"Gestisce con te la parte ordinaria dell'attività."
+    :"Lavora qui e vede ogni settimana cosa succede davvero.");
+  p.circoloSbloccato=false;
+  p.visto=true;
+  p.attivita={id:a.id,ruolo};
+  if(ruolo==="socio") p.rel=Math.max(1,Number(p.rel||0));
+  G.gente.push(p);
+  return p;
+}
+
+function stradaAttivitaStato(id,creaPersone){
+  const a=stradaAttivitaDef(id);
+  if(!a) return null;
+  const s=G.strada||(G.strada={});
+  if(!s.attivitaStato || typeof s.attivitaStato!=="object") s.attivitaStato={};
+  let st=s.attivitaStato[id];
+  if(!st || typeof st!=="object"){
+    st=s.attivitaStato[id]={
+      partnerPersonId:null,employeePersonId:null,
+      pressione:0,issue:null,history:[],
+      blockedUntilAbsoluteDay:null,lastMeetingWeek:null,lastIssueWeek:null
+    };
+  }
+  if(!Array.isArray(st.history)) st.history=[];
+  if(!Number.isFinite(Number(st.pressione))) st.pressione=0;
+  st.pressione=Math.max(0,Math.min(100,Number(st.pressione)||0));
+
+  const owned=!!(s.attivita&&s.attivita[id]);
+  if(owned && creaPersone!==false){
+    const trova=pid=>(G.gente||[]).find(p=>p&&p.id===pid&&!p.via)||null;
+    let partner=st.partnerPersonId?trova(st.partnerPersonId):null;
+    let employee=st.employeePersonId?trova(st.employeePersonId):null;
+    if(!partner){
+      partner=stradaAttivitaPersonaNuova(a,"socio");
+      if(partner) st.partnerPersonId=partner.id;
+    }
+    if(!employee){
+      employee=stradaAttivitaPersonaNuova(a,"dipendente");
+      if(employee) st.employeePersonId=employee.id;
+    }
+    if(partner&&employee&&typeof postoCollegaPersone==="function")
+      postoCollegaPersone(partner,employee,"attivita-lavoro");
+  }
+  return st;
+}
+
+function stradaAttivitaPersone(id){
+  const st=stradaAttivitaStato(id,true);
+  const trova=pid=>(G.gente||[]).find(p=>p&&p.id===pid&&!p.via)||null;
+  return {
+    partner:st&&st.partnerPersonId?trova(st.partnerPersonId):null,
+    employee:st&&st.employeePersonId?trova(st.employeePersonId):null
+  };
+}
+
+function stradaAttivitaWeekIndex(){
+  return (Math.max(1,Number(G.year)||1)-1)*52+Math.max(1,Number(G.week)||1);
+}
+
+function stradaAttivitaOperativa(id){
+  const st=stradaAttivitaStato(id,true);
+  if(!st) return false;
+  return st.blockedUntilAbsoluteDay==null || stradaAbsDay()>=Number(st.blockedUntilAbsoluteDay);
+}
 
 /* Protezione a tre gradini più "nessuna", coi tre prezzi del documento. */
 const STRADA_PROT = [
@@ -2855,8 +2965,23 @@ function stradaChance(colpo, approccio, personaSquadra, preparazione){
 
 function stradaLavaggioStato(){
   const s=G.strada, key=(G.year||1)+":"+(G.week||1);
-  if(!s.lavaggio || typeof s.lavaggio!=="object" || s.lavaggio.key!==key) s.lavaggio={key:key,used:0};
+  if(!s.lavaggio || typeof s.lavaggio!=="object" || s.lavaggio.key!==key)
+    s.lavaggio={key:key,used:0,canali:{}};
   if(typeof s.lavaggio.used!=="number") s.lavaggio.used=0;
+  if(!s.lavaggio.canali || typeof s.lavaggio.canali!=="object") s.lavaggio.canali={};
+
+  if(!s.lavaggio.canaliMigrati){
+    let residuo=Math.max(0,Number(s.lavaggio.used)||0);
+    s.lavaggio.canali.base=Math.min(400,residuo);
+    residuo=Math.max(0,residuo-s.lavaggio.canali.base);
+    for(const a of STRADA_ATTIVITA){
+      if(!s.attivita || !s.attivita[a.id]) continue;
+      const preso=Math.min(Number(a.capienza||a.resa||0),residuo);
+      s.lavaggio.canali[a.id]=preso;
+      residuo=Math.max(0,residuo-preso);
+    }
+    s.lavaggio.canaliMigrati=true;
+  }
   return s.lavaggio;
 }
 
@@ -3071,13 +3196,47 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
    Le azioni piccole (ripulire, prendere un uomo, rilevare un'attività) tornano
    la frase da mostrare: il pannello la fa comparire in basso, senza fermare
    niente. Chi non può fare la cosa riceve il motivo, non il silenzio. */
+function stradaAttivitaCapienzaEffettiva(a){
+  if(!a || !G.strada.attivita[a.id] || !stradaAttivitaOperativa(a.id)) return 0;
+  const st=stradaAttivitaStato(a.id,true);
+  const base=Number(a.capienza||a.resa||0);
+  return Math.max(0,Math.round(base*(st&&st.issue ? .55 : 1)));
+}
+function stradaLavaggioUsatoCanale(id){
+  const l=stradaLavaggioStato();
+  return Math.max(0,Number(l.canali[id]||0));
+}
+function stradaLavaggioResiduoCanale(id){
+  if(id==="base") return Math.max(0,400-stradaLavaggioUsatoCanale("base"));
+  const a=stradaAttivitaDef(id);
+  if(!a) return 0;
+  return Math.max(0,stradaAttivitaCapienzaEffettiva(a)-stradaLavaggioUsatoCanale(id));
+}
 function stradaCapienzaTotale(){
   let cap=400;
-  for(const a of STRADA_ATTIVITA) if(G.strada.attivita[a.id]) cap+=a.resa;
+  for(const a of STRADA_ATTIVITA) cap+=stradaAttivitaCapienzaEffettiva(a);
   return cap;
 }
 function stradaCapienza(){
-  return Math.max(0,stradaCapienzaTotale()-stradaLavaggioStato().used);
+  return Math.max(0,stradaCanaliLavaggio().reduce((n,x)=>n+Math.max(0,Number(x.residuo||0)),0));
+}
+function stradaCanaliLavaggio(){
+  const out=[{
+    id:"base",n:"Giri piccoli",capienza:400,residuo:stradaLavaggioResiduoCanale("base"),
+    rischio:"basso",efficienza:.58,heatMax:1.1,blocked:false,issue:false
+  }];
+  for(const a of STRADA_ATTIVITA){
+    if(!G.strada.attivita[a.id]) continue;
+    const st=stradaAttivitaStato(a.id,true);
+    out.push({
+      id:a.id,n:a.n,capienza:stradaAttivitaCapienzaEffettiva(a),
+      residuo:stradaLavaggioResiduoCanale(a.id),
+      rischio:a.rischio<.07?"basso":a.rischio<.1?"medio":"alto",
+      efficienza:Number(a.efficienza||.75),heatMax:Number(a.heatMax||2),
+      blocked:!stradaAttivitaOperativa(a.id),issue:!!(st&&st.issue)
+    });
+  }
+  return out;
 }
 function stradaTempoRiciclaggio(){
   try{
@@ -3093,24 +3252,96 @@ function stradaTempoRiciclaggio(){
   if(tx && tx.blocked) return "Prima devi chiudere quello che stai facendo.";
   return null;
 }
-function stradaRipulisci(){
+function stradaRipulisci(importo,canaleId){
   const s = G.strada;
   if(s.arresto) return "Sei in carcere: non puoi ripulire i soldi finché non esci.";
   if(s.sporchi <= 0) return "Non hai soldi sporchi da ripulire.";
   if(stradaCapienza()<=0) return "Hai già usato tutta la capacità di ripulitura di questa settimana.";
-  const tempoRiciclaggio = stradaTempoRiciclaggio();
+
+  const canali=stradaCanaliLavaggio().filter(x=>x.residuo>0&&!x.blocked);
+  let canale=canaleId?canali.find(x=>x.id===canaleId):null;
+  if(!canale) canale=canali[0]||null;
+  if(!canale) return "Non hai un canale disponibile questa settimana.";
+
+  const max=Math.min(Number(s.sporchi||0),Number(canale.residuo||0));
+  const richiesto=Number.isFinite(Number(importo))?Math.max(1,Math.round(Number(importo))):max;
+  const passa=Math.min(max,richiesto);
+  if(passa<=0) return "Da qui questa settimana non può passare altro.";
+
+  const tempoRiciclaggio=stradaTempoRiciclaggio();
   if(tempoRiciclaggio) return tempoRiciclaggio;
-  const importo = Math.min(s.sporchi, stradaCapienza());
-  const soglia = 400;
-  const bassa = Math.min(importo, soglia), alta = Math.max(0, importo - soglia);
-  const pulito = Math.round(bassa * .58 + alta * .86);
-  s.sporchi -= importo;
-  stradaLavaggioStato().used += importo;
-  G.money += pulito;
-  s.heat = clamp(s.heat + 2, 0, 100);
-  pushLog("Ripuliti " + fmt(importo) + " € sporchi: in tasca ne restano " + fmt(pulito) + " €.", "");
+
+  const eff=Math.max(.45,Math.min(.9,Number(canale.efficienza||.58)));
+  const pulito=Math.round(passa*eff);
+  const ratio=canale.capienza>0?passa/canale.capienza:1;
+  let heatDelta=.35+ratio*Number(canale.heatMax||1);
+  s.sporchi-=passa;
+  const lav=stradaLavaggioStato();
+  lav.used=Number(lav.used||0)+passa;
+  lav.canali[canale.id]=Number(lav.canali[canale.id]||0)+passa;
+  G.money+=pulito;
+
+  if(canale.id!=="base"){
+    const st=stradaAttivitaStato(canale.id,true);
+    st.pressione=Math.min(100,Number(st.pressione||0)+Math.round(ratio*24)+(ratio>=.75?6:0));
+    heatDelta+=Number(st.pressione||0)/100*.8;
+    st.history.push({type:"launder",week:stradaAttivitaWeekIndex(),amount:passa,ratio:Number(ratio.toFixed(3))});
+    if(st.history.length>24) st.history.shift();
+    const persone=stradaAttivitaPersone(canale.id);
+    if(persone.employee&&ratio>=.75&&typeof postoRegistraConseguenzaMondo==="function")
+      postoRegistraConseguenzaMondo(persone.employee,"business-heavy-flow",0,{
+        source:"attivita",reason:"movimenti-insoliti",context:canale.id
+      });
+  }
+
+  s.heat=clamp(s.heat+heatDelta,0,100);
+  pushLog("Fatti passare <b>"+fmt(passa)+" €</b> da "+canale.n+
+    ": "+fmt(pulito)+" € puliti, attenzione +"+heatDelta.toFixed(1)+".","");
   save(); renderStrada(); renderGioco();
-  return "Ripuliti " + fmt(importo) + " €: in tasca ne restano " + fmt(pulito) + " €.";
+  return canale.n+": "+fmt(passa)+" € passati, "+fmt(pulito)+" € puliti.";
+}
+
+function stScenaLavaggioCanale(canaleId){
+  const canale=stradaCanaliLavaggio().find(x=>x.id===canaleId);
+  if(!canale || canale.residuo<=0)
+    return {k:"Riciclaggio",titolo:"Canale pieno",testo:"Da qui questa settimana non può passare altro.",
+      opts:[{n:"Torna indietro",d:"Scegli un altro canale",run(){STRADA_SCENA=stScenaRiciclaggio();renderStScheda();}}]};
+
+  const max=Math.min(Number(G.strada.sporchi||0),Number(canale.residuo||0));
+  const importi=[Math.max(1,Math.round(max*.25)),Math.max(1,Math.round(max*.5)),max]
+    .filter((v,i,arr)=>v>0&&arr.indexOf(v)===i);
+  return {
+    k:"Riciclaggio",titolo:canale.n,
+    testo:"Capienza residua <b>"+fmt(canale.residuo)+" €</b>. Rischio "+canale.rischio+
+      ". Più ne fai passare insieme, più l'attività si espone.",
+    stats:[
+      {t:"residuo "+fmt(canale.residuo)+" €"},
+      {t:"rischio "+canale.rischio},
+      {t:"resa "+Math.round(canale.efficienza*100)+"%"}
+    ],
+    opts:[
+      ...importi.map(v=>({n:"Fai passare "+fmt(v)+" €",d:"Una singola operazione · 45 min",
+        hot:v===max&&max>Math.round(canale.capienza*.7),
+        run(){
+          const t=stradaRipulisci(v,canale.id);
+          STRADA_SCENA=null;stToast(t);
+        }})),
+      {n:"Torna indietro",d:"Scegli un altro canale",run(){STRADA_SCENA=stScenaRiciclaggio();renderStScheda();}}
+    ]
+  };
+}
+function stScenaRiciclaggio(){
+  const canali=stradaCanaliLavaggio().filter(x=>x.residuo>0&&!x.blocked);
+  return {
+    k:"Riciclaggio",titolo:"Come li fai passare",
+    testo:"Non esiste più un unico rubinetto. Ogni attività ha capienza, resa e rischio propri. Scegli prima <b>dove</b>, poi <b>quanto</b>.",
+    opts:canali.length
+      ? canali.map(x=>({
+          n:x.n,d:"Residuo "+fmt(x.residuo)+" € · rischio "+x.rischio+(x.issue?" · problema aperto":""),
+          run(){STRADA_SCENA=stScenaLavaggioCanale(x.id);renderStScheda();}
+        }))
+      : [{n:"Chiudi",d:"Nessun canale disponibile",run(){STRADA_SCENA=null;}}]
+  };
 }
 
 /* ==================== CHI TI COPRE ==================== */
@@ -3134,14 +3365,19 @@ function stToggleAvvocato(){
   return "L'avvocato non è più un toggle: devi conoscerne uno e affidargli davvero l'incarico.";
 }
 function stCompraAttivita(id){
-  const a = STRADA_ATTIVITA.find(x => x.id === id);
+  const a = stradaAttivitaDef(id);
   if(!a) return "";
   if(G.strada.attivita[id]) return a.n + " è già tua.";
   if(G.money < a.costo) return "Non hai " + fmt(a.costo) + " € per rilevare " + a.n.toLowerCase() + ".";
-  G.money -= a.costo; G.strada.attivita[id] = true;
-  pushLog("Hai rilevato: <b>" + a.n + "</b>.", "good");
+  G.money -= a.costo;
+  G.strada.attivita[id] = true;
+  const st=stradaAttivitaStato(id,true);
+  const persone=stradaAttivitaPersone(id);
+  if(st) st.history.push({type:"acquired",week:stradaAttivitaWeekIndex()});
+  pushLog("Hai rilevato: <b>" + a.n + "</b>." +
+    (persone.partner?" A gestirla con te c'è <b>"+persone.partner.n+"</b>.":""), "good");
   save(); renderStrada(); renderGioco();
-  return a.n + " è tua. Adesso puoi ripulire di più.";
+  return a.n + " è tua. Da ora ha ricavi, persone, problemi e una capacità di riciclaggio propria.";
 }
 function stMollaIlGiro(){
   const s = G.strada;
@@ -3524,6 +3760,192 @@ window.ADF_JAIL=Object.freeze({
    costano, la vetrina che alza l'attenzione, il controllo delle sei del
    mattino, gli opp a sorpresa, e — se sei dentro — il carcere che macina
    fan, hype e contratto finché non esci. */
+function stradaAttivitaProblemaDef(id){
+  return STRADA_ATTIVITA_PROBLEMI.find(x=>x.id===id)||null;
+}
+
+function stradaAttivitaChiudiSettimana(a,roll,variantRoll){
+  if(!a || !G.strada.attivita[a.id]) return {income:0,issue:null,paused:false};
+  const st=stradaAttivitaStato(a.id,true);
+  const settimana=stradaAttivitaWeekIndex();
+
+  if(!stradaAttivitaOperativa(a.id)){
+    st.pressione=Math.max(0,Number(st.pressione||0)-18);
+    st.history.push({type:"paused-week",week:settimana});
+    if(st.history.length>24) st.history.shift();
+    return {income:0,issue:st.issue||null,paused:true};
+  }
+
+  const factor=st.issue?.id ? .65 : 1;
+  const income=Math.round((Number(a.ricavoPulito||0)-Number(a.gestione||0))*factor);
+  const used=stradaLavaggioUsatoCanale(a.id);
+  const cap=Math.max(1,Number(a.capienza||a.resa||1));
+  const load=Math.max(0,Math.min(1.5,used/cap));
+  const risk=Math.min(.38,Number(a.rischio||.05)+load*.12+Number(st.pressione||0)/500);
+  let issue=null;
+
+  if(!st.issue && Number(st.lastIssueWeek)!==settimana){
+    const r=Number.isFinite(Number(roll))?Number(roll):Math.random();
+    st.lastIssueWeek=settimana;
+    if(r<risk){
+      const rv=Number.isFinite(Number(variantRoll))?Math.max(0,Math.min(.999999,Number(variantRoll))):Math.random();
+      const def=STRADA_ATTIVITA_PROBLEMI[Math.floor(rv*STRADA_ATTIVITA_PROBLEMI.length)]||STRADA_ATTIVITA_PROBLEMI[0];
+      st.issue={id:def.id,openedWeek:settimana};
+      issue=def;
+      st.history.push({type:"issue-opened",issueId:def.id,week:settimana,load:Number(load.toFixed(3))});
+      const persone=stradaAttivitaPersone(a.id);
+      const voce=def.tipo==="dipendente"?(persone.employee||persone.partner):(persone.partner||persone.employee);
+      if(typeof pushLog==="function")
+        pushLog("<b>"+a.n+": "+def.n+".</b> "+(voce?voce.n+" ti chiama: ":"")+def.testo,"bad");
+      if(voce&&typeof postoRegistraConseguenzaMondo==="function")
+        postoRegistraConseguenzaMondo(voce,"business-issue-opened",0,{
+          source:"attivita",reason:def.id,context:a.id
+        });
+    }
+  }
+
+  st.pressione=Math.max(0,Math.min(100,Number(st.pressione||0)-10));
+  st.history.push({type:"week-close",week:settimana,income,used,pressure:Number(st.pressione||0)});
+  if(st.history.length>24) st.history.shift();
+  return {income,issue:issue||st.issue||null,paused:false,load,risk};
+}
+
+function stradaAttivitaRisolviProblema(id,scelta){
+  const a=stradaAttivitaDef(id),st=stradaAttivitaStato(id,true);
+  if(!a||!st||!st.issue) return "Non c'è più nessun problema aperto.";
+  const def=stradaAttivitaProblemaDef(st.issue.id);
+  if(!def) { st.issue=null; return "Problema chiuso."; }
+  const persone=stradaAttivitaPersone(id);
+  const persona=def.tipo==="dipendente"?(persone.employee||persone.partner):(persone.partner||persone.employee);
+  const settimana=stradaAttivitaWeekIndex();
+
+  if(scelta==="sistema"){
+    if(Number(G.money||0)<Number(def.costo||0))
+      return "Non hai "+fmt(def.costo)+" € per sistemare la cosa adesso.";
+    G.money-=Number(def.costo||0);
+    st.pressione=Math.max(0,Number(st.pressione||0)-22);
+    if(persona&&typeof postoRegistraConseguenzaMondo==="function")
+      postoRegistraConseguenzaMondo(persona,"business-issue-resolved",1,{
+        source:"attivita",reason:def.id,context:id
+      });
+    st.history.push({type:"issue-resolved",issueId:def.id,choice:"sistema",week:settimana});
+  }else if(scelta==="pausa"){
+    st.blockedUntilAbsoluteDay=stradaAbsDay()+7;
+    st.pressione=Math.max(0,Number(st.pressione||0)-32);
+    if(persona&&typeof postoRegistraConseguenzaMondo==="function")
+      postoRegistraConseguenzaMondo(persona,"business-paused-cleanup",1,{
+        source:"attivita",reason:def.id,context:id
+      });
+    st.history.push({type:"issue-resolved",issueId:def.id,choice:"pausa",week:settimana});
+  }else{
+    G.strada.heat=clamp(Number(G.strada.heat||0)+Number(def.heatIgnora||1),0,100);
+    st.pressione=Math.min(100,Number(st.pressione||0)+18);
+    if(persona&&typeof postoRegistraConseguenzaMondo==="function")
+      postoRegistraConseguenzaMondo(persona,"business-issue-ignored",-1,{
+        source:"attivita",reason:def.id,context:id
+      });
+    st.history.push({type:"issue-resolved",issueId:def.id,choice:"ignora",week:settimana});
+  }
+  if(st.history.length>24) st.history.shift();
+  st.issue=null;
+  if(typeof save==="function") save();
+  renderStrada();renderGioco();
+  return scelta==="sistema"?"Hai sistemato il problema senza fermare l'attività."
+    :scelta==="pausa"?"Hai fermato l'attività per una settimana per rimetterla in ordine."
+    :"Hai tirato dritto: il problema è chiuso, ma l'attenzione sale.";
+}
+
+function stScenaProblemaAttivita(id){
+  const a=stradaAttivitaDef(id),st=stradaAttivitaStato(id,true);
+  const def=st&&st.issue?stradaAttivitaProblemaDef(st.issue.id):null;
+  if(!a||!def) return stScenaAttivita(id);
+  return {
+    k:"Attività",titolo:def.n,
+    testo:"<b>"+a.n+"</b> · "+def.testo,
+    opts:[
+      {n:"Sistemala",d:"−"+fmt(def.costo)+" € · abbassi la pressione",
+        no:Number(G.money||0)<Number(def.costo||0),
+        run(){const t=stradaAttivitaRisolviProblema(id,"sistema");STRADA_SCENA=stScenaAttivita(id);renderStScheda();stToast(t);}},
+      {n:"Fermati una settimana",d:"Niente ricavi e niente riciclaggio: ripulisci l'attività, non i soldi",
+        run(){const t=stradaAttivitaRisolviProblema(id,"pausa");STRADA_SCENA=stScenaAttivita(id);renderStScheda();stToast(t);}},
+      {n:"Tira dritto",d:"Non spendi ora · aumenta attenzione e tensione con chi ci lavora",hot:true,
+        run(){const t=stradaAttivitaRisolviProblema(id,"ignora");STRADA_SCENA=stScenaAttivita(id);renderStScheda();stToast(t);}},
+      {n:"Torna indietro",d:"Non decidi adesso",run(){STRADA_SCENA=stScenaAttivita(id);renderStScheda();}}
+    ]
+  };
+}
+
+function stradaAttivitaContattoIncontro(id){
+  if(typeof stradaContattiAttivi!=="function") return null;
+  const persone=stradaAttivitaPersone(id);
+  const esclusi=new Set([persone.partner&&persone.partner.id,persone.employee&&persone.employee.id].filter(Boolean));
+  return stradaContattiAttivi().filter(p=>p&&!esclusi.has(p.id))
+    .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a))[0]||null;
+}
+
+function stradaAttivitaIncontro(id){
+  const st=stradaAttivitaStato(id,true),persone=stradaAttivitaPersone(id);
+  const contatto=stradaAttivitaContattoIncontro(id);
+  const week=stradaAttivitaWeekIndex();
+  if(!st||!contatto) return "Non hai ancora un contatto con cui abbia senso fissare qui un incontro.";
+  if(Number(st.lastMeetingWeek)===week) return "Questa settimana hai già usato l'attività come punto d'incontro.";
+  if(!stradaAttivitaOperativa(id)) return "L'attività è ferma: non è il momento di portarci gente.";
+  if(typeof GAME_TIME!=="undefined"&&typeof GAME_TIME.spend==="function"){
+    const tx=GAME_TIME.spend(45,"crime:business-meeting",{detail:{activityId:id,personId:contatto.id}});
+    if(tx&&tx.blocked) return "Non hai abbastanza tempo o c'è una situazione da chiudere prima.";
+  }
+  st.lastMeetingWeek=week;
+  st.pressione=Math.min(100,Number(st.pressione||0)+3);
+  stradaModificaFiducia(contatto,2,"incontro-attivita-"+id);
+  if(persone.partner&&typeof postoCollegaPersone==="function")
+    postoCollegaPersone(persone.partner,contatto,"attivita-incontro");
+  if(persone.partner&&typeof postoRegistraConseguenzaMondo==="function")
+    postoRegistraConseguenzaMondo(persone.partner,"business-meeting",1,{
+      source:"attivita",reason:"incontro",context:id,
+      relatedPersonId:contatto.id,relatedPersonName:contatto.n
+    });
+  st.history.push({type:"meeting",week,personId:contatto.id});
+  if(st.history.length>24) st.history.shift();
+  save();renderStrada();renderGioco();
+  return "Hai fatto incontrare "+contatto.n+" qui. La relazione si muove anche fuori dalla Strada.";
+}
+
+function stScenaAttivita(id){
+  const a=stradaAttivitaDef(id),st=stradaAttivitaStato(id,true);
+  if(!a||!st) return {k:"Attività",titolo:"Non disponibile",testo:"",opts:[{n:"Chiudi",run(){STRADA_SCENA=null;}}]};
+  const persone=stradaAttivitaPersone(id);
+  const usato=stradaLavaggioUsatoCanale(id),residuo=stradaLavaggioResiduoCanale(id);
+  const contatto=stradaAttivitaContattoIncontro(id);
+  const week=stradaAttivitaWeekIndex();
+  const fermata=!stradaAttivitaOperativa(id);
+  const rischio=a.rischio<.07?"basso":a.rischio<.1?"medio":"alto";
+  const opts=[];
+  if(st.issue) opts.push({n:"Problema aperto",d:(stradaAttivitaProblemaDef(st.issue.id)||{}).n||"Da gestire",
+    hot:true,run(){STRADA_SCENA=stScenaProblemaAttivita(id);renderStScheda();}});
+  if(!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)
+    opts.push({n:"Fai passare soldi",d:"Residuo "+fmt(residuo)+" € · scegli tu l'importo",
+      run(){STRADA_SCENA=stScenaLavaggioCanale(id);renderStScheda();}});
+  if(!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)
+    opts.push({n:"Fissa un incontro con "+contatto.n,d:"45 min · usa l'attività come luogo reale della rete",
+      run(){const t=stradaAttivitaIncontro(id);STRADA_SCENA=stScenaAttivita(id);renderStScheda();stToast(t);}});
+  opts.push({n:"Chiudi",d:"Torna alle attività",run(){STRADA_SCENA=null;}});
+
+  return {
+    k:"Attività di copertura",titolo:a.n,
+    testo:(fermata?"<b>FERMA questa settimana.</b> ":"")+
+      "Ricavi normali "+fmt(a.ricavoPulito)+" € − "+fmt(a.gestione)+" € di gestione. "+
+      "Capienza "+fmt(a.capienza)+" €, rischio "+rischio+". "+
+      (persone.partner?"Responsabile: <b>"+persone.partner.n+"</b>. ":"")+
+      (persone.employee?"Dipendente: <b>"+persone.employee.n+"</b>.":""),
+    stats:[
+      {t:"passati "+fmt(usato)+" €"},
+      {t:"pressione "+Math.round(Number(st.pressione||0))+"/100"},
+      {t:st.issue?"problema aperto":"operativa"}
+    ],
+    opts
+  };
+}
+
 function stradaSettimana(){
   const s = G.strada;
 
@@ -3594,13 +4016,20 @@ function stradaSettimana(){
     return; /* dentro non succede altro: niente attività, niente opp */
   }
 
-  /* attività: rendita settimanale (45% pulito, 55% sporco), meno la gestione */
-  let attive = 0;
+  /* Punto Strada 17: l'impresa produce reddito normale, non denaro sporco
+     dal nulla. Il denaro sporco entra solo quando il giocatore decide di farlo
+     passare; il volume di quella scelta alimenta rischio e problemi operativi. */
+  let attive=0,redditoAttivita=0;
   for(const a of STRADA_ATTIVITA){
     if(!s.attivita[a.id]) continue;
     attive++;
-    G.money += Math.round(a.resa * .45) - a.gestione;
-    s.sporchi += Math.round(a.resa * .55);
+    const esito=stradaAttivitaChiudiSettimana(a);
+    redditoAttivita+=Number(esito.income||0);
+  }
+  if(redditoAttivita){
+    G.money+=redditoAttivita;
+    G._entratePulite=Number(G._entratePulite||0)+redditoAttivita;
+    pushLog("<b>Attività di copertura:</b> "+fmt(redditoAttivita)+" € netti da ricavi normali.","good");
   }
 
   /* Punto 6: protezione e avvocato sono accordi con persone reali.
@@ -4044,17 +4473,31 @@ function renderStAttivita(){
   const s = G.strada;
   $("st-tab-attivita").innerHTML =
     STRADA_ATTIVITA.map(a => {
-      const tua = !!s.attivita[a.id];
-      return '<div class="activity' + (tua ? " owned" : "") + '">' +
-        '<div class="a-top"><strong>' + a.n + '</strong><span class="price">' +
-          (tua ? "TUA" : fmt(a.costo) + " €") + '</span></div>' +
-        '<p>' + (tua
-          ? "Resa " + fmt(a.resa) + " €/sett. · 45% pulito / 55% sporco · −" + fmt(a.gestione) + " € di gestione"
-          : "Resa " + fmt(a.resa) + " €/sett. · alza di altrettanto quanto puoi ripulire.") + '</p>' +
-        (tua ? "" : '<button class="pill' + (G.money < a.costo ? " no" : "") + '" data-stattivita="' + a.id + '">Rileva</button>') +
+      const tua=!!s.attivita[a.id];
+      if(!tua){
+        const rischio=a.rischio<.07?"basso":a.rischio<.1?"medio":"alto";
+        return '<div class="activity">' +
+          '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+fmt(a.costo)+' €</span></div>' +
+          '<p>Ricavi normali '+fmt(a.ricavoPulito)+' €/sett. · −'+fmt(a.gestione)+' € gestione · '+
+            'capienza '+fmt(a.capienza)+' € · rischio '+rischio+'.</p>' +
+          '<button class="pill'+(G.money<a.costo?" no":"")+'" data-stattivita="'+a.id+'">Rileva</button>' +
+          '</div>';
+      }
+
+      const st=stradaAttivitaStato(a.id,true),persone=stradaAttivitaPersone(a.id);
+      const fermata=!stradaAttivitaOperativa(a.id);
+      const stato=fermata?"FERMA":st.issue?"PROBLEMA":"OPERATIVA";
+      const residuo=stradaLavaggioResiduoCanale(a.id);
+      return '<div class="activity owned">' +
+        '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+stato+'</span></div>' +
+        '<p>'+(persone.partner?persone.partner.n+' · ':'')+
+          'netto normale '+fmt(Math.max(0,a.ricavoPulito-a.gestione))+' €/sett. · '+
+          'riciclaggio residuo '+fmt(residuo)+' € · pressione '+Math.round(Number(st.pressione||0))+'/100'+
+          (st.issue?' · <b>'+(stradaAttivitaProblemaDef(st.issue.id)||{}).n+'</b>':'')+'.</p>' +
+        '<button class="pill'+(st.issue?" danger":"")+'" data-stgestione="'+a.id+'">Gestisci</button>' +
         '</div>';
     }).join("") +
-    '<div class="business-foot">Le attività rendono ogni settimana e allargano quanto denaro sporco riesci a far sparire.</div>';
+    '<div class="business-foot">Sono imprese vere: producono reddito pulito, hanno persone e problemi. Il denaro sporco passa solo quando decidi tu quanto esporle.</div>';
 }
 
 /* ---- in basso: le tre città ---- */
@@ -4121,7 +4564,10 @@ $("st-modal").addEventListener("click", ev => {
 $("st-ripulisci").onclick = () => {
   hubTap();
   if(G.strada.arresto){ stToast("Sei in carcere: non puoi ripulire i soldi finché non esci."); return; }
-  stToast(stradaRipulisci());
+  if(Number(G.strada.sporchi||0)<=0){ stToast("Non hai soldi sporchi da ripulire."); return; }
+  if(stradaCapienza()<=0){ stToast("Hai già usato tutta la capacità di questa settimana."); return; }
+  STRADA_SCENA=stScenaRiciclaggio();
+  renderStScheda();
 };
 
 $("st-tab-copre").addEventListener("click", ev => {
@@ -4137,9 +4583,16 @@ $("st-tab-copre").addEventListener("click", ev => {
 });
 
 $("st-tab-attivita").addEventListener("click", ev => {
-  const a = ev.target.closest("[data-stattivita]");
+  const gestisci=ev.target.closest("[data-stgestione]");
+  if(gestisci){
+    hubTap();
+    STRADA_SCENA=stScenaAttivita(gestisci.dataset.stgestione);
+    renderStScheda();
+    return;
+  }
+  const a=ev.target.closest("[data-stattivita]");
   if(!a) return;
-  hubTap(); stToast(stCompraAttivita(a.dataset.stattivita));
+  hubTap();stToast(stCompraAttivita(a.dataset.stattivita));
 });
 
 $("st-citta-lista").addEventListener("click", ev => {
