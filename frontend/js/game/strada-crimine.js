@@ -4421,12 +4421,21 @@ function stradaSettimana(){
     if(s.arresto.settimane <= 0){
       const colpoFatto = s.arresto.colpo;
       const jailFx = s.carcere || {};
+      const relazioniUscita=carcereScarcerazioneRelazioni(jailFx);
       s.arresto = null;
       s.rep = clamp(s.rep + 12 + (Number(jailFx.releaseRepBonus)||0), 0, 100);
       s.heat = clamp(s.heat + (Number(jailFx.releaseHeatBonus)||0), 0, 100);
       if(jailFx.releaseRepBonus || jailFx.releaseHeatBonus)
         pushLog("<b>Quello che hai deciso dentro ti aspetta fuori.</b> Il giro e l'attenzione ripartono da dove li avevi lasciati.", "");
-      showEvent({k:"Sei uscito", t:"Fuori", d:"La storia di «" + colpoFatto + "» ti ha seguito fin qui.",
+      if(relazioniUscita.contatti.length)
+        pushLog("<b>Non sei uscito da solo.</b> "+relazioniUscita.contatti.map(p=>p.n).join(", ")+
+          (relazioniUscita.contatti.length===1?" resta un contatto costruito dentro.":" restano contatti costruiti dentro."),"good");
+      if(relazioniUscita.rivali.length)
+        pushLog("<b>Un conto ha passato il cancello con te.</b> "+relazioniUscita.rivali.map(p=>p.n).join(", ")+
+          (relazioniUscita.rivali.length===1?" non ha dimenticato.":" non hanno dimenticato."),"bad");
+      showEvent({k:"Sei uscito", t:"Fuori", d:"La storia di «" + colpoFatto + "» ti ha seguito fin qui."+
+        (relazioniUscita.contatti.length?" Anche "+relazioniUscita.contatti.map(p=>p.n).join(", ")+" fa parte di quello che ti porti fuori.":"")+
+        (relazioniUscita.rivali.length?" C'è però un conto aperto con "+relazioniUscita.rivali.map(p=>p.n).join(", ")+".":""),
         annulla(){},
         opts:[
           {n:"Raccontala", d:"+lucidità, +hype: la trasformi in un pezzo",
