@@ -252,12 +252,12 @@ test("landscape mobile: landing instrada MakeHuman nel relay mobile", async ({ p
   await creator.getByRole("button",{name:/MakeHuman/i}).tap();
 
   const src=await creator.locator("#localEditorFrame").getAttribute("src");
-  expect(src).toContain("makehuman-mobile-v1/index.html?v=3");
+  expect(src).toContain("makehuman-mobile-v1/index.html?v=4");
   await expect(creator.locator("#creatorExitGame")).toBeHidden();
 });
 
 test("landscape mobile: MakeHuman separa avatar e controlli senza coprirli", async ({ page }) => {
-  await page.goto("/media/makehuman-camerino-v1/index.html?v=mobile-3&mobile=1");
+  await page.goto("/media/makehuman-camerino-v1/index.html?v=mobile-4&mobile=1");
 
   const sidebar=page.locator("#editorSidebar");
   const camera=page.locator(".camera-switcher");
@@ -289,7 +289,7 @@ test("landscape mobile: MakeHuman separa avatar e controlli senza coprirli", asy
   expect(layout.mobile).toBe(true);
   expect(layout.sidebar.left).toBeGreaterThanOrEqual(layout.vw*.44);
   expect(layout.sidebar.right).toBeLessThanOrEqual(layout.vw+1);
-  expect(layout.sidebar.bottom).toBeLessThan(layout.actions.top);
+  expect(layout.actions.top-layout.sidebar.bottom).toBeGreaterThanOrEqual(6);
   expect(layout.camera.right).toBeLessThanOrEqual(layout.vw*.45+2);
   expect(layout.actions.left).toBeGreaterThanOrEqual(layout.vw*.44);
   expect(layout.actions.right).toBeLessThanOrEqual(layout.vw+1);
