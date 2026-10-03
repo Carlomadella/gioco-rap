@@ -1269,6 +1269,9 @@ function stradaPersonaMeta(p){
       sources:[],
       opportunityIds:[],
       introducedByPersonId:null,
+      /* Il contesto geografico della relazione criminale, non della PERSONA. */
+      firstLinkedCityId:null,
+      lastLinkedCityId:null,
       fiducia:0,
       fiduciaEventi:[],
       favori:0,
@@ -2180,6 +2183,10 @@ function stradaSegnaPersona(p,meta){
     st.opportunityIds.push(meta.opportunityId);
   if(st.introducedByPersonId==null && meta.introducedByPersonId)
     st.introducedByPersonId=meta.introducedByPersonId;
+  const npcCtx=stradaNpcContestoPersona(p,meta.cityId);
+  if(st.firstLinkedCityId==null) st.firstLinkedCityId=npcCtx.cityId;
+  st.lastLinkedCityId=npcCtx.cityId;
+  stradaNpcSegnalaContesto(p,{cityId:npcCtx.cityId,source:meta.source||"street"});
 
   /* Una persona conosciuta sul lavoro continua a essere collega/rider/cliente:
      non le cambiamo ruolo. Da quando scopri il suo lato Strada può però
@@ -2197,15 +2204,198 @@ function stradaContattoKey(nome){
     .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
 }
 
-function stradaPersonaDaId(id){
-  return id ? (G.gente||[]).find(p=>p&&p.id===id&&!p.via) || null : null;
+/* Punto 22 — contratto CRIME → NPC.
+   Il sistema NPC vero resta esterno alla Strada. Questo file definisce soltanto
+   cosa serve al crime e come degradare sull'anagrafe attuale G.gente.
+
+   Il futuro Population/NPC Manager può registrare:
+     window.ADF_CRIME_NPC = {
+       personById(id),
+       findPerson({crimeKey,name,cityId,context}),
+       createPerson({roleHint,name,cityId,context,story}),
+       people({cityId,originPlace,context}),
+       linkPeople({aId,bId,reason,context}),
+       cityOf(personId),
+       groupsForPerson(personId),
+       markContext({personId,context,cityId,source})
+     }
+
+   Nessuno di questi metodi è obbligatorio: ogni funzione qui sotto ha fallback
+   compatibile col gioco attuale. La Strada conserva SOLO lo stato criminale
+   della relazione (p.strada); identità, città, legami e gruppi restano NPC-side. */
+const STRADA_NPC_CONTRACT_VERSION = 1;
+
+function stradaNpcAdapter(){
+  try{
+    const a=typeof window!=="undefined" ? window.ADF_CRIME_NPC : null;
+    return a && typeof a==="object" ? a : null;
+  }catch(_){ return null; }
 }
 
-function stradaContattiLuogo(luogo){
-  return (G.gente||[]).filter(p=>
-    p && !p.via && p.origineLuogo===luogo
-  );
+function stradaCittaContesto(explicita){
+  if(explicita!=null && String(explicita).trim()) return String(explicita).trim();
+  try{
+    if(typeof ST_CITTA!=="undefined" && ST_CITTA) return String(ST_CITTA);
+  }catch(_){}
+  return "provincia";
 }
+
+function stradaNpcCittaPersona(p){
+  if(!p || !p.id) return "provincia";
+  const a=stradaNpcAdapter();
+  try{
+    if(a && typeof a.cityOf==="function"){
+      const c=a.cityOf(p.id);
+      if(c!=null && String(c).trim()) return String(c).trim();
+    }
+  }catch(_){}
+  const legacy=p.mondo&&p.mondo.cittaAttuale!=null
+    ? p.mondo.cittaAttuale
+    : p.cittaAttuale!=null ? p.cittaAttuale : p.citta;
+  return legacy!=null && String(legacy).trim() ? String(legacy).trim() : "provincia";
+}
+
+function stradaNpcPersonaDaId(id){
+  if(!id) return null;
+  const a=stradaNpcAdapter();
+  try{
+    if(a && typeof a.personById==="function"){
+      const p=a.personById(id);
+      if(p && !p.via) return p;
+    }
+  }catch(_){}
+  return (G.gente||[]).find(p=>p&&p.id===id&&!p.via) || null;
+}
+
+function stradaNpcPersone(query){
+  query=query&&typeof query==="object"?query:{};
+  const a=stradaNpcAdapter();
+  try{
+    if(a && typeof a.people==="function"){
+      const out=a.people(Object.assign({context:"crime"},query));
+      if(Array.isArray(out)) return out.filter(p=>p&&!p.via);
+    }
+  }catch(_){}
+
+  return (G.gente||[]).filter(p=>{
+    if(!p || p.via) return false;
+    if(query.originPlace!=null && p.origineLuogo!==query.originPlace) return false;
+    if(query.cityId!=null && stradaNpcCittaPersona(p)!==String(query.cityId)) return false;
+    return true;
+  });
+}
+
+function stradaNpcTrovaPersona(query){
+  query=query&&typeof query==="object"?query:{};
+  const cityId=stradaCittaContesto(query.cityId);
+  const a=stradaNpcAdapter();
+  try{
+    if(a && typeof a.findPerson==="function"){
+      const p=a.findPerson(Object.assign({context:"crime",cityId},query));
+      if(p && !p.via) return p;
+    }
+  }catch(_){}
+
+  return stradaNpcPersone({cityId}).find(p=>
+    (query.crimeKey && p.strada && p.strada.key===query.crimeKey) ||
+    (query.name && p.n===query.name)
+  ) || null;
+}
+
+function stradaNpcCreaPersona(request){
+  request=request&&typeof request==="object"?request:{};
+  const cityId=stradaCittaContesto(request.cityId);
+  const a=stradaNpcAdapter();
+  try{
+    if(a && typeof a.createPerson==="function"){
+      const p=a.createPerson(Object.assign({context:"crime",cityId},request));
+      if(p && !p.via) return {person:p,managed:true};
+    }
+  }catch(_){}
+
+  if(typeof nuovaPersona!=="function") return {person:null,managed:false};
+  const p=nuovaPersona(request.roleHint||"strada");
+  if(!p) return {person:null,managed:false};
+  G.gente=Array.isArray(G.gente)?G.gente:[];
+  if(!G.gente.some(x=>x&&x.id===p.id)) G.gente.push(p);
+  return {person:p,managed:false};
+}
+
+function stradaNpcSegnalaContesto(p,meta){
+  if(!p || !p.id) return;
+  const a=stradaNpcAdapter();
+  try{
+    if(a && typeof a.markContext==="function")
+      a.markContext({
+        personId:p.id,
+        context:"crime",
+        cityId:stradaCittaContesto(meta&&meta.cityId),
+        source:meta&&meta.source||null
+      });
+  }catch(_){}
+}
+
+function stradaNpcCollega(a,b,reason){
+  if(!a || !b || !a.id || !b.id || a===b) return false;
+  const adapter=stradaNpcAdapter();
+  try{
+    if(adapter && typeof adapter.linkPeople==="function"){
+      const out=adapter.linkPeople({
+        aId:a.id,bId:b.id,
+        reason:String(reason||"crime-link"),
+        context:"crime"
+      });
+      if(out!==false) return true;
+    }
+  }catch(_){}
+  return typeof postoCollegaPersone==="function"
+    ? !!postoCollegaPersone(a,b,reason)
+    : false;
+}
+
+function stradaNpcGruppiPersona(p){
+  if(!p || !p.id) return [];
+  const a=stradaNpcAdapter();
+  try{
+    if(a && typeof a.groupsForPerson==="function"){
+      const out=a.groupsForPerson(p.id);
+      if(Array.isArray(out)) return out.filter(Boolean);
+    }
+  }catch(_){}
+  return [];
+}
+
+function stradaNpcContestoPersona(p,cityId){
+  return {
+    cityId:p ? stradaNpcCittaPersona(p) : stradaCittaContesto(cityId),
+    groupIds:p ? stradaNpcGruppiPersona(p)
+      .map(g=>typeof g==="string"?g:g&&g.groupId)
+      .filter(Boolean) : []
+  };
+}
+
+function stradaPersonaDaId(id){
+  return stradaNpcPersonaDaId(id);
+}
+
+function stradaContattiLuogo(luogo,citta){
+  return stradaNpcPersone({
+    originPlace:luogo,
+    cityId:stradaCittaContesto(citta||"provincia")
+  });
+}
+
+try{
+  if(typeof window!=="undefined")
+    window.ADF_CRIME_NPC_CONTRACT=Object.freeze({
+      version:STRADA_NPC_CONTRACT_VERSION,
+      adapterGlobal:"ADF_CRIME_NPC",
+      methods:Object.freeze([
+        "personById","findPerson","createPerson","people",
+        "linkPeople","cityOf","groupsForPerson","markContext"
+      ])
+    });
+}catch(_){}
 
 /* Punto 14: la Fabbrica è una storyline parallela, non un distributore di
    crimini. Prima devi averci lavorato davvero e aver conosciuto una persona
@@ -2274,25 +2464,35 @@ function stradaFabbricaPersonaCandidata(){
 function stradaCreaContatto(nome,key,meta){
   if(!G.gente) G.gente=[];
   meta=meta||{};
+  const cityId=stradaCittaContesto(meta.cityId);
 
-  /* Se un nome già appartiene a una persona persistente, quello non diventa
-     un omonimo nuovo: scopri semplicemente un lato che prima non conoscevi.
-     È intenzionale e collega davvero Circolo/lavoro/Strada. */
-  let p=(G.gente||[]).find(x=>x && !x.via && x.strada && x.strada.key===key) || null;
-  if(!p && nome)
-    p=(G.gente||[]).find(x=>x && !x.via && x.n===nome) || null;
+  /* Il crime chiede una PERSONA al sistema NPC, non la possiede. Se l'adapter
+     non esiste ancora, il fallback conserva esattamente il comportamento
+     storico di G.gente + nuovaPersona(). */
+  let p=stradaNpcTrovaPersona({crimeKey:key,name:nome,cityId});
 
   if(!p){
-    if(typeof nuovaPersona!=="function") return null;
-    p=nuovaPersona("strada");
-    p.n=String(nome||p.n||"Contatto");
-    p.origine="strada";
-    p.origineDettaglio="conoscenza della Strada";
-    p.storia=meta.story||"L'hai conosciuto attraverso il giro della Strada.";
-    p.circoloSbloccato=true;
-    p.numero=false; /* il TrapPhone non equivale al numero personale */
-    p.numDa=null;
-    G.gente.push(p);
+    const creato=stradaNpcCreaPersona({
+      roleHint:"strada",
+      name:String(nome||"Contatto"),
+      cityId,
+      source:meta.source||"street",
+      story:meta.story||"L'hai conosciuto attraverso il giro della Strada."
+    });
+    p=creato.person;
+    if(!p) return null;
+
+    /* Questi campi legacy restano solo nel fallback: il nuovo NPC manager
+       decide autonomamente identità/origine/ambienti della persona. */
+    if(!creato.managed){
+      p.n=String(nome||p.n||"Contatto");
+      p.origine="strada";
+      p.origineDettaglio="conoscenza della Strada";
+      p.storia=meta.story||"L'hai conosciuto attraverso il giro della Strada.";
+      p.circoloSbloccato=true;
+      p.numero=false; /* il TrapPhone non equivale al numero personale */
+      p.numDa=null;
+    }
   }else if(meta.story &&
            (!p.storia || p.storia==="L'hai conosciuto attraverso il giro della Strada.")){
     p.storia=meta.story;
@@ -2303,7 +2503,8 @@ function stradaCreaContatto(nome,key,meta){
     source:meta.source||"street",
     opportunityId:meta.opportunityId||null,
     introducedByPersonId:meta.introducedByPersonId||null,
-    story:meta.story||null
+    story:meta.story||null,
+    cityId
   });
 }
 
@@ -2314,8 +2515,10 @@ function stradaCreaContatto(nome,key,meta){
 function stradaCausaOpportunita(variante,trigger){
   if(!variante || trigger==="fabbrica") return null;
   const key=variante.contactKey||stradaContattoKey(variante.persona);
-  const esistente=(G.gente||[]).find(x=>x && !x.via &&
-    ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
+  const cityId=stradaCittaContesto();
+  const esistente=stradaNpcTrovaPersona({
+    crimeKey:key,name:variante.persona,cityId
+  });
 
   if(esistente){
     if(esistente.strada&&esistente.strada.known){
@@ -2418,6 +2621,11 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
     variante.networkSourceLabel=causa?causa.label:null;
     variante.introducedByPersonId=causa&&causa.introducedBy?causa.introducedBy.id:null;
     variante.introducedByName=causa&&causa.introducedBy?causa.introducedBy.n:null;
+    variante.networkCityId=stradaCittaContesto();
+    const introCtx=causa&&causa.introducedBy
+      ? stradaNpcContestoPersona(causa.introducedBy,variante.networkCityId)
+      : {groupIds:[]};
+    variante.networkGroupIds=introCtx.groupIds;
 
     const storia=causa&&causa.introducedBy
       ?"Te l'ha presentato "+causa.introducedBy.n+": ha fatto il tuo nome nel giro."
@@ -2426,7 +2634,8 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
       source:legacy===true?"legacy-opportunity":"opportunity",
       opportunityId:variante.id,
       introducedByPersonId:variante.introducedByPersonId,
-      story:storia
+      story:storia,
+      cityId:variante.networkCityId
     });
     if(p && causa&&causa.introducedBy && typeof postoCollegaPersone==="function")
       postoCollegaPersone(causa.introducedBy,p,"strada-introduzione");
