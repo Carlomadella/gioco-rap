@@ -111,7 +111,7 @@
           <button class="quit" id="quit" type="button">Molla il giro</button>
         </aside>
         <section class="panel center" id="crimeCenter">
-          <div class="herohead"><div class="kicker"><span class="pulse-dot"></span> NOTTE · CONTANTI · FAVORI · NESSUN CONTRATTO</div><h1>Qui niente è <span>pulito.</span></h1><p id="crimeCaption">Ogni guadagno lascia qualcuno da pagare, qualcuno che sa troppo o qualcuno che ti sta cercando.</p><div id="crimeCaptionSource" class="crime-caption-source"></div></div>
+          <div class="herohead"><div class="kicker"><span class="pulse-dot"></span> CONTANTI · FAVORI · ORARI CHE CONTANO · NESSUN CONTRATTO</div><h1>Qui niente è <span>pulito.</span></h1><p id="crimeCaption">Ogni guadagno lascia qualcuno da pagare, qualcuno che sa troppo o qualcuno che ti sta cercando.</p><div id="crimeCaptionSource" class="crime-caption-source"></div></div>
           <div class="crimes" id="crimes"></div>
           <div class="lockscene" id="crimeLock"><div class="lockbox"><span>Fuori dal giro per ora</span><strong id="lockTitle">Sei dentro.</strong><span id="lockReq"></span></div></div>
         </section>
