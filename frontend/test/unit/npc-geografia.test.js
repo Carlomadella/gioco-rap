@@ -67,6 +67,16 @@ describe("NPC · punto 9 geografia e mobilita",()=>{
     expect(x.citta).toBe("milano");
   });
 
+
+  it("una conferma esplicita materializza anche una città uguale al fallback legacy",()=>{
+    const api=runtime();
+    const x=p({citta:"milano"});
+    api.sposta(x,{cittaId:"milano",dalGiorno:10,fonte:"trasferta:incontro"});
+    expect(api.posizioni(x)).toEqual([
+      {cittaId:"milano",dalGiorno:10,fonte:"trasferta:incontro"}
+    ]);
+    expect(api.posizione(x,10)).toMatchObject({cittaId:"milano",esplicita:true});
+  });
   it("supporta spostamenti futuri e li applica solo quando maturano",()=>{
     const api=runtime();
     const x=p({citta:"milano"});
