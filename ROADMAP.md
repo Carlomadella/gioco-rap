@@ -363,8 +363,9 @@ quando dalla provincia cominci a muoverti verso Milano.
 - Entrate: streaming, concerti, merch, feat pagati. Spese che alzano il lifestyle ma bruciano cassa.
 - **Criminalità** come strada alternativa per soldi e, poi, fama (punto 21): la Provincia è
   già giocabile con rete di persone, heat, attività di copertura, carcere, uscita dal giro,
-  fallout e intel. L'espansione futura deve rendere Milano e Los Angeles qualitativamente
-  diverse, non soltanto la Provincia con numeri più alti.
+  fallout e intel. Attività criminali resta accessibile 24/7 dopo lo sblocco; sono i singoli
+  colpi ad avere finestre coerenti giorno/sera/notte/weekend. L'espansione futura deve rendere
+  Milano e Los Angeles qualitativamente diverse, non soltanto la Provincia con numeri più alti.
 - Il bilanciamento economico del crime va misurato sul sistema attuale: i numeri del
   simulatore del 29/09 precedono il ciclo completo dei 24 punti e non sono più un benchmark
   sufficiente. Resta valido come storico finché non viene rilanciato.
