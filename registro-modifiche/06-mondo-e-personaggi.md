@@ -6,6 +6,33 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8cd436f6 -->
+## 03/10/26, 07:38 — feature/strada-punto20-carcere-relazioni → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `8cd436f6`
+
+### Cosa è entrato
+
+- `645dcd95` — Cache: aggiorna Strada punto 20 — **mycolbraga**
+- `bbaac7a0` — Audit: aggiungi gate Strada punto 20 — **mycolbraga**
+- `490864b2` — Test: carcere come seconda fonte di relazioni — **mycolbraga**
+- `b57737d5` — UI: mostra le relazioni costruite in carcere — **mycolbraga**
+- `9e435fcd` — Strada punto 20: porta relazioni e rivalità fuori dal carcere — **mycolbraga**
+- `ba59c903` — Strada punto 20: eventi e azioni costruiscono relazioni in carcere — **mycolbraga**
+- `61b79385` — Strada punto 20: persone persistenti conosciute in carcere — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-carcere-relazioni.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:408dec7f -->
 ## 03/10/26, 07:23 — feature/strada-punto19-heat-mondo → main
 
