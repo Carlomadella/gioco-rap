@@ -948,6 +948,11 @@ function stScenaApproccio(colpo,preparazione){
   const s = G.strada;
   preparazione=stradaPreparazioneContesto(preparazione);
   const personeSquadra=stradaPersoneSquadra();
+  const intel=stradaIntelDaContesto(preparazione);
+  const lead=typeof stradaOpportunitaAttiva==="function"?stradaOpportunitaAttiva(colpo.id):null;
+  const miglioreSquadra=personeSquadra.slice().sort((a,b)=>
+    stradaBonusFiduciaSquadra(b)-stradaBonusFiduciaSquadra(a)
+  )[0]||null;
   return {k:"Come vuoi muoverti?", titolo:colpo.n, testo:colpo.d, approcci:true,
     stats:[
       {t:fmt(colpo.min) + "–" + fmt(colpo.max) + " €", c:"money"},
@@ -955,16 +960,25 @@ function stScenaApproccio(colpo,preparazione){
       {t:stradaDurataColpoLabel(colpo)+" di tempo"},
       {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)},
       {t:stradaCategoriaLabel(colpo)},
-      {t:"Preparazione: "+stradaPreparazioneEtichetta(preparazione)}
+      {t:"Preparazione: "+stradaPreparazioneEtichetta(preparazione)},
+      ...(intel?[{t:"Intel: "+stradaIntelDescrizione(preparazione),c:"money"}]:[])
     ],
     opts:STRADA_APPROCCI.map(a => {
       const riga = stRigaApproccio(a);
       const squadra=a.id==="squadra";
-      const dx=squadra
+      const personaStima=squadra?miglioreSquadra:null;
+      const stima=intel
+        ? Math.round(stradaChanceConOpportunita(colpo,a,lead,personaStima,preparazione)*100)
+        : null;
+      const usaIntel=!!(intel&&intel.approachId===a.id);
+      const baseDx=squadra
         ? (personeSquadra.length
           ? personeSquadra.length+" "+(personeSquadra.length===1?"persona fidata":"persone fidate")
           : "nessuno si fida abbastanza")
         : riga.dx;
+      const dx=intel
+        ? "Stima "+stima+"% · "+(usaIntel?"sfrutta la dritta":baseDx)
+        : baseDx;
       return {n:a.n, d:a.d, sx:riga.sx, dx, hot:a.id === "ferro",
         no:(squadra && !personeSquadra.length) || (a.serveFerro && !s.ferro) || G.energy < colpo.energia,
         run(){
@@ -3857,7 +3871,7 @@ function stradaEffettiOpportunita(lead,successo){
 function stradaChance(colpo, approccio, personaSquadra, preparazione){
   const s = G.strada;
   const categoria=stradaEffettiCategoria(colpo);
-  const prep=stradaPreparazioneEffetti(preparazione);
+  const prep=stradaPreparazioneEffetti(preparazione,approccio);
   let p = .62 - colpo.difficolta * .34;
   p += categoria.chance;
   p += prep.chance;
@@ -3899,7 +3913,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
   if(!colpo || !approccio) return;
   const s = G.strada;
   preparazione=stradaPreparazioneContesto(preparazione);
-  const effettiPreparazione=stradaPreparazioneEffetti(preparazione);
+  const effettiPreparazione=stradaPreparazioneEffetti(preparazione,approccio);
 
   if(G.energy < colpo.energia){ STRADA_SCENA = stScenaAvviso(colpo, "Non hai abbastanza energia per questo colpo (serve " + colpo.energia + ").", preparazione); return; }
   const personaSquadra=approccio.id==="squadra" ? stradaPersonaSquadra(personaSquadraId) : null;
@@ -4116,6 +4130,7 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       }
     }
   }
+  stradaIntelConsuma(colpo.id);
   save(); renderStrada(); renderGioco();
 }
 
