@@ -348,8 +348,8 @@ function stradaAttivitaStato(id,creaPersone){
       employee=stradaAttivitaPersonaNuova(a,"dipendente");
       if(employee) st.employeePersonId=employee.id;
     }
-    if(partner&&employee&&typeof postoCollegaPersone==="function")
-      postoCollegaPersone(partner,employee,"attivita-lavoro");
+    if(partner&&employee)
+      stradaNpcCollega(partner,employee,"attivita-lavoro");
   }
   return st;
 }
@@ -577,8 +577,7 @@ function stradaPresentazioneDopoSuccesso(persona,roll,variantRoll){
     }
   );
   if(!nuovo) return null;
-  if(typeof postoCollegaPersone==="function")
-    postoCollegaPersone(persona,nuovo,"strada-referral");
+  stradaNpcCollega(persona,nuovo,"strada-referral");
 
   st.lastReferralAbsoluteDay=oggi;
   stradaModificaFiducia(nuovo,3,"presentazione-da-"+persona.id);
@@ -2637,8 +2636,8 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
       story:storia,
       cityId:variante.networkCityId
     });
-    if(p && causa&&causa.introducedBy && typeof postoCollegaPersone==="function")
-      postoCollegaPersone(causa.introducedBy,p,"strada-introduzione");
+    if(p && causa&&causa.introducedBy)
+      stradaNpcCollega(causa.introducedBy,p,"strada-introduzione");
     stradaHeatSincronizzaPersone();
     return p && stradaRelazioneOperativa(p) ? p : null;
   }
@@ -3406,8 +3405,7 @@ function stradaRisolviEventoRete(personId){
       relatedPersonId:requester.id,relatedPersonName:requester.n
     });
     stradaAggiungiFavore(requester,1,"rete-nome-dato");
-    if(typeof postoCollegaPersone==="function")
-      postoCollegaPersone(requester,candidato,"strada-nome");
+    stradaNpcCollega(requester,candidato,"strada-nome");
     st.connectionsMade++;
     st.history.push({
       type:"name-given",absoluteDay:oggi,
@@ -3436,8 +3434,7 @@ function stradaRisolviEventoRete(personId){
     });
     stradaAggiungiFavore(a,1,"rete-ponte");
     stradaAggiungiFavore(b,1,"rete-ponte");
-    if(typeof postoCollegaPersone==="function")
-      postoCollegaPersone(a,b,"strada-ponte");
+    stradaNpcCollega(a,b,"strada-ponte");
     st.connectionsMade++;
     st.history.push({
       type:"bridge-made",absoluteDay:oggi,
@@ -4710,8 +4707,8 @@ function stradaAttivitaIncontro(id){
   st.lastMeetingWeek=week;
   st.pressione=Math.min(100,Number(st.pressione||0)+3);
   stradaModificaFiducia(contatto,2,"incontro-attivita-"+id);
-  if(persone.partner&&typeof postoCollegaPersone==="function")
-    postoCollegaPersone(persone.partner,contatto,"attivita-incontro");
+  if(persone.partner)
+    stradaNpcCollega(persone.partner,contatto,"attivita-incontro");
   if(persone.partner&&typeof postoRegistraConseguenzaMondo==="function")
     postoRegistraConseguenzaMondo(persone.partner,"business-meeting",1,{
       source:"attivita",reason:"incontro",context:id,
