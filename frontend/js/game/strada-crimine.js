@@ -1081,6 +1081,52 @@ const STRADA_RELAZIONI = Object.freeze({
   coldTrustLoss:15
 });
 
+/* Punto Strada 19: l'heat cambia il mondo, non soltanto il dado del colpo.
+   Le quattro fasce sono una fonte unica di verità per opportunità, persone,
+   controlli e costo degli errori. Nessun "livello criminale" viene salvato:
+   la fascia deriva sempre dall'heat attuale. */
+const STRADA_HEAT_FASCE = Object.freeze([
+  Object.freeze({
+    id:"basso",min:0,label:"Basso",occhi:"Nessuno",
+    opportunita:1,cautela:.00,controllo:.00,controlloFerro:.03,
+    errore:1,pena:1,escalation:0,bruciaOpportunita:0,stopCooldown:0,
+    mondo:"Il giro scorre normalmente. Nessuno sta cambiando abitudini per colpa tua."
+  }),
+  Object.freeze({
+    id:"medio",min:25,label:"Medio",occhi:"Gente prudente",
+    opportunita:.82,cautela:.25,controllo:.04,controlloFerro:.07,
+    errore:1.12,pena:1.05,escalation:.08,bruciaOpportunita:.08,stopCooldown:0,
+    mondo:"Le persone meno legate a te iniziano a tenersi basse e le porte si aprono più lentamente."
+  }),
+  Object.freeze({
+    id:"alto",min:50,label:"Alto",occhi:"Giro caldo",
+    opportunita:.55,cautela:.45,controllo:.13,controlloFerro:.14,
+    errore:1.35,pena:1.15,escalation:.22,bruciaOpportunita:.28,stopCooldown:21,
+    mondo:"Qualcuno evita di farsi vedere con te, le occasioni possono saltare e i controlli diventano concreti."
+  }),
+  Object.freeze({
+    id:"critico",min:75,label:"Molto alto",occhi:"Ti stanno addosso",
+    opportunita:.30,cautela:.70,controllo:.22,controlloFerro:.22,
+    errore:1.65,pena:1.35,escalation:.42,bruciaOpportunita:.52,stopCooldown:14,
+    mondo:"Il giro si restringe. Anche un errore piccolo può trascinare conseguenze molto più pesanti."
+  })
+]);
+
+function stradaHeatProfilo(valore){
+  const h=clamp(Number(valore==null?(G.strada&&G.strada.heat):valore)||0,0,100);
+  for(let i=STRADA_HEAT_FASCE.length-1;i>=0;i--)
+    if(h>=STRADA_HEAT_FASCE[i].min) return STRADA_HEAT_FASCE[i];
+  return STRADA_HEAT_FASCE[0];
+}
+
+function stradaHeatMondoStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.heatMondo || typeof s.heatMondo!=="object")
+    s.heatMondo={lastStopRequestAbsoluteDay:null,history:[]};
+  if(!Array.isArray(s.heatMondo.history)) s.heatMondo.history=[];
+  return s.heatMondo;
+}
+
 function stradaPersonaMeta(p){
   if(!p) return null;
   if(!p.strada || typeof p.strada!=="object"){
@@ -1109,7 +1155,10 @@ function stradaPersonaMeta(p){
       tensione:0,
       rivalita:false,
       lastReferralAbsoluteDay:null,
-      conseguenzeEventi:[]
+      conseguenzeEventi:[],
+      heatCaution:false,
+      heatCautionBand:null,
+      heatCautionSinceAbsoluteDay:null
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
@@ -1123,6 +1172,8 @@ function stradaPersonaMeta(p){
   if(!Number.isFinite(Number(p.strada.tensione))) p.strada.tensione=0;
   p.strada.tensione=Math.max(0,Math.min(3,Math.floor(Number(p.strada.tensione)||0)));
   p.strada.rivalita=!!p.strada.rivalita;
+  p.strada.heatCaution=!!p.strada.heatCaution;
+  if(p.strada.heatCautionBand!=null) p.strada.heatCautionBand=String(p.strada.heatCautionBand);
   if(!Number.isFinite(Number(p.strada.favori))) p.strada.favori=0;
   p.strada.favori=Math.max(0,Math.min(3,Math.floor(Number(p.strada.favori)||0)));
   if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
@@ -1143,6 +1194,47 @@ function stradaPersonaMeta(p){
     p.strada.fiducia=clamp(base,0,40);
   }else p.strada.fiducia=clamp(Number(p.strada.fiducia)||0,0,100);
   return p.strada;
+}
+
+function stradaHeatSincronizzaPersone(){
+  const prof=stradaHeatProfilo();
+  const oggi=stradaAbsDay();
+  const pool=(G.gente||[]).filter(p=>{
+    if(!p || p.via || !p.strada || !p.strada.known) return false;
+    const st=stradaPersonaMeta(p);
+    return (st.streetStatus==="active" || st.streetStatus==="cold") && !st.rivalita;
+  }).sort((a,b)=>{
+    const fa=stradaFiduciaValore(a), fb=stradaFiduciaValore(b);
+    if(fa!==fb) return fa-fb; /* si tirano indietro prima i legami più deboli */
+    const la=Number(stradaPersonaMeta(a).lastPlayerStreetInteractionAbsoluteDay||0);
+    const lb=Number(stradaPersonaMeta(b).lastPlayerStreetInteractionAbsoluteDay||0);
+    return la-lb;
+  });
+
+  const quanti=prof.cautela>0 && pool.length
+    ? Math.min(pool.length,Math.max(1,Math.ceil(pool.length*prof.cautela)))
+    : 0;
+  const prudenti=new Set(pool.slice(0,quanti).map(p=>p.id));
+
+  for(const p of pool){
+    const st=stradaPersonaMeta(p);
+    const prima=st.heatCaution===true;
+    const dopo=prudenti.has(p.id);
+    st.heatCaution=dopo;
+    st.heatCautionBand=dopo?prof.id:null;
+    if(dopo&&!prima) st.heatCautionSinceAbsoluteDay=oggi;
+    if(!dopo) st.heatCautionSinceAbsoluteDay=null;
+  }
+  return pool.filter(p=>prudenti.has(p.id));
+}
+
+function stradaHeatPersonaCauta(p){
+  const st=stradaPersonaMeta(p);
+  return !!(st&&st.heatCaution);
+}
+
+function stradaRelazioneOperativa(p){
+  return stradaRelazioneDisponibile(p) && !stradaHeatPersonaCauta(p);
 }
 
 function stradaRelazioneForte(p){
