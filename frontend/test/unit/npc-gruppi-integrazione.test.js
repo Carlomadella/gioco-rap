@@ -11,7 +11,7 @@ const state=fs.readFileSync(path.join(ROOT,"js/game/state.js"),"utf8");
 const legami=fs.readFileSync(path.join(ROOT,"js/game/npc-legami.js"),"utf8");
 const cerchie=fs.readFileSync(path.join(ROOT,"js/game/npc-cerchie.js"),"utf8");
 const gruppi=fs.readFileSync(path.join(ROOT,"js/game/npc-gruppi.js"),"utf8");
-const strada=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8";
+const strada=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
 
 function runtime(){
   const window={};
