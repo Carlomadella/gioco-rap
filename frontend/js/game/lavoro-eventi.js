@@ -1959,7 +1959,12 @@ function streetStarted(){
 }
 
 function showCrime(job,s,roll){
-  if(!job || !CRIME_JOBS.has(job.id)) return false;
+  if(!job) return false;
+  /* Punto 15: la Pizzeria può allargare tantissimo la rete sociale, ma non
+     produce mai direttamente una dritta criminale. Anche un futuro ruolo con
+     id riusato da CRIME_JOBS resta sociale finché appartiene alla Pizzeria. */
+  if(workKey(job)==="pizzeria") return false;
+  if(!CRIME_JOBS.has(job.id)) return false;
   if(!streetStarted() || (G.strada&&G.strada.arresto)) return false;
   if(!familyReady(s,"crime") || Number(roll)>=CFG.chance.crime) return false;
   if(activeLead("crimeLead")) return false;
