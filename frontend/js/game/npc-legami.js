@@ -45,26 +45,42 @@
     return p.reteLegami;
   }
 
+  function tipiRecord(r){
+    const out=[];
+    const add=v=>{
+      if(TIPI[v] && !out.includes(v)) out.push(v);
+    };
+    if(r&&Array.isArray(r.tipi)) r.tipi.forEach(add);
+    if(r&&TIPI[r.tipo]) add(r.tipo);
+    if(!out.length) out.push("conoscenza");
+    return out;
+  }
+
   function vistaRecord(r){
     if(!r || typeof r!=="object" || !r.personId) return null;
-    const t=TIPI[r.tipo] ? r.tipo : "conoscenza";
+    const ts=tipiRecord(r);
     const per=PERCEZIONI.has(r.percezione) ? r.percezione : null;
     return Object.freeze({
       personId:String(r.personId),
-      tipo:t,
+      tipi:Object.freeze(ts.slice()),
+      /* `tipo` e' una comodita' solo quando non e' ambiguo. */
+      tipo:ts.length===1?ts[0]:null,
       percezione:per,
       sottotipo:r.sottotipo==null?null:String(r.sottotipo),
       reason:r.reason==null?null:String(r.reason),
       sinceWeek:settimana(r.sinceWeek),
-      tipoEsplicito:TIPI[r.tipo]!=null,
+      tipoEsplicito:!!(
+        (Array.isArray(r.tipi)&&r.tipi.some(x=>TIPI[x])) || TIPI[r.tipo]
+      ),
       percezioneEsplicita:per!=null,
-      coPresenza:TIPI[t].coPresenza===true
+      coPresenza:ts.some(x=>TIPI[x].coPresenza===true)
     });
   }
 
   function legami(p,opzioni){
+    persona(p);
     const opts=opzioni&&typeof opzioni==="object"?opzioni:{};
-    const tipi=Array.isArray(opts.tipi)&&opts.tipi.length
+    const richiesti=Array.isArray(opts.tipi)&&opts.tipi.length
       ? new Set(opts.tipi.map(tipo)) : null;
     const co=opts.coPresenza;
 
@@ -74,7 +90,7 @@
       const v=vistaRecord(r);
       if(!v || v.personId===p.id || seen.has(v.personId)) continue;
       seen.add(v.personId);
-      if(tipi&&!tipi.has(v.tipo)) continue;
+      if(richiesti && !v.tipi.some(x=>richiesti.has(x))) continue;
       if(co===true&&!v.coPresenza) continue;
       if(co===false&&v.coPresenza) continue;
       out.push(v);
@@ -85,6 +101,21 @@
   function legame(p,personId){
     const id=String(personId||"");
     return legami(p).find(x=>x.personId===id)||null;
+  }
+
+  function nuoviTipi(rec,t,sostituisci){
+    if(sostituisci) return [t];
+    let ts=tipiRecord(rec);
+
+    /* conoscenza e' il fallback generico: un fatto piu' specifico la rende
+       ridondante, ma gli altri tipi specifici possono convivere. */
+    if(t!=="conoscenza"){
+      ts=ts.filter(x=>x!=="conoscenza");
+      if(!ts.includes(t)) ts.push(t);
+    }else if(!ts.length){
+      ts=["conoscenza"];
+    }
+    return ts.length?ts:["conoscenza"];
   }
 
   function upsert(da,aChi,opts){
@@ -103,9 +134,9 @@
       list.push(rec);
     }
 
-    /* Il primo momento noto resta stabile. I vecchi record senza tipo vengono
-       arricchiti soltanto quando un evento li tocca davvero. */
-    rec.tipo=t;
+    rec.tipi=nuoviTipi(rec,t,opts.sostituisciTipi===true);
+    delete rec.tipo;
+
     if(opts.hasPercezione===true){
       if(per!=null) rec.percezione=per;
       else delete rec.percezione;
@@ -135,7 +166,6 @@
     const opts=opzioni&&typeof opzioni==="object"?opzioni:{};
     const baseTipo=tipo(opts.tipo);
     const reciproco=opts.reciproco!==false;
-
     const haValore=(obj,key)=>
       Object.prototype.hasOwnProperty.call(obj,key) && obj[key]!==undefined;
     const hasPerA=haValore(opts,"percezioneA") || haValore(opts,"percezione");
@@ -145,6 +175,7 @@
 
     const va=upsert(a,b,{
       tipo:opts.tipoA||baseTipo,
+      sostituisciTipi:opts.sostituisciTipi===true,
       percezione:Object.prototype.hasOwnProperty.call(opts,"percezioneA")
         ? opts.percezioneA : opts.percezione,
       hasPercezione:hasPerA,
@@ -159,6 +190,7 @@
     if(reciproco){
       vb=upsert(b,a,{
         tipo:opts.tipoB||baseTipo,
+        sostituisciTipi:opts.sostituisciTipi===true,
         percezione:Object.prototype.hasOwnProperty.call(opts,"percezioneB")
           ? opts.percezioneB : opts.percezione,
         hasPercezione:hasPerB,
@@ -173,18 +205,33 @@
     return Object.freeze({aVersoB:va,bVersoA:vb,reciproco});
   }
 
+  function rimuoviTipo(da,aChi,tipoId){
+    persona(da); persona(aChi);
+    const t=tipo(tipoId);
+    const list=raw(da,false);
+    const idx=list.findIndex(x=>x&&String(x.personId)===aChi.id);
+    if(idx<0) return false;
+    const rec=list[idx];
+    const ts=tipiRecord(rec).filter(x=>x!==t);
+    if(!ts.length){
+      list.splice(idx,1);
+      return true;
+    }
+    rec.tipi=ts;
+    delete rec.tipo;
+    return true;
+  }
+
   function tra(a,b){
     persona(a); persona(b);
     const ab=legame(a,b.id);
     const ba=legame(b,a.id);
+    const key=v=>v?v.tipi.slice().sort().join("|")+";"+String(v.percezione)+";"+String(v.sottotipo):"";
     return Object.freeze({
       aId:a.id,bId:b.id,
       aVersoB:ab,bVersoA:ba,
       reciproco:!!(ab&&ba),
-      simmetrico:!!(ab&&ba&&
-        ab.tipo===ba.tipo&&
-        ab.percezione===ba.percezione&&
-        ab.sottotipo===ba.sottotipo)
+      simmetrico:!!(ab&&ba&&key(ab)===key(ba))
     });
   }
 
@@ -200,6 +247,7 @@
     legami,
     legame,
     collega,
+    rimuoviTipo,
     tra,
     personeCollegate
   });
