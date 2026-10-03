@@ -1334,9 +1334,13 @@ Prima del punteggio vengono esclusi:
 
 - `p.via`;
 - `p.carcere.currentJailId` esplicito;
-- contatti delle Trasferte con `p.fuori === true`;
-- città corrente esplicitamente diversa da `provincia`, leggendo in ordine
-  `p.mondo.cittaAttuale`, `p.cittaAttuale`, `p.citta`.
+- città corrente verificabile diversa da `provincia`;
+- un contatto legacy `p.fuori === true` soltanto se non esiste alcuna città
+  verificabile.
+
+Dal punto 9 la città viene letta prima da `ADF_NPC_GEOGRAFIA` e poi dai campi
+legacy. `p.fuori` resta quindi un marker storico della rete Trasferte, non una
+prova eterna che la persona sia fisicamente fuori Provincia.
 
 Non viene usato `ST_CITTA`: appartiene al pannello crime e non certifica la
 posizione fisica del protagonista.
@@ -1344,8 +1348,6 @@ posizione fisica del protagonista.
 Per NPC senza appartenenze esplicite, `postoSoloLavoro(p)` resta il filtro
 legacy. Un NPC con una vera appartenenza `sala:provincia`, invece, non viene
 respinto soltanto perché conserva una vecchia origine lavorativa.
-
-La geografia definitiva resta il punto 9.
 
 ### Bug di stabilità corretto
 
@@ -1421,4 +1423,260 @@ vincoli prima dei pesi, integrazione concreta del Circolo e test.
 **Non integrato qui:** lavoro, Strada, carcere, attività e Trasferte. Devono
 adottare lo stesso contratto nel punto 16 con i rispettivi gate, senza
 sostituire i loro sistemi specifici.
+
+## Punto 9 — provenienza e mobilità tra città
+
+**Stato:** modello geografico implementato e collegato ai consumer esistenti
+Circolo, Strada e Trasferte. Non sono state aggiunte storyline di viaggio NPC.
+
+File introdotti:
+
+- `frontend/js/game/npc-geografia.js`;
+- `frontend/test/unit/npc-geografia.test.js`;
+- `frontend/test/unit/npc-geografia-integrazione.test.js`.
+
+### Tre concetti che non vanno più confusi
+
+1. **Provenienza geografica:** da dove viene la persona, solo quando il dato è
+   realmente noto.
+2. **Posizione/città attuale:** dove si trova la persona in un determinato
+   giorno del calendario.
+3. **Origine dell'incontro:** dove o come il protagonista l'ha conosciuta
+   (`origine`, `origineLuogo`, Trasferta, carcere, lavoro, Strada ecc.).
+
+Il punto 9 non usa mai uno di questi dati come prova automatica degli altri.
+
+In particolare, incontrare qualcuno a Milano non significa che sia nato a
+Milano. Il codice Trasferte descrive `p.citta` come “dove sta” il contatto e
+usa quel dato per rete/requisiti: viene quindi riutilizzato come fallback della
+**posizione**, non copiato nella provenienza.
+
+### Provenienza canonica
+
+Quando un contenuto conosce davvero l'origine geografica usa:
+
+`p.identita.provenienza = { cittaId, fonte }`
+
+tramite `ADF_NPC_GEOGRAFIA.impostaOrigine(p, cittaId, fonte)`.
+
+Regole:
+
+- è opzionale;
+- `origineLuogo` non la valorizza;
+- `p.citta` non la valorizza;
+- una Trasferta non la valorizza;
+- impostare due volte la stessa città è idempotente;
+- tentare di sostituire una provenienza già definita con un'altra città viene
+  rifiutato: una correzione anagrafica futura dovrà essere un evento esplicito,
+  non un side effect di un selettore.
+
+I vecchi save possono non avere `identita` o `provenienza`: resta un dato
+sconosciuto valido.
+
+### Posizione temporale
+
+La geografia persistente usa:
+
+`p.geografia.posizioni[]`
+
+Ogni transizione contiene:
+
+- `cittaId`;
+- `dalGiorno`;
+- `fonte`.
+
+È una timeline di cambi di città, non una fotografia duplicata ogni giorno.
+La città valida al giorno N è l'ultima transizione con
+`dalGiorno <= N`.
+
+Questo consente di rappresentare con costo minimo:
+
+- trasferimento permanente;
+- spostamento futuro già deciso;
+- visita temporanea;
+- rientro;
+- ricomparsa in un'altra città della stessa PERSONA.
+
+Non cambia ID, nome, relazione, chat, competenze o rete sociale.
+
+### Mobilità e programmazione
+
+L'API espone:
+
+- `cittaAttuale(p, giorno)`;
+- `posizione(p, giorno)`;
+- `posizioni(p)`;
+- `sposta(p, {cittaId, dalGiorno, fonte})`;
+- `visita(p, {cittaId, dalGiorno, alGiorno, ritornoCittaId?, fonte})`.
+
+`sposta` può registrare anche un cambio futuro. Prima di quel giorno la
+persona resta nella città precedente; dal giorno della transizione si trova
+nella nuova.
+
+`visita` registra due transizioni: andata e ritorno. Se la città precedente è
+nota, viene usata come rientro; se è sconosciuta, il chiamante deve fornire
+`ritornoCittaId`.
+
+Non esiste un timer real-time, un job giornaliero o una storyline implicita:
+la posizione si risolve quando un sistema la interroga.
+
+Due città diverse nello stesso giorno vengono rifiutate. Una visita non può
+attraversare altri spostamenti già programmati senza che il chiamante risolva
+prima il conflitto.
+
+### Catalogo città
+
+`ADF_NPC_GEOGRAFIA` mantiene un registro leggero `id → nome`, ma **non usa il
+catalogo come whitelist**. Un ID geografico valido può esistere anche prima che
+una UI abbia una scheda dedicata.
+
+Trasferte registra nel layer comune:
+
+- `provincia`;
+- le 18 città già esistenti nel proprio catalogo: Milano, Roma, Bologna,
+  Torino, Napoli, Firenze, Verona, Padova, Brescia, Genova, Rimini, Perugia,
+  Pescara, Bari, Palermo, Catania, Cagliari e Trieste.
+
+Questo riusa il sistema corrente invece di introdurre un secondo catalogo.
+
+La città iniziale scritta dal giocatore in `ARTIST.city` resta oggi testo
+libero usato da Trasferte per evitare di invitare il protagonista “fuori” nella
+propria città. Non viene trasformata automaticamente nell'ID `provincia` né
+usata per riscrivere la geografia degli NPC: il gioco non possiede ancora una
+mappa canonica che dimostri quell'equivalenza.
+
+### Compatibilità dei campi legacy
+
+La lettura della posizione segue questo ordine:
+
+1. timeline esplicita `p.geografia.posizioni`;
+2. `p.mondo.cittaAttuale`;
+3. `p.cittaAttuale`;
+4. `p.citta`;
+5. sconosciuta.
+
+La timeline non cancella i campi vecchi. Questo permette ai consumer non ancora
+migrati di continuare a funzionare.
+
+`p.fuori` cambia interpretazione precisa: resta il marker che identifica un
+contatto nato nel sistema Trasferte. **Non è più una fonte autorevole della
+posizione fisica**. Una persona può quindi conservare `fuori:true` e trovarsi
+davvero in Provincia tramite una transizione esplicita.
+
+### Integrazione Trasferte
+
+Trasferte ora:
+
+- registra il proprio catalogo città nel layer geografico;
+- registra la posizione esplicita dei nuovi contatti nel giorno dell'incontro;
+- continua a salvare `p.citta` e `p.fuori` per compatibilità;
+- usa `cittaPersona(p)` per `rete(cittaId)`, requisiti, catene, occasioni,
+  testi e raggruppamento nell'app;
+- non chiama mai `impostaOrigine()`.
+
+Quindi un contatto conosciuto a Milano può essere spostato a Roma e le future
+catene/occasioni lo considerano a Roma senza creare una seconda PERSONA.
+
+L'innesto storico del Circolo non elimina più tutte le persone con
+`p.fuori`. Filtra secondo la città corrente: un contatto Trasferte realmente
+rientrato in Provincia può ricomparire, mentre uno ancora a Roma no.
+
+### Integrazione Circolo
+
+`presentiOggi()` usa `ADF_NPC_GEOGRAFIA.cittaAttuale(p, oggi)` prima dei
+fallback legacy.
+
+Per `sala:provincia`:
+
+- città diversa da `provincia` → esclusione fisica;
+- città sconosciuta + `p.fuori===true` → esclusione conservativa;
+- posizione esplicita `provincia` → la persona può essere valutata anche se
+  conserva `p.fuori===true`.
+
+Appartenenze, detenzione e gli altri gate del punto 8 restano indipendenti.
+
+### Integrazione Strada
+
+`stradaNpcCittaPersona(p)` mantiene la priorità del futuro adapter
+`ADF_CRIME_NPC.cityOf()`.
+
+Se l'adapter non fornisce la città, legge ora `ADF_NPC_GEOGRAFIA` prima dei
+campi legacy. Il sistema crime può quindi seguire uno spostamento della stessa
+persona senza dover duplicare la geografia dentro `p.strada`.
+
+`ST_CITTA` continua a rappresentare il **contesto scelto nel pannello crime**,
+non la posizione personale dell'NPC.
+
+### Ricomparse future senza storyline
+
+Il punto 9 prepara gli spostamenti ma non decide **perché** una persona si
+muova. Un futuro evento potrà, per esempio:
+
+- programmare una visita a Milano;
+- trasferire un collaboratore a Roma;
+- far rientrare un contatto in Provincia;
+- far comparire la stessa persona in una Trasferta futura.
+
+L'evento dovrà fornire città, giorno e fonte. Il layer geografico si limita a
+registrare/risolvere il fatto.
+
+Non vengono introdotte probabilità casuali di trasloco, pendolarismo,
+simulazione quotidiana o storyline automatiche per centinaia di NPC.
+
+### Sufficienza rispetto al dimensionamento 300–800
+
+La struttura è adatta alla scala prevista perché salva **transizioni**, non una
+posizione giornaliera per persona.
+
+Per un NPC che non si muove non viene aggiunto alcun record: continuano a
+funzionare i fallback legacy. Per chi cambia città vengono salvati solo i
+cambiamenti reali.
+
+La complessità di lettura è proporzionale al numero di spostamenti della singola
+persona, non alla popolazione globale. Al punto 18 andrà comunque misurato il
+caso di carriere molto lunghe e persone molto mobili.
+
+### Test
+
+`npc-geografia.test.js` copre:
+
+- catalogo città non usato come whitelist;
+- provenienza distinta da incontro e posizione;
+- provenienza non riscrivibile incidentalmente;
+- priorità dei fallback legacy;
+- posizione esplicita sopra il legacy;
+- spostamenti futuri;
+- visite temporanee e rientro;
+- ritorno obbligatorio quando la città precedente è ignota;
+- conflitti nello stesso giorno;
+- visite sovrapposte a movimenti programmati;
+- idempotenza;
+- copie non mutanti;
+- roundtrip JSON.
+
+`npc-geografia-integrazione.test.js` verifica inoltre:
+
+- Trasferte legge una posizione nuova senza cancellare `p.citta`;
+- `fuori:true` resta marker del sottosistema;
+- rete Trasferte segue la città corrente;
+- il filtro Sala accetta un contatto realmente rientrato;
+- il bridge crime usa la stessa timeline;
+- un adapter crime esplicito mantiene priorità.
+
+Il test del selettore Circolo include anche un caso completo in cui un contatto
+Trasferte con `fuori:true`, originariamente `p.citta="milano"`, viene
+spostato esplicitamente in `provincia` e può comparire senza modificare il
+campo legacy.
+
+### Confine del punto 9
+
+**Chiuso:** distinzione provenienza/posizione/incontro, timeline geografica,
+spostamenti futuri, visite e rientri, catalogo condiviso e integrazione
+Circolo/Strada/Trasferte.
+
+**Non implementato:** generazione casuale della provenienza, distribuzioni
+geografiche della popolazione, residenza separata dalla posizione, storyline
+di trasferimento, viaggi autonomi, UI della provenienza e migrazione massiva
+dei vecchi save. Questi aspetti appartengono ai punti 12, 16, 17, 18 e 19 o a
+future espansioni del mondo.
 
