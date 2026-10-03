@@ -1,35 +1,33 @@
-﻿﻿/* La Strada (punto 21): la professione del criminale in provincia.
+﻿﻿/* La Strada: sistema criminale giocabile della Provincia.
 
-   Ricostruita da zero seguendo il documento vincolante `claude/carriera-criminale.md`
-   (i quattro numeri, gli 11 colpi, i soldi sporchi, la vetrina, chi ti copre, gli opp,
-   il carcere, uscirne): il codice originale non era mai arrivato su GitHub, solo il
-   design (vedi punto 57 in implementazioni/06-mondo-e-personaggi.md). Qui c'è la
-   fetta di Provincia, giocabile davvero; Milano e Los Angeles restano in vista con
-   scritto dove si aprono, come chiede il documento, perché le loro mappe non
-   esistono ancora.
+   Stato corrente (03/10/2026):
+   - la Provincia usa un pool di 30 colpi in 5 categorie e ne propone 4 al giorno;
+   - persone, fiducia, favori/debiti, rivalità, attività di copertura e carcere sono
+     persistenti e collegati al resto del mondo;
+   - durante la detenzione le azioni esterne sono bloccate dai gate globali del gioco;
+   - si può mollare il giro senza cancellare il passato;
+   - heat, lifestyle, fallout e intel modificano davvero rischio e conseguenze;
+   - esiste il contratto opzionale `ADF_CRIME_NPC` verso il futuro NPC Manager.
+     Finché l'integrazione non è completa, diversi flussi usano ancora `G.gente`
+     come sorgente/fallback legacy.
 
-   File a parte da `strada.js`: quello è un'altra "strada", gli incontri per la via
-   del punto 54 (il fan, l'hater, l'opp...) — nome uguale per un caso di battitura
-   nel documento originale, funzioni del tutto diverse. Tenerle divise evita di
-   perdere l'uno o l'altro pezzo a ogni modifica.
+   Restano fuori dal perimetro attuale:
+   - gameplay criminale completo di Milano e Los Angeles;
+   - casinò di Los Angeles;
+   - finestre temporali specifiche dei singoli colpi (oggi i colpi consumano tempo
+     reale ma non hanno ancora vincoli mattina/pomeriggio/notte/weekend);
+   - adozione completa del bridge NPC in tutti i lookup/creazioni crime.
 
-   Cosa NON copre ancora questa prima versione, di proposito, per restare onesti:
-   - i colpi di Milano e Los Angeles (bloccati finché non esistono quelle città);
-   - il casinò di Los Angeles;
-   - il blocco delle altre azioni del gioco mentre sei dentro (l'arresto qui pesa sui
-     numeri — fan, hype, spese, contratto — ma non impedisce fisicamente di scrivere
-     o registrare: bloccare tutto il resto del gioco tocca troppi file per farlo alla
-     cieca, senza poterlo provare in un browser vero);
-   - i contatti criminali collegati alla rubrica (la rubrica di fase 3 non esiste ancora). */
+   File separato da `strada.js`: quello gestisce gli incontri per la via (fan,
+   hater, opp...), mentre questo gestisce Attività criminali. */
 "use strict";
 
 /* ==================== DATI ==================== */
 
-/* I quattro colpi di provincia, con guadagno, energia (punto 39: l'energia è
-   giornaliera), difficoltà (0-1, pesa sulla riuscita) e pena base in settimane.
-   Guadagni ed energia sono quelli del documento dov'era scritto un numero; dove
-   il documento non fissava un valore esatto (energia, pena base) ho messo una
-   stima ragionevole, da tarare quando si gioca davvero. */
+/* Il pool della Provincia usa 30 colpi divisi per categoria. Ogni colpo porta
+   guadagno, energia (giornaliera), difficoltà (0-1), pena base e soglia minima
+   di nome nel giro. I valori storici dei primi quattro colpi restano conservati
+   per compatibilità, mentre il pool si allarga progressivamente con la reputazione. */
 const STRADA_CATEGORIE_COLPO = Object.freeze({
   trasporto:Object.freeze({
     n:"Trasporto", tag:"meno resa · meno attenzione",
@@ -555,10 +553,9 @@ function stradaOpportunitaTriggerConfig(trigger){
   };
 }
 
-/* Pool di opportunità criminali. Non aggiunge nuovi metodi operativi nel mondo
-   reale: varia i quattro colpi già esistenti sul piano di gameplay.
-   Ogni offerta modifica davvero ricompensa, probabilità, attenzione e
-   reputazione su successo/fallimento. */
+/* Pool di opportunità criminali. Le opportunità danno una causa narrativa e
+   relazionale ai colpi del pool (ricontatto, presentazione, passaparola, rete)
+   e possono modificarne ricompensa, probabilità, attenzione e reputazione. */
 const STRADA_OPPORTUNITA = Object.freeze([
   Object.freeze({
     id:"giro-breve", minRep:0, colpoId:"consegne",
