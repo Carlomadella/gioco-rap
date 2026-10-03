@@ -1,3 +1,4 @@
+import { crimeNpcBridge } from "../helpers/crime-npc-bridge.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,7 +21,7 @@ function runtimeCapacita(G){
   return new Function(
     "G","STRADA_FIDUCIA_SQUADRA","stradaAggiornaRelazioniCriminali",
     "stradaRelazioneDisponibile","stradaFiduciaValore","stradaReputazioneGlobale",
-    code+"\nreturn {STRADA_CAPACITA_RETE,stradaCapacitaRete};"
+    crimeNpcBridge(crime)+code+"\nreturn {STRADA_CAPACITA_RETE,stradaCapacitaRete};"
   )(
     G,25,()=>{},
     p=>!!p.available,
