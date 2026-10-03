@@ -1139,6 +1139,8 @@ test("dentro a renderGioco non e' rimasto nessun `my` senza padrone",
 console.log("\nBlocco 3 — carcere separato");
 test("hub manda il detenuto alla schermata Carcere",
   hub.includes('G.strada && G.strada.arresto && typeof apriCarcere === "function"'));
+test("Attività criminali resta sempre accessibile: i vincoli sono dei singoli colpi",
+  hours.includes('crimin:    {allDay:true}'));
 test("orari non bloccano il carcere alle 08:00",
   hours.includes('place === "crimin" && G.strada && G.strada.arresto') &&
   hours.includes('jail:true'));
