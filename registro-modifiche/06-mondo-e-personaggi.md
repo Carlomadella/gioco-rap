@@ -6,6 +6,35 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1ac94af1 -->
+## 03/10/26, 01:20 — feature/strada-punto16-rete-causale → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `1ac94af1`
+
+### Cosa è entrato
+
+- `2fc04c77` — Merge main into strada punto 16 — **mycolbraga**
+- `24b7d306` — Bump cache punto 16 rete causale — **mycolbraga**
+- `b03b13a9` — Audit punto 16: invarianti della rete causale — **mycolbraga**
+- `ae083c45` — Test punto 16: rete causale e ricorrenza delle persone — **mycolbraga**
+- `03c2e684` — Strada punto 16: mostra la causa delle opportunita nel mondo — **mycolbraga**
+- `0655b054` — Strada punto 16: non inventare provenienze nei salvataggi legacy — **mycolbraga**
+- `93292b35` — Strada punto 16: rendi causali passaparola e presentazioni — **mycolbraga**
+- `e00d296c` — Strada punto 16: persisti legami sociali e presenze al Circolo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-rete-causale.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:649a06dc -->
 ## 03/10/26, 01:05 — feature/strada-punto15-pizzeria-sociale → main
 
