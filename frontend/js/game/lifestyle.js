@@ -191,9 +191,11 @@ function lifestyleChiudiSettimanaRischio(){
   const snap=lifestyleSnapshotCorrente(true);
   const media=lifestyleMediaRischio(true,true);
   const classe=lifestyleClassificaRischio(media);
-  const giro=(typeof stradaGiroAvviato==="function")
-    ? !!stradaGiroAvviato()
-    : !!(G.strada&&(G.strada.giroAvviato||G.strada.badgeSbloccato));
+  const giro=(typeof stradaRischioCriminaleAttivo==="function")
+    ? !!stradaRischioCriminaleAttivo()
+    : (typeof stradaGiroAvviato==="function")
+      ? !!stradaGiroAvviato()
+      : !!(G.strada&&(G.strada.giroAvviato||G.strada.badgeSbloccato));
 
   let heatDelta=0;
   if(giro && !G.strada.arresto && classe.gap>0){
