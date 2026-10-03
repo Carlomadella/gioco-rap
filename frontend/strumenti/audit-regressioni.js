@@ -1471,6 +1471,34 @@ test("punto 16: i salvataggi legacy non ricevono una provenienza inventata",
   crime.includes('type:"legacy"') &&
   crime.includes("prima che il gioco iniziasse a tracciare il passaparola"));
 
+test("punto 17: gli esiti Strada entrano nella relazione sociale della stessa persona",
+  posto.includes("function postoConseguenzeMondo(p)") &&
+  posto.includes("function postoRegistraConseguenzaMondo(p,tipo,punti,meta)") &&
+  crime.includes("function stradaEcoMondo(p,tipo,punti,meta)") &&
+  crime.includes("postoRegistraConseguenzaMondo(p,tipo,punti"));
+test("punto 17: successo e fallimento propagano conseguenze fuori dal sottosistema criminale",
+  crime.includes('successo?"crime-together-success":"crime-together-failure"') &&
+  crime.includes('successo?"street-opportunity-success":"street-opportunity-failure"') &&
+  crime.includes('stradaEcoMondo(personaLead,"street-arrest",0'));
+test("punto 17: il passaparola segue il presentatore reale invece di creare un effetto anonimo",
+  crime.includes("st.introducedByPersonId") &&
+  crime.includes('"street-hearsay-"+String(tipo||"consequence")') &&
+  crime.includes("relatedPersonId:p.id") &&
+  crime.includes('stradaModificaFiducia(introd,ecoPunti,"passaparola-"'));
+test("punto 17: rifiutare con chiarezza e ignorare una persona non sono equivalenti",
+  crime.includes('stradaEcoMondo(persona,"street-opportunity-declined",0') &&
+  crime.includes('stradaEcoMondo(persona,"street-opportunity-ignored",-1'));
+test("punto 17: i favori di rete hanno effetto anche sul rapporto generale",
+  crime.includes('stradaEcoMondo(requester,"street-network-favor",1') &&
+  crime.includes('stradaEcoMondo(candidato,"street-network-introduction",1') &&
+  crime.includes('stradaEcoMondo(a,"street-network-bridge",1') &&
+  crime.includes('stradaEcoMondo(b,"street-network-bridge",1'));
+test("punto 17: il Circolo può far riemergere una conseguenza recente senza regalare conoscenza",
+  posto.includes("postoUltimaConseguenzaMondo(p)") &&
+  posto.includes("eco&&etaEco<=4") &&
+  posto.includes("circoloUltimoVistoKey") &&
+  !posto.includes("p.visto=true; // conseguenza mondo"));
+
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
   !crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)") &&
