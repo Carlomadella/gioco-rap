@@ -522,6 +522,9 @@ const DIALOGHI_VITA = Object.freeze([
 ]);
 
 /* ==================== LA GENTE ==================== */
+const POSTO_CITTA_INIZIALE = "provincia";
+const POSTO_GRUPPI_EMERGENTI_SOFT_CAP = 2;
+
 function relNome(p){ return REL_NOMI[clamp(p.rel, 0, 5)]; }
 function relSoglia(p){ return 3 + p.rel; }         /* più sali, più costa salire */
 
@@ -547,6 +550,10 @@ function nuovaPersona(ruolo){
     fama: Math.round(rnd(4, 46)),
     car: pick(CARATTERI).id,
     scoperto: false,                                /* il carattere si scopre parlando */
+    /* Punto 22: stato geografico separato dall'identità e dal rapporto col
+       giocatore. Provenienza resta null finché il gioco non la conosce davvero;
+       la città attuale invece è la provincia, perché è dove nasce il cast oggi. */
+    mondo:{provenienza:null,cittaAttuale:POSTO_CITTA_INIZIALE,ambienti:[],spostamenti:[]},
     rel: 0, pt: 0, ult: -1, feat: -99,
     skin: pick(RIV_SKIN), hair: Math.floor(rnd(0, 4)),
     col: pick(["#FF5A36", "#B026FF", "#FFC53D", "#3DC7FF", "#FF4D9D", "#57C98B", "#7A5CFF"])
@@ -687,6 +694,242 @@ function postoSoloLavoro(p){
   return !!(p && p.origineLuogo && !p.circoloSbloccato);
 }
 
+/* Punto 22: sopra G.gente aggiungiamo il minimo indispensabile per trattare
+   il cast come una popolazione, senza rifare ora identità, ruoli o gameplay.
+   - reteLegami resta il grafo sociale sparso già esistente;
+   - p.mondo contiene solo stato geografico/ambientale;
+   - G.popolazione.gruppi promuove cluster reali di 3-5 persone;
+   - nessuna gang/crew viene inventata: i gruppi nascono solo quando la rete
+     ha già chiuso almeno un triangolo reale. */
+function popolazioneStato(){
+  if(!G.popolazione || typeof G.popolazione!=="object")
+    G.popolazione={version:1,gruppi:[],nextGroupSeq:1};
+  const st=G.popolazione;
+  st.version=Math.max(1,Number(st.version)||1);
+  if(!Array.isArray(st.gruppi)) st.gruppi=[];
+  if(!Number.isInteger(Number(st.nextGroupSeq)) || Number(st.nextGroupSeq)<1)
+    st.nextGroupSeq=1;
+  return st;
+}
+
+function popolazionePersonaMondo(p){
+  if(!p || typeof p!=="object") return null;
+  if(!p.mondo || typeof p.mondo!=="object")
+    p.mondo={provenienza:null,cittaAttuale:POSTO_CITTA_INIZIALE,ambienti:[],spostamenti:[]};
+  const m=p.mondo;
+  if(!("provenienza" in m)) m.provenienza=null;
+  if(typeof m.cittaAttuale!=="string" || !m.cittaAttuale.trim())
+    m.cittaAttuale=POSTO_CITTA_INIZIALE;
+  if(!Array.isArray(m.ambienti)) m.ambienti=[];
+  if(!Array.isArray(m.spostamenti)) m.spostamenti=[];
+
+  /* Migrazione additiva dei salvataggi legacy: non inventiamo biografia,
+     registriamo solo ambienti che il vecchio save dimostra già. */
+  const ambiente=p.origineLuogo ||
+    (p.origine==="circolo"?"circolo":
+     p.origine==="carcere"?"carcere":
+     p.attivita&&p.attivita.id?"attivita:"+p.attivita.id:null);
+  if(ambiente && !m.ambienti.includes(ambiente)) m.ambienti.push(ambiente);
+  return m;
+}
+
+function popolazioneAssicura(){
+  const st=popolazioneStato();
+  if(!Array.isArray(G.gente)) G.gente=[];
+  G.gente.forEach(p=>popolazionePersonaMondo(p));
+
+  /* Sanificazione difensiva: un gruppo non deve poter duplicare membri o
+     trattenere ID inesistenti dopo save vecchi/modificati. */
+  const validi=new Set(G.gente.filter(p=>p&&p.id).map(p=>p.id));
+  st.gruppi=st.gruppi.filter(g=>g&&typeof g==="object").map(g=>{
+    if(!Array.isArray(g.membri)) g.membri=[];
+    g.membri=[...new Set(g.membri.filter(id=>validi.has(id)))].slice(0,5);
+    if(!g.stato) g.stato="attivo";
+    if(typeof g.emergente!=="boolean") g.emergente=true;
+    return g;
+  }).filter(g=>g.groupId&&g.membri.length>=3);
+  return st;
+}
+
+function popolazioneCittaPersona(p){
+  const m=popolazionePersonaMondo(p);
+  return m?m.cittaAttuale:POSTO_CITTA_INIZIALE;
+}
+
+function popolazionePersonaInCitta(p,citta){
+  return !!(p && !p.via &&
+    popolazioneCittaPersona(p)===String(citta||POSTO_CITTA_INIZIALE));
+}
+
+function popolazioneRegistraAmbiente(p,ambiente){
+  const m=popolazionePersonaMondo(p);
+  const a=String(ambiente||"").trim();
+  if(!m || !a) return false;
+  if(!m.ambienti.includes(a)) m.ambienti.push(a);
+  return true;
+}
+
+function popolazioneSpostaPersona(p,citta,ambiente){
+  if(!p || p.via) return false;
+  const nuova=String(citta||"").trim();
+  if(!nuova) return false;
+  const m=popolazionePersonaMondo(p),prima=m.cittaAttuale;
+  if(prima!==nuova){
+    m.cittaAttuale=nuova;
+    m.spostamenti.push({
+      da:prima,a:nuova,
+      absoluteDay:typeof stradaAbsDay==="function"?stradaAbsDay():null
+    });
+    if(m.spostamenti.length>12) m.spostamenti.shift();
+  }
+  if(ambiente) popolazioneRegistraAmbiente(p,ambiente);
+  return true;
+}
+
+function popolazioneGruppoDaId(groupId){
+  return popolazioneStato().gruppi.find(g=>g&&g.groupId===groupId)||null;
+}
+
+function popolazioneGruppiPersona(p){
+  if(!p || !p.id) return [];
+  return popolazioneStato().gruppi.filter(g=>
+    g&&g.stato!=="sciolto"&&Array.isArray(g.membri)&&g.membri.includes(p.id));
+}
+
+function popolazioneDensitaGruppo(ids){
+  const unici=[...new Set(ids||[])];
+  if(unici.length<2) return 0;
+  let archi=0;
+  for(let i=0;i<unici.length;i++){
+    const p=(G.gente||[]).find(x=>x&&x.id===unici[i]);
+    if(!p) continue;
+    const legati=new Set(postoReteLegami(p).map(x=>x&&x.personId).filter(Boolean));
+    for(let j=i+1;j<unici.length;j++) if(legati.has(unici[j])) archi++;
+  }
+  const possibili=unici.length*(unici.length-1)/2;
+  return possibili?archi/possibili:0;
+}
+
+function popolazioneAmbienteComune(ids){
+  const persone=(ids||[]).map(id=>(G.gente||[]).find(p=>p&&p.id===id)).filter(Boolean);
+  if(!persone.length) return null;
+  let comuni=[...popolazionePersonaMondo(persone[0]).ambienti];
+  for(const p of persone.slice(1)){
+    const set=new Set(popolazionePersonaMondo(p).ambienti);
+    comuni=comuni.filter(x=>set.has(x));
+  }
+  return comuni[0]||null;
+}
+
+function popolazionePromuoviCluster(ids,meta){
+  meta=meta&&typeof meta==="object"?meta:{};
+  const st=popolazioneAssicura();
+  const persone=[...new Set(ids||[])]
+    .map(id=>(G.gente||[]).find(p=>p&&p.id===id&&!p.via))
+    .filter(Boolean)
+    .slice(0,5);
+  if(persone.length<3) return null;
+
+  const citta=popolazioneCittaPersona(persone[0]);
+  if(persone.some(p=>popolazioneCittaPersona(p)!==citta)) return null;
+
+  const memberIds=persone.map(p=>p.id);
+  const stesso=st.gruppi.find(g=>g&&g.stato!=="sciolto"&&
+    g.membri.length===memberIds.length&&memberIds.every(id=>g.membri.includes(id)));
+  if(stesso) return stesso;
+
+  const emergente=meta.emergente!==false;
+  if(emergente && st.gruppi.filter(g=>g&&g.emergente&&g.stato!=="sciolto").length>=
+      POSTO_GRUPPI_EMERGENTI_SOFT_CAP) return null;
+
+  const densita=popolazioneDensitaGruppo(memberIds);
+  if(meta.richiedeRete!==false && densita<.5) return null;
+
+  const groupId="grp-"+String(st.nextGroupSeq++);
+  const gruppo={
+    groupId,
+    membri:memberIds,
+    tipo:String(meta.tipo||"cerchia"),
+    coesione:Math.round(densita*100),
+    ambientePrincipale:meta.ambiente||popolazioneAmbienteComune(memberIds),
+    citta,
+    stato:"attivo",
+    emergente,
+    sourceReason:meta.sourceReason||null,
+    createdWeek:typeof totalWeeks==="function"?totalWeeks():Number(G.week||1)
+  };
+  st.gruppi.push(gruppo);
+  return gruppo;
+}
+
+function popolazioneTipoGruppoDaMotivo(motivo){
+  const m=String(motivo||"");
+  if(m.includes("carcere")) return "carcere";
+  if(m.includes("attivita") || m.includes("lavoro")) return "lavoro";
+  if(m.includes("strada")) return "rete-strada";
+  return "cerchia";
+}
+
+function popolazioneValutaCluster(p,motivo){
+  if(!p || p.via || !p.id) return null;
+  const st=popolazioneAssicura();
+  if(st.gruppi.filter(g=>g&&g.emergente&&g.stato!=="sciolto").length>=
+     POSTO_GRUPPI_EMERGENTI_SOFT_CAP) return null;
+
+  const citta=popolazioneCittaPersona(p);
+  const vicini=postoLegamiAttivi(p)
+    .filter(x=>popolazionePersonaInCitta(x,citta))
+    .sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+  if(vicini.length<2) return null;
+
+  /* Il primo nucleo deve essere un triangolo già esistente: niente gruppi
+     creati a caso da una persona che conosce due sconosciuti fra loro. */
+  let membri=null;
+  for(let i=0;i<vicini.length&&!membri;i++){
+    const legamiI=new Set(postoReteLegami(vicini[i]).map(x=>x&&x.personId).filter(Boolean));
+    for(let j=i+1;j<vicini.length;j++){
+      if(legamiI.has(vicini[j].id)){
+        membri=[p,vicini[i],vicini[j]];
+        break;
+      }
+    }
+  }
+  if(!membri) return null;
+
+  /* Un quarto/quinto membro entra solo se è già legato ad almeno due membri:
+     crescita organica del cluster, non riempimento automatico. */
+  const candidati=(G.gente||[])
+    .filter(x=>x&&!x.via&&!membri.includes(x)&&popolazionePersonaInCitta(x,citta))
+    .sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+  for(const candidato of candidati){
+    if(membri.length>=5) break;
+    const legati=new Set(postoReteLegami(candidato).map(x=>x&&x.personId).filter(Boolean));
+    if(membri.filter(x=>legati.has(x.id)).length>=2) membri.push(candidato);
+  }
+
+  return popolazionePromuoviCluster(membri.map(x=>x.id),{
+    tipo:popolazioneTipoGruppoDaMotivo(motivo),
+    ambiente:popolazioneAmbienteComune(membri.map(x=>x.id)),
+    sourceReason:motivo||"rete-sociale"
+  });
+}
+
+function popolazioneSpostaGruppo(groupId,citta,ambiente){
+  const gruppo=popolazioneGruppoDaId(groupId);
+  const nuova=String(citta||"").trim();
+  if(!gruppo || gruppo.stato==="sciolto" || !nuova) return false;
+  for(const id of gruppo.membri){
+    const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via);
+    if(p) popolazioneSpostaPersona(p,nuova,ambiente);
+  }
+  gruppo.citta=nuova;
+  if(ambiente) gruppo.ambientePrincipale=String(ambiente);
+  return true;
+}
+
+/* Migrazione lazy e non distruttiva dei salvataggi esistenti. */
+try{ popolazioneAssicura(); }catch(_){}
+
 /* Punto Strada 16: la rete sociale è fatta di legami tra persone, non di
    percentuali visibili al giocatore. I legami sono generici e persistenti:
    possono nascere da una presentazione della Strada, da un favore o da un
@@ -699,6 +942,7 @@ function postoReteLegami(p){
 
 function postoCollegaPersone(a,b,motivo){
   if(!a || !b || a===b || a.via || b.via || !a.id || !b.id) return false;
+  popolazionePersonaMondo(a);popolazionePersonaMondo(b);
   const sett=typeof totalWeeks==="function" ? totalWeeks() : Number(G.week||1);
   const aggiungi=(da,aChi)=>{
     const legami=postoReteLegami(da);
@@ -712,6 +956,10 @@ function postoCollegaPersone(a,b,motivo){
   };
   aggiungi(a,b);
   aggiungi(b,a);
+
+  /* La rete resta la fonte di verità. Solo quando un nuovo legame chiude una
+     struttura sociale già plausibile il cluster può diventare gruppo. */
+  popolazioneValutaCluster(a,motivo);
   return true;
 }
 
@@ -802,7 +1050,10 @@ function postoRegistraConseguenzaMondo(p,tipo,punti,meta){
 function genteBaseDellaSala(){
   /* Invariante storico, lasciato esplicito anche per il gate regressioni:
      classifica e contatti confinati al lavoro non consumano slot della Sala. */
-  return (G.gente || []).filter(p => p && !p.rivale && !postoSoloLavoro(p));
+  return (G.gente || []).filter(p =>
+    p && !p.rivale &&
+    popolazionePersonaInCitta(p,POSTO_CITTA_INIZIALE) &&
+    !postoSoloLavoro(p));
 }
 function genteDellaSala(){
   /* Punto 3: dal conteggio generativo escludiamo in più i contatti Strada già
@@ -860,7 +1111,10 @@ function sistemaGente(){
 function presentiOggi(quanti){
   sistemaGente();
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
-  const vivi = G.gente.filter(p => !p.via && !postoSoloLavoro(p));
+  const vivi = G.gente.filter(p =>
+    !p.via &&
+    popolazionePersonaInCitta(p,POSTO_CITTA_INIZIALE) &&
+    !postoSoloLavoro(p));
 
   const punteggio=p=>{
     const k=(p.id.charCodeAt(1)*31+sett*17)%97;
