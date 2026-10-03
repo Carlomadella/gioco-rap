@@ -62,10 +62,10 @@
       conosciuto:st.known===true,
       fiducia:fid==null?null:clamp(fid,0,100),
       stato:status,
-      favori:Math.max(0,intero(st.favori,0)),
+      favori:clamp(intero(st.favori,0),0,3),
       colpiInsieme:Math.max(0,intero(st.colpiInsieme,0)),
-      debitiGiocatore:Math.max(0,intero(st.debitiGiocatore,0)),
-      tensione:Math.max(0,intero(st.tensione,0)),
+      debitiGiocatore:clamp(intero(st.debitiGiocatore,0),0,3),
+      tensione:clamp(intero(st.tensione,0),0,3),
       rivalita:st.rivalita===true,
       cautelaHeat:st.heatCaution===true
     });
@@ -80,7 +80,7 @@
     return freeze({
       /* Memoria del rapporto nato durante la detenzione. Può essere negativa.
          Non sostituisce né p.rel né p.strada.fiducia. */
-      conosciuto:st.conosciuto!==false,
+      conosciuto:st.conosciuto===true,
       rapporto:rapporto==null?null:clamp(rapporto,-10,10),
       currentJailId:st.currentJailId==null?null:String(st.currentJailId),
       linkedStreet:st.linkedStreet===true,
@@ -112,7 +112,8 @@
     return Object.freeze({
       /* Fatti separati per i futuri contratti comportamentali. Nessuno è un
          "relationship score" e nessun tratto viene trasformato in fiducia. */
-      socialeAvviato:!!v.sociale && (v.sociale.livello>0 || v.sociale.numero),
+      socialeAvviato:!!v.sociale &&
+        (v.sociale.livello>0 || v.sociale.progresso!==0 || v.sociale.numero),
       stradaConosciuta:!!v.strada && v.strada.conosciuto,
       stradaFiducia:v.strada ? v.strada.fiducia : null,
       stradaTensione:v.strada ? v.strada.tensione : 0,
