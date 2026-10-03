@@ -889,3 +889,167 @@ ORGANIZZAZIONE, migrazione legacy o selettori basati sui nuovi dati.
 Queste parti devono essere integrate nei punti successivi senza perdere i gate
 esistenti di Sala, Studio, Trasferte, lavoro, Strada e sistema legale.
 
+## Punto 6 — stati dinamici e disponibilità
+
+**Stato:** definizione riesaminata sulla repository corrente; ricostruita anche
+la correzione concreta del rientro post-carcere e i relativi test. Il modello
+generale degli stati non viene ancora materializzato nei salvataggi.
+
+### Principio: stato dinamico ≠ identità
+
+Una persona mantiene ID, identità, personalità, competenze e rapporti quando
+cambia lavoro, città, disponibilità o condizione temporanea. Gli stati cambiano
+solo attraverso fatti/eventi riferiti a quella persona: non vengono ripescati
+casualmente aprendo una schermata o caricando il salvataggio.
+
+Il modello futuro deve coprire soltanto stati che il gameplay usa davvero:
+
+| Dimensione | Contratto futuro | Assenza |
+| --- | --- | --- |
+| Impiego attuale | `stato.impiego`: condizione, mansione/luogo quando attestati | sconosciuto, non “disoccupato” |
+| Detenzione fisica | `stato.detenzione`: libero/detenuto e istituto quando attestati | sconosciuto, non “libero” |
+| Città attuale | fonte geografica autorevole compatibile con Trasferte | definita al punto 9 |
+| Attività per ambiente | appartenenze + eventuali limitazioni contestuali | non esiste un generico “attivo ovunque” |
+| Impedimenti temporanei | contesto/canale/azione interessati, motivo e termine/evento di chiusura | nessun blocco globale inventato |
+| Condizione economica | solo quando un evento la usa davvero | niente portafoglio/salario simulato per tutti |
+
+Non aggiungiamo ora salute, morte, fame, umore o calendario giornaliero NPC
+solo per rendere il modello più “realistico”: con centinaia di persone
+diventerebbero costo e complessità senza gameplay corrispondente.
+
+### Disponibilità è una domanda contestuale
+
+Non esiste un singolo `disponibile=true/false` valido per tutta la persona.
+La domanda corretta specifica almeno:
+
+- persona;
+- luogo/ambiente;
+- azione;
+- canale (fisico, chat, telefono, ecc.);
+- momento del calendario.
+
+Esempio: un contatto può essere indisponibile nella Strada ma ancora
+raggiungibile in chat; può essere fuori città e quindi non comparire fisicamente
+al Circolo ma mantenere una relazione; può aver chiuso un impiego senza perdere
+competenze o numero.
+
+Ordine minimo dei controlli:
+
+1. identità canonica e filtri legacy ancora autorevoli;
+2. geografia/ambiente per gli incontri fisici;
+3. detenzione fisica quando esplicitamente nota;
+4. impedimenti pertinenti e loro scadenza;
+5. accesso, relazione, competenza e gate specifico dell'azione.
+
+La fine di un impedimento **rimuove soltanto l'impedimento**: non regala
+presenza, fiducia, numero, servizio o collaborazione.
+
+### Lettura conservativa dei dati legacy verificati
+
+| Dato corrente | Prova | Non prova |
+| --- | --- | --- |
+| `p.via` | esclusione dai selettori legacy; usato anche quando una persona passa ad altro sistema | morte, trasferimento o cancellazione dell'identità |
+| `origineLuogo` e metadati lavoro | storia del contesto d'incontro | impiego attuale o presenza oggi |
+| `p.citta`, `p.fuori` | profilo geografico usato dalle Trasferte | viaggio in corso o posizione precisa |
+| `circoloSbloccato` | accesso legacy alla selezione del Circolo | residenza, presenza certa o volontà di collaborare |
+| `p.strada.streetStatus` | disponibilità **nella relazione criminale** | stato globale della persona |
+| `p.strada.returnAfterAbsoluteDay` | scadenza della riemersione nella Strada | scarcerazione fisica o accesso ad altri ambienti |
+| `p.carcere.currentJailId` | collegamento all'episodio carcerario gestito | pena completa autonoma dell'NPC |
+| `releasedAbsoluteDay` / `returnAfterAbsoluteDay` del carcere | continuità del rapporto fuori | prova che tutti siano stati scarcerati insieme al protagonista |
+
+Quindi i dati carcerari esistenti restano autorevoli per la **storia della
+relazione**. Una vera detenzione individuale futura richiede un fatto specifico
+dell'NPC e non viene ricostruita retroattivamente.
+
+### Transizioni e calendario
+
+Assunzione, perdita dell'impiego, spostamento, arresto, scarcerazione o altro
+impedimento cambiano stato solo se un evento li stabilisce per la persona.
+
+Ogni transizione futura deve:
+
+- conservare l'ID;
+- avere fonte/motivo;
+- usare il calendario interno;
+- essere idempotente al caricamento;
+- non essere riapplicata perché una schermata viene riaperta.
+
+Le scadenze usano giorni assoluti positivi del gioco. Una scadenza al giorno N
+matura con `oggi >= N`. Non usiamo date reali, timeout browser o aggiornamenti
+giornalieri globali dell'intera anagrafe.
+
+### Fix concreto ricostruito — null non è giorno zero
+
+La funzione `postoRientroCarcereDisponibile()` conteneva ancora:
+
+`Number(m.returnAfterAbsoluteDay)`
+
+e quindi `Number(null) === 0`. Una scadenza assente poteva essere letta come
+già maturata e impedire la corretta ricostruzione del ritardo dei salvataggi
+legacy.
+
+È stato introdotto `postoGiornoAssolutoValido(v)`, che accetta soltanto:
+
+- interi positivi;
+- stringhe contenenti un intero positivo, per compatibilità coi save.
+
+Rifiuta `null`, `undefined`, stringa vuota/spazi, booleani, zero, negativi,
+decimali e testo non numerico.
+
+La ricostruzione legacy usa la data di uscita solo se anch'essa valida e
+conserva i ritardi esistenti:
+
+- rapporto >= 2 → 42 giorni;
+- rapporto = 1 → 56 giorni;
+- rapporto = 0 → 84 giorni;
+- rapporto < 0 → 63 giorni.
+
+Una scadenza esplicita valida prevale sulla ricostruzione. Il rientro al giorno
+esatto della scadenza è ammesso. `currentJailId`, `via`,
+`linkedStreet` e `outsideFollowupDone` continuano a impedire riattivazioni
+inappropriate.
+
+Il rientro non cambia `rel`, `pt`, `numero`, fiducia o favori:
+`circoloSbloccato` abilita soltanto la possibilità di ricomparire nel percorso
+legacy già esistente.
+
+### Test ricostruiti
+
+`frontend/test/unit/npc-stati-rientro.test.js` copre:
+
+- `null` e altri valori non validi;
+- numeri e stringhe numeriche valide;
+- ricostruzione dei quattro ritardi 42/56/84/63;
+- compatibilità di `releasedAbsoluteDay` salvata come stringa;
+- precedenza della scadenza esplicita;
+- confine `oggi === scadenza`;
+- blocco durante `currentJailId`;
+- esclusione `via` e origine non carceraria;
+- nessuna ricostruzione dopo collegamento Strada o follow-up completato;
+- rapporto/punti/numero invariati;
+- idempotenza: il secondo controllo non salva o sblocca di nuovo.
+
+La pagina di gioco è stata aggiornata da `posto.js?v=25` a
+`posto.js?v=26` per evitare cache stale nel browser.
+
+### Sufficienza rispetto alla simulazione
+
+Il modello è coerente con il riferimento 300–800 perché **non simula
+continuamente ogni persona**. Stati e impedimenti sono persistiti solo quando
+servono; scadenze e viste possono essere valutate alla prima lettura pertinente.
+
+Questa scelta evita una scansione/aggiornamento giornaliero di centinaia di NPC
+e lascia al punto 18 la misurazione reale di crescita del save e costo dei
+selettori.
+
+### Confine del punto 6
+
+**Chiuso:** modello concettuale degli stati, disponibilità contestuale,
+interpretazione dei dati legacy, regole temporali, fix concreto del rientro
+post-carcere e test mirati.
+
+**Non ancora implementato:** oggetto generale `stato`, transizioni comuni per
+impiego/detenzione/città/impedimenti e manager centrale. Queste parti devono
+essere introdotte insieme alle appartenenze, geografia, selettori e
+centralizzazione senza creare una seconda fonte di verità concorrente.
+
