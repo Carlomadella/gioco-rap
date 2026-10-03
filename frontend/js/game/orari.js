@@ -33,7 +33,8 @@
        palco, fino alle tre. Le fasce dentro stanno in CIRCOLO_FASCE. */
     beat:      {open:"13:00", close:"03:00"},
     vita:      {allDay:true},
-    crimin:    {open:"18:00", close:"04:00"},
+    /* Attività criminali resta accessibile 24/7 dopo lo sblocco: le finestre temporali appartengono ai singoli colpi. */
+    crimin:    {allDay:true},
     fabbrica:  {open:"08:00", close:"19:00"},
     palestra:  {open:"08:00", close:"23:00"},
     shop:      {open:"10:00", close:"22:00"},
