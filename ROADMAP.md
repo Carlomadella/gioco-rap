@@ -301,8 +301,9 @@ Fatto di recente (dettagli in `implementazioni/`):
 ## Fase 1 — L'hub a mappa _(in corso: la provincia c'è)_
 
 La sezione qui sopra. È il lavoro che viene prima di tutto il resto, perché tutto il resto
-poi ci si attacca sopra come luogo della città. La città di partenza è costruita; restano
-i contatti, la criminalità e le altre due città.
+poi ci si attacca sopra come luogo della città. La città di partenza è costruita; contatti
+e criminalità della Provincia sono già sistemi giocabili. Restano soprattutto l'espansione
+verso Milano e Los Angeles e le parti della rete/città che dipendono da quelle mappe future.
 
 Dentro ci finisce anche la vecchia idea della **mappa d'Italia**, come strato successivo:
 fan per città che crescono con uscite, concerti e social; città-roccaforti che rendono di più;
@@ -360,9 +361,13 @@ quando dalla provincia cominci a muoverti verso Milano.
 - Spese settimanali fisse legate al lifestyle; benessere e lifestyle collegati.
 - Il lavoro dà soldi ma toglie benessere e abbassa il rendimento → capire quando mollarlo.
 - Entrate: streaming, concerti, merch, feat pagati. Spese che alzano il lifestyle ma bruciano cassa.
-- **Criminalità** come strada alternativa per soldi e, poi, fama (punto 21): piccoli colpi in
-  provincia, colpi grossi a Milano, altissimo rischio a Los Angeles. Reputazione di strada
-  che sale, e polizia e rivali che diventano un problema vero.
+- **Criminalità** come strada alternativa per soldi e, poi, fama (punto 21): la Provincia è
+  già giocabile con rete di persone, heat, attività di copertura, carcere, uscita dal giro,
+  fallout e intel. L'espansione futura deve rendere Milano e Los Angeles qualitativamente
+  diverse, non soltanto la Provincia con numeri più alti.
+- Il bilanciamento economico del crime va misurato sul sistema attuale: i numeri del
+  simulatore del 29/09 precedono il ciclo completo dei 24 punti e non sono più un benchmark
+  sufficiente. Resta valido come storico finché non viene rilanciato.
 - A Los Angeles il casinò: si moltiplica o si perde tutto in una serata.
 
 ## Fase 8 — Abilità & gestione del tempo
