@@ -1552,6 +1552,52 @@ test("punto 18: il rischio viene chiuso dopo la Strada, così include i ricavi d
   sim.indexOf('if(typeof stradaSettimana === "function") stradaSettimana();') <
   sim.indexOf('if(typeof lifestyleChiudiSettimanaRischio==="function") lifestyleChiudiSettimanaRischio();'));
 
+test("punto 19: l'heat ha quattro fasce condivise da gameplay e UI",
+  crime.includes("const STRADA_HEAT_FASCE = Object.freeze([") &&
+  crime.includes('id:"basso",min:0') &&
+  crime.includes('id:"medio",min:25') &&
+  crime.includes('id:"alto",min:50') &&
+  crime.includes('id:"critico",min:75') &&
+  crime.includes("function stradaHeatProfilo(valore)") &&
+  crime.includes("return stradaHeatProfilo().occhi"));
+test("punto 19: i contatti deboli diventano prudenti senza sparire dal mondo",
+  crime.includes("function stradaHeatSincronizzaPersone()") &&
+  crime.includes("fa-fb; /* si tirano indietro prima i legami più deboli */") &&
+  crime.includes("st.heatCaution=dopo") &&
+  crime.includes("function stradaRelazioneOperativa(p)") &&
+  crime.includes("stradaRelazioneDisponibile(p) && !stradaHeatPersonaCauta(p)"));
+test("punto 19: heat alto frena opportunità nuove e può bruciare quelle già aperte",
+  crime.includes("chance*=Number(heat.opportunita||1)") &&
+  crime.includes('if(heat.id==="alto") cooldown+=2') &&
+  crime.includes('else if(heat.id==="critico") cooldown+=4') &&
+  crime.includes("function stradaHeatBruciaOpportunita(roll,silent)") &&
+  crime.includes('type:"burned-by-heat"') &&
+  crime.includes("st.active=null") &&
+  crime.includes("st.pendingChoices=[]"));
+test("punto 19: heat alto genera richieste esplicite di abbassare il profilo",
+  state.includes("heatMondo:{lastStopRequestAbsoluteDay:null,history:[]}") &&
+  crime.includes("function stradaHeatRichiestaFermati(silent)") &&
+  crime.includes('type:"stop-request"') &&
+  crime.includes("ti ha chiesto di abbassare il profilo"));
+test("punto 19: controlli e costo degli errori crescono con la pressione",
+  crime.includes("function stradaHeatRischioControllo()") &&
+  crime.includes("const rischioControllo=stradaHeatRischioControllo();") &&
+  crime.includes("function stradaHeatCostoErrore()") &&
+  crime.includes("(rumore + rumoreLead) * costoErrore") &&
+  crime.includes("stradaHeatChanceSoloDenuncia(.6)") &&
+  crime.includes("stradaHeatPenaMoltiplicatore()"));
+test("punto 19: chi si tiene basso non partecipa a colpi, incontri o ponti",
+  crime.includes(".filter(p=>stradaRelazioneOperativa(p) &&") &&
+  crime.includes("stradaContattiAttivi().filter(p=>p&&!esclusi.has(p.id)&&!stradaHeatPersonaCauta(p))") &&
+  crime.includes("stradaContattiAttivi().filter(p=>!stradaHeatPersonaCauta(p))") &&
+  crime.includes("!stradaRelazioneOperativa(requester) || !stradaRelazioneOperativa(candidato)") &&
+  crime.includes("!stradaRelazioneOperativa(a) || !stradaRelazioneOperativa(b)"));
+test("punto 19: la Strada spiega al giocatore come il giro reagisce all'heat",
+  crime.includes("<strong>Pressione sul giro</strong>") &&
+  crime.includes("heatMondo.mondo") &&
+  crime.includes("si tiene basso") &&
+  crime.includes("stradaHeatMuoviMondo(Math.random(),false)"));
+
 test("punto 13 esteso: gli esiti Strada entrano nella relazione sociale della stessa persona",
   posto.includes("function postoConseguenzeMondo(p)") &&
   posto.includes("function postoRegistraConseguenzaMondo(p,tipo,punti,meta)") &&
