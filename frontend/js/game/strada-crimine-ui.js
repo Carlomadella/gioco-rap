@@ -452,11 +452,12 @@
       const giorni=u&&typeof stradaAbsDay==="function"
         ? Math.max(0,Number(u.memoryUntilAbsoluteDay||0)-stradaAbsDay())
         : 0;
-      box.innerHTML='<div class="crime-empty"><b>Hai mollato il giro</b><p>Non accetti più colpi e non ricicli denaro. '+
+      box.className="dentro";
+      box.innerHTML='<b>Hai mollato il giro</b><p>Non accetti più colpi e non ricicli denaro. '+
         (giorni>0
           ? 'Il passato può ancora tornare a bussare per circa '+giorni+' giorni.'
           : 'Persone, precedenti e storia restano parte del personaggio.')+
-        '</p></div>';
+        '</p>';
       return;
     }
 
@@ -466,10 +467,12 @@
           .filter(c=>crimeWindow(c.id).ok);
 
     if(!offerte.length){
-      box.innerHTML='<div class="crime-empty"><b>Nessun lavoro gira adesso</b><p>Le offerte del giorno restano le stesse, ma in questa fascia oraria nessuna è coerente con il contesto. Torna più tardi.</p></div>';
+      box.className="dentro";
+      box.innerHTML='<b>Nessun lavoro gira adesso</b><p>Le offerte del giorno restano le stesse, ma in questa fascia oraria nessuna è coerente con il contesto. Torna più tardi.</p>';
       return;
     }
 
+    box.className="crimes";
     const leadIncontro=typeof stradaOpportunitaAttiva==="function"?stradaOpportunitaAttiva():null;
     const leadLavoro=window.ADF_WORK_EVENTS&&typeof ADF_WORK_EVENTS.crimeLeadActive==="function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
