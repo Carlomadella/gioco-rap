@@ -497,3 +497,184 @@ effetti, dialoghi combinatori, scoperta e migrazione. Il punto 4 deve dimostrare
 che i tratti operativi producano differenze concrete prima che la generazione
 li utilizzi.
 
+## Punto 4 — interessi e comportamento
+
+**Stato:** definizione riesaminata e prototipo verificabile ricostruito. Il
+prototipo non è caricato dal gioco e non modifica salvataggi, premi o NPC
+esistenti.
+
+File introdotti:
+
+- `frontend/strumenti/npc/contratti-comportamento.cjs`;
+- `frontend/test/unit/npc-contratti-comportamento.test.js`.
+
+### Principio: interessi e tratti hanno responsabilità diverse
+
+- **Interessi:** orientano quali temi/contenuti sono pertinenti a una persona.
+- **Tratti:** orientano come quella persona reagisce a una situazione
+  semanticamente pertinente.
+- **Competenze:** restano separate; interessarsi a musica, audio o cucina non
+  dimostra saper rappare, mixare o cucinare professionalmente.
+- **Disponibilità e gate:** vengono prima delle preferenze. Un tratto non rende
+  possibile un'azione vietata dallo stato, dalla relazione o dal sottosistema.
+
+Nessuno dei due sistemi assegna automaticamente relazione, fiducia, denaro,
+rete, favori, servizi o ricompense.
+
+### Interessi attivi verificati
+
+Il codice corrente permette di collegare senza inventare contenuti tre interessi:
+
+| Interesse | Contenuti presenti | Valutazione |
+| --- | --- | --- |
+| `musica` | brani, generi, live, artisti, feat e ascolto in Sala/chat | attivo |
+| `audio` | microfoni, mix, registrazione, mixer, cavi e problemi tecnici | attivo |
+| `quartiere` | zona, luoghi, persone incontrate e vita locale in chat/lavoro | attivo |
+
+Per i nuovi NPC generici l'obiettivo resta **uno o due interessi attivi**.
+Gli NPC legacy possono averne zero finché non esiste informazione sufficiente.
+
+### Interessi candidati ma sospesi
+
+| Interesse | Perché non è ancora attivo |
+| --- | --- |
+| `cucina` | la Pizzeria ha oggi molto gameplay di cucina, ma descrive mansioni e situazioni lavorative; non dimostra un interesse personale trasferibile a qualunque NPC |
+| `sport` | non esiste un percorso conversazionale/sociale NPC abbastanza sviluppato |
+| `cinema` | video e videomaker esistono, ma non costituiscono ancora un percorso generale sull'interesse per il cinema |
+
+Non deduciamo quindi `cucina` dal lavoro in Pizzeria, `sport` dalla palestra o
+`cinema` dal mestiere di videomaker.
+
+Con tre interessi attivi esistono soltanto **6 insiemi non vuoti distinti** se
+assegniamo uno o due interessi (3 singoli + 3 coppie). Questo è sufficiente per
+verificare il contratto tecnico, **non per considerare finita la varietà degli
+interessi** in una popolazione di centinaia di persone.
+
+L'espansione deve essere guidata dai contenuti: un interesse nuovo entra nel
+pool generativo soltanto quando possiede almeno un percorso di dialogo, attività
+o scelta riconoscibile fuori da una sola professione.
+
+### Contratti comportamentali dei 18 tratti operativi
+
+Il prototipo associa ogni tratto operativo del punto 3 a un **trigger semantico**
+e a un segnale di reazione. I trigger non sono parole cercate nei testi: sono
+categorie che i contenuti dovranno dichiarare durante l'integrazione.
+
+| Tratto | Trigger | Segnale richiesto |
+| --- | --- | --- |
+| `prudente` | proposta rischiosa | chiede garanzie |
+| `diffidente` | affidamento a una persona | chiede riscontri |
+| `ambizioso` | opportunità di crescita | valuta prospettive |
+| `impulsivo` | decisione urgente | preferisce decidere subito |
+| `leale` | richiesta di aiuto | privilegia un legame già accertato |
+| `socievole` | conversazione aperta | allarga lo scambio |
+| `opportunista` | scambio vantaggioso | negozia il vantaggio personale |
+| `generoso` | richiesta di aiuto | considera aiuto senza contropartita |
+| `competitivo` | confronto con un pari | cerca il confronto |
+| `riservato` | domanda personale | limita la confidenza |
+| `pratico` | problema concreto | propone una soluzione attuabile |
+| `idealista` | compromesso con i valori | difende il principio |
+| `permaloso` | critica personale | percepisce svalutazione |
+| `irascibile` | provocazione | reagisce con irritazione |
+| `rancoroso` | tentativo di riparazione | richiede riparazione di un torto reale |
+| `conciliante` | tentativo di riparazione | cerca ricomposizione di un conflitto reale |
+| `flessibile` | revisione del piano | considera l'alternativa |
+| `ostinato` | revisione del piano | difende il piano attuale |
+
+`disciplinato` e `incostante` non hanno contratto operativo finché manca un
+vero ciclo persistente degli impegni, coerentemente col punto 3.
+
+### Prerequisiti: la personalità non inventa la storia
+
+Il prototipo rende espliciti i prerequisiti:
+
+- `leale` reagisce come tale a una richiesta di aiuto solo se esiste un
+  `legameAccertato`;
+- `rancoroso` richiede un `tortoAccertato`;
+- `conciliante` su una riparazione richiede un `conflittoAccertato`.
+
+Questi flag sono **input del contratto**, non nuovi campi da salvare con questi
+nomi. Nell'integrazione dovranno essere derivati dalle fonti autorevoli
+(relazioni, Strada, carcere, eventi o rete) invece di duplicarne lo stato.
+
+La combinazione `rancoroso + conciliante` produce nel prototipo una risposta
+composta: ricomposizione possibile a condizione di riparare il torto. I due
+tratti non si annullano né sommano bonus numerici.
+
+### Composizione delle coppie
+
+Con 18 tratti esistono 153 coppie teoriche. Il prototipo ne accetta 152 nella
+generazione generica e blocca soltanto `flessibile + ostinato`, perché senza
+domini distinti la coppia produrrebbe due segnali opposti allo stesso trigger.
+
+Regole verificate dal contratto:
+
+- ordine dei tratti non significativo;
+- duplicati e codici sconosciuti rifiutati;
+- tratti sospesi rifiutati dal pool operativo;
+- terzo tratto rifiutato di default e ammesso soltanto tramite richiesta
+  esplicita del chiamante narrativo;
+- nessun effetto numerico viene cumulato dal prototipo;
+- nessuna scrittura in `G`, `p.strada`, `p.carcere`, relazione o salvataggio.
+
+Altre coppie vengono escluse solo quando un comportamento concreto dimostra un
+conflitto reale. Non costruiamo una tassonomia di incompatibilità arbitraria.
+
+### Contratto degli interessi
+
+`prioritizeTopics(interessi, topics)` conserva gli oggetti contenuto e cambia
+soltanto la priorità, portando avanti i temi pertinenti agli interessi attivi.
+Non aggiunge campi di ricompensa, non modifica l'input e non rende selezionabile
+un contenuto che il contesto non aveva già fornito.
+
+Il prototipo quindi non decide **se** un'azione è consentita; ordina contenuti
+già candidati dal sottosistema competente.
+
+### Verifiche ricostruite
+
+Il test Vitest copre:
+
+- 18 tratti operativi e 2 sospesi;
+- distinzione prudente/diffidente;
+- prerequisito reale di `leale`;
+- prerequisiti di `rancoroso` e `conciliante`;
+- composizione della riparazione;
+- indipendenza dall'ordine dei tratti;
+- tutte le 153 coppie operative teoriche: 152 ammesse e 1 bloccata;
+- duplicati, codici sconosciuti, sospesi e terzo tratto;
+- tre interessi attivi e tre sospesi;
+- zero interessi ammesso per legacy ma non per nuovi NPC generici;
+- priorità dei temi senza mutazioni o ricompense.
+
+Nell'ambiente di ricostruzione è stato eseguito uno smoke test Node sulla logica
+del modulo e il controllo sintattico di modulo e test. La suite Vitest completa
+del repository non viene dichiarata eseguita da questo connettore: va verificata
+dal runtime del progetto/CI.
+
+### Sufficienza rispetto al dimensionamento
+
+Il riferimento 300–800 non richiede che ogni NPC abbia una coppia di tratti o
+interessi unica. Richiede che la combinazione complessiva PERSONA produca
+varietà e che il costo della valutazione resti locale al personaggio/evento.
+
+Il prototipo soddisfa il vincolo di costo: valuta soltanto i tratti della persona
+coinvolta e i temi candidati per quell'interazione; non scansiona né aggiorna
+l'intera popolazione.
+
+La **personalità** ha ora un contratto sufficientemente distinto per procedere
+all'integrazione successiva. Gli **interessi**, invece, hanno un contratto
+corretto ma un catalogo ancora troppo piccolo per essere considerato finale:
+la varietà dovrà crescere insieme ai contenuti, e sarà controllata nel reaudit.
+
+### Confine del punto 4
+
+**Chiuso in questo punto:** responsabilità di tratti/interessi, catalogo
+interessi attivo/sospeso, contratti semantici dei 18 tratti, prerequisiti,
+composizione, prototipo e test mirati.
+
+**Non ancora gameplay attivo:** tag semantici sui contenuti reali,
+`personalita.tratti` / `personalita.interessi` nei generatori, risposte
+combinate, scoperta, effetti sulle relazioni e ampliamento degli interessi.
+L'integrazione deve avvenire senza sommare il vecchio bonus `car` a nuovi
+bonus e senza scrivere direttamente nei sottosistemi proprietari.
+
