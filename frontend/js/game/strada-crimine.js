@@ -253,6 +253,120 @@ const STRADA_PREPARAZIONI = Object.freeze([
   })
 ]);
 
+/* Punto 24: l'identità della Strada è conoscenza, sotterfugio e informazione.
+   La preparazione non è più soltanto un modificatore astratto: produce intel
+   concreto, valido per quel colpo e per quel giorno. L'informazione non decide
+   al posto del giocatore: indica quale approccio sfrutta davvero ciò che hai
+   scoperto. */
+const STRADA_INTEL_TIPI=Object.freeze({
+  pulito:Object.freeze({
+    id:"varco",label:"Varco pulito",approachId:"pulito",
+    text:"Hai scoperto un passaggio e un momento con meno occhi addosso."
+  }),
+  squadra:Object.freeze({
+    id:"sincronia",label:"Sincronia",approachId:"squadra",
+    text:"Hai capito che il punto critico è muoversi in due nello stesso momento."
+  }),
+  ferro:Object.freeze({
+    id:"pressione",label:"Finestra stretta",approachId:"ferro",
+    text:"Hai capito che la finestra utile è breve e che una mossa decisa la chiude prima che la situazione si allarghi."
+  })
+});
+
+function stradaIntelStato(){
+  const s=G.strada||(G.strada={});
+  const oggi=stradaAbsDay();
+  if(!s.intelStato || typeof s.intelStato!=="object" ||
+     Number(s.intelStato.absoluteDay)!==oggi){
+    s.intelStato={absoluteDay:oggi,entries:{}};
+  }
+  if(!s.intelStato.entries || typeof s.intelStato.entries!=="object")
+    s.intelStato.entries={};
+  return s.intelStato;
+}
+
+function stradaIntelApprocciDisponibili(){
+  const out=["pulito"];
+  try{
+    if(typeof stradaPersoneSquadra==="function" && stradaPersoneSquadra().length)
+      out.push("squadra");
+  }catch(_){}
+  if(G.strada&&G.strada.ferro) out.push("ferro");
+  return out;
+}
+
+function stradaIntelHash(text){
+  let h=2166136261>>>0;
+  const s=String(text||"");
+  for(let i=0;i<s.length;i++){
+    h^=s.charCodeAt(i);
+    h=Math.imul(h,16777619)>>>0;
+  }
+  return h>>>0;
+}
+
+function stradaIntelCrea(colpo,source,persona){
+  if(!colpo || !colpo.id) return null;
+  const st=stradaIntelStato();
+  const key=String(colpo.id);
+  const disponibili=stradaIntelApprocciDisponibili();
+  const seed=[
+    stradaAbsDay(),colpo.id,source||"informazioni",
+    persona&&persona.id||"nessuno"
+  ].join(":");
+  const approachId=disponibili[stradaIntelHash(seed)%disponibili.length]||"pulito";
+  const tipo=STRADA_INTEL_TIPI[approachId]||STRADA_INTEL_TIPI.pulito;
+  const fonte=persona&&persona.n
+    ? "Dritta di "+persona.n
+    : source==="finestra" ? "Osservazione sul posto" : "Informazioni raccolte";
+  const entry={
+    intelId:String(stradaAbsDay())+":"+key,
+    colpoId:key,
+    absoluteDay:stradaAbsDay(),
+    source:String(source||"informazioni"),
+    sourcePersonId:persona&&persona.id||null,
+    sourcePersonName:persona&&persona.n||null,
+    approachId,
+    label:tipo.label,
+    text:tipo.text,
+    sourceLabel:fonte
+  };
+  st.entries[key]=entry;
+  return entry;
+}
+
+function stradaIntelPerColpo(colpoId){
+  if(!colpoId) return null;
+  const st=stradaIntelStato();
+  const e=st.entries[String(colpoId)]||null;
+  return e&&Number(e.absoluteDay)===stradaAbsDay()?e:null;
+}
+
+function stradaIntelDaContesto(ctx){
+  if(!ctx || !ctx.intelColpoId) return null;
+  return stradaIntelPerColpo(ctx.intelColpoId);
+}
+
+function stradaIntelConsuma(colpoId){
+  const st=stradaIntelStato();
+  const key=String(colpoId||"");
+  const e=st.entries[key]||null;
+  if(e) delete st.entries[key];
+  return e;
+}
+
+function stradaIntelSfruttata(ctx,approccio){
+  const intel=stradaIntelDaContesto(ctx);
+  return !!(intel&&approccio&&intel.approachId===approccio.id);
+}
+
+function stradaIntelDescrizione(ctx){
+  const intel=stradaIntelDaContesto(ctx);
+  if(!intel) return null;
+  return intel.sourceLabel+": "+intel.text;
+}
+
+
 /* Attività di provincia: Lavanderia, Autolavaggio, Minimarket (nomi dal
    documento). Il documento non fissa costo d'acquisto né resa esatta per la
    provincia (lo fa solo per il tipo di reparto, 45% pulito/55% sporco): i
@@ -630,36 +744,44 @@ function stradaPreparazioneDaId(id){
 
 function stradaPreparazioneContesto(ctx){
   if(!ctx || ctx.pagata!==true) return {
-    id:"subito", pagata:true, personId:null, personName:null
+    id:"subito", pagata:true, personId:null, personName:null, intelColpoId:null
   };
   const prep=stradaPreparazioneDaId(ctx.id);
   return {
     id:prep.id,
     pagata:true,
     personId:ctx.personId||null,
-    personName:ctx.personName||null
+    personName:ctx.personName||null,
+    intelColpoId:ctx.intelColpoId||null
   };
 }
 
-function stradaPreparazioneEffetti(ctx){
+function stradaPreparazioneEffetti(ctx,approccio){
   const c=stradaPreparazioneContesto(ctx);
   const prep=stradaPreparazioneDaId(c.id);
+  const intel=stradaIntelDaContesto(c);
+  const usa=!!(intel&&approccio&&intel.approachId===approccio.id);
+  const baseChance=Number(prep.chance||0);
+  const baseHeat=Number(prep.heat||1);
   return {
     id:prep.id,
     n:prep.n,
-    chance:Number(prep.chance||0),
-    heat:Number(prep.heat||1),
+    chance:intel&&approccio ? (usa?baseChance:Math.min(.02,baseChance*.3)) : baseChance,
+    heat:intel&&approccio ? (usa?baseHeat:1-(1-baseHeat)*.25) : baseHeat,
     minuti:Number(prep.minuti||0),
     personId:c.personId,
-    personName:c.personName
+    personName:c.personName,
+    intel,
+    intelSfruttata:usa
   };
 }
 
 function stradaPreparazioneEtichetta(ctx){
   const eff=stradaPreparazioneEffetti(ctx);
-  return eff.id==="contatto" && eff.personName
+  const base=eff.id==="contatto" && eff.personName
     ? eff.n+" · "+eff.personName
     : eff.n;
+  return eff.intel ? base+" · "+eff.intel.label : base;
 }
 
 function stradaErroreTempoPreparazione(minuti){
@@ -679,9 +801,13 @@ function stradaApplicaPreparazione(colpo,prepId,personId){
     if(!stradaConsumaFavore(p,"preparazione:"+String(colpo&&colpo.id||"colpo")))
       return {ok:false,reason:"Quel favore non è più disponibile."};
     if(typeof save==="function") save();
+    const intel=stradaIntelCrea(colpo,"contatto",p);
     return {
       ok:true,
-      context:{id:prep.id,pagata:true,personId:p.id,personName:p.n}
+      context:{
+        id:prep.id,pagata:true,personId:p.id,personName:p.n,
+        intelColpoId:intel?intel.colpoId:null
+      }
     };
   }
 
@@ -708,7 +834,14 @@ function stradaApplicaPreparazione(colpo,prepId,personId){
       return {ok:false,reason:"Prima devi chiudere la decisione o l'azione in corso."};
   }
 
-  return {ok:true,context:{id:prep.id,pagata:true,personId:null,personName:null}};
+  const intel=prep.id==="subito"?null:stradaIntelCrea(colpo,prep.id,null);
+  return {
+    ok:true,
+    context:{
+      id:prep.id,pagata:true,personId:null,personName:null,
+      intelColpoId:intel?intel.colpoId:null
+    }
+  };
 }
 
 function stScenaPreparazioneErrore(colpo,msg){
@@ -769,9 +902,9 @@ function stScenaPreparazione(colpo){
       const costo=favore
         ? (personeFavori.length?"1 favore":"nessun favore disponibile")
         : (minuti?((typeof GAME_TIME!=="undefined"&&GAME_TIME.formatDuration)?GAME_TIME.formatDuration(minuti):minuti+" min"):"nessun costo");
-      const effetto=Number(p.chance||0)>0
-        ? "+"+Math.round(Number(p.chance||0)*100)+"% riuscita · attenzione ↓"
-        : "nessun bonus";
+      const effetto=p.id==="subito"
+        ? "nessuna informazione in più"
+        : "intel sul colpo · bonus pieno solo se la sfrutti";
       return {
         n:p.n,d:p.d,sx:costo,dx:effetto,
         no:favore&&!personeFavori.length,
