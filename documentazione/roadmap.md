@@ -1,6 +1,6 @@
 # La roadmap del progetto — a che punto siamo davvero
 
-**Aggiornata al 02/10/2026.** Ogni riga di questo file è stata controllata sul repo il
+**Aggiornata al 03/10/2026.** Ogni riga di questo file è stata controllata sul repo il
 giorno in cui è stata scritta: se qui c'è scritto «fatto», il codice c'è ed è stato
 guardato. Se c'è scritto «da fare», nel repo non c'è niente che lo faccia.
 
@@ -348,6 +348,11 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
   **FATTO in parte (02/10/2026)** — le opportunità criminali hanno un pool generale, un dialogo con la
   decisione e conseguenze vere, e arrivano anche fuori dalla Fabbrica (pull request #30 di Carletto,
   segnata dal push degli altri; `frontend/js/game/strada-crimine.js`). Il bilanciamento resta da fare;
+  **FATTO in parte (03/10/2026)** — la Strada di Mycol, punti 9–24 (segnata dal push degli altri):
+  il TrapPhone è uno sblocco del giro e non c'è più in una carriera nuova, l'heat cambia contatti e
+  controlli, il rischio lifestyle confronta le spese con le entrate giustificabili, le persone del
+  carcere restano dopo, si può mollare il giro col passato che resta. Le due prove unitarie di quei
+  punti che cercavano testo con `\n` cadevano su Windows (file in CRLF): leggono il file senza `\r`;
 - i dialoghi tanti e diversi, e gli scenari uguali nella forma e diversi nelle circostanze:
   tutti e due a metà.
 
