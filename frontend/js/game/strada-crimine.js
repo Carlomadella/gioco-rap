@@ -2723,6 +2723,30 @@ function stradaNpcTipoLegame(reason){
   return reason==="attivita-lavoro" ? "collaborazione" : "conoscenza";
 }
 
+function stradaNpcScopriLegameLocale(a,b,reason){
+  try{
+    const api=typeof window!=="undefined" ? window.ADF_NPC_CONOSCENZA : null;
+    if(!api || typeof api.scopriLegame!=="function") return;
+    const oggi=typeof stradaAbsDay==="function" ? stradaAbsDay() : null;
+    const meta={fonte:"strada:"+String(reason||"crime-link"),giorno:oggi};
+
+    const scopriDirezione=(da,aChi)=>{
+      const r=Array.isArray(da&&da.reteLegami)
+        ? da.reteLegami.find(x=>x&&String(x.personId)===String(aChi.id))
+        : null;
+      if(!r) return;
+      const dettagli={};
+      if(typeof r.tipo==="string"&&r.tipo) dettagli.tipo=r.tipo;
+      /* Percezioni e sottotipi restano privati finché un evento dedicato non
+         li rende espliciti al giocatore. */
+      api.scopriLegame(da,aChi.id,dettagli,meta);
+    };
+
+    scopriDirezione(a,b);
+    scopriDirezione(b,a);
+  }catch(_){}
+}
+
 function stradaNpcCollega(a,b,reason,meta){
   if(!a || !b || !a.id || !b.id || a===b) return false;
   const cfg=meta&&typeof meta==="object"?meta:{};
@@ -2739,12 +2763,17 @@ function stradaNpcCollega(a,b,reason,meta){
         perceptionB:cfg.percezioneB||cfg.percezione||null,
         context:"crime"
       });
-      if(out!==false) return true;
+      if(out!==false){
+        stradaNpcScopriLegameLocale(a,b,reason);
+        return true;
+      }
     }
   }catch(_){}
-  return typeof postoCollegaPersone==="function"
+  const ok=typeof postoCollegaPersone==="function"
     ? !!postoCollegaPersone(a,b,reason,Object.assign({},cfg,{tipo:relationshipType}))
     : false;
+  if(ok) stradaNpcScopriLegameLocale(a,b,reason);
+  return ok;
 }
 
 function stradaNpcGruppiPersona(p){
