@@ -328,7 +328,7 @@ function stradaAttivitaStato(id,creaPersone){
     st=s.attivitaStato[id]={
       partnerPersonId:null,employeePersonId:null,
       pressione:0,issue:null,history:[],
-      blockedUntilWeek:null,lastMeetingWeek:null,lastIssueWeek:null
+      blockedUntilAbsoluteDay:null,lastMeetingWeek:null,lastIssueWeek:null
     };
   }
   if(!Array.isArray(st.history)) st.history=[];
@@ -370,7 +370,7 @@ function stradaAttivitaWeekIndex(){
 function stradaAttivitaOperativa(id){
   const st=stradaAttivitaStato(id,true);
   if(!st) return false;
-  return st.blockedUntilWeek==null || stradaAttivitaWeekIndex()>=Number(st.blockedUntilWeek);
+  return st.blockedUntilAbsoluteDay==null || stradaAbsDay()>=Number(st.blockedUntilAbsoluteDay);
 }
 
 /* Protezione a tre gradini più "nessuna", coi tre prezzi del documento. */
@@ -3830,7 +3830,7 @@ function stradaAttivitaRisolviProblema(id,scelta){
       });
     st.history.push({type:"issue-resolved",issueId:def.id,choice:"sistema",week:settimana});
   }else if(scelta==="pausa"){
-    st.blockedUntilWeek=settimana+1;
+    st.blockedUntilAbsoluteDay=stradaAbsDay()+7;
     st.pressione=Math.max(0,Number(st.pressione||0)-32);
     if(persona&&typeof postoRegistraConseguenzaMondo==="function")
       postoRegistraConseguenzaMondo(persona,"business-paused-cleanup",1,{
