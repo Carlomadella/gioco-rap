@@ -1713,9 +1713,10 @@ test("punto 20: la UI carcere mostra facce e stato del rapporto",
   crimeui.includes("v.persone&&v.persone.length"));
 test("punto 20: anche le conoscenze deboli possono riemergere fuori dopo settimane o mesi",
   crime.includes("m.returnAfterAbsoluteDay=stradaAbsDay()+ritardo") &&
+  posto.includes("function postoGiornoAssolutoValido(v)") &&
   posto.includes("function postoRientroCarcereDisponibile(p)") &&
   posto.includes('p.origineLuogo!==\"carcere\"') &&
-  posto.includes("m.releasedAbsoluteDay!=null") &&
+  posto.includes("const uscita=postoGiornoAssolutoValido(m.releasedAbsoluteDay)") &&
   posto.includes("m.returnAfterAbsoluteDay=quando") &&
   posto.includes("p.circoloSbloccato=true"));
 test("punto 20: il reincontro fuori può chiudere un favore rimasto dal carcere",
