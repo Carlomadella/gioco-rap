@@ -873,6 +873,124 @@ function stradaGiroAvviato(){
   return s.giroAvviato;
 }
 
+/* ==================== USCIRE DAL GIRO · PUNTO 21 ====================
+   Essere entrato nel giro e parteciparvi adesso sono due fatti diversi.
+   giroAvviato resta memoria storica; uscitaGiro decide invece se il giocatore
+   sta ancora accettando colpi, riciclando e ricevendo opportunità nuove. */
+function stradaUscitaStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.uscitaGiro || typeof s.uscitaGiro!=="object"){
+    s.uscitaGiro={
+      mollato:false,leftAbsoluteDay:null,profondita:0,memoryUntilAbsoluteDay:null,
+      lastKnockAbsoluteDay:null,history:[]
+    };
+  }
+  const u=s.uscitaGiro;
+  u.mollato=!!u.mollato;
+  if(!Array.isArray(u.history))u.history=[];
+  if(!Number.isFinite(Number(u.profondita)))u.profondita=0;
+  return u;
+}
+
+function stradaPartecipazioneAttiva(){
+  if(!stradaAttivitaSbloccate()) return false;
+  return stradaUscitaStato().mollato!==true;
+}
+
+function stradaProfonditaUscita(){
+  const s=G.strada||{};
+  const contatti=(G.gente||[]).filter(p=>p&&!p.via&&p.strada&&p.strada.known);
+  const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA).length;
+  const rivali=contatti.filter(p=>stradaRivalitaAttiva(p)).length;
+  const debiti=contatti.reduce((n,p)=>n+Math.max(0,Number(stradaConseguenzePersona(p).debiti||0)),0);
+  const attive=Object.values(s.attivita||{}).filter(Boolean).length;
+  const colpi=Math.max(0,Number(G.diario&&G.diario.colpi)||0);
+  const score=
+    Number(s.rep||0)*.30+
+    Math.min(4,Number(s.precedenti||0))*11+
+    Math.min(12,colpi)*2.5+
+    Math.min(8,contatti.length)*2+
+    Math.min(4,fidati)*3+
+    Math.min(3,rivali)*5+
+    Math.min(4,debiti)*2+
+    Math.min(3,attive)*2+
+    (s.carcere?5:0);
+  return clamp(Math.round(score),0,100);
+}
+
+function stradaMemoriaGiorni(profondita){
+  const p=Math.max(0,Number(profondita)||0);
+  return p<25 ? 120 : p<50 ? 365 : p<75 ? 730 : 1460;
+}
+
+function stradaPassatoAttivo(){
+  const u=stradaUscitaStato();
+  if(!u.mollato) return false;
+  if(!Number.isFinite(Number(u.memoryUntilAbsoluteDay))) return false;
+  return stradaAbsDay()<=Number(u.memoryUntilAbsoluteDay);
+}
+
+function stradaRischioCriminaleAttivo(){
+  return stradaPartecipazioneAttiva() || stradaPassatoAttivo();
+}
+
+function stradaPassatoCandidati(){
+  return (G.gente||[]).filter(p=>p&&!p.via&&p.strada&&p.strada.known).map(p=>{
+    const st=stradaPersonaMeta(p),cons=stradaConseguenzePersona(p);
+    const kind=st.rivalita?"rival":Number(cons.debiti||0)>0?"debt":
+      (stradaFiduciaValore(p)>=35 || p.origine==="carcere")?"contact":null;
+    if(!kind)return null;
+    const peso=(kind==="rival"?6:kind==="debt"?5:2)+stradaFiduciaValore(p)/40;
+    return {p,kind,peso};
+  }).filter(Boolean);
+}
+
+function stradaPassatoSettimana(roll,variantRoll){
+  const u=stradaUscitaStato();
+  if(!u.mollato || !stradaPassatoAttivo()) return null;
+  const oggi=stradaAbsDay();
+  const last=Number(u.lastKnockAbsoluteDay);
+  if(Number.isFinite(last)&&oggi-last<21) return null;
+
+  const durata=Math.max(1,Number(u.memoryUntilAbsoluteDay)-Number(u.leftAbsoluteDay||oggi));
+  const resta=Math.max(0,Number(u.memoryUntilAbsoluteDay)-oggi);
+  const frazione=clamp(resta/durata,0,1);
+  const chance=.015+(Number(u.profondita||0)/100)*.085*frazione;
+  const r=Number.isFinite(Number(roll))?Number(roll):Math.random();
+  if(r>=chance)return null;
+
+  const candidati=stradaPassatoCandidati();
+  if(!candidati.length)return null;
+  const totale=candidati.reduce((n,x)=>n+x.peso,0);
+  let pickRoll=Number.isFinite(Number(variantRoll))?Math.max(0,Math.min(.999999,Number(variantRoll))):Math.random();
+  let cursore=pickRoll*totale,scelta=candidati[candidati.length-1];
+  for(const x of candidati){cursore-=x.peso;if(cursore<=0){scelta=x;break;}}
+
+  const p=scelta.p;
+  u.lastKnockAbsoluteDay=oggi;
+  const e={
+    type:"past-knock",absoluteDay:oggi,personId:p.id,personName:p.n,
+    kind:scelta.kind,profondita:Number(u.profondita||0)
+  };
+  u.history.push(e);if(u.history.length>20)u.history.shift();
+  stradaRegistraConseguenzaPersona(p,"past-knock",{kind:scelta.kind,profondita:u.profondita});
+
+  if(scelta.kind==="rival"){
+    G.strada.heat=clamp(Number(G.strada.heat||0)+1.5,0,100);
+    G.wellbeing=clamp(Number(G.wellbeing||0)-2,0,100);
+    if(typeof pushLog==="function")
+      pushLog("<b>Il passato torna a bussare.</b> "+p.n+" si è fatto sentire. Hai mollato il giro, non il conto aperto.","bad");
+  }else if(scelta.kind==="debt"){
+    G.wellbeing=clamp(Number(G.wellbeing||0)-1,0,100);
+    if(typeof pushLog==="function")
+      pushLog("<b>"+p.n+" non ha dimenticato il favore.</b> Non ti propone un colpo: ti ricorda soltanto che certi conti restano.","");
+  }else{
+    if(typeof pushLog==="function")
+      pushLog("<b>"+p.n+" ricompare.</b> Non ti sta riportando nel giro: è una persona che faceva parte di quella vita e non è sparita quando hai mollato.","");
+  }
+  return e;
+}
+
 function stradaAbsDay(){
   return Math.max(1,
     ((Number(G.year || 1) - 1) * 52 + (Number(G.week || 1) - 1)) * 7 +
