@@ -169,7 +169,10 @@ function renderAbbigliamento(){
       if(!v || guardarobaPosseduto(v.raw) || shFitRequisito(v)) return;
       const prezzo = shFitPrezzo(v);
       if(G.money < prezzo) return;
-      G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;
+      G.money -= prezzo;
+      if(typeof lifestyleRegistraSpesaVisibile==="function")
+        lifestyleRegistraSpesaVisibile(prezzo,"vestiti",.65);
+      guardarobaPosseduti()[v.raw] = true;
       if(typeof SFX === "object" && SFX.cash) SFX.cash(); else hubTap();
       pushLog("Hai comprato: " + v.n + (prezzo < v.p ? " a " + prezzo + " € invece di " + v.p : "") +
         ". È nel camerino, quando vuoi metterlo.", "good");
