@@ -1573,7 +1573,7 @@ test("punto 24: la dritta modifica realmente chance e attenzione solo se l'appro
   crime.includes("usa?baseHeat:1-(1-baseHeat)*.25") &&
   crime.includes("intelSfruttata:usa"));
 test("punto 24: informazione e sotterfugio diventano una decisione leggibile, non un bonus nascosto",
-  crime.includes('...(intel?[{t:"Intel: "+stradaIntelDescrizione(preparazione),c:"money"}]:[])') &&
+  crime.includes('...(intel?[{t:"Intel: "+(typeof stradaIntelDescrizione==="function"') &&
   crime.includes('"Stima "+stima+"% · "+(usaIntel?"sfrutta la dritta":baseDx)') &&
   crime.includes("stradaChanceConOpportunita(colpo,a,lead,personaStima,preparazione)"));
 test("punto 24: l'intel nasce da tempo, osservazione o persone reali e viene consumato sul colpo",
