@@ -618,6 +618,39 @@ function postoSoloLavoro(p){
   return !!(p && p.origineLuogo && !p.circoloSbloccato);
 }
 
+/* Punto Strada 16: la rete sociale è fatta di legami tra persone, non di
+   percentuali visibili al giocatore. I legami sono generici e persistenti:
+   possono nascere da una presentazione della Strada, da un favore o da un
+   contatto comune, senza trasformare la persona in un "NPC criminale". */
+function postoReteLegami(p){
+  if(!p || p.via) return [];
+  if(!Array.isArray(p.reteLegami)) p.reteLegami=[];
+  return p.reteLegami;
+}
+
+function postoCollegaPersone(a,b,motivo){
+  if(!a || !b || a===b || a.via || b.via || !a.id || !b.id) return false;
+  const sett=typeof totalWeeks==="function" ? totalWeeks() : Number(G.week||1);
+  const aggiungi=(da,aChi)=>{
+    const legami=postoReteLegami(da);
+    let legame=legami.find(x=>x&&x.personId===aChi.id);
+    if(!legame){
+      legame={personId:aChi.id,reason:motivo||"contatto-comune",sinceWeek:sett};
+      legami.push(legame);
+    }else if(motivo){
+      legame.reason=motivo;
+    }
+  };
+  aggiungi(a,b);
+  aggiungi(b,a);
+  return true;
+}
+
+function postoLegamiAttivi(p){
+  const ids=new Set(postoReteLegami(p).map(x=>x&&x.personId).filter(Boolean));
+  return (G.gente||[]).filter(x=>x && !x.via && ids.has(x.id));
+}
+
 /* Quanta gente gira: all'inizio tre facce, poi ne arriva una ogni due settimane.
    Il giornalista compare solo quando qualcuno comincia a sapere chi sei. */
 /* La gente DELLA SALA: chi e' arrivato dalla classifica (`rivale`, studio.js)
@@ -653,7 +686,12 @@ function sistemaGente(){
     /* uno slot ogni tanto lo prende il giornalista, se è ora */
     else if(n >= 4 && POSTO_RUOLI.giornalista.da(G) &&
        !G.gente.some(p => p.ruolo === "giornalista")) r = "giornalista";
-    G.gente.push(nuovaPersona(r));
+    const p=nuovaPersona(r);
+    p.origine="circolo";
+    p.origineDettaglio="persona del Circolo";
+    p.storia="È una faccia che gira al Circolo.";
+    p.circoloSbloccato=true;
+    G.gente.push(p);
   }
 
   /* Punto Strada 6: il legale privato è una persona del mondo, non un toggle.
@@ -682,17 +720,54 @@ function presentiOggi(quanti){
   sistemaGente();
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   const vivi = G.gente.filter(p => !p.via && !postoSoloLavoro(p));
-  const ord = vivi.slice().sort((a, b) => {
-    const ka = (a.id.charCodeAt(1) * 31 + sett * 17) % 97;
-    const kb = (b.id.charCodeAt(1) * 31 + sett * 17) % 97;
-    /* Chi conosci meglio è più facile trovarlo. Un contatto della Strada che
-       hai già scoperto riceve solo un piccolo peso in più: può ricomparire,
-       non diventa una presenza fissa ogni sera. */
-    const sa = a.strada && a.strada.known ? 8 : 0;
-    const sb = b.strada && b.strada.known ? 8 : 0;
-    return (kb + b.rel * 12 + sb) - (ka + a.rel * 12 + sa);
+
+  const punteggio=p=>{
+    const k=(p.id.charCodeAt(1)*31+sett*17)%97;
+    const strada=p.strada&&p.strada.known ? 8 : 0;
+    const ritorno=Math.min(6,Math.max(0,Number(p.circoloPresenze||0))*2);
+    /* I contatti comuni pesano davvero: chi è collegato a persone che già
+       frequenti ha più probabilità di ricomparire nello stesso ambiente. */
+    const rete=Math.min(10,postoLegamiAttivi(p).reduce((n,x)=>
+      n+(Number(x.rel||0)>=1 || (x.strada&&x.strada.known) ? 4 : 1),0));
+    return k+Number(p.rel||0)*12+strada+ritorno+rete;
+  };
+
+  const ord=vivi.slice().sort((a,b)=>punteggio(b)-punteggio(a));
+  const limite=Math.max(0,Number(quanti||3));
+  const scelti=[];
+  const presi=new Set();
+
+  for(const p of ord){
+    if(scelti.length>=limite) break;
+    if(presi.has(p.id)) continue;
+    scelti.push(p); presi.add(p.id);
+
+    /* Se una persona è già davvero nella tua rete, un suo legame può
+       comparire insieme a lei. Questo trasforma "un contatto comune" in una
+       relazione del mondo, non in un nuovo tiro casuale scollegato. */
+    if(scelti.length<limite &&
+       (Number(p.rel||0)>0 || (p.strada&&p.strada.known))){
+      const legato=postoLegamiAttivi(p)
+        .filter(x=>!presi.has(x.id) && vivi.includes(x))
+        .sort((a,b)=>punteggio(b)-punteggio(a))[0] || null;
+      if(legato){
+        scelti.push(legato);
+        presi.add(legato.id);
+      }
+    }
+  }
+
+  /* Ricordiamo solo che la faccia è passata dal Circolo, non il suo nome:
+     "visto" resta riservato a quando il giocatore ci parla davvero. */
+  const giorno=[Number(G.year||1),Number(G.week||1),Number(G.day||1)].join(":");
+  scelti.forEach(p=>{
+    if(p.circoloUltimoVistoKey!==giorno){
+      p.circoloUltimoVistoKey=giorno;
+      p.circoloPresenze=Math.max(0,Number(p.circoloPresenze||0))+1;
+    }
   });
-  return ord.slice(0, quanti || 3);
+
+  return scelti.slice(0,limite);
 }
 
 /* ==================== DOVE SI INCONTRA ====================
