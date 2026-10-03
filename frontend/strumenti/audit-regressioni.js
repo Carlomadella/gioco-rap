@@ -23,6 +23,7 @@ const ev = leggi("js/game/eventi-v2.js");
 const tel = leggi("js/game/telefono.js");
 const chatjs = leggi("js/game/chat.js");
 const actions = leggi("js/game/actions.js");
+const lavoroEventi = leggi("js/game/lavoro-eventi.js");
 const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
 const studioEl = leggi("js/game/studio-elementi.js");
@@ -1428,6 +1429,20 @@ test("punto 14: l'anzianità di sede persiste oltre il cartellino mensile",
   actions.includes("function lavoroTurniTotaliSede(luogo)") &&
   actions.includes("sede.totalShiftsWorked=totaliPrima+1") &&
   actions.includes("totaliSede:sede.totalShiftsWorked"));
+test("punto 15: la Pizzeria usa soprattutto contatti sociali quotidiani",
+  actions.includes("socialOnly:true") &&
+  actions.includes('ruoli:Object.freeze(["collega","collega","rider","cliente","cliente","fornitore","rapper","promoter"])') &&
+  actions.includes('ruoli:Object.freeze(["collega","collega","collega","rider","cliente","cliente"])'));
+test("punto 15: la Pizzeria non genera conoscenze Strada neppure a giro avviato",
+  actions.includes('if(lavoroReteChiave(job)==="pizzeria" || (cfg&&cfg.socialOnly===true))') &&
+  actions.includes('return ruoli.filter(r => r !== "strada")'));
+test("punto 15: il primo incontro Pizzeria non regala subito il numero",
+  ev.includes('const puoScambiareNumero=!pizzeriaSociale || giaVisto || Number(p.rel||0)>0') &&
+  ev.includes("al primo incontro non c'è ancora motivo di scambiarsi il numero") &&
+  ev.includes("opts:opzioniContatto"));
+test("punto 15: il lavoro Pizzeria non produce direttamente lead crime",
+  lavoroEventi.includes('if(workKey(job)==="pizzeria") return false') &&
+  lavoroEventi.includes("function showCrime(job,s,roll)"));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
