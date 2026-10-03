@@ -6,7 +6,8 @@ import { describe, expect, it } from "vitest";
 
 const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
-const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
+/* Su Windows i file escono in CRLF: senza i \r i toContain con dentro un a capo combaciano */
+const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8").replace(/\r\n/g,"\n");
 const eventi=fs.readFileSync(path.join(ROOT,"js/game/eventi-v2.js"),"utf8");
 
 function creaRuntime(dayRef, gente){
