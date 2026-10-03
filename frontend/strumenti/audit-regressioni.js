@@ -1636,6 +1636,16 @@ test("punto 20: la UI carcere mostra facce e stato del rapporto",
   crimeui.includes("Persone qui dentro") &&
   crimeui.includes('id="adf-jail-people"') &&
   crimeui.includes("v.persone&&v.persone.length"));
+test("punto 20: anche le conoscenze deboli possono riemergere fuori dopo settimane o mesi",
+  crime.includes("m.returnAfterAbsoluteDay=stradaAbsDay()+ritardo") &&
+  posto.includes("function postoRientroCarcereDisponibile(p)") &&
+  posto.includes('p.origineLuogo!==\"carcere\"') &&
+  posto.includes("p.circoloSbloccato=true"));
+test("punto 20: il reincontro fuori può chiudere un favore rimasto dal carcere",
+  posto.includes('jailOutside:\"favore\"') &&
+  posto.includes('source:\"carcere-reunion\"') &&
+  posto.includes('stradaModificaFiducia(p,4,\"carcere-favore-fuori\")') &&
+  posto.includes('stradaAggiungiFavore(p,1,\"carcere-favore-fuori\")'));
 
 test("punto 21: mollare è uno stato persistente separato dall'essere entrato nel giro",
   state.includes("uscitaGiro:{mollato:false") &&
