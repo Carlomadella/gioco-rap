@@ -664,10 +664,10 @@ function postoRientroCarcereDisponibile(p){
      quando la incontri davvero. */
   p.circoloSbloccato=true;
   m.returnAfterAbsoluteDay=null;
-  if(typeof save==="function") save();
   if(typeof pushLog==="function")
     pushLog("<b>Una faccia del carcere è tornata fuori.</b> "+p.n+
       " ha ricominciato a girare in provincia. Prima o poi potreste incrociarvi.","");
+  if(typeof save==="function") save();
   return true;
 }
 
