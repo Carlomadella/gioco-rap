@@ -6840,9 +6840,9 @@ Guardato e **a posto**:
 
 Trovata invece una cosa nell'audit, che è la cugina di quella sistemata. E una svista
 nell'indice in cima: la frase «La prossima voce nuova è la 95» del primo paragrafo era rimasta
-indietro (più giù, dopo la 100, c'era già scritto «la 101»); sistemata con la chiusura della 101.
+indietro (più giù, dopo la 100, c'era già scritto «la 101»); sistemata con la chiusura di questa voce (su `main` uscita come 101, nel recap è la 105).
 
-### 101. Due controlli dell'audit che non possono mai scattare
+### 105. Due controlli dell'audit che non possono mai scattare
 - **dove** — `frontend/strumenti/audit-regressioni.js:1006` e `:1226`
 - **cosa succede** — sono due controlli del tipo «questo pezzo vecchio **non** deve tornare».
   Quello alla 1006 (in cabina l'oro non deve stare su «Un'altra take») cerca il pezzo vecchio

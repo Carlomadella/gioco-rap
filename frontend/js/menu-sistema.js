@@ -55,6 +55,7 @@
       "#modal.on",
       "#drawer.on",
       "#report.on",
+      "#recap.on",          /* il recap di fine giornata: Esc lo chiude (uscita.js), non apre il menu */
       "#scena.on",
       "#crimeModal.on",
       "#adf-result-overlay.on",

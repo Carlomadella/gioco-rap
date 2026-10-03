@@ -2682,6 +2682,40 @@ test("nel telefono la riga della Discografia va su due righe: prima il titolo no
 /* Mixtape e album (02/10/2026, CARLO «Studio (16/09/2026)»: «fai in modo che si
    possano creare mixtape e album»). File nuovo, js/game/progetti.js, e
    css/progetti.css: la linguetta Disco dello Studio, i dischi in Discografia. */
+/* Il recap di fine giornata (02/10/2026, CARLO «mettere un recap giornaliero
+   con in aggiunta gli highlights»): js/game/recap-giornata.js, css/recap-giornata.css. */
+console.log("\nIl recap di fine giornata");
+const recapJs = leggi("js/game/recap-giornata.js");
+test("il recap sta in un file suo, caricato dal gioco con il suo foglio e la sua finestra, e ha le sue prove",
+  index.includes('<script src="js/game/recap-giornata.js') && index.includes('href="css/recap-giornata.css') &&
+  index.includes('<div class="report recap" id="recap">') &&
+  recapJs.includes("const RECAP_HIGHLIGHT_MAX = 5;") &&
+  fs.existsSync(path.join(ROOT, "test/unit/recap-giornata.test.js")) &&
+  fs.existsSync(path.join(ROOT, "test/e2e/recap-giornata.spec.js")));
+test("il diario conta le sue righe e le mosse finiscono nel recap",
+  sim.includes("G.logN = (G.logN || 0) + 1;") &&
+  leggi("js/game/ui.js").includes('if(typeof recapMossa === "function") recapMossa(a);'));
+test("il recap esce dalla fine giornata vera, non il settimo giorno né sui salti, e blocca il «+1» finché è aperto",
+  ev.includes('const recapPrima=(n===1 && typeof recapPrepara==="function") ? recapPrepara() : null;') &&
+  ev.includes("if(recapPrima && done===1 && weeks===0 && !errore && !interrotto &&") &&
+  ev.includes('const ids=["modal","report","recap",') &&
+  leggi("js/game/uscita.js").includes('{id:"recap", chiudi(){'));
+test("il recap conta come finestra aperta anche per il menu di sistema, le trasferte e il widget del tempo, e la fotografia della mattina si fa prima della mossa",
+  leggi("js/menu-sistema.js").includes('"#recap.on",') &&
+  leggi("js/game/trasferte.js").includes('["modal", "report", "recap", "writer",') &&
+  leggi("js/game/tempo-controlli.js").includes('"#report.on","#recap.on",') &&
+  /\(typeof recapGiornata === "function"\) recapGiornata\(\);\r?\n\s*const msg = a\.run\(\);/.test(leggi("js/game/ui.js")));
+test("il recap si spegne dalle impostazioni",
+  leggi("js/impostazioni.js").includes("conferme:true, recap:true}") &&
+  leggi("js/impostazioni-ui.js").includes('sw("gioco.recap")'));
+test("un colpo in Strada entra nel recap, mossa e riga del diario, e i soldi sporchi si vedono (voce 106)",
+  leggi("js/game/strada-crimine.js").includes('if(typeof recapMossa==="function") recapMossa({n:"Colpo: " + colpo.n});') &&
+  leggi("js/game/strada-crimine.js").includes('if(STRADA_SCENA) pushLog("<b>" + colpo.n + "</b> — "') &&
+  recapJs.includes("sporchi:recapSporchi(),") &&
+  recapJs.includes("' <i>Soldi sporchi '"));
+test("una notte andata in errore non butta la fotografia di stamattina (voce 107)",
+  ev.includes("if(!errore) recapFoto();") && !ev.includes("\n    recapFoto();\n  }"));
+
 console.log("\nMixtape e album \u2014 la linguetta Disco dello Studio");
 const progettiJs = leggi("js/game/progetti.js");
 test("mixtape e album stanno in un file loro, caricato dopo seguiti.js con il suo foglio, e hanno il loro test",

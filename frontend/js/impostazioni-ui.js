@@ -130,6 +130,9 @@ function corpoGioco(){
     riga(L("Chiedi conferma","Ask before spending"),
       L("Prima delle mosse che costano soldi.","Before moves that cost money."),
       sw("gioco.conferme")) +
+    riga(L("Recap di fine giornata","End-of-day recap"),
+      L("Quando chiudi la giornata: i numeri, le mosse e gli highlights.","When you end the day: numbers, moves and highlights."),
+      sw("gioco.recap")) +
   '</div>';
 }
 

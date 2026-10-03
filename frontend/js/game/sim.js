@@ -15,6 +15,9 @@ let SALTO_STOP = null;
 
 function pushLog(text, cls){
   G.log.unshift({w:"A" + G.year + " S" + String(G.week).padStart(2,"0"), t:text, c:cls || ""});
+  /* quante righe ha scritto il diario da sempre: il recap di fine giornata
+     (recap-giornata.js) conta da qui quali sono di oggi */
+  G.logN = (G.logN || 0) + 1;
   if(G.log.length > 80) G.log.length = 80;
 }
 

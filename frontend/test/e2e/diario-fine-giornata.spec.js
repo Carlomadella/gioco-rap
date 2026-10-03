@@ -16,7 +16,7 @@ test("sette fine giornata non riempiono il diario di «giorno saltato»", async 
     for(let i = 0; i < 7; i++){
       await new Promise(res => setTimeout(res, 120));
       const b = document.querySelector("#modal.on #m-opts button"); if(b) b.click();
-      for(const id of ["report", "adf-result-overlay"]){ const el = document.getElementById(id); if(el) el.classList.remove("on"); }
+      for(const id of ["report", "recap", "adf-result-overlay"]){ const el = document.getElementById(id); if(el) el.classList.remove("on"); }
       ADF_TIME_SKIP(1);
     }
     const righe = G.log.map(l => l.t.replace(/<[^>]+>/g, ""));

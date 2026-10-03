@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 102. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 108. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -113,8 +113,19 @@ mosse né lucidità, e venerdì conviene sempre) è una decisione di bilanciamen
 Le voci 92 e 93 (il Bancone del 02/10) sono chiuse lo stesso giorno, prima del push, e stanno in
 `problemi-risolti.md`.
 
-La voce 101 (due controlli dell'audit che non potevano mai scattare, giro del 03/10) è chiusa
-lo stesso giorno, prima del push, e sta in `problemi-risolti.md`. La prossima voce nuova è la 102.
+**103.** Dal giro del 02/10 sul recap di fine giornata (branch `task/recap-giornaliero`,
+dettaglio in fondo): le mosse fatte fuori dalle card non entrano nel conto delle mosse del
+recap, solo nel diario — è una decisione. La 101, la 102 e la 104 sono chiuse prima del push.
+La 105 (due controlli dell'audit che non potevano mai scattare, giro del 03/10 su
+`task/test-strada-crlf`, uscita su `main` col numero 101 che il recap aveva già preso) è chiusa
+lo stesso giorno, prima del push, e sta in `problemi-risolti.md`. La prossima voce nuova è la 108.
+
+**106, 107.** Dal giro del 03/10 sul recap insieme alla Strada (branch `task/recap-giornaliero`,
+dettaglio in fondo): **106** — un colpo in Strada non scrive niente nel diario, quindi una
+giornata di colpi esce come «Una giornata ferma: niente da raccontare» con i soldi saliti senza
+motivo (e i soldi sporchi non compaiono da nessuna parte); smentisce la risposta data alla 103.
+**107** — se la notte va in errore e il giorno torna com'era, il recap di quel giorno riparte da
+zero e si perde la mattina. Tutte e due chiuse il 03/10, prima del push.
 
 ---
 
@@ -960,3 +971,124 @@ settimana; la foto della linguetta esiste.
   pagare niente in cambio: stanotte non conviene mai. Va deciso se è giusto così.
 - **come si vede** — chiudi un mixtape su «Stanotte» e guarda la lucidità: non si muove.
 - **quanto pesa** — da sistemare con calma.
+
+## Giro del 02/10/2026 (segnala-problemi, fine task `task/recap-giornaliero`, commit `9e026938` + merge `cea8628b`)
+
+Controllati: `npm run prova` (189 a posto, 0 no), `audit-regressioni.js` (501 ok, 0 falliti),
+`npm run verifica:build` (33 ok, 0 falliti). Poi il recap girato davvero nel browser
+(Playwright, su una porta mia): Esc, il «+1» dall'Abilità e dalla Strada, la prima mossa di una
+partita nuova, il telefono in orizzontale (844 × 390). **A posto**: in orizzontale la finestra
+sta nello schermo, scorre dentro e «Domani» resta in vista in fondo; il «+1» da Abilità,
+Pannello e Strada chiude quelle schermate, quindi il recap non finisce sotto a niente; i
+salvataggi vecchi senza `G.logN` e senza `G.giornata` ripartono da una fotografia nuova senza
+errori; gli highlights mettono l'HTML delle righe del diario così com'è, ma è lo stesso che fa
+già il diario (`ui.js:570`), non è un rischio nuovo; il settimo giorno esce solo il rapporto
+della settimana, in carcere e sui salti lunghi niente recap.
+
+### 101. Il recap manca in tre liste delle «finestre aperte»: Esc apre il menu invece di chiuderlo
+- **dove** — `frontend/js/menu-sistema.js:52` (`dialogoFlottante`), `frontend/js/game/trasferte.js:701`
+  (`schermoLibero`), `frontend/js/game/tempo-controlli.js:204` (`blockingOverlay`). Il recap è
+  stato aggiunto in `uscita.js` e in `skipOverlayBusy`, ma queste tre liste hanno dentro
+  `#report` (il rapporto della settimana) e non `#recap`.
+- **cosa succede** — **visto:** col recap aperto, Esc apre il menu di sistema e il recap resta
+  lì sotto (il menu si prende il tasto per primo e non lo lascia passare a `uscita.js`); dallo
+  stesso menu «Torna alla mappa» non è bloccato. **Visto nel codice, non riprodotto:** un invito
+  di trasferta o un'«occasione» nati nella notte guardano `schermoLibero()`, che non vede il
+  recap, e dopo un quarto di secondo si aprono **sopra** al recap — proprio le due finestre una
+  sull'altra che il recap vuole evitare. Il widget del tempo, infine, col recap aperto dice di
+  non essere bloccato (a 1280 × 800 sta sotto alla finestra, quindi non si preme: è solo un
+  conto sbagliato).
+- **come si vede** — +1 giorno da un martedì, esce il recap, premi Esc: si apre il menu.
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (02/10/2026)**, prima del push: `#recap` sta nelle liste di `menu-sistema.js`
+  (`dialogoFlottante`), `trasferte.js` (`schermoLibero`) e `tempo-controlli.js`
+  (`blockingOverlay`); un controllo dell'audit le tiene ferme.
+
+### 102. La prima mossa di una partita nuova, o dopo una trasferta, non entra nei numeri del recap
+- **dove** — `frontend/js/game/recap-giornata.js:51-61` (`recapGiornata`, `recapMossa`) con
+  `frontend/js/game/ui.js:143-148`; la fotografia della mattina la fa solo
+  `frontend/js/game/eventi-v2.js:2970-2974`, a fine notte.
+- **cosa succede** — quando la fotografia di stamattina manca o è di un altro giorno (partita
+  nuova, salvataggio di prima, rientro da una trasferta) la si rifà **alla prima mossa**, ma
+  `recapMossa` viene chiamata dopo che la mossa ha già cambiato soldi e fan e ha già scritto
+  la sua riga nel diario. Così quella mossa è contata fra le mosse, ma i suoi soldi, i suoi
+  fan e la sua riga spariscono dal recap. Provato: +50 € e una riga, il recap dice 0 € e
+  nessun highlight.
+- **come si vede** — partita nuova, prima mossa che paga, poi «+1 giorno»: «in cassa» non la conta.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (02/10/2026)**, prima del push: `avviaAzioneDiretta` (ui.js) chiama
+  `recapGiornata()` prima di `a.run()`, così la fotografia della mattina si fa prima che la
+  mossa cambi i numeri.
+
+### 103. Le mosse fatte fuori dalle card non si contano
+- **dove** — `frontend/js/game/ui.js:146-147` è l'unico posto che chiama `recapMossa`; i colpi in
+  Strada (`strada-crimine*.js`) e le stanze dello Studio che non passano da `hubAzione` non la
+  chiamano.
+- **cosa succede** — una giornata passata a fare colpi in Strada esce come «Nessuna mossa»,
+  con gli highlights pieni di quello che hai fatto. Può essere una scelta («mossa» = card),
+  ma letta dal giocatore sembra un errore. Va deciso.
+- **come si vede** — fai solo colpi in Strada, poi «+1 giorno».
+- **quanto pesa** — da sistemare con calma.
+- **RISPOSTA (02/10/2026)** — è una scelta, scritta in «Il recap di fine giornata»
+  (`05-carriera-e-tempo.md`): le mosse fuori dalle card entrano nel recap come righe del
+  diario, non nel conto delle mosse. Se si vuole contarle, va deciso quali (i colpi sì, le
+  take della Cabina no?): è una decisione di Carlo.
+
+### 104. Il commento dei mixtape è finito sulla riga del recap
+- **dove** — `frontend/pagine/gioco.html:718-719`
+- **cosa succede** — la riga di `progetti.js` ha perso il suo commento («mixtape e album…»), che
+  adesso sta in coda alla riga di `recap-giornata.js`, attaccato al commento del recap. Non
+  cambia niente nel gioco, ma chi legge la pagina attribuisce il commento al file sbagliato.
+- **come si vede** — apri `gioco.html` alla riga 719.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (02/10/2026)**, prima del push: il commento è tornato sulla riga di `progetti.js`.
+
+## Giro del 03/10/2026 (segnala-problemi, fine task `task/recap-giornaliero`, `972bbeee`, dopo i merge della Strada)
+
+Controllati: `npm run prova` (189 a posto, 0 no), `audit-regressioni.js` (604 ok, 0 falliti),
+`npm run verifica:build` (33 ok, 0 falliti); le e2e `recap-giornata` (2) e `carcere-spese`
+passano su una porta mia (8150). Poi il recap provato nel browser insieme alla Strada.
+**A posto**: il «+1» dal widget dentro la Strada e dentro il Circolo chiude quelle schermate, e
+il recap esce subito, non sotto; in carcere niente recap, né il giorno dell'arresto (dopo un colpo
+andato male) né mentre sei dentro, né il giorno in cui esci (la scarcerazione e la perquisizione
+«alle sei del mattino» scattano solo a fine settimana, quando esce il rapporto della settimana);
+il giorno dopo l'uscita il recap riparte da una fotografia giusta; il TrapPhone vive dentro la
+Strada e non apre niente da solo sopra al recap; i turni di lavoro passano da
+`avviaAzioneDiretta` e si contano fra le mosse; il riciclaggio scrive la sua riga nel diario, e
+quindi finisce negli highlights. Esc e le liste delle finestre aperte trattano il recap come il
+rapporto della settimana anche con la Strada di mezzo (sistemato con la 101).
+
+### 106. Una giornata di colpi in Strada esce come «una giornata ferma»
+- **dove** — `frontend/js/game/strada-crimine.js:4038-4143` (`stradaTenta`: i soldi a 4043, le
+  multe a 4086 e 4092) non scrive nessuna riga nel diario e non chiama `recapMossa`; la frase sta
+  in `frontend/js/game/recap-giornata.js:145`.
+- **cosa succede** — **provato nel browser:** un martedì, un colpo «Consegne che non chiedi»
+  andato bene (+40 € in tasca, 54 € sporchi), poi «+1 giorno». Il recap dice «+40 € in cassa ·
+  Nessuna mossa · 15 di energia» e sotto «Una giornata ferma: niente da raccontare». Il colpo non
+  c'è da nessuna parte: né fra le mosse né fra gli highlights, e i soldi sporchi non compaiono.
+  Lo stesso per un colpo saltato con la multa o la denuncia: i soldi scendono e il recap non dice
+  perché. La risposta data alla 103 (e scritta in `implementazioni/05-carriera-e-tempo.md:590`)
+  dice che le mosse fuori dalle card «nel recap compaiono come righe del diario»: per i colpi non
+  è vero, perché la riga nel diario non c'è. Al contrario il riciclaggio, che scrive la sua riga,
+  fa vedere i soldi ripuliti come «in cassa» in più, come se fossero un guadagno del giorno.
+- **come si vede** — sblocca la Strada, fai un solo colpo che va bene, poi «+1 giorno».
+- **quanto pesa** — si vede ma si gira intorno.
+- **RISOLTO (03/10/2026)**, prima del push: `stradaTenta` chiama `recapMossa` («Colpo: …») e
+  scrive com'è andata nel diario (andata bene, saltato, denuncia, arrestato), e il recap fotografa
+  anche i soldi sporchi: «Soldi sporchi +54 €» accanto alle mosse, così il riciclaggio si legge
+  come cassa su e sporchi giù. Prove in `recap-giornata.test.js` e `recap-giornata.spec.js`.
+
+### 107. Se la notte va in errore, il recap di quel giorno riparte da zero
+- **dove** — `frontend/js/game/eventi-v2.js:3420` (il giorno rotto torna com'era) e `3463`
+  (`recapFoto()` chiamata comunque, anche quando c'è stato l'errore).
+- **cosa succede** — **visto nel codice, non riprodotto:** quando la chiusura del giorno si rompe,
+  il gioco rimette la partita com'era prima del «+1», compresa la fotografia di stamattina e le
+  mosse fatte. Subito dopo però il recap rifà la fotografia da capo, sullo stesso giorno: le mosse
+  di oggi e i numeri di stamattina si perdono, e al «+1» successivo il recap racconta solo quello
+  fatto dopo l'errore. Succede solo se il cambio giorno va in errore, che è raro.
+- **come si vede** — fai due mosse, «+1 giorno» con un errore nella notte (esce l'avviso «Il
+  giorno non si è chiuso»), poi «+1 giorno» di nuovo: il recap non ha le due mosse.
+- **quanto pesa** — da sistemare con calma.
+- **RISOLTO (03/10/2026)**, prima del push: dopo un errore `saltaGiorni` non rifà la fotografia
+  (`if(!errore) recapFoto()`): resta quella rimessa a posto col giorno, e se invece un giorno è
+  passato `recapGiornata` se ne accorge da sola. Un controllo nell'audit.
