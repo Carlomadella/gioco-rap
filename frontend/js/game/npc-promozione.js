@@ -12,7 +12,7 @@
   function giorno(v){
     let n=null;
     if(typeof v==="number") n=v;
-    else if(typeof v==="string" && /^\\d+$/.test(v.trim())) n=Number(v.trim());
+    else if(typeof v==="string" && /^\d+$/.test(v.trim())) n=Number(v.trim());
     if(!Number.isSafeInteger(n) || n<=0)
       throw new TypeError("giorno deve essere un intero positivo");
     return n;

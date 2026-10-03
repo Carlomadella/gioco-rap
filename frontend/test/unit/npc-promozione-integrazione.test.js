@@ -42,7 +42,7 @@ describe("NPC · punto 15 integrazione temporanei",()=>{
 
   it("i vecchi save che avevano presentati indicizzati per nome restano leggibili",()=>{
     const code=blocco(circolo,"function circoloOspiteGiaPresentato(o)","function circoloRuoloOspite(o)");
-    const fn=new Function("circoloStato",code+"\\nreturn circoloOspiteGiaPresentato;")(
+    const fn=new Function("circoloStato",code+"\nreturn circoloOspiteGiaPresentato;")(
       ()=>({presentati:{Raiz:1}})
     );
     expect(fn({tempId:"raiz",n:"Raiz"})).toBe(true);
@@ -59,7 +59,7 @@ describe("NPC · punto 15 integrazione temporanei",()=>{
     let seq=0;
     const fn=new Function(
       "window","G","ccNumeroGiorno","nuovaPersona",
-      helper+"\\nreturn circoloPromuoviOspite;"
+      helper+"\nreturn circoloPromuoviOspite;"
     )(
       window,G,()=>12,
       ruolo=>({id:"p"+(++seq),ruolo,n:"generato",fama:1,rel:0})

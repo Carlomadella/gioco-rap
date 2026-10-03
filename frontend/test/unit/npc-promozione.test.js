@@ -26,6 +26,14 @@ describe("NPC · punto 15 promozione temporanei",()=>{
     expect(persone).toEqual([]);
   });
 
+  it("accetta anche il giorno serializzato come stringa",()=>{
+    const api=runtime(),persone=[];
+    const p=api.promuovi(persone,temp(),{
+      giorno:"12",motivo:"contatto",fonte:"test:string-day",crea:()=>({id:"p12"})
+    });
+    expect(p.promozioneTemporanea.giorno).toBe(12);
+  });
+
   it("promuove una comparsa mantenendo l'identità osservata",()=>{
     const api=runtime(),persone=[];
     const p=api.promuovi(persone,temp(),{
