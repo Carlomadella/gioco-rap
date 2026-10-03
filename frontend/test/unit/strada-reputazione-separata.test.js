@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
-const html=fs.readFileSync(path.join(ROOT,"pagine/gioco.html"),"utf8");
+const html=fs.readFileSync(path.join(ROOT,"pagine/gioco.html"),"utf8");\nconst crimeUi=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8");
 
 function block(startText,endText){
   const a=crime.indexOf(startText);
@@ -83,10 +83,11 @@ describe("Strada · punto 12 reputazione globale e fiducia personale",()=>{
     expect(crime).toContain("stradaFiduciaValore(p)>=STRADA_FERRO_FIDUCIA_MIN");
   });
 
-  it("la UI distingue esplicitamente nome globale e fiducia personale",()=>{
-    expect(html).toContain("<span>Nome nel giro</span>");
-    expect(html).not.toContain("<span>Reputazione di strada</span>");
-    expect(crime).toContain("p.n + ' · Fiducia: ' + stradaFiduciaEtichetta(p)");
+  it("la UI V2 distingue esplicitamente nome globale e fiducia personale",()=>{
+    expect(crimeUi).toContain("<span>Nome nel giro</span>");
+    expect(crimeUi).not.toContain("<span>Reputazione di strada</span>");
+    expect(crimeUi).toContain("Persone del giro");
+    expect(crimeUi).toContain("stradaPersoneSquadra()");
     expect(crime).toContain('"nome nel giro "+stradaSegno(p.successRep)');
   });
 });
