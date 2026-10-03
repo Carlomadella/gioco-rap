@@ -4028,7 +4028,9 @@ function stradaSettimana(){
   }
   if(redditoAttivita){
     G.money+=redditoAttivita;
-    G._entratePulite=Number(G._entratePulite||0)+redditoAttivita;
+    if(typeof lifestyleRegistraEntrata==="function")
+      lifestyleRegistraEntrata(redditoAttivita,"attivita");
+    else G._entratePulite=Number(G._entratePulite||0)+redditoAttivita;
     pushLog("<b>Attività di copertura:</b> "+fmt(redditoAttivita)+" € netti da ricavi normali.","good");
   }
 
@@ -4089,14 +4091,8 @@ function stradaSettimana(){
   /* la reputazione si sgonfia un po' se non ti fai vedere */
   s.rep = clamp(s.rep - .6, 0, 100);
 
-  /* la vetrina: se il tenore di vita non regge con quello che dichiari */
-  const spesa = lifeCost(), entrate = G._entratePulite || 0;
-  if(spesa > entrate * 1.5 + 70){
-    const osten = (G.life.casa||0) + (G.life.auto||0) * 1.2 + (G.life.look||0) * 1.5 + (G.life.uscite||0) * 1.1;
-    const salita = clamp(1.5 + osten * .5, 1.5, 9);
-    s.heat = clamp(s.heat + salita, 0, 100);
-    s.rep = clamp(s.rep + salita * .5, 0, 100);
-  }
+  /* Punto 18: il rischio lifestyle si chiude in advanceWeek(), dopo che
+     tutte le fonti giustificabili della settimana sono state registrate. */
 
   /* Punto 5: possedere il ferro è già un rischio. Senza ferro i controlli
      seri restano legati a heat > 50; col ferro possono partire prima e la
@@ -4418,6 +4414,10 @@ function renderStCopre(){
   const dormienti=tuttiContatti.filter(p=>!stradaRelazioneDisponibile(p) && !stradaRivalitaAttiva(p));
   const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
   const avvConosciuti=stradaAvvocatiConosciuti();
+  const tenore=typeof lifestyleRiepilogoRischio==="function"
+    ? lifestyleRiepilogoRischio()
+    : {id:"coerente",label:"Coerente",entrate:Number(G._entratePulite||0),visibile:typeof lifeCost==="function"?lifeCost():0,
+       testo:"Il tuo tenore di vita è compatibile con quello che puoi giustificare."};
   $("st-tab-copre").innerHTML =
     '<div class="cover-row"><div class="t"><strong>Persone del giro (' + contatti.length + ' attive)</strong>' +
       '<span>' + (fidati.length
@@ -4465,6 +4465,12 @@ function renderStCopre(){
     '<div class="cover-row"><div class="t"><strong>Costo copertura</strong>' +
       '<span>Quello che ti esce di tasca ogni settimana per gli accordi attivi.</span></div>' +
       '<div class="pills"><span class="pill on">' + fmt(stCopertura()) + ' €/sett.</span></div></div>' +
+
+    '<div class="cover-row"><div class="t"><strong>Tenore di vita</strong>' +
+      '<span>'+tenore.testo+' · circa '+fmt(tenore.entrate)+' €/sett. giustificabili contro '+
+        fmt(tenore.visibile)+' €/sett. visibili.</span></div>' +
+      '<div class="pills"><span class="pill'+(tenore.id==="coerente"?' on':tenore.id==="tirato"?'':' danger')+'">'+
+        tenore.label+'</span></div></div>' +
 
     '<div class="street-note">Nel giro non compri sicurezza. Compri relazioni, favori e persone disposte a esporsi per te.</div>';
 }

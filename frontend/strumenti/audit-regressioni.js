@@ -50,6 +50,8 @@ const crimeuiPiatto = crimeui.replace(/\s+/g, "");
 const crime = leggi("js/game/strada-crimine.js");
 const state = leggi("js/game/state.js");
 const sim = leggi("js/game/sim.js");
+const lifestyle = leggi("js/game/lifestyle.js");
+const phases = leggi("js/game/phases.js");
 const telefono = leggi("js/game/telefono.js");
 const covers = leggi("js/game/covers.js");
 const skip = leggi("js/game/skip.js");
@@ -1494,6 +1496,7 @@ test("punto 17: il riciclaggio è per canale e importo scelto dal giocatore",
   crime.includes("Scegli prima <b>dove</b>, poi <b>quanto</b>"));
 test("punto 17: le attività producono reddito pulito normale e non sporco automatico",
   crime.includes("redditoAttivita+=Number(esito.income||0)") &&
+  crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")') &&
   crime.includes("G._entratePulite=Number(G._entratePulite||0)+redditoAttivita") &&
   !crime.includes("s.sporchi += Math.round(a.resa * .55)"));
 test("punto 17: problemi operativi, dipendenti e controlli hanno conseguenze reali",
@@ -1507,6 +1510,47 @@ test("punto 17: un'attività può diventare punto d'incontro della rete",
   crime.includes("function stradaAttivitaIncontro(id)") &&
   crime.includes('GAME_TIME.spend(45,"crime:business-meeting"') &&
   crime.includes('postoCollegaPersone(persone.partner,contatto,"attivita-incontro")'));
+
+test("punto 18: il rischio lifestyle ha un registro settimanale e una media mobile",
+  state.includes("rischioLifestyle:{key:null,entrate:0,fonti:{}") &&
+  lifestyle.includes("function lifestyleRischioStato()") &&
+  lifestyle.includes("function lifestyleMediaRischio(includiCorrente,correnteCompleta)") &&
+  lifestyle.includes("st.history.slice(-3)") &&
+  lifestyle.includes("const progresso=completa ? 1") &&
+  lifestyle.includes("function lifestyleClassificaRischio(media)"));
+test("punto 18: il giocatore vede un giudizio leggibile, non una dichiarazione fiscale",
+  lifestyle.includes('"coerente",label:"Coerente"') &&
+  lifestyle.includes('"tirato",label:"Tirato"') &&
+  lifestyle.includes('"sopra",label:"Sopra le entrate"') &&
+  lifestyle.includes('"esposto",label:"Troppo esposto"') &&
+  crime.includes("<strong>Tenore di vita</strong>") &&
+  crime.includes("€/sett. giustificabili"));
+test("punto 18: lavoro, live, streaming, trasferte, etichetta e attività sono giustificabili",
+  actions.includes('lifestyleRegistraEntrata(incassoLive,"live")') &&
+  actions.includes('lifestyleRegistraEntrata(paga.totale,"lavoro")') &&
+  sim.includes('lifestyleRegistraEntrata(gross,"streaming")') &&
+  transfers.includes('lifestyleRegistraEntrata(soldi,"trasferta")') &&
+  transfers.includes('lifestyleRegistraEntrata(soldi,"data-fuori-citta")') &&
+  ui.includes('lifestyleRegistraEntrata(o.advance,"anticipo-etichetta")') &&
+  crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")') &&
+  phases.includes('lifestyleRegistraEntrata(9000,"tour")'));
+test("punto 18: vestiti indossati, acquisti e viaggi alimentano la visibilità",
+  lifestyle.includes("function lifestyleValoreVestitiVisibili()") &&
+  lifestyle.includes("stileAddosso().reduce") &&
+  negozio.includes('lifestyleRegistraSpesaVisibile(prezzo,"vestiti",.65)') &&
+  transfers.includes('lifestyleRegistraSpesaVisibile(inv.offerta.viaggio,"viaggio",.35)'));
+test("punto 18: il lifestyle non crea heat finché il giro criminale non è avviato",
+  lifestyle.includes('const giro=(typeof stradaGiroAvviato==="function")') &&
+  lifestyle.includes("if(giro && !G.strada.arresto && classe.gap>0)"));
+test("punto 18: denaro criminale e riciclaggio non diventano reddito giustificabile",
+  (() => {
+    const successo=crime.slice(crime.indexOf("if(successo){"),crime.indexOf("}else{",crime.indexOf("if(successo){")));
+    const ricicla=crime.slice(crime.indexOf("function stradaRipulisci("),crime.indexOf("function stScenaLavaggioCanale"));
+    return !successo.includes("lifestyleRegistraEntrata") && !ricicla.includes("lifestyleRegistraEntrata");
+  })());
+test("punto 18: il rischio viene chiuso dopo la Strada, così include i ricavi delle attività",
+  sim.indexOf('if(typeof stradaSettimana === "function") stradaSettimana();') <
+  sim.indexOf('if(typeof lifestyleChiudiSettimanaRischio==="function") lifestyleChiudiSettimanaRischio();'));
 
 test("punto 13 esteso: gli esiti Strada entrano nella relazione sociale della stessa persona",
   posto.includes("function postoConseguenzeMondo(p)") &&
@@ -2221,8 +2265,10 @@ test("il reparto Vestiti vende capi del camerino MakeHuman: ogni raw della vetri
     const capi = [...guardaroba.matchAll(/\{id:"[a-z0-9]+", raw:"([^"]+)", n:"[^"]+", slot:"([a-zA-Z]+)", p:(\d+)/g)];
     return capi.length >= 30 && capi.every(m => perRaw.get(m[1]) === m[2] && +m[3] > 0);
   })());
-test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, G.vestiti[raw] diventa true, si salva",
-  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
+test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, il capo diventa tuo, la spesa resta visibile e si salva",
+  negozio.includes("G.money -= prezzo;") &&
+  negozio.includes('lifestyleRegistraSpesaVisibile(prezzo,"vestiti",.65)') &&
+  negozio.includes("guardarobaPosseduti()[v.raw] = true;") &&
   negozio.includes("save(); renderGioco();") &&
   ui.includes('if(typeof renderAbbigliamento === "function") renderAbbigliamento();'));
 test("la vetrina e i capi tuoi arrivano al camerino: ponte → creator → init del camerino",
@@ -2334,7 +2380,8 @@ test("l'offerta vale solo su un capo ancora comprabile (non tuo, non bloccato), 
   offerte.includes("if(guardarobaPosseduto(v.raw) || (typeof shFitRequisito === \"function\" && shFitRequisito(v))) return null;") &&
   negozio.includes("function shFitPrezzo(v){") &&
   negozio.includes("const prezzo = shFitPrezzo(v);") &&
-  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
+  negozio.includes("G.money -= prezzo;") &&
+  negozio.includes("guardarobaPosseduti()[v.raw] = true;") &&
   negozio.includes('<span class="shprice off"><s>'));
 test("la sezione «Questa settimana» sta in testa al reparto, solo su «Tutti», e il diario dice cosa c'e' in offerta",
   negozio.includes('const offerte = SH_FIT_FILTRO === "tutti" && typeof offerteSezione === "function" ? offerteSezione() : "";') &&

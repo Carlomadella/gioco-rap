@@ -139,7 +139,9 @@ function advanceWeek(){
   let gross = streams * 0.0055;
   if(G.contract) gross *= G.contract.share;
   if(G.manager) gross *= 0.85;
-  G._entratePulite = gross; /* la vetrina della Strada la confronta con le spese di lifestyle */
+  if(typeof lifestyleRegistraEntrata==="function")
+    lifestyleRegistraEntrata(gross,"streaming");
+  else G._entratePulite = gross;
   const costs = weeklyCosts();
   G.money += gross - costs;
 
@@ -281,6 +283,10 @@ function advanceWeek(){
   /* punto 21: il giro della Strada — heat che decade, attività che rendono,
      uomini/protezione/avvocato che costano, il carcere che macina se sei dentro */
   if(typeof stradaSettimana === "function") stradaSettimana();
+  /* Punto Strada 18: chiudiamo qui il confronto fra tenore di vita e reddito
+     giustificabile, dopo che anche le attività di copertura hanno versato i
+     loro ricavi normali. */
+  if(typeof lifestyleChiudiSettimanaRischio==="function") lifestyleChiudiSettimanaRischio();
   /* Il telefono non continua a generare conversazioni "normali" mentre sei
      fisicamente dentro: il contatto con l'esterno passa dal micro-loop carcere. */
   if(!detenutoAInizioSettimana && typeof chatSettimana === "function") chatSettimana();

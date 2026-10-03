@@ -2681,7 +2681,10 @@ const ACTIONS = [
      const f = Math.round((rnd(8,30) + presenzaSulPalco()*1.4 + G.hype*0.7) * RITMO * molt);
      const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO * molt);
      const lbb = lifeBonus();
-     G.fans += Math.round(f*lbb.live); G.money += Math.round(m*lbb.live);
+     const incassoLive=Math.round(m*lbb.live);
+     G.fans += Math.round(f*lbb.live); G.money += incassoLive;
+     if(typeof lifestyleRegistraEntrata==="function")
+       lifestyleRegistraEntrata(incassoLive,"live");
      gain("presenza", 1.2 * (giaOggi ? 0.5 : 1)); G.wellbeing -= 3;
      adfSegnaOggi("live");
      diarioBordo().live++;
@@ -2722,6 +2725,8 @@ const ACTIONS = [
        : {base:j.pay, totale:j.pay, bonus:0, percentuale:0, tipo:null, etichetta:""};
      const effettiTurno = lavoroEffettiTurno(luogoLavoroAttuale,j);
      G.money += paga.totale;
+     if(typeof lifestyleRegistraEntrata==="function")
+       lifestyleRegistraEntrata(paga.totale,"lavoro");
      G.wellbeing += Number(effettiTurno.benessere || 0);
      if(typeof addLuc === "function") addLuc(Number(effettiTurno.lucidita || 0));
      G.shifts = (G.shifts||0) + 1;

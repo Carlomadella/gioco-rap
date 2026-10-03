@@ -73,6 +73,7 @@ const TRIALS = [
        : failTrial("Hai suonato davanti a quindici persone distratte.", 8); }},
     {n:"Chiedi di essere pagato", d:"Passi se hai hype 40+. Altrimenti ti chiude la porta.",
      run(){ if(G.hype >= 40){ G.money += 400;
+         if(typeof lifestyleRegistraEntrata==="function") lifestyleRegistraEntrata(400,"cachet");
          return passTrial("Ti hanno pagato e ti hanno richiamato. Ti sei fatto rispettare."); }
        return failTrial("«Torna quando sei qualcuno.» Porta chiusa.", 10); }},
     {n:"Ti paghi tu la serata", d:"−600 €, passi comunque se puoi permettertelo",
@@ -107,10 +108,12 @@ const TRIALS = [
   opts:[
     {n:"Le fai tutte e trenta", d:"Passi se il benessere è 45+. Ti svuota comunque.",
      run(){ if(G.wellbeing >= 45){ G.wellbeing = clamp(G.wellbeing-30,0,100); G.money += 9000;
+         if(typeof lifestyleRegistraEntrata==="function") lifestyleRegistraEntrata(9000,"tour");
          return passTrial("Trenta date fatte. Sei distrutto ma adesso giochi in un altro campionato."); }
        return failTrial("Sei crollato alla dodicesima data. Tour annullato.", 12); }},
     {n:"Ne fai dieci e tieni la testa", d:"Passi se l'hype è 60+",
      run(){ G.money += 3000;
+       if(typeof lifestyleRegistraEntrata==="function") lifestyleRegistraEntrata(3000,"tour");
        return G.hype >= 60
         ? passTrial("Dieci date piene. Hai fatto meno e hai contato di più.")
         : failTrial("Dieci date mezze vuote. Non è bastato.", 10); }},
