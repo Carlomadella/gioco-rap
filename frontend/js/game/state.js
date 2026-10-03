@@ -66,6 +66,11 @@ const START = () => ({
        della settimana, più quattro snapshot per rendere il rischio stabile. */
     rischioLifestyle:{key:null,entrate:0,fonti:{},speseExtra:0,speseFonti:{},
       history:[],closedKey:null,last:null},
+    /* Punto Strada 19: l'heat non è solo una barra. Qui resta la memoria
+       minima degli effetti che ha prodotto sul mondo (porte chiuse, richieste
+       di abbassare il profilo, controlli). La cautela delle persone resta
+       invece sulla persona stessa, non duplicata qui. */
+    heatMondo:{lastStopRequestAbsoluteDay:null,history:[]},
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
