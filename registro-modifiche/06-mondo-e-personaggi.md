@@ -6,6 +6,35 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:50ca2072 -->
+## 03/10/26, 01:34 — feature/strada-punto17-conseguenze-tra-sistemi → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `50ca2072`
+
+### Cosa è entrato
+
+- `0944d02d` — Test: adatta capacità rete al ponte sociale — **mycolbraga**
+- `5cfded97` — Cache: aggiorna conseguenze tra sistemi — **mycolbraga**
+- `53af35c9` — Audit: gate conseguenze tra sistemi — **mycolbraga**
+- `cae7df8a` — Test: conseguenze Strada tra sistemi — **mycolbraga**
+- `f11cd51c` — Test: preserva rete causale con memoria sociale — **mycolbraga**
+- `23c95701` — Strada punto 17: propaga gli esiti fra le persone — **mycolbraga**
+- `f2baa19f` — Strada punto 17: memoria sociale condivisa — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-conseguenze-tra-sistemi.test.js`
+- **Modificato:** `frontend/test/unit/strada-peso-capacita.test.js`
+- **Modificato:** `frontend/test/unit/strada-rete-causale.test.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
 <!-- merge:1ac94af1 -->
 ## 03/10/26, 01:20 — feature/strada-punto16-rete-causale → main
 
