@@ -4102,7 +4102,12 @@ function stradaAttivitaIncontro(id){
   const st=stradaAttivitaStato(id,true),persone=stradaAttivitaPersone(id);
   const contatto=stradaAttivitaContattoIncontro(id);
   const week=stradaAttivitaWeekIndex();
-  if(!st||!contatto) return "Non hai ancora un contatto con cui abbia senso fissare qui un incontro.";
+  if(!st||!contatto){
+    const prudenti=stradaContattiAttivi().filter(stradaHeatPersonaCauta);
+    if(prudenti.length)
+      return "Con l'attenzione così alta, i contatti che potresti portare qui non vogliono farsi vedere con te.";
+    return "Non hai ancora un contatto con cui abbia senso fissare qui un incontro.";
+  }
   if(Number(st.lastMeetingWeek)===week) return "Questa settimana hai già usato l'attività come punto d'incontro.";
   if(!stradaAttivitaOperativa(id)) return "L'attività è ferma: non è il momento di portarci gente.";
   if(typeof GAME_TIME!=="undefined"&&typeof GAME_TIME.spend==="function"){
@@ -4518,8 +4523,7 @@ function stClasseRischio(colpo){
   return r <= .2 ? "risk-low" : r <= .45 ? "risk-mid" : "risk-high";
 }
 function stOcchiAddosso(){
-  const h = G.strada.heat;
-  return h < 20 ? "Nessuno" : h < 45 ? "Qualcuno" : h < 70 ? "Troppi" : "Ti stanno addosso";
+  return stradaHeatProfilo().occhi;
 }
 function stCopertura(){
   const s = G.strada;
@@ -4558,7 +4562,7 @@ function renderStBarre(){
   $("st-precedenti").textContent = s.precedenti;
   const occhi = $("st-occhi");
   occhi.textContent = stOcchiAddosso();
-  occhi.classList.toggle("hot", s.heat >= 45);
+  occhi.classList.toggle("hot", s.heat >= 50);
 }
 
 /* ---- il centro: i colpi, o il tempo che passa ---- */
@@ -4635,10 +4639,14 @@ function renderStCopre(){
   const avvSt=stradaAvvocatoStato();
   const tuttiContatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via);
   const rivali=tuttiContatti.filter(stradaRivalitaAttiva);
+  stradaHeatSincronizzaPersone();
   const contatti=tuttiContatti.filter(stradaRelazioneDisponibile)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const prudenti=contatti.filter(stradaHeatPersonaCauta);
+  const operativi=contatti.filter(p=>!stradaHeatPersonaCauta(p));
   const dormienti=tuttiContatti.filter(p=>!stradaRelazioneDisponibile(p) && !stradaRivalitaAttiva(p));
-  const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const fidati=operativi.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const heatMondo=stradaHeatProfilo();
   const avvConosciuti=stradaAvvocatiConosciuti();
   const tenore=typeof lifestyleRiepilogoRischio==="function"
     ? lifestyleRiepilogoRischio()
@@ -4649,6 +4657,8 @@ function renderStCopre(){
       '<span>' + (fidati.length
         ? fidati.length + ' ' + (fidati.length===1?'si fida':'si fidano') + ' abbastanza da muoversi con te.'
         : 'Conosci gente, ma nessuno attivo si fida ancora abbastanza da venire a un colpo con te.') +
+        (prudenti.length ? ' · ' + prudenti.length + ' ' +
+          (prudenti.length===1?'contatto si tiene basso per l\'attenzione':'contatti si tengono bassi per l\'attenzione') + '.' : '') +
         (dormienti.length ? ' · ' + dormienti.length + ' ' +
           (dormienti.length===1?'contatto è fuori dal giro per ora':'contatti sono fuori dal giro per ora') + '.' : '') +
         (rivali.length ? ' · ' + rivali.length + ' ' +
@@ -4656,14 +4666,20 @@ function renderStCopre(){
       '</span></div>' +
       '<div class="pills">' +
         (contatti.slice(0,3).map(p=>'<span class="pill' +
-          (stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
+          (stradaHeatPersonaCauta(p)?' no':stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
           p.n + ' · Fiducia: ' + stradaFiduciaEtichetta(p) +
+          (stradaHeatPersonaCauta(p)?' · si tiene basso':'') +
           (stradaConseguenzePersona(p).debiti ? ' · Gli devi '+stradaConseguenzePersona(p).debiti+' favore/i' : '') +
           '</span>').join('') ||
           '<span class="pill no">Nessun contatto attivo</span>') +
         (dormienti.length ? '<span class="pill no">' + dormienti.length + ' non raggiungibili</span>' : '') +
         (rivali.slice(0,2).map(p=>'<span class="pill danger">'+p.n+' · Rivalità</span>').join('')) +
       '</div></div>' +
+
+    '<div class="cover-row"><div class="t"><strong>Pressione sul giro</strong>' +
+      '<span>'+heatMondo.mondo+'</span></div>' +
+      '<div class="pills"><span class="pill'+(heatMondo.id==="basso"?' on':heatMondo.id==="medio"?'':' danger')+'">'+
+        heatMondo.label+'</span></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
       '<span>' + (s.prot>0
