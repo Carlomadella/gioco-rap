@@ -357,9 +357,10 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
   i numeri del vecchio simulatore («un colpo al giorno», 300 giorni su 364 in carcere,
   carriera in rosso) restano uno **snapshot storico**, non una diagnosi del runtime attuale.
   La voce 65 di `problemi-riscontrati.md` resta aperta solo finché il simulatore non viene
-  rilanciato sul codice corrente. Il gap gameplay noto emerso dal reaudit è diverso:
-  i colpi consumano tempo reale ma non hanno ancora vere finestre
-  mattina/pomeriggio/notte/weekend;
+  rilanciato sul codice corrente. **CHIUSO (03/10/2026)** anche il gap temporale emerso dal
+  reaudit: Attività criminali resta accessibile 24/7 dopo lo sblocco, mentre ogni colpo
+  usa una finestra coerente con il contesto (giorno/sera/notte/weekend) e verifica anche
+  che durata e preparazione possano concludersi dentro quella finestra;
   **FATTO in parte (03/10/2026)** — la Strada di Mycol, punti 9–24 (segnata dal push degli altri):
   il TrapPhone è uno sblocco del giro e non c'è più in una carriera nuova, l'heat cambia contatti e
   controlli, il rischio lifestyle confronta le spese con le entrate giustificabili, le persone del
