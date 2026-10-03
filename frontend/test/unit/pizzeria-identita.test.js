@@ -84,16 +84,16 @@ describe("identità gameplay Pizzeria", () => {
 
     const base = vm.runInContext("lavoroReteDef(G.job)",ctx);
     expect(base.roleId).toBe("lavapiatti");
-    expect(base.maxContatti).toBe(5);
-    expect(base.chanceIncontro).toBe(.22);
+    expect(base.maxContatti).toBe(6);
+    expect(base.chanceIncontro).toBe(.24);
     expect(base.chanceIncontro).toBeGreaterThan(vm.runInContext("ADF_LAVORO_RETE.fabbrica.chanceIncontro",ctx));
 
     ctx.G.job.id="pizzaiolo"; ctx.G.job.n="Pizzaiolo";
     const top = vm.runInContext("lavoroReteDef(G.job)",ctx);
     expect(vm.runInContext("lavoroReteChiave(G.job)",ctx)).toBe("pizzeria");
     expect(top.roleId).toBe("pizzaiolo");
-    expect(top.maxContatti).toBe(8);
-    expect(top.chanceIncontro).toBe(.28);
+    expect(top.maxContatti).toBe(9);
+    expect(top.chanceIncontro).toBe(.30);
     expect(top.reteBonusIncontro).toBeGreaterThan(base.reteBonusIncontro);
   });
 

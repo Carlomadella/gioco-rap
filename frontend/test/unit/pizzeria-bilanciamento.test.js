@@ -71,8 +71,8 @@ describe("stress test Pizzeria part-time",()=>{
       expect(x.pChance).toBeGreaterThan(x.fChance);
       expect(x.pCap).toBeGreaterThan(x.fCap);
     }
-    expect(rows[0]).toMatchObject({pChance:.22,fChance:.16,pCap:5,fCap:4});
-    expect(rows[3]).toMatchObject({pChance:.28,fChance:.22,pCap:8,fCap:7});
+    expect(rows[0]).toMatchObject({pChance:.24,fChance:.16,pCap:6,fCap:4});
+    expect(rows[3]).toMatchObject({pChance:.30,fChance:.22,pCap:9,fCap:7});
   });
 
   it("il part-time lascia molto spazio di giorno ma confligge naturalmente con la musica serale",()=>{
