@@ -6,6 +6,39 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:649a06dc -->
+## 03/10/26, 01:05 — feature/strada-punto15-pizzeria-sociale → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `649a06dc`
+
+### Cosa è entrato
+
+- `4a818f31` — test(lavoro): aggiorna cache lavoro-eventi punto 15 — **mycolbraga**
+- `d6313611` — test(pizzeria): aggiorna cap e probabilita sociali — **mycolbraga**
+- `3c19074c` — test(pizzeria): aggiorna esposizione sociale punto 15 — **mycolbraga**
+- `3ca1c0f4` — chore(frontend): aggiorna cache punto 15 — **mycolbraga**
+- `bbe613d4` — test(audit): verifica accesso sociale Pizzeria punto 15 — **mycolbraga**
+- `4f31e8eb` — test(strada): copri accesso sociale Pizzeria punto 15 — **mycolbraga**
+- `e0ed797e` — fix(pizzeria): impedisci dritta criminale diretta dal lavoro — **mycolbraga**
+- `8d310585` — feat(pizzeria): rendi lento e naturale lo scambio numero — **mycolbraga**
+- `41e3295a` — feat(pizzeria): rendi la rete soprattutto sociale e quotidiana — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/lavoro-eventi.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-bilanciamento.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-identita.test.js`
+- **Aggiunto:** `frontend/test/unit/strada-pizzeria-sociale.test.js`
+
+**File interessati in questa categoria:** 8
+
+---
+
 <!-- merge:51dce728 -->
 ## 03/10/26, 00:33 — feature/strada-punto14-fabbrica-storyline → main
 
