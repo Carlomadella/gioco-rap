@@ -3068,43 +3068,57 @@ function adfWorkContactAfterShift(){
 
   const origine=p.origineDettaglio || "contatto conosciuto al lavoro";
   const titoloLavoro=G.job && G.job.n ? G.job.n : "Lavoro";
+  const pizzeriaSociale=chiave==="pizzeria";
+  const puoScambiareNumero=!pizzeriaSociale || giaVisto || Number(p.rel||0)>0;
+  const opzioniContatto=[];
+
+  /* Punto 15: il primo incontro in Pizzeria resta volutamente ambiguo.
+     Prima una faccia diventa familiare, poi eventualmente entra in rubrica. */
+  if(puoScambiareNumero){
+    opzioniContatto.push({n:"Scambiatevi il numero", d:"Diventa un contatto persistente nelle chat", run(){
+      const x=typeof postoScambiaNumeroLavoro==="function"
+        ? postoScambiaNumeroLavoro(p) : null;
+      if(!x) return {t:"Non siete riusciti a scambiarvi il numero.",c:""};
+      if(typeof gain==="function") gain("rete",0.5);
+      return {
+        t:"<b>"+p.n+"</b> è adesso nella tua rete: "+ruolo.toLowerCase()+
+          " · "+origine+". Lo trovi nelle chat.",
+        c:"good"
+      };
+    }});
+  }
+
+  opzioniContatto.push({n:"Parlate un po'", d:pizzeriaSociale&&!puoScambiareNumero
+    ? "È il primo incontro: costruisci familiarità, senza forzare subito il numero"
+    : "Costruisci il rapporto senza scambiarvi ancora il numero", run(){
+    if(typeof postoAvvicinaContattoLavoro==="function")
+      postoAvvicinaContattoLavoro(p,2);
+    if(chiave==="pizzeria" && typeof lavoroBonusRetePersona==="function")
+      lavoroBonusRetePersona(p,"work-contact-talk",0.2,2);
+    else if(typeof gain==="function") gain("rete",0.2);
+    return {
+      t:pizzeriaSociale&&!puoScambiareNumero
+        ? "Con <b>"+p.n+"</b> adesso c'è una faccia, un nome e una conversazione. Se vi rincrocerete, il rapporto potrà andare avanti."
+        : "Con <b>"+p.n+"</b> non è rimasta solo una chiacchiera da turno. Potrà ricapitare.",
+      c:""
+    };
+  }});
+  opzioniContatto.push({n:"Saluta e vai", d:"Nessun passo avanti nel rapporto", run(){
+    return {t:"Vi conoscete di vista. Se vi rincrocerete, il rapporto ripartirà da qui.",c:""};
+  }});
 
   afterClear(()=>showEvent({
     k:titoloLavoro+" · Contatti",
     t:giaVisto ? p.n+" torna a fermarti dopo il turno" : "Una conoscenza dopo il turno",
     d:"Hai appena finito di lavorare e finisci a parlare con <b>"+p.n+"</b>. " +
       dettaglio+"<br><br><b>"+ruolo+"</b> · "+origine+". " +
-      "Se nasce un contatto, resta una persona vera della tua rete e può ricomparire anche dopo.",
+      (pizzeriaSociale&&!puoScambiareNumero
+        ? "Qui il valore è riconoscersi e rivedersi: al primo incontro non c'è ancora motivo di scambiarsi il numero."
+        : "Se nasce un contatto, resta una persona vera della tua rete e può ricomparire anche dopo."),
     annulla(){
       /* Chiudere il popup non cancella la persona: ormai vi siete conosciuti. */
     },
-    opts:[
-      {n:"Scambiatevi il numero", d:"Diventa un contatto persistente nelle chat", run(){
-        const x=typeof postoScambiaNumeroLavoro==="function"
-          ? postoScambiaNumeroLavoro(p) : null;
-        if(!x) return {t:"Non siete riusciti a scambiarvi il numero.",c:""};
-        if(typeof gain==="function") gain("rete",0.5);
-        return {
-          t:"<b>"+p.n+"</b> è adesso nella tua rete: "+ruolo.toLowerCase()+
-            " · "+origine+". Lo trovi nelle chat.",
-          c:"good"
-        };
-      }},
-      {n:"Parlate un po'", d:"Costruisci il rapporto senza scambiarvi ancora il numero", run(){
-        if(typeof postoAvvicinaContattoLavoro==="function")
-          postoAvvicinaContattoLavoro(p,2);
-        if(chiave==="pizzeria" && typeof lavoroBonusRetePersona==="function")
-          lavoroBonusRetePersona(p,"work-contact-talk",0.2,2);
-        else if(typeof gain==="function") gain("rete",0.2);
-        return {
-          t:"Con <b>"+p.n+"</b> non è rimasta solo una chiacchiera da turno. Potrà ricapitare.",
-          c:""
-        };
-      }},
-      {n:"Saluta e vai", d:"Nessun passo avanti nel rapporto", run(){
-        return {t:"Vi conoscete di vista. Se vi rincrocerete, il rapporto ripartirà da qui.",c:""};
-      }}
-    ]
+    opts:opzioniContatto
   }),80);
 
   return true;
