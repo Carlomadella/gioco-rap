@@ -136,6 +136,22 @@ describe("NPC · punto 11 legami tra persone",()=>{
     });
   });
 
+  it("aggiornare il tipo senza nuova percezione conserva quella già nota",()=>{
+    const api=runtime();
+    const a=p("a"),b=p("b");
+    api.collega(a,b,{
+      tipo:"conoscenza",percezioneA:"positiva",percezioneB:"ambivalente",sinceWeek:2
+    });
+    api.collega(a,b,{tipo:"collaborazione",reason:"progetto",sinceWeek:8});
+
+    expect(api.legame(a,"b")).toMatchObject({
+      tipo:"collaborazione",percezione:"positiva",sinceWeek:2
+    });
+    expect(api.legame(b,"a")).toMatchObject({
+      tipo:"collaborazione",percezione:"ambivalente",sinceWeek:2
+    });
+  });
+
   it("arricchisce un record legacy solo quando un evento lo tocca",()=>{
     const api=runtime();
     const a=p("a",{reteLegami:[{personId:"b",reason:"vecchio",sinceWeek:2}]});
