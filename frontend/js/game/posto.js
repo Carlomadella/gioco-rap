@@ -1251,6 +1251,22 @@ function poRispondi(i){
      è quello che conta come rapporto che non deve crescere. */
   if(o[2] && o[2] === p.car){
     p.scoperto = true;
+    /* Compatibilità + nuovo discovery: il vecchio carattere resta autorevole
+       per i dialoghi esistenti, mentre il layer PERSONA registra soltanto che
+       il giocatore lo ha effettivamente capito. */
+    try{
+      const conoscenza=typeof window!=="undefined" ? window.ADF_NPC_CONOSCENZA : null;
+      if(conoscenza&&typeof conoscenza.scopri==="function"){
+        const oggi=((Math.max(1,Number(G.year)||1)-1)*52+
+          (Math.max(1,Number(G.week)||1)-1))*7+
+          Math.max(1,Number(G.day)||1);
+        conoscenza.scopri(
+          p,
+          {tipo:"carattere-legacy",id:p.car},
+          {fonte:"circolo:dialogo-carattere",giorno:oggi}
+        );
+      }
+    }catch(_){}
     if(pt > 0) pt += 1;
   }
   /* Il dopo-serata (js/game/circolo.js): se sei appena sceso dal palco, una
