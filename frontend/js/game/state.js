@@ -61,6 +61,11 @@ const START = () => ({
     /* Punto Strada 11: nessun rango criminale persistito. Salviamo soltanto
        gli eventi di rete realmente accaduti e i loro cooldown. */
     reteInfluenza:{lastCheckAbsoluteDay:null,nextEventAbsoluteDay:null,pending:null,history:[],connectionsMade:0},
+    /* Punto Strada 18: niente dichiarazione fiscale da compilare. Conserviamo
+       soltanto il totale delle entrate giustificabili e delle spese visibili
+       della settimana, più quattro snapshot per rendere il rischio stabile. */
+    rischioLifestyle:{key:null,entrate:0,fonti:{},speseExtra:0,speseFonti:{},
+      history:[],closedKey:null,last:null},
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
