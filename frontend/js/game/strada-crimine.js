@@ -1716,18 +1716,24 @@ const STRADA_FABBRICA_STORY_MIN_TURNI = 10;
 
 function stradaFabbricaTurniLavorati(){
   try{
+    if(typeof lavoroTurniTotaliSede==="function")
+      return Math.max(0,Number(lavoroTurniTotaliSede("fabbrica")||0));
+  }catch(_){}
+  /* Fallback per runtime/test vecchi: usa soltanto prove persistite esistenti. */
+  let totale=0;
+  try{
     if(typeof lavoroCartellino==="function"){
       const c=lavoroCartellino("fabbrica");
-      if(c && Number.isFinite(Number(c.totale))) return Math.max(0,Number(c.totale));
+      if(c && Number.isFinite(Number(c.totale))) totale=Math.max(totale,Number(c.totale));
     }
   }catch(_){}
   try{
     if(typeof lavoroReteStato==="function"){
       const r=lavoroReteStato("fabbrica");
-      if(r && Number.isFinite(Number(r.turniVisti))) return Math.max(0,Number(r.turniVisti));
+      if(r && Number.isFinite(Number(r.turniVisti))) totale=Math.max(totale,Number(r.turniVisti));
     }
   }catch(_){}
-  return 0;
+  return totale;
 }
 
 function stradaFabbricaPersonaConosciuta(p){
