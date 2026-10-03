@@ -75,7 +75,7 @@ describe("NPC · punto 12 integrazione discovery",()=>{
     const code=blocco(strada,"function stradaNpcTipoLegame(reason)","function stradaNpcGruppiPersona");
     const api=new Function(
       "window","stradaNpcAdapter","stradaAbsDay","postoCollegaPersone","Object","String","Array",
-      code+"\\nreturn stradaNpcCollega;"
+      code+"\nreturn stradaNpcCollega;"
     )(
       window,()=>null,()=>18,
       (a,b,reason,cfg)=>{
