@@ -731,19 +731,53 @@ function postoSoloLavoro(p){
   return !!(p && p.origineLuogo && !p.circoloSbloccato);
 }
 
-/* Punto Strada 16: la rete sociale è fatta di legami tra persone, non di
-   percentuali visibili al giocatore. I legami sono generici e persistenti:
-   possono nascere da una presentazione della Strada, da un favore o da un
-   contatto comune, senza trasformare la persona in un "NPC criminale". */
+/* Punto 11 PERSONA: rete NPC↔NPC sparsa. I record legacy restano validi
+   e vengono letti come conoscenze finché un evento non li arricchisce. */
+function postoLegamiApi(){
+  try{
+    const a=typeof window!=="undefined" ? window.ADF_NPC_LEGAMI : null;
+    return a&&typeof a==="object" ? a : null;
+  }catch(_){ return null; }
+}
+
 function postoReteLegami(p){
   if(!p || p.via) return [];
   if(!Array.isArray(p.reteLegami)) p.reteLegami=[];
   return p.reteLegami;
 }
 
-function postoCollegaPersone(a,b,motivo){
+function postoTipoLegameDaMotivo(motivo){
+  /* Classifichiamo soltanto ciò che il codice corrente dimostra davvero.
+     Presentazioni e ponti restano conoscenze; lavorare stabilmente nella
+     stessa attività è collaborazione. */
+  return motivo==="attivita-lavoro" ? "collaborazione" : "conoscenza";
+}
+
+function postoCollegaPersone(a,b,motivo,meta){
   if(!a || !b || a===b || a.via || b.via || !a.id || !b.id) return false;
   const sett=typeof totalWeeks==="function" ? totalWeeks() : Number(G.week||1);
+  const api=postoLegamiApi();
+  const cfg=meta&&typeof meta==="object"?meta:{};
+
+  if(api&&typeof api.collega==="function"){
+    api.collega(a,b,{
+      tipo:cfg.tipo||postoTipoLegameDaMotivo(motivo),
+      tipoA:cfg.tipoA,
+      tipoB:cfg.tipoB,
+      percezione:cfg.percezione,
+      percezioneA:cfg.percezioneA,
+      percezioneB:cfg.percezioneB,
+      sottotipo:cfg.sottotipo,
+      sottotipoA:cfg.sottotipoA,
+      sottotipoB:cfg.sottotipoB,
+      reciproco:cfg.reciproco!==false,
+      reason:motivo||cfg.reason||"contatto-comune",
+      sinceWeek:sett
+    });
+    return true;
+  }
+
+  /* Fallback storico per test/pagine parziali che non caricano npc-legami.js. */
   const aggiungi=(da,aChi)=>{
     const legami=postoReteLegami(da);
     let legame=legami.find(x=>x&&x.personId===aChi.id);
@@ -755,11 +789,15 @@ function postoCollegaPersone(a,b,motivo){
     }
   };
   aggiungi(a,b);
-  aggiungi(b,a);
+  if(cfg.reciproco!==false) aggiungi(b,a);
   return true;
 }
 
 function postoLegamiAttivi(p){
+  const api=postoLegamiApi();
+  if(api&&typeof api.personeCollegate==="function")
+    return api.personeCollegate(p,G.gente||[],{coPresenza:true});
+
   const ids=new Set(postoReteLegami(p).map(x=>x&&x.personId).filter(Boolean));
   return (G.gente||[]).filter(x=>x && !x.via && ids.has(x.id));
 }
