@@ -28,6 +28,7 @@ describe("NPC · punto 11 legami tra persone",()=>{
 
     expect(api.legami(a)).toEqual([{
       personId:"b",
+      tipi:["conoscenza"],
       tipo:"conoscenza",
       percezione:null,
       sottotipo:null,
@@ -53,15 +54,15 @@ describe("NPC · punto 11 legami tra persone",()=>{
     expect(api.tra(a,b)).toMatchObject({
       reciproco:true,
       simmetrico:true,
-      aVersoB:{tipo:"amicizia",percezione:"positiva"},
-      bVersoA:{tipo:"amicizia",percezione:"positiva"}
+      aVersoB:{tipi:["amicizia"],tipo:"amicizia",percezione:"positiva"},
+      bVersoA:{tipi:["amicizia"],tipo:"amicizia",percezione:"positiva"}
     });
     expect(a.reteLegami).toEqual([{
-      personId:"b",tipo:"amicizia",percezione:"positiva",
+      personId:"b",tipi:["amicizia"],percezione:"positiva",
       reason:"storia-comune",sinceWeek:12
     }]);
     expect(b.reteLegami).toEqual([{
-      personId:"a",tipo:"amicizia",percezione:"positiva",
+      personId:"a",tipi:["amicizia"],percezione:"positiva",
       reason:"storia-comune",sinceWeek:12
     }]);
   });
@@ -82,8 +83,8 @@ describe("NPC · punto 11 legami tra persone",()=>{
     const tra=api.tra(a,b);
     expect(tra.reciproco).toBe(true);
     expect(tra.simmetrico).toBe(false);
-    expect(tra.aVersoB).toMatchObject({tipo:"amicizia",percezione:"positiva"});
-    expect(tra.bVersoA).toMatchObject({tipo:"conoscenza",percezione:"ambivalente"});
+    expect(tra.aVersoB).toMatchObject({tipi:["amicizia"],tipo:"amicizia",percezione:"positiva"});
+    expect(tra.bVersoA).toMatchObject({tipi:["conoscenza"],tipo:"conoscenza",percezione:"ambivalente"});
   });
 
   it("supporta un legame direzionale senza inventare reciprocità",()=>{
@@ -98,7 +99,7 @@ describe("NPC · punto 11 legami tra persone",()=>{
     });
 
     expect(api.legame(a,"b")).toMatchObject({
-      tipo:"rivalita",percezione:"negativa",coPresenza:false
+      tipi:["rivalita"],tipo:"rivalita",percezione:"negativa",coPresenza:false
     });
     expect(api.legame(b,"a")).toBeNull();
     expect(api.tra(a,b)).toMatchObject({reciproco:false,simmetrico:false});
@@ -117,10 +118,34 @@ describe("NPC · punto 11 legami tra persone",()=>{
 
     expect(api.legame(a,"b").sottotipo).toBe("fratello");
     expect(api.legame(b,"a").sottotipo).toBe("sorella");
+    expect(api.tra(a,b).reciproco).toBe(true);
     expect(api.tra(a,b).simmetrico).toBe(false);
   });
 
-  it("non duplica la stessa coppia direzionale quando il legame evolve",()=>{
+  it("più tipi specifici possono coesistere sulla stessa coppia",()=>{
+    const api=runtime();
+    const a=p("a"),b=p("b");
+    api.collega(a,b,{tipo:"parentela",sottotipoA:"fratello",sottotipoB:"sorella",sinceWeek:1});
+    api.collega(a,b,{tipo:"collaborazione",reason:"impresa",sinceWeek:8});
+
+    expect(api.legame(a,"b")).toMatchObject({
+      tipi:["parentela","collaborazione"],
+      tipo:null,
+      sottotipo:"fratello",
+      sinceWeek:1,
+      coPresenza:true
+    });
+    expect(api.legame(b,"a")).toMatchObject({
+      tipi:["parentela","collaborazione"],
+      tipo:null,
+      sottotipo:"sorella",
+      sinceWeek:1
+    });
+    expect(a.reteLegami).toHaveLength(1);
+    expect(b.reteLegami).toHaveLength(1);
+  });
+
+  it("una conoscenza generica viene sostituita quando emerge un tipo specifico",()=>{
     const api=runtime();
     const a=p("a"),b=p("b");
     api.collega(a,b,{tipo:"conoscenza",reason:"presentazione",sinceWeek:3});
@@ -129,26 +154,26 @@ describe("NPC · punto 11 legami tra persone",()=>{
     expect(a.reteLegami).toHaveLength(1);
     expect(b.reteLegami).toHaveLength(1);
     expect(a.reteLegami[0]).toMatchObject({
-      personId:"b",tipo:"collaborazione",reason:"progetto",sinceWeek:3
+      personId:"b",tipi:["collaborazione"],reason:"progetto",sinceWeek:3
     });
     expect(b.reteLegami[0]).toMatchObject({
-      personId:"a",tipo:"collaborazione",reason:"progetto",sinceWeek:3
+      personId:"a",tipi:["collaborazione"],reason:"progetto",sinceWeek:3
     });
   });
 
-  it("aggiornare il tipo senza nuova percezione conserva quella già nota",()=>{
+  it("aggiornare i tipi senza nuova percezione conserva quella già nota",()=>{
     const api=runtime();
     const a=p("a"),b=p("b");
     api.collega(a,b,{
-      tipo:"conoscenza",percezioneA:"positiva",percezioneB:"ambivalente",sinceWeek:2
+      tipo:"amicizia",percezioneA:"positiva",percezioneB:"ambivalente",sinceWeek:2
     });
     api.collega(a,b,{tipo:"collaborazione",reason:"progetto",sinceWeek:8});
 
     expect(api.legame(a,"b")).toMatchObject({
-      tipo:"collaborazione",percezione:"positiva",sinceWeek:2
+      tipi:["amicizia","collaborazione"],percezione:"positiva",sinceWeek:2
     });
     expect(api.legame(b,"a")).toMatchObject({
-      tipo:"collaborazione",percezione:"ambivalente",sinceWeek:2
+      tipi:["amicizia","collaborazione"],percezione:"ambivalente",sinceWeek:2
     });
   });
 
@@ -161,15 +186,30 @@ describe("NPC · punto 11 legami tra persone",()=>{
 
     expect(a.reteLegami[0]).toEqual({
       personId:"b",reason:"evento-nuovo",sinceWeek:2,
-      tipo:"amicizia",percezione:"positiva"
+      tipi:["amicizia"],percezione:"positiva"
     });
     expect(b.reteLegami[0]).toEqual({
       personId:"a",reason:"evento-nuovo",sinceWeek:2,
-      tipo:"amicizia",percezione:"positiva"
+      tipi:["amicizia"],percezione:"positiva"
     });
   });
 
-  it("filtra i legami plausibili per co-presenza senza trascinare rivalità",()=>{
+  it("può rimuovere un solo tipo senza distruggere gli altri",()=>{
+    const api=runtime();
+    const a=p("a"),b=p("b");
+    api.collega(a,b,{tipo:"parentela",sinceWeek:1});
+    api.collega(a,b,{tipo:"collaborazione",sinceWeek:2});
+
+    expect(api.rimuoviTipo(a,b,"collaborazione")).toBe(true);
+    expect(api.legame(a,"b").tipi).toEqual(["parentela"]);
+    expect(api.legame(b,"a").tipi).toEqual(["parentela","collaborazione"]);
+
+    expect(api.rimuoviTipo(a,b,"parentela")).toBe(true);
+    expect(api.legame(a,"b")).toBeNull();
+    expect(api.legame(b,"a")).not.toBeNull();
+  });
+
+  it("filtra i legami plausibili per co-presenza senza trascinare rivalità isolate",()=>{
     const api=runtime();
     const a=p("a"),amico=p("b"),rivale=p("c"),collab=p("d"),via=p("e",{via:true});
     api.collega(a,amico,{tipo:"amicizia",sinceWeek:1});
@@ -181,6 +221,17 @@ describe("NPC · punto 11 legami tra persone",()=>{
       .toEqual([amico,collab]);
     expect(api.personeCollegate(a,[a,amico,rivale,collab,via],{coPresenza:false}))
       .toEqual([rivale]);
+  });
+
+  it("rivalità e parentela possono coesistere senza perdere la parentela",()=>{
+    const api=runtime();
+    const a=p("a"),b=p("b");
+    api.collega(a,b,{tipo:"parentela",sinceWeek:1});
+    api.collega(a,b,{tipo:"rivalita",percezioneA:"negativa",percezioneB:"ambivalente",sinceWeek:4});
+
+    expect(api.legame(a,"b").tipi).toEqual(["parentela","rivalita"]);
+    expect(api.legame(a,"b").coPresenza).toBe(true);
+    expect(api.legame(b,"a").tipi).toEqual(["parentela","rivalita"]);
   });
 
   it("non crea una matrice: senza legame non salva nulla",()=>{
