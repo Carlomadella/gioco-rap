@@ -160,7 +160,7 @@ describe("identità sociale dei lavori", () => {
     expect(eventi).toContain("function adfWorkContactAfterShift()");
     expect(eventi).toContain('claimAutoEvent("work-contact")');
     expect(eventi).toContain('lavoroTentaIncontroContatto(chiave,Math.random(),G.job)');
-    expect(eventi).toContain('const contactShown = a.id==="turno" && !overtimeShown && !streetShown');
+    expect(eventi).toContain('const contactShown = a.id==="turno" && !overtimeShown && !factoryIntroShown && !streetShown');
     expect(eventi).toContain("? adfWorkContactAfterShift()");
     expect(eventi).toContain('t:giaVisto ? p.n+" torna a fermarti dopo il turno"');
   });

@@ -2574,6 +2574,11 @@ function adfStreetIntroDecision(proposta){
 
 function adfStreetIntroAfterAction(a){
   if(!a || typeof stradaTentaIngresso!=="function") return false;
+  /* Punto 14: dopo un turno Fabbrica l'unico accesso criminale ammesso è la
+     storyline dedicata del collega reale. Niente proposta generica che cada
+     casualmente proprio all'uscita dallo stabilimento. */
+  if(a.id==="turno" && G.job && typeof lavoroLuogo==="function" &&
+     lavoroLuogo(G.job)==="fabbrica") return false;
   if(typeof stradaAttivitaSbloccate==="function" && stradaAttivitaSbloccate()) return false;
 
   const stato=st();
@@ -2925,6 +2930,45 @@ function adfStreetOpportunityAfterAction(a){
   return true;
 }
 
+function adfFactoryStreetIntroAfterShift(){
+  if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
+    return false;
+  if(typeof stradaAttivitaSbloccate==="function" && stradaAttivitaSbloccate())
+    return false;
+  if(typeof stradaTentaIngressoFabbrica!=="function") return false;
+
+  const s=st();
+  if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaIngressoFabbrica(Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("factory-street-intro")) return false;
+
+  s.lastHookEventDay=absDay();
+  afterClear(()=>showEvent({
+    k:"Fabbrica · Dopo il turno",
+    t:(proposta.persona||"Un collega")+" cambia tono",
+    d:"Non è la Fabbrica che ti sta offrendo un crimine. È una persona con cui hai già condiviso abbastanza turni da non essere più soltanto una faccia sulla linea."+
+      "<br><br>Fuori dal cancello <b>"+(proposta.persona||"il collega")+"</b> aspetta che gli altri si allontanino e ti prende da parte."+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»"),
+    annulla(){
+      if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+    },
+    opts:[
+      {n:"Sentiamo",d:"Capisci finalmente che fuori dal turno ha altri collegamenti",run(){
+        afterClear(()=>adfStreetIntroDecision(proposta),60);
+        return null;
+      }},
+      {n:"Lascia stare",d:"Per te resta soltanto un collega di Fabbrica",run(){
+        if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+        return {t:"Hai chiuso lì. La Fabbrica resta la Fabbrica e la porta della Strada non si apre.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
 function adfFactoryStreetAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
     return false;
@@ -2945,12 +2989,14 @@ function adfFactoryStreetAfterShift(){
 
   s.lastHookEventDay=absDay();
 
+  const riconosciuta=proposta.factoryWasKnown===true;
   afterClear(()=>showEvent({
     k:"Fuori dalla Fabbrica",
     t:(proposta.persona||"Qualcuno")+" ti ferma un attimo",
-    d:"Hai appena finito il turno. Fuori dal cancello riconosci una faccia del giro. " +
-      "Il lavoro non c'entra: è semplicemente dove vi siete incrociati.<br><br>"+
-      "<b>"+(proposta.persona||"La persona")+":</b> "+(proposta.intro||"«Ho una cosa da proporti.»"),
+    d:(riconosciuta
+      ? "Hai appena finito il turno. Con <b>"+(proposta.persona||"questa persona")+"</b> non serve più fingere di non sapere: vi conoscete già anche dall'altra parte."
+      : "Hai appena finito il turno. <b>"+(proposta.persona||"Un collega")+"</b> con cui lavori da abbastanza tempo cambia tono. Non è un crimine della Fabbrica: capisci soltanto che sa che sei già nel giro.")+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+(proposta.intro||"«Ho una cosa da proporti.»"),
     annulla(){
       if(typeof stradaRifiutaPropostaFabbrica==="function")
         stradaRifiutaPropostaFabbrica();
@@ -3500,17 +3546,20 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   } : null;
 
   const overtimeShown = a.id==="turno" ? adfWorkOvertimeAfterShift() : false;
-  const streetShown = a.id==="turno" && !overtimeShown
+  const factoryIntroShown = a.id==="turno" && !overtimeShown
+    ? adfFactoryStreetIntroAfterShift()
+    : false;
+  const streetShown = a.id==="turno" && !overtimeShown && !factoryIntroShown
     ? adfFactoryStreetAfterShift()
     : false;
-  const workFamilyShown = a.id==="turno" && !overtimeShown && !streetShown &&
+  const workFamilyShown = a.id==="turno" && !overtimeShown && !factoryIntroShown && !streetShown &&
     window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.afterShift==="function"
       ? ADF_WORK_EVENTS.afterShift(shiftPayload)
       : false;
-  const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
+  const contactShown = a.id==="turno" && !overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown
     ? adfWorkContactAfterShift()
     : false;
-  const introShown = !overtimeShown && !streetShown && !workFamilyShown && !contactShown
+  const introShown = !overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown && !contactShown
     ? adfStreetIntroAfterAction(a)
     : false;
   const ferroShown = a.id!=="turno" && !introShown
@@ -3529,13 +3578,13 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
       street:streetShown,
       workFamily:workFamilyShown,
       contact:contactShown,
-      intro:introShown
+      intro:factoryIntroShown||introShown
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !networkShown && !streetOpportunityShown)
+  if(!overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !networkShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
-  if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown && !introShown)
+  if(a.id==="turno" && G.job && !overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown && !contactShown && !introShown)
     emitHook("after_job_shift",shiftPayload || {
       action_id:"turno",
       job_id:G.job.id,

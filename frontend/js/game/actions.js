@@ -1999,6 +1999,24 @@ function lavoroSede(luogo){
   return sede;
 }
 
+/* Turni totali realmente lavorati nella sede. A differenza del cartellino
+   mensile non si azzera al cambio ciclo: serve alle storyline che dipendono
+   dal tempo realmente passato con le persone di quel posto. */
+function lavoroTurniTotaliSede(luogo){
+  const sede=lavoroSede(luogo);
+  if(!sede) return 0;
+  if(!Number.isFinite(Number(sede.totalShiftsWorked))){
+    const corrente=sede.attendance&&Array.isArray(sede.attendance.turni)
+      ? sede.attendance.turni.length : 0;
+    const rete=sede.network&&Number.isFinite(Number(sede.network.turniVisti))
+      ? Number(sede.network.turniVisti) : 0;
+    /* Migrazione prudente: usiamo solo prove di turni già persistite. */
+    sede.totalShiftsWorked=Math.max(0,corrente,rete);
+  }
+  sede.totalShiftsWorked=Math.max(0,Math.floor(Number(sede.totalShiftsWorked)||0));
+  return sede.totalShiftsWorked;
+}
+
 function lavoroCartellino(luogo){
   const ciclo = lavoroCicloCorrente();
   const sede = lavoroSede(luogo);
@@ -2085,11 +2103,15 @@ function lavoroRegistraPresenza(luogo){
   const cartellino = lavoroCartellino(luogo);
   if(!cartellino) return null;
   const pos = lavoroPosizioneOggi();
-  const stato = lavoroSede(luogo).attendance;
+  const sede=lavoroSede(luogo);
+  const stato = sede.attendance;
+  const totaliPrima=lavoroTurniTotaliSede(luogo);
   stato.turni.push(pos);
+  sede.totalShiftsWorked=totaliPrima+1;
   return {
     luogo:luogo,
     totale:stato.turni.length,
+    totaliSede:sede.totalShiftsWorked,
     oggi:stato.turni.filter(n => n === pos).length,
     ciclo:cartellino.ciclo
   };

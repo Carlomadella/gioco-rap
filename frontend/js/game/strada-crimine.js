@@ -1709,6 +1709,70 @@ function stradaContattiLuogo(luogo){
   );
 }
 
+/* Punto 14: la Fabbrica è una storyline parallela, non un distributore di
+   crimini. Prima devi averci lavorato davvero e aver conosciuto una persona
+   reale. Solo dopo quella stessa persona può rivelare il lato Strada. */
+const STRADA_FABBRICA_STORY_MIN_TURNI = 10;
+
+function stradaFabbricaTurniLavorati(){
+  try{
+    if(typeof lavoroTurniTotaliSede==="function")
+      return Math.max(0,Number(lavoroTurniTotaliSede("fabbrica")||0));
+  }catch(_){}
+  /* Fallback per runtime/test vecchi: usa soltanto prove persistite esistenti. */
+  let totale=0;
+  try{
+    if(typeof lavoroCartellino==="function"){
+      const c=lavoroCartellino("fabbrica");
+      if(c && Number.isFinite(Number(c.totale))) totale=Math.max(totale,Number(c.totale));
+    }
+  }catch(_){}
+  try{
+    if(typeof lavoroReteStato==="function"){
+      const r=lavoroReteStato("fabbrica");
+      if(r && Number.isFinite(Number(r.turniVisti))) totale=Math.max(totale,Number(r.turniVisti));
+    }
+  }catch(_){}
+  return totale;
+}
+
+function stradaFabbricaPersonaConosciuta(p){
+  if(!p || p.via || p.origineLuogo!=="fabbrica") return false;
+  if(p.workEncountered || p.numero || Number(p.rel)>0 || Number(p.pt)>0) return true;
+  try{
+    if(typeof lavoroReteStato==="function"){
+      const r=lavoroReteStato("fabbrica");
+      return !!(r && Array.isArray(r.history) && r.history.some(x=>x&&x.personId===p.id));
+    }
+  }catch(_){}
+  return false;
+}
+
+function stradaFabbricaPersonaMatura(p){
+  return stradaFabbricaTurniLavorati()>=STRADA_FABBRICA_STORY_MIN_TURNI &&
+    stradaFabbricaPersonaConosciuta(p);
+}
+
+function stradaFabbricaPersonaCandidata(){
+  const s=G.strada||{};
+  if(s.ingressoPersonaId){
+    const stessa=stradaPersonaDaId(s.ingressoPersonaId);
+    if(stessa && stessa.origineLuogo==="fabbrica" && stradaFabbricaPersonaMatura(stessa))
+      return stessa;
+  }
+
+  return stradaContattiLuogo("fabbrica")
+    .filter(p=>stradaFabbricaPersonaMatura(p))
+    .filter(p=>!p.strada || !p.strada.known || stradaRelazioneDisponibile(p))
+    .sort((a,b)=>{
+      const ak=a.strada&&a.strada.known?1:0;
+      const bk=b.strada&&b.strada.known?1:0;
+      return (bk-ak) ||
+        Number(b.rel||0)-Number(a.rel||0) ||
+        Number(b.pt||0)-Number(a.pt||0);
+    })[0] || null;
+}
+
 function stradaCreaContatto(nome,key,meta){
   if(!G.gente) G.gente=[];
   meta=meta||{};
@@ -1762,25 +1826,17 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
     return p && stradaRelazioneDisponibile(p) ? p : null;
   }
 
-  /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Una dritta
-     post-turno può esistere solo se in quel posto c'è già una persona reale
-     che il giocatore ha scoperto essere collegata alla Strada. */
-  const candidati=stradaContattiLuogo("fabbrica")
-    /* Un collega reale che non ha ancora rivelato il lato Strada resta
-       eleggibile: il decadimento vale solo per rapporti criminali già noti. */
-    .filter(p=>!p.strada || !p.strada.known || stradaRelazioneDisponibile(p))
-    .sort((a,b)=>{
-    const ak=a.strada&&a.strada.known?1:0;
-    const bk=b.strada&&b.strada.known?1:0;
-    return (bk-ak) ||
-      Number(b.rel||0)-Number(a.rel||0) ||
-      Number(b.pt||0)-Number(a.pt||0);
-  });
-  const p=candidati[0] || null;
-  return p ? stradaSegnaPersona(p,{
+  /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Serve un
+     collega già incontrato e abbastanza vita condivisa in stabilimento. */
+  const p=stradaFabbricaPersonaCandidata();
+  if(!p) return null;
+  variante.factoryStory=true;
+  variante.factoryPersonId=p.id;
+  variante.factoryWasKnown=!!(p.strada&&p.strada.known);
+  return stradaSegnaPersona(p,{
     source:"factory-opportunity",
     opportunityId:variante.id
-  }) : null;
+  });
 }
 
 function stradaCollegaLeadPersona(lead,trigger,legacy){
@@ -1795,20 +1851,24 @@ function stradaCollegaLeadPersona(lead,trigger,legacy){
 
 function stradaPersonaIngressoValida(p){
   if(!p || p.via || !p.id || !p.n || p.ruolo==="giornalista") return false;
-  /* Contatti del lavoro: esistono perché li hai incontrati davvero.
-     Contatti del Circolo: devono essere già stati visti/conosciuti, non una
-     faccia appena generata dal pool della Sala. Il punto 2 raffinerà fiducia
-     e percorsi; qui impediamo soltanto proposte da sconosciuti virtuali. */
-  if(p.origineLuogo==="fabbrica" || p.origineLuogo==="pizzeria" || p.origine==="lavoro")
+  /* La Fabbrica ha il proprio percorso contestuale post-turno (punto 14):
+     un collega di stabilimento non può materializzare una proposta criminale
+     durante un'azione generica fuori dal lavoro. */
+  if(p.origineLuogo==="fabbrica") return false;
+  /* Gli altri contatti del lavoro restano percorsi validi nel mondo. */
+  if(p.origineLuogo==="pizzeria" || p.origine==="lavoro")
     return true;
   return !!p.visto || !!p.numero || Number(p.rel)>0 || Number(p.pt)>0;
 }
 
-function stradaPersonaIngresso(variantRoll){
+function stradaPersonaIngresso(variantRoll,context){
   const s=stradaIngressoStato();
   if(s.ingressoPersonaId){
     const stessa=(G.gente||[]).find(p=>p && p.id===s.ingressoPersonaId && !p.via);
-    if(stessa) return stessa;
+    if(stessa){
+      if(stessa.origineLuogo==="fabbrica" && context!=="fabbrica") return null;
+      return stessa;
+    }
   }
 
   const pool=(G.gente||[]).filter(stradaPersonaIngressoValida);
@@ -1827,16 +1887,17 @@ function stradaPersonaIngresso(variantRoll){
   return fascia[Math.floor(r*fascia.length)] || fascia[0] || null;
 }
 
-function stradaTentaIngresso(roll,variantRoll){
+function stradaCreaPropostaIngresso(persona,roll,sourceContext){
   const s=stradaIngressoStato();
-  if(s.badgeSbloccato || s.arresto) return null;
+  if(s.badgeSbloccato || s.arresto || !persona) return null;
 
   const oggi=stradaAbsDay();
 
-  /* Una proposta già comparsa resta la stessa finché il giocatore non decide.
-     Se oggi l'ha già vista non la ripetiamo dopo ogni azione: torna dal giorno
-     successivo, utile anche quando manca energia per accettarla. */
+  /* Una proposta Fabbrica già avviata torna soltanto nel suo contesto:
+     non segue il giocatore magicamente in palestra, Studio o Circolo. */
   if(s.ingressoPending && typeof s.ingressoPending==="object"){
+    if(s.ingressoPending.sourceContext==="fabbrica" && sourceContext!=="fabbrica")
+      return null;
     if(Number(s.ingressoLastShownAbsoluteDay)===oggi) return null;
     s.ingressoLastShownAbsoluteDay=oggi;
     return Object.assign({},s.ingressoPending);
@@ -1844,9 +1905,6 @@ function stradaTentaIngresso(roll,variantRoll){
   if(s.ingressoNextOfferAbsoluteDay!=null &&
      oggi<Number(s.ingressoNextOfferAbsoluteDay)) return null;
   if(Number(s.ingressoLastCheckAbsoluteDay)===oggi) return null;
-
-  const persona=stradaPersonaIngresso(variantRoll);
-  if(!persona) return null;
 
   s.ingressoLastCheckAbsoluteDay=oggi;
   const r=Number.isFinite(Number(roll))
@@ -1861,6 +1919,7 @@ function stradaTentaIngresso(roll,variantRoll){
   const seconda=step>1;
   const proposta={
     kind:"crime-intro",
+    sourceContext:sourceContext||"world",
     step,
     personId:persona.id,
     persona:persona.n,
@@ -1880,6 +1939,20 @@ function stradaTentaIngresso(roll,variantRoll){
   s.ingressoPending=Object.assign({},proposta);
   s.ingressoLastShownAbsoluteDay=oggi;
   return Object.assign({},proposta);
+}
+
+function stradaTentaIngresso(roll,variantRoll){
+  const persona=stradaPersonaIngresso(variantRoll,"world");
+  return stradaCreaPropostaIngresso(persona,roll,"world");
+}
+
+function stradaTentaIngressoFabbrica(roll){
+  if(!G.job) return null;
+  const luogo=typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null);
+  if(luogo!=="fabbrica") return null;
+  const persona=stradaFabbricaPersonaCandidata();
+  if(!persona) return null;
+  return stradaCreaPropostaIngresso(persona,roll,"fabbrica");
 }
 
 function stradaRifiutaIngresso(){
@@ -2235,6 +2308,9 @@ function stradaTentaPropostaFabbrica(roll,variantRoll){
   if(!G.job) return null;
   const luogo=typeof lavoroLuogo==="function" ? lavoroLuogo(G.job) : (G.job.place||null);
   if(luogo!=="fabbrica") return null;
+  /* Anche se sei già nel giro, la Fabbrica parla solo attraverso una persona
+     che hai realmente conosciuto dopo abbastanza turni insieme. */
+  if(!stradaFabbricaPersonaCandidata()) return null;
   return stradaTentaOpportunita("fabbrica",roll,variantRoll);
 }
 
