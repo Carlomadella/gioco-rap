@@ -1742,6 +1742,13 @@ function stradaFalloutPerditaTarget(colpo,score,arrested,shielded,costoErrore){
   ));
 }
 
+function stradaAddebitaPuliti(importo){
+  const costo=Math.max(0,Math.round(Number(importo)||0));
+  if(!costo) return 0;
+  G.money=Number(G.money||0)-costo;
+  return costo;
+}
+
 function stradaFalloutPerdiDenaro(target){
   const s=G.strada||(G.strada={}),voluto=Math.max(0,Math.round(Number(target)||0));
   if(!voluto) return {totale:0,sporchi:0,puliti:0};
@@ -1749,7 +1756,7 @@ function stradaFalloutPerdiDenaro(target){
   s.sporchi=Math.max(0,Number(s.sporchi||0)-sporchi);
   const residuo=Math.max(0,voluto-sporchi);
   const puliti=Math.min(Math.max(0,Number(G.money||0)),residuo);
-  G.money=Math.max(0,Number(G.money||0)-puliti);
+  if(puliti>0) G.money=Number(G.money||0)-puliti;
   return {totale:sporchi+puliti,sporchi,puliti};
 }
 
@@ -3335,7 +3342,7 @@ function stradaAccettaIngresso(successRoll,rewardRoll){
     s.heat=clamp(Number(s.heat||0)+Number(STRADA_INGRESSO.heatSuccesso[step-1]||2),0,100);
   }else{
     multa=Math.round(Number(STRADA_INGRESSO.min[step-1]||120)*.45);
-    G.money=Math.max(0,Number(G.money||0)-multa);
+    stradaAddebitaPuliti(multa);
     s.heat=clamp(Number(s.heat||0)+Number(STRADA_INGRESSO.heatFallimento[step-1]||4),0,100);
     /* Regola esplicita del punto 1: nessun precedente e nessuna detenzione
        durante l'ingresso. Il fallimento resta reale tramite soldi/heat. */
@@ -4206,13 +4213,13 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       const primaVolta = s.precedenti === 0 && approccio.id !== "ferro" && colpo.difficolta <= .3;
       if(ingressoProtetto){
         const multa = Math.max(40, Math.round(colpo.min * .45 * costoErrore));
-        G.money = Math.max(0, G.money - multa);
+        stradaAddebitaPuliti(multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Saltato, ma sei fuori", testo:"<b>" + colpo.n + "</b> è saltato. " +
             "Perdi " + fmt(multa) + " € e attiri attenzione, ma in questa fase nessuno ha abbastanza per mandarti dentro." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
       }else if(primaVolta && Math.random() < stradaHeatChanceSoloDenuncia(.6)){
         const multa = Math.round(colpo.min * .8 * costoErrore);
-        G.money = Math.max(0, G.money - multa);
+        stradaAddebitaPuliti(multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
             fmt(multa) + " € di multa. Stavolta è andata." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
