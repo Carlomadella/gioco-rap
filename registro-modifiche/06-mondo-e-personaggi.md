@@ -6,6 +6,39 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:46b234e5 -->
+## 03/10/26, 01:51 — feature/strada-punto17-attivita-copertura → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `46b234e5`
+
+### Cosa è entrato
+
+- `b85e965e` — Test: fermo attività per sette giorni reali — **mycolbraga**
+- `3a8591af` — Fix: ferma attività per sette giorni reali — **mycolbraga**
+- `aac19cbe` — Cache: aggiorna attività di copertura — **mycolbraga**
+- `e19698bf` — Test: pausa attività di una settimana — **mycolbraga**
+- `3e6a902d` — Fix: limita la pausa attività a una settimana — **mycolbraga**
+- `f8b740e3` — Audit: riallinea il vero punto 17 attività — **mycolbraga**
+- `2cde081b` — Test: attività di copertura come gameplay — **mycolbraga**
+- `b55a204b` — UI: rendi scrollabile la gestione attività — **mycolbraga**
+- `cc604a79` — Strada punto 17: gestione attività dalla UI — **mycolbraga**
+- `d7e57be8` — Strada punto 17: problemi operativi e incontri nelle attività — **mycolbraga**
+- `72361ab2` — Strada punto 17: riciclaggio per impresa e importo — **mycolbraga**
+- `403d02d9` — Strada punto 17: traccia il riciclaggio per canale — **mycolbraga**
+- `7f3e6e4a` — Strada punto 17: attività come imprese persistenti — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/strada-crimine-v2.css`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-attivita-copertura.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
 <!-- merge:50ca2072 -->
 ## 03/10/26, 01:34 — feature/strada-punto17-conseguenze-tra-sistemi → main
 
