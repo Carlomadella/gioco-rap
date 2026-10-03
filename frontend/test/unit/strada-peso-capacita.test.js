@@ -177,7 +177,7 @@ describe("Strada · punto 11 peso e capacità senza ranghi",()=>{
     expect(fav.map(x=>[x.id,x.d])).toEqual([["a",1],["b",1]]);
   });
 
-  it("la UI racconta capacità e rete, non titoli o promozioni",()=>{
+  it("gli eventi raccontano capacità e rete, non titoli o promozioni",()=>{
     expect(eventi).toContain("Più di una persona si fa viva");
     expect(eventi).toContain("ti chiede un nome");
     expect(eventi).toContain("Questa volta il ponte sei tu");
