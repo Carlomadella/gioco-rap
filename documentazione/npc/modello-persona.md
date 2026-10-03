@@ -2728,3 +2728,325 @@ sociale della conoscenza.
 I cluster sociali del mondo sono il punto 13; non devono essere confusi con
 quello che il giocatore sa della rete.
 
+## Punto 13 — cerchie sociali / cluster
+
+**Stato:** introdotta una vista runtime derivata del grafo sociale che riconosce
+cerchie robuste senza creare automaticamente gruppi formali, crew o nuove
+entità persistenti.
+
+File introdotti:
+
+- `frontend/js/game/npc-cerchie.js`;
+- `frontend/test/unit/npc-cerchie.test.js`;
+- `frontend/test/unit/npc-cerchie-integrazione.test.js`.
+
+### Cerchia ≠ gruppo formale
+
+Il punto 13 distingue due concetti.
+
+Una **cerchia sociale** è una struttura che emerge dai legami NPC↔NPC già
+presenti nel grafo del punto 11.
+
+Un **gruppo formale** è invece una entità esplicita del mondo con una propria
+identità, storia, eventuali regole di ingresso/uscita e riferimenti persistenti.
+
+Quindi:
+
+- tre amici molto collegati possono costituire una cerchia;
+- questo non significa automaticamente che abbiano fondato una crew;
+- una cerchia non riceve `groupId`;
+- `p.groupIds`, `p.gruppi` o `p.cerchie` non vengono scritti;
+- l'hook crime `groupsForPerson()` resta riservato ai gruppi espliciti del
+  punto 14 e del futuro Population Manager.
+
+### Fonte autorevole
+
+Le cerchie usano esclusivamente:
+
+`window.ADF_NPC_LEGAMI`
+
+e quindi il grafo `reteLegami` già definito al punto 11.
+
+Non vengono dedotte da:
+
+- professione;
+- stesso luogo di lavoro;
+- stessa città;
+- stessa appartenenza;
+- stesso tratto;
+- stessa relazione col protagonista;
+- stessa reputazione Strada.
+
+Questi fattori possono produrre eventi che creano veri legami, ma non sono
+sostituti dei legami.
+
+### Arco sociale usato per i cluster
+
+Un arco entra nel grafo delle cerchie solo se:
+
+1. la relazione esiste in entrambe le direzioni;
+2. entrambi i lati possiedono almeno un tipo con `coPresenza:true`.
+
+Con il catalogo del punto 11 questo include, quando reciproci:
+
+- conoscenza;
+- amicizia;
+- collaborazione;
+- parentela.
+
+Una rivalità pura non crea una cerchia di co-presenza.
+
+Un rapporto registrato soltanto in una direzione non basta: può rappresentare
+una percezione o un riferimento asimmetrico, ma non autorizza a dichiarare una
+cerchia sociale condivisa.
+
+### Perché non usiamo semplici componenti connesse
+
+Una componente connessa è troppo permissiva.
+
+Esempio:
+
+`A — B — C — D — E`
+
+Se bastasse essere raggiungibili tramite qualche arco, cinque persone con una
+semplice catena di conoscenze diventerebbero un unico “gruppo sociale”.
+
+Peggio ancora: due cerchie dense collegate da una sola conoscenza verrebbero
+fuse in un mega-cluster.
+
+Il punto 13 usa quindi **componenti biconnesse** del grafo sociale reciproco.
+
+Conseguenze:
+
+- una catena non diventa cerchia;
+- un triangolo sì;
+- un ciclo di quattro persone sì;
+- due triangoli collegati da un singolo ponte restano due cerchie;
+- una persona di articolazione può appartenere a più cerchie.
+
+Questo rappresenta meglio il gameplay desiderato: reti locali riconoscibili,
+ponti fra mondi sociali e nessuna fusione automatica dell'intera città.
+
+### Dimensione minima
+
+Una cerchia richiede almeno **tre persone**.
+
+I blocchi biconnessi di due sole persone vengono scartati perché descrivono una
+relazione, non un cluster.
+
+La relazione a due continua a esistere normalmente nel punto 11.
+
+### Persone ponte
+
+Una PERSONA può appartenere a più cerchie contemporaneamente.
+
+Esempio:
+
+- `A-B-C` formano una cerchia;
+- `C-D-E` ne formano un'altra;
+- `C` appartiene a entrambe.
+
+Le due cerchie non vengono fuse.
+
+Questo è intenzionale e prepara il terreno a:
+
+- introduzioni;
+- contatti comuni;
+- passaggi fra ambienti sociali;
+- eventuale nascita di gruppi al punto 14.
+
+Non viene però salvato un ruolo “ponte” dentro la PERSONA: è una proprietà
+derivabile dalla rete corrente.
+
+### Più tipi sullo stesso arco
+
+Il punto 11 può salvare più tipi contemporaneamente sulla stessa coppia.
+
+Esempio:
+
+- amicizia;
+- collaborazione.
+
+Per le cerchie questi tipi non moltiplicano l'arco.
+
+La coppia A↔B resta un solo collegamento sociale ai fini della topologia.
+
+### Record legacy
+
+Un vecchio record reciproco di `reteLegami` senza tipo esplicito continua a
+essere letto dal punto 11 come `conoscenza`.
+
+Di conseguenza può partecipare a una cerchia se anche il verso opposto esiste.
+
+Non vengono creati tipi nuovi nel save per “normalizzare” il legacy.
+
+### `via` e presenza corrente
+
+Le cerchie descrivono **struttura sociale persistente**, non presenza fisica
+corrente.
+
+Per questo il modulo non elimina automaticamente una PERSONA dalla rete perché
+ha `via:true`.
+
+Nel progetto corrente `via` è un filtro legacy di selezione/ownership e non
+prova morte, cancellazione o fine di ogni rapporto.
+
+Quando serve decidere chi può comparire oggi continuano a valere:
+
+- punto 6: stato/disponibilità;
+- punto 7: appartenenze;
+- punto 8: selezione/ricorrenza;
+- punto 9: geografia.
+
+### API runtime
+
+`window.ADF_NPC_CERCHIE` espone:
+
+- `cerchie(persone)`;
+- `perPersona(personaOId, persone)`;
+- `compagniDiCerchia(personaOId, persone)`;
+- `appartenenze(persone)`.
+
+Ogni cerchia restituisce:
+
+- `key`: chiave deterministica derivata dagli ID dei membri;
+- `memberIds`;
+- `size`;
+- `edgeCount`;
+- `density`.
+
+La `key` è una **chiave di vista**, non un ID persistente di gruppo.
+
+Se la topologia cambia, può cambiare anche la chiave.
+
+Per questo non deve essere salvata come identità di una crew.
+
+### Letture pure
+
+Il modulo non:
+
+- modifica `reteLegami`;
+- crea NPC;
+- scrive cerchie nelle PERSONA;
+- chiama `save()`;
+- assegna gruppi;
+- cambia città/appartenenze;
+- modifica relazioni col protagonista;
+- modifica discovery.
+
+Le cerchie sono ricostruite dalla rete quando servono.
+
+### Integrazione Strada
+
+La Strada possiede già nel contratto crime:
+
+`groupsForPerson(personId)`
+
+Il punto 13 **non** lo collega a `ADF_NPC_CERCHIE`.
+
+Senza adapter esplicito:
+
+`stradaNpcGruppiPersona(p) → []`
+
+anche se la persona appartiene a una o più cerchie sociali.
+
+Solo un adapter futuro che possiede un vero registro di gruppi può restituire
+`groupId`.
+
+Questo impedisce che un cluster statistico/topologico venga trasformato per
+errore in:
+
+- crew;
+- gang;
+- collettivo;
+- gruppo musicale;
+- organizzazione criminale.
+
+### Rapporto col punto 8
+
+Il selettore del punto 8 possiede già il concetto di legami per favorire
+ricorrenze coerenti.
+
+Il punto 13 non sostituisce quella logica e non forza automaticamente tutta una
+cerchia dentro lo stesso ambiente.
+
+`compagniDiCerchia()` è disponibile per futuri controller che abbiano un
+motivo di gameplay concreto per usarlo, ma i normali gate di presenza restano
+obbligatori.
+
+Quindi:
+
+> stessa cerchia ≠ stessa stanza oggi.
+
+### Rapporto col punto 12
+
+Il punto 13 opera sul **mondo reale**.
+
+Il fatto che A, B e C formino una cerchia non significa che il protagonista
+conosca l'intera struttura.
+
+La discovery del punto 12 continua a governare ciò che una futura UI può
+mostrare al giocatore.
+
+Non viene introdotto un bypass che legga la cerchia reale e riveli legami
+ancora nascosti.
+
+### Sufficienza rispetto alla simulazione 300–800 NPC
+
+L'algoritmo lavora sul grafo sparso esistente.
+
+Non crea:
+
+- matrice PERSONA × PERSONA;
+- record di appartenenza alle cerchie nel save;
+- aggiornamenti giornalieri;
+- 800 profili sociali aggiuntivi.
+
+La costruzione parte dalle liste di legami già presenti e crea archi soltanto
+per relazioni reciproche di co-presenza.
+
+È stato aggiunto un test con **800 PERSONA** e dieci cerchie sparse che verifica
+che il calcolo non aggiunga campi ai profili.
+
+Il punto 18 dovrà misurare tempi e memoria su save lunghi/reali, ma la struttura
+del punto 13 non introduce crescita persistente proporzionale al numero di
+cluster possibili.
+
+### Test
+
+`npc-cerchie.test.js` copre:
+
+- triangolo → una cerchia;
+- catena → nessuna cerchia;
+- due cerchie con persona condivisa;
+- due cerchie collegate da un singolo arco senza fusione;
+- legame direzionale escluso;
+- rivalità pura esclusa;
+- ciclo di quattro persone;
+- più tipi sullo stesso arco contati una volta;
+- record legacy reciproci;
+- compagni di cerchia senza attraversare ponti;
+- persona appartenente a due cerchie;
+- appartenenze derivate e deterministiche;
+- nessuna scrittura di `groupId` / `cerchie` / `gruppi`;
+- popolazione da 800 PERSONA;
+- rifiuto di ID duplicati.
+
+`npc-cerchie-integrazione.test.js` verifica:
+
+- ordine corretto di caricamento dopo `npc-legami.js`;
+- nessuna conversione automatica cerchia → `groupsForPerson`;
+- gruppi Strada disponibili soltanto tramite adapter esplicito;
+- doppia appartenenza a cerchie senza campi gruppo persistiti.
+
+### Confine del punto 13
+
+**Chiuso:** definizione e runtime delle cerchie sociali, cluster robusti,
+persone ponte, compatibilità legacy, multi-tipo, separazione da presenza,
+discovery e gruppi formali, test su scala 800.
+
+**Non implementato qui:** creazione/persistenza di crew, gang, collettivi o
+altri gruppi con identità propria; regole di nascita, scioglimento,
+leadership, nome, scopo o appartenenza formale. Queste sono responsabilità del
+**punto 14 — gruppi emergenti**.
+
