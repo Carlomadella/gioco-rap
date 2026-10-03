@@ -6,6 +6,54 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:dfe55047 -->
+## 03/10/26, 07:04 — feature/strada-punto18-lifestyle-reddito → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `dfe55047`
+
+### Cosa è entrato
+
+- `5f1d0a44` — CI: ritenta verifica Strada punto 18 — **mycolbraga**
+- `b38df1a2` — Audit: aggiorna i gate Shop per il rischio lifestyle — **mycolbraga**
+- `4b3c8710` — Merge main into feature/strada-punto18-lifestyle-reddito — **mycolbraga**
+- `8f785fa9` — Cache: aggiorna Strada punto 18 — **mycolbraga**
+- `28482e1d` — Fix audit: correggi newline gate lifestyle — **mycolbraga**
+- `1430fad0` — Audit: copri il rischio lifestyle progressivo — **mycolbraga**
+- `e75b0d97` — Test: snapshot completo per il valore vestiti — **mycolbraga**
+- `91cebc3a` — Fix: allinea testo e calcolo del rischio lifestyle — **mycolbraga**
+- `bbbc7469` — Fix: rendi progressivo il rischio lifestyle durante la settimana — **mycolbraga**
+- `54af0653` — Audit: aggiungi gate Strada punto 18 — **mycolbraga**
+- `f281fc4e` — Test: lifestyle e reddito giustificabile — **mycolbraga**
+- `490fde59` — Strada punto 18: cachet e tour tra le entrate giustificabili — **mycolbraga**
+- `488da8da` — Strada punto 18: anticipo etichetta giustifica il tenore di vita — **mycolbraga**
+- `22a9bacf` — Strada punto 18: vestiti come spesa visibile — **mycolbraga**
+- `4c1e993c` — Strada punto 18: trasferte tra entrate e spese visibili — **mycolbraga**
+- `dfe051ef` — Strada punto 18: collega attività e UI al rischio lifestyle — **mycolbraga**
+- `de2e31ca` — Strada punto 18: chiudi il rischio lifestyle a fine settimana — **mycolbraga**
+- `ad068d3f` — Strada punto 18: lavoro e live come reddito giustificabile — **mycolbraga**
+- `35596335` — Strada punto 18: rischio lifestyle su media mobile — **mycolbraga**
+- `53471b89` — Strada punto 18: stato rischio lifestyle — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/lifestyle.js`
+- **Modificato:** `frontend/js/game/negozio.js`
+- **Modificato:** `frontend/js/game/phases.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Aggiunto:** `frontend/test/unit/strada-lifestyle-reddito.test.js`
+
+**File interessati in questa categoria:** 12
+
+---
+
 <!-- merge:46b234e5 -->
 ## 03/10/26, 01:51 — feature/strada-punto17-attivita-copertura → main
 
