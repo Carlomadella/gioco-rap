@@ -33,9 +33,11 @@ function runtimeFinestre(){
 }
 
 describe("Reaudit crime · integrazione UI/core",()=>{
-  it("1 · la UI finale usa solo le quattro offerte del giorno",()=>{
-    expect(ui).toContain("stradaColpiDisponibili()");
-    expect(ui).toContain("offerte.map");
+  it("1 · il pool resta di quattro offerte ma la UI mostra solo quelle coerenti con l'ora",()=>{
+    expect(core).toContain("function stradaColpiDisponibiliAdesso()");
+    expect(core).toContain("return stradaColpiDisponibili().filter(c=>stradaFinestraColpoStato(c).ok)");
+    expect(ui).toContain('typeof stradaColpiDisponibiliAdesso==="function"');
+    expect(ui).toContain("Nessun lavoro gira adesso");
     expect(ui).not.toContain('q("#crimes").innerHTML=STRADA_COLPI.map');
   });
 
@@ -79,6 +81,28 @@ describe("Reaudit crime · integrazione UI/core",()=>{
     expect(hours).not.toContain('crimin:    {open:"18:00", close:"04:00"}');
     expect(hours).toContain('place === "crimin" && G.strada && G.strada.arresto');
     expect(hours).toContain("jail:true");
+  });
+
+  it("UI V2 espone i sistemi avanzati che il giocatore deve poter leggere",()=>{
+    expect(ui).toContain('typeof stRischio==="function"');
+    expect(ui).toContain('typeof stradaCadutaProfilo==="function"');
+    expect(ui).toContain('typeof stradaOpportunitaAttiva==="function"');
+    expect(ui).toContain('typeof ADF_WORK_EVENTS.crimeLeadActive==="function"');
+    expect(ui).toContain('typeof stradaHeatProfilo==="function"');
+    expect(ui).toContain('typeof stradaHeatPersonaCauta==="function"');
+    expect(ui).toContain('typeof stradaRivalitaAttiva==="function"');
+    expect(ui).toContain('typeof lifestyleRiepilogoRischio==="function"');
+    expect(ui).toContain('q("#pressureDetail").textContent=heatMondo.mondo');
+    expect(ui).toContain('q("#lifestyleDetail").textContent=');
+  });
+
+  it("UI V2 ha uno stato ex-giro completo e il core blocca nuovi incarichi legali",()=>{
+    expect(ui).toContain("Hai mollato il giro");
+    expect(ui).toContain('q("#quit").textContent=partecipa?"Molla il giro":"Fuori dal giro"');
+    expect(ui).toContain('q("#launder").disabled=!partecipa');
+    expect(ui).toContain('q("#prot").disabled=!partecipa');
+    expect(ui).toContain('q("#lawyer").disabled=!partecipa');
+    expect(core).toContain('Hai mollato il giro: non stai più affidando incarichi criminali a un legale privato.');
   });
 
   it("7 · tutti i 30 colpi hanno una finestra e giorno/notte/weekend sono distinti",()=>{
