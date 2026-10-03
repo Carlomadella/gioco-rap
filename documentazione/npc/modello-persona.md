@@ -2464,13 +2464,21 @@ Conoscere una relazione non significa conoscerne ogni dettaglio.
 Per A → B possono essere scoperti separatamente:
 
 1. **esistenza:** “A conosce B”;
-2. **tipo:** “sono amici / collaboratori / rivali / parenti”;
+2. **uno o più tipi:** amicizia, collaborazione, rivalità, parentela ecc.;
 3. **percezione:** “A vede B positivamente / negativamente / in modo
    ambivalente”;
 4. **sottotipo:** per esempio `fratello`.
 
+Il grafo del punto 11 può mantenere più tipi contemporaneamente sullo stesso
+arco. La discovery segue la stessa regola: conoscere `amicizia` non rivela
+automaticamente anche una `collaborazione` reale già esistente.
+
+Per compatibilità, quando è noto un solo tipo la vista espone `tipo`; quando
+sono noti più tipi espone `tipi[]`.
+
 Quindi una presentazione può rendere noto soltanto che due persone si
-conoscono, senza rivelare ciò che una pensa davvero dell'altra.
+conoscono, senza rivelare ciò che una pensa davvero dell'altra o altri tipi di
+rapporto privati.
 
 ### I valori mutevoli non trapelano
 
@@ -2620,13 +2628,19 @@ direttamente — referral, introduzione, nome dato, ponte o collaborazione in un
 attività — il sistema locale registra discovery di:
 
 - esistenza del legame;
-- tipo del legame.
+- **soltanto il tipo dimostrato da quell'evento**, se quel tipo è realmente
+  presente nel grafo dopo l'evento.
 
 Non vengono rivelati automaticamente:
 
 - percezione interna;
 - sottotipo;
+- altri tipi preesistenti sullo stesso arco;
 - altri legami della persona.
+
+Esempio: se due NPC sono già amici privatamente e il giocatore assiste solo a
+un referral che dimostra che si conoscono, il referral non svela per magia
+l'amicizia.
 
 Se un futuro `ADF_CRIME_NPC` esterno gestisce il grafo senza materializzarlo
 nel record locale, la Strada **non inventa** una discovery che non può
@@ -2679,6 +2693,7 @@ contratto non richiede pruning adesso.
 - appartenenze nascoste/scoperte;
 - esistenza del legame separata dal tipo;
 - tipo/percezione/sottotipo separati;
+- discovery progressiva dei legami multi-tipo;
 - evoluzione del legame senza leak del nuovo valore;
 - provenienza distinta dalla città corrente;
 - compatibilità `p.scoperto`;
@@ -2693,6 +2708,7 @@ contratto non richiede pruning adesso.
 
 - presenza del bridge nel dialogo Sala;
 - referral Strada che scopre esistenza + tipo in entrambe le direzioni;
+- referral che non svela tipi privati preesistenti;
 - collaborazione di attività scoperta come `collaborazione`, non amicizia;
 - percezioni private non rivelate;
 - adapter esterno privo di grafo locale che non produce discovery inventata.
