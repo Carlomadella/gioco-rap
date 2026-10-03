@@ -1002,6 +1002,8 @@ function nuovoContatto(ruolo, cittaId, daId){
     rel:0, pt:0, ult:-1, feat:-99,
     skin:pick(skin), hair:Math.floor(Math.random() * 4),
     col:pick(["#FF5A36", "#B026FF", "#FFC53D", "#3DC7FF", "#FF4D9D", "#57C98B", "#7A5CFF"]),
+    fuori:true,
+    citta:cittaId,
     daId:daId || null,
     reqKey:scala[Math.min(fascia, scala.length - 1)] || "aperto",
     conosciutoIl:assoluto(),
@@ -1020,8 +1022,6 @@ function nuovoContatto(ruolo, cittaId, daId){
         fonte:"trasferta:incontro"
       });
   }catch(e){ console.warn("[Trasferte] posizione NPC non registrata", e); }
-  p.fuori=true;
-  p.citta=cittaId;
   return p;
 }
 
