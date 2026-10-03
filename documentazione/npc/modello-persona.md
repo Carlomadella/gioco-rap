@@ -1970,3 +1970,380 @@ nuove UI che mostrino tutte le dimensioni, migrazione strutturale di
 
 I legami fra NPC sono il punto 11.
 
+## Punto 11 — legami tra NPC
+
+**Stato:** il vecchio `reteLegami` bidirezionale e generico è stato evoluto in
+un grafo sparso tipizzato, mantenendo compatibilità con i salvataggi e con i
+consumer esistenti.
+
+File introdotti:
+
+- `frontend/js/game/npc-legami.js`;
+- `frontend/test/unit/npc-legami.test.js`;
+- `frontend/test/unit/npc-legami-integrazione.test.js`.
+
+### Punto di partenza verificato
+
+La repository possedeva già:
+
+`p.reteLegami = [{ personId, reason, sinceWeek }]`
+
+e tre helper in `posto.js`:
+
+- `postoReteLegami(p)`;
+- `postoCollegaPersone(a,b,motivo)`;
+- `postoLegamiAttivi(p)`.
+
+`postoCollegaPersone()` scriveva sempre lo stesso record nelle due direzioni.
+Il sistema sapeva quindi che due persone erano collegate, ma non poteva
+distinguere una conoscenza da una collaborazione, amicizia, rivalità o
+parentela.
+
+Inoltre `postoLegamiAttivi()` considerava qualunque arco utile alla
+co-presenza nel Circolo. Questa assunzione non è più valida quando entra una
+rivalità.
+
+### Grafo sparso, non matrice
+
+La rete resta salvata sulle sole persone coinvolte.
+
+Non viene creato:
+
+- un record per ogni coppia possibile;
+- un array di 800 valori per persona;
+- una matrice globale persona × persona;
+- un punteggio continuo per ogni coppia.
+
+Se due NPC non hanno un rapporto realmente creato da un evento o da una regola,
+non viene salvato nulla.
+
+Questo preserva la struttura già esistente e rimane compatibile con una
+popolazione nell'ordine di 300–800 persone.
+
+### Tipi di legame
+
+Il catalogo operativo del punto 11 è:
+
+| Tipo | Significato | Può sostenere co-presenza di rete |
+| --- | --- | --- |
+| `conoscenza` | le persone si conoscono realmente | sì |
+| `amicizia` | esiste un rapporto amicale esplicito | sì |
+| `collaborazione` | lavorano o hanno lavorato insieme in un rapporto concreto | sì |
+| `rivalita` | esiste conflitto/competizione personale tra i due NPC | **no automaticamente** |
+| `parentela` | esiste un legame familiare esplicito | sì |
+
+Una rivalità può naturalmente far incontrare due persone attraverso un evento,
+una storyline o una presenza indipendente. Semplicemente **non viene usata come
+bonus generico di rete** per trascinare un NPC accanto all'altro nel Circolo.
+
+### Nessuna inferenza aggressiva
+
+Il codice corrente viene classificato solo quando il significato è dimostrato.
+
+Gli eventi:
+
+- `strada-referral`;
+- `strada-introduzione`;
+- `strada-nome`;
+- `strada-ponte`;
+- incontri generici tramite attività;
+
+restano `conoscenza`.
+
+`attivita-lavoro`, che collega il socio e il dipendente della stessa attività
+persistente, viene classificato `collaborazione`.
+
+Non deduciamo:
+
+- amicizia da una presentazione;
+- parentela da nomi, età o provenienza;
+- rivalità da competizione generica;
+- collaborazione dal semplice fatto di frequentare lo stesso luogo.
+
+### Record persistente
+
+I nuovi record possono contenere:
+
+- `personId`;
+- `tipo`;
+- `percezione`;
+- `sottotipo`;
+- `reason`;
+- `sinceWeek`.
+
+`reason` continua a conservare **perché** il legame è nato.
+`tipo` descrive **che rapporto è**.
+
+I due campi non sono intercambiabili.
+
+Esempio:
+
+`tipo: "conoscenza", reason: "strada-referral"`
+
+è diverso da inventare un nuovo tipo `strada-referral`.
+
+### Compatibilità legacy
+
+Un record vecchio:
+
+`{ personId:"p2", reason:"strada-nome", sinceWeek:9 }`
+
+viene letto come:
+
+- tipo derivato di compatibilità: `conoscenza`;
+- nessuna percezione nota;
+- stessa ragione;
+- stessa settimana.
+
+La semplice lettura **non modifica il salvataggio**.
+
+Il record viene arricchito con `tipo` o altri campi soltanto quando un nuovo
+evento tocca realmente quel rapporto.
+
+Non viene eseguita una migrazione massiva al caricamento.
+
+### Reciprocità e direzione
+
+Il nuovo contratto distingue tre casi.
+
+#### 1. Relazione reciproca e simmetrica
+
+Esempio:
+
+- A considera B un amico;
+- B considera A un amico.
+
+Entrambe le direzioni esistono e hanno lo stesso tipo/percezione.
+
+#### 2. Relazione reciproca ma asimmetrica
+
+Esempio:
+
+- A considera B un amico;
+- B considera A soltanto una conoscenza.
+
+Oppure:
+
+- entrambi sono parenti;
+- A è `fratello`;
+- B è `sorella`.
+
+Entrambe le direzioni esistono, ma non sono identiche.
+
+#### 3. Relazione direzionale
+
+Esempio:
+
+- A considera B un rivale;
+- non esiste ancora prova che B consideri A nello stesso modo.
+
+Viene salvato soltanto A → B.
+
+La reciprocità quindi non viene inventata quando il fatto conosciuto è
+unilaterale.
+
+### Percezione
+
+Ogni direzione può avere, quando un evento la definisce:
+
+- `positiva`;
+- `neutra`;
+- `negativa`;
+- `ambivalente`.
+
+La percezione è opzionale.
+
+L'assenza significa **sconosciuta/non definita**, non neutra.
+
+Aggiornare il tipo di un legame senza fornire una nuova percezione non cancella
+quella già persistita.
+
+`undefined` viene trattato come “non specificato”; `null` può essere usato
+da un evento esplicito per rimuovere una percezione precedentemente salvata.
+
+### Parentela senza esplosione di tipi
+
+`parentela` resta il tipo principale.
+
+Un `sottotipo` opzionale può descrivere informazioni realmente note, per
+esempio:
+
+- fratello / sorella;
+- genitore / figlio;
+- altro legame familiare esplicitamente definito.
+
+Non vengono creati decine di tipi principali solo per rappresentare ruoli
+complementari.
+
+### Evoluzione del rapporto
+
+Per una stessa direzione esiste un solo record per `personId`.
+
+Quindi:
+
+`conoscenza → collaborazione`
+
+aggiorna il legame esistente invece di crearne un secondo.
+
+`sinceWeek` conserva il primo momento noto del rapporto; un aggiornamento
+successivo non riscrive la sua origine storica.
+
+`reason` può invece essere aggiornato all'evento più recente che qualifica il
+rapporto.
+
+La storia dettagliata degli eventi non viene duplicata dentro ogni arco: quando
+serve appartiene ai sistemi/event log che hanno prodotto il cambiamento.
+
+### API runtime
+
+`window.ADF_NPC_LEGAMI` espone:
+
+- `tipi()`;
+- `legami(p, opzioni)`;
+- `legame(p, personId)`;
+- `collega(a, b, opzioni)`;
+- `tra(a, b)`;
+- `personeCollegate(p, persone, opzioni)`.
+
+`tra(a,b)` restituisce due concetti distinti:
+
+- `reciproco`: esistono entrambe le direzioni;
+- `simmetrico`: le due direzioni hanno stesso tipo, percezione e sottotipo.
+
+Una relazione può quindi essere reciproca senza essere simmetrica.
+
+### Integrazione Posto / Circolo
+
+`postoCollegaPersone()` usa il nuovo grafo quando disponibile e conserva il
+fallback storico quando `npc-legami.js` non è caricato.
+
+`postoLegamiAttivi()` chiede soltanto legami con
+`coPresenza:true`.
+
+Questo mantiene il comportamento storico per:
+
+- conoscenze legacy;
+- amicizie;
+- collaborazioni;
+- parentela;
+
+ma impedisce che una semplice rivalità venga interpretata come motivo per
+comparire automaticamente insieme nel Circolo.
+
+Tutti gli altri gate del selettore restano validi: città, detenzione,
+appartenenze e stato possono comunque impedire la presenza.
+
+### Integrazione Strada
+
+`stradaNpcCollega()` continua a usare il bridge `ADF_CRIME_NPC.linkPeople()`
+quando presente.
+
+Il payload viene arricchito in modo backward-compatible con:
+
+- `relationshipType`;
+- `reciprocal`;
+- `perceptionA`;
+- `perceptionB`.
+
+Il numero di versione del contratto crime resta 1 perché:
+
+- il metodo è ancora `linkPeople`;
+- i vecchi campi `aId`, `bId`, `reason`, `context` non cambiano;
+- i nuovi campi sono opzionali e aggiuntivi.
+
+Senza adapter, il fallback passa gli stessi dati al grafo locale.
+
+### Cosa non viene fuso
+
+Il grafo NPC↔NPC non usa:
+
+- `p.rel` del protagonista;
+- `p.strada.fiducia`;
+- `p.carcere.rapporto`;
+- tratti di personalità come se fossero relazioni;
+- appartenenza allo stesso ambiente come prova automatica di amicizia.
+
+Il punto 10 e il punto 11 descrivono quindi due famiglie diverse:
+
+- giocatore ↔ NPC;
+- NPC ↔ NPC.
+
+### Rapporto con i tratti
+
+Come per il punto 10, un tratto non crea il legame.
+
+`leale` non crea amicizia.
+`competitivo` non crea rivalità.
+`rancoroso` non crea automaticamente un nemico.
+
+Un evento può usare quei tratti per decidere **come evolve** una relazione
+realmente esistente, ma deve prima esistere un fatto di gameplay.
+
+### Informazione conosciuta dal giocatore
+
+Il punto 11 definisce e persiste la rete reale del mondo.
+
+Non decide automaticamente quali archi il protagonista conosca o possa vedere.
+
+Una parentela, rivalità o amicizia può esistere nel mondo senza essere ancora
+nota al giocatore.
+
+La distinzione fra rete reale e informazione scoperta appartiene al punto 12.
+
+### Sufficienza rispetto alla simulazione 300–800 NPC
+
+Il modello resta sparso.
+
+Con 800 persone e, per esempio, una media di pochi legami reali per persona,
+vengono salvati soltanto quegli archi.
+
+Non vengono creati 639.200 rapporti potenziali.
+
+Chi non possiede legami non riceve neppure `reteLegami`.
+
+Le letture del Circolo filtrano ancora `G.gente` per risolvere gli ID;
+nell'ordine di 300–800 persone questo resta piccolo rispetto ai costi di
+rendering/gameplay attuali. Il punto 18 dovrà comunque misurare carriere lunghe
+e decidere se il Population Manager del punto 16 debba mantenere anche un indice
+`id → persona`.
+
+### Test
+
+`npc-legami.test.js` copre:
+
+- lettura non mutante dei record legacy;
+- amicizia reciproca;
+- tipi/percezioni asimmetrici;
+- legame direzionale;
+- parentela con sottotipi complementari;
+- evoluzione senza duplicati;
+- conservazione di `sinceWeek`;
+- arricchimento lazy del legacy;
+- preservazione delle percezioni durante gli update;
+- filtro co-presenza che esclude rivalità;
+- popolazione di 800 NPC senza matrice;
+- rifiuto di tipi/percezioni/self-link invalidi;
+- roundtrip JSON.
+
+`npc-legami-integrazione.test.js` verifica:
+
+- classificazione `attivita-lavoro → collaborazione`;
+- referral/ponti Strada → conoscenza;
+- rivalità direzionale esclusa dalla co-presenza automatica;
+- vecchi record ancora validi per la rete;
+- payload tipizzato verso un adapter crime;
+- percezioni asimmetriche inoltrabili a un Population Manager futuro.
+
+### Confine del punto 11
+
+**Chiuso:** catalogo minimo dei legami, grafo sparso, compatibilità legacy,
+reciprocità, asimmetria, percezioni, parentela tipizzata, evoluzione senza
+duplicati, integrazione Circolo/Strada.
+
+**Non implementato qui:** discovery dei legami da parte del giocatore, UI della
+rete, generazione automatica di famiglie/amicizie/rivalità, cluster e gruppi,
+propagazione sociale o simulazione giornaliera della rete.
+
+La scoperta delle informazioni è il punto 12; cluster e gruppi arrivano ai
+punti 13–14.
+
