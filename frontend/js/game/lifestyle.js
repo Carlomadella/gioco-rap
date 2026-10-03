@@ -38,6 +38,179 @@ const LIFE = [
 ];
 
 function lifeCost(){ return LIFE.reduce((a,c) => a + c.t[G.life[c.id] || 0].w, 0); }
+
+/* ==================== RISCHIO LIFESTYLE · PUNTO STRADA 18 ====================
+   Il giocatore non compila contabilità. Internamente teniamo soltanto:
+   - entrate chiaramente giustificabili della settimana;
+   - spese visibili extra (vestiti/viaggi ecc.);
+   - quattro snapshot settimanali, per non punire un singolo picco.
+   Il risultato è una frase leggibile: coerente / tirato / sopra le entrate /
+   troppo esposto. */
+function lifestyleWeekKey(){
+  return String(Number(G.year||1))+":"+String(Number(G.week||1));
+}
+
+function lifestyleRischioStato(){
+  if(!G.strada || typeof G.strada!=="object") G.strada={};
+  let st=G.strada.rischioLifestyle;
+  if(!st || typeof st!=="object"){
+    st=G.strada.rischioLifestyle={
+      key:null,entrate:0,fonti:{},speseExtra:0,speseFonti:{},
+      history:[],closedKey:null,last:null
+    };
+  }
+  if(!Array.isArray(st.history)) st.history=[];
+  if(!st.fonti || typeof st.fonti!=="object") st.fonti={};
+  if(!st.speseFonti || typeof st.speseFonti!=="object") st.speseFonti={};
+  const key=lifestyleWeekKey();
+  if(st.key!==key){
+    st.key=key;
+    st.entrate=0;
+    st.fonti={};
+    st.speseExtra=0;
+    st.speseFonti={};
+  }
+  return st;
+}
+
+function lifestyleRegistraEntrata(importo,fonte){
+  importo=Math.max(0,Number(importo)||0);
+  if(!importo) return 0;
+  const st=lifestyleRischioStato();
+  const k=String(fonte||"altro");
+  st.entrate+=importo;
+  st.fonti[k]=Number(st.fonti[k]||0)+importo;
+  /* compatibilità: altri moduli legacy leggono ancora questo totale. */
+  G._entratePulite=st.entrate;
+  return importo;
+}
+
+function lifestyleRegistraSpesaVisibile(importo,fonte,peso){
+  importo=Math.max(0,Number(importo)||0);
+  peso=Math.max(0,Number(peso==null?1:peso)||0);
+  const pesata=importo*peso;
+  if(!pesata) return 0;
+  const st=lifestyleRischioStato();
+  const k=String(fonte||"altro");
+  st.speseExtra+=pesata;
+  st.speseFonti[k]=Number(st.speseFonti[k]||0)+pesata;
+  return pesata;
+}
+
+function lifestyleValoreVestitiVisibili(){
+  if(typeof stileAddosso!=="function") return 0;
+  return stileAddosso().reduce((n,v)=>n+Math.max(0,Number(v&&v.p)||0),0);
+}
+
+function lifestyleOstentazione(){
+  const life=G.life||{};
+  const livelli=LIFE.reduce((n,c)=>n+((Number(life[c.id]||0))/Math.max(1,c.t.length-1)),0);
+  const media=livelli/Math.max(1,LIFE.length);
+  const vestiti=lifestyleValoreVestitiVisibili();
+  return Math.max(0,Math.min(10,media*7+Math.min(3,vestiti/700)));
+}
+
+function lifestyleSnapshotCorrente(){
+  const st=lifestyleRischioStato();
+  const ricorrente=Math.max(0,Number(lifeCost())||0);
+  const vestiti=lifestyleValoreVestitiVisibili();
+  /* Un outfit costoso è un segnale di ricchezza, non una spesa ripetuta ogni
+     settimana: gli attribuiamo solo un piccolo peso equivalente. */
+  const segnaleVestiti=vestiti*.05;
+  return {
+    key:st.key,
+    entrate:Math.max(0,Number(st.entrate)||0),
+    ricorrente,
+    extra:Math.max(0,Number(st.speseExtra)||0),
+    vestiti,
+    visibile:ricorrente+Math.max(0,Number(st.speseExtra)||0)+segnaleVestiti,
+    fonti:Object.assign({},st.fonti),
+    speseFonti:Object.assign({},st.speseFonti)
+  };
+}
+
+function lifestyleMediaRischio(includiCorrente){
+  const st=lifestyleRischioStato();
+  const righe=st.history.slice(-3).map(x=>({
+    entrate:Number(x.entrate||0),
+    visibile:Number(x.visibile||0)
+  }));
+  if(includiCorrente!==false) righe.push(lifestyleSnapshotCorrente());
+  if(!righe.length) return {entrate:0,visibile:0,settimane:0};
+  return {
+    entrate:righe.reduce((n,x)=>n+x.entrate,0)/righe.length,
+    visibile:righe.reduce((n,x)=>n+x.visibile,0)/righe.length,
+    settimane:righe.length
+  };
+}
+
+function lifestyleClassificaRischio(media){
+  media=media||lifestyleMediaRischio(true);
+  const tolleranza=media.entrate*1.35+90;
+  const gap=media.visibile-tolleranza;
+  if(gap<=0) return {id:"coerente",label:"Coerente",gap:0};
+  if(gap<=120) return {id:"tirato",label:"Tirato",gap};
+  if(gap<=300) return {id:"sopra",label:"Sopra le entrate",gap};
+  return {id:"esposto",label:"Troppo esposto",gap};
+}
+
+function lifestyleRiepilogoRischio(){
+  const st=lifestyleRischioStato();
+  const media=lifestyleMediaRischio(true);
+  const classe=lifestyleClassificaRischio(media);
+  return {
+    ...classe,
+    entrate:media.entrate,
+    visibile:media.visibile,
+    settimane:media.settimane,
+    ostentazione:lifestyleOstentazione(),
+    testo:classe.id==="coerente"
+      ? "Il tuo tenore di vita è compatibile con quello che puoi giustificare."
+      : classe.id==="tirato"
+        ? "Stai iniziando a vivere sopra quello che riesci a giustificare."
+        : classe.id==="sopra"
+          ? "Il tuo tenore di vita è chiaramente sopra le entrate giustificabili."
+          : "Stai mostrando e spendendo molto più di quanto puoi giustificare.",
+    last:st.last||null
+  };
+}
+
+function lifestyleChiudiSettimanaRischio(){
+  const st=lifestyleRischioStato();
+  if(st.closedKey===st.key && st.last) return st.last;
+
+  const snap=lifestyleSnapshotCorrente();
+  const media=lifestyleMediaRischio(true);
+  const classe=lifestyleClassificaRischio(media);
+  const giro=(typeof stradaGiroAvviato==="function")
+    ? !!stradaGiroAvviato()
+    : !!(G.strada&&(G.strada.giroAvviato||G.strada.badgeSbloccato));
+
+  let heatDelta=0;
+  if(giro && !G.strada.arresto && classe.gap>0){
+    heatDelta=Math.max(.6,Math.min(8,.7+classe.gap/130+lifestyleOstentazione()*.28));
+    G.strada.heat=clamp(Number(G.strada.heat||0)+heatDelta,0,100);
+    if(typeof pushLog==="function"){
+      pushLog("<b>Tenore di vita: "+classe.label+".</b> "+lifestyleRiepilogoRischio().testo+
+        " Attenzione +"+heatDelta.toFixed(1)+".","bad");
+    }
+  }
+
+  const chiusa={
+    ...snap,
+    status:classe.id,
+    label:classe.label,
+    gap:classe.gap,
+    heatDelta:Number(heatDelta.toFixed(2)),
+    ostentazione:Number(lifestyleOstentazione().toFixed(2))
+  };
+  st.history.push(chiusa);
+  if(st.history.length>8) st.history.shift();
+  st.closedKey=st.key;
+  st.last=chiusa;
+  G._entratePulite=snap.entrate;
+  return chiusa;
+}
 /* punto 63: un riassunto per la sidebar del profilo, non i venticinque numeri
    del pannello Lifestyle vero — solo quante categorie hai alzato dal livello
    base e quanto, in media, sei sopra quel base */
