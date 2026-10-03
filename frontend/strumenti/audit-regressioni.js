@@ -1448,11 +1448,13 @@ test("punto 15: il lavoro Pizzeria non produce direttamente lead crime",
   lavoroEventi.includes('if(workKey(job)==="pizzeria") return false') &&
   lavoroEventi.includes("function showCrime(job,s,roll)"));
 
-test("punto 16: le persone possono avere legami sociali persistenti e bidirezionali",
+test("punto 16: le persone hanno legami persistenti e il grafo conserva la compatibilità legacy",
   posto.includes("function postoReteLegami(p)") &&
-  posto.includes("function postoCollegaPersone(a,b,motivo)") &&
+  posto.includes("function postoCollegaPersone(a,b,motivo,meta)") &&
   posto.includes("function postoLegamiAttivi(p)") &&
-  posto.includes('reason:motivo||"contatto-comune"'));
+  posto.includes("window.ADF_NPC_LEGAMI") &&
+  posto.includes("reciproco:cfg.reciproco!==false") &&
+  posto.includes('reason:motivo||cfg.reason||"contatto-comune"'));
 test("punto 16: il Circolo favorisce ricorrenze e contatti comuni senza regalare il nome",
   posto.includes("circoloPresenze") &&
   posto.includes("postoLegamiAttivi(p).reduce") &&
@@ -1524,12 +1526,14 @@ test("punto 22: il fallback legacy è centralizzato nel bridge NPC",
   crime.includes('let p=typeof nuovaPersona==="function" ? nuovaPersona(role) : null') &&
   crime.includes('if(!G.gente.some(x=>x&&x.id===p.id)) G.gente.push(p)'));
 
-test("punto 22: col nuovo manager ricerca, creazione e legami passano dal bridge crime",
+test("punto 22: col nuovo manager ricerca, creazione e legami tipizzati passano dal bridge crime",
   crime.includes('typeof a.findPerson==="function"') &&
   crime.includes('typeof a.createPerson==="function"') &&
   crime.includes('typeof adapter.linkPeople==="function"') &&
   crime.includes("let p=stradaNpcTrovaPersona({crimeKey:key,name:nome,cityId})") &&
-  crime.includes("stradaNpcCollega(a,b,reason)"));
+  crime.includes("function stradaNpcCollega(a,b,reason,meta)") &&
+  crime.includes("relationshipType") &&
+  crime.includes("reciprocal:cfg.reciproco!==false"));
 test("punto 22: città e gruppi NPC entrano solo come contesto della rete criminale",
   crime.includes("function stradaNpcCittaPersona(p)") &&
   crime.includes("function stradaNpcGruppiPersona(p)") &&
