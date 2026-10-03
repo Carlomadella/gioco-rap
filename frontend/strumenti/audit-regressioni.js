@@ -1539,8 +1539,9 @@ test("punto 18: vestiti indossati, acquisti e viaggi alimentano la visibilità",
   lifestyle.includes("stileAddosso().reduce") &&
   negozio.includes('lifestyleRegistraSpesaVisibile(prezzo,"vestiti",.65)') &&
   transfers.includes('lifestyleRegistraSpesaVisibile(inv.offerta.viaggio,"viaggio",.35)'));
-test("punto 18: il lifestyle non crea heat finché il giro criminale non è avviato",
-  lifestyle.includes('const giro=(typeof stradaGiroAvviato==="function")') &&
+test("punto 18: il lifestyle non crea heat senza rischio criminale attivo",
+  lifestyle.includes('const giro=(typeof stradaRischioCriminaleAttivo==="function")') &&
+  lifestyle.includes("!!stradaRischioCriminaleAttivo()") &&
   lifestyle.includes("if(giro && !G.strada.arresto && classe.gap>0)"));
 test("punto 18: denaro criminale e riciclaggio non diventano reddito giustificabile",
   (() => {
@@ -1648,13 +1649,18 @@ test("punto 21: la memoria dura da mesi ad anni in base alla profondità",
   crime.includes("p<25 ? 120 : p<50 ? 365 : p<75 ? 730 : 1460") &&
   crime.includes("u.memoryUntilAbsoluteDay=oggi+memoria"));
 test("punto 21: uscire chiude meccaniche operative ma conserva persone e precedenti",
-  crime.includes("opp.pending=null;opp.pendingChoices=[];opp.active=null") &&
-  crime.includes("rete.pending=null") &&
-  crime.includes("s.prot=0") &&
-  crime.includes("s.ferro=false") &&
-  crime.includes("s.avvocato=false") &&
-  !crime.includes("G.gente=[]") &&
-  !crime.includes("s.precedenti=0"));
+  (() => {
+    const a=crime.indexOf("function stMollaIlGiro()");
+    const b=crime.indexOf("/* ==================== CARCERE EVENTI",a);
+    const block=crime.slice(a,b);
+    return block.includes("opp.pending=null;opp.pendingChoices=[];opp.active=null") &&
+      block.includes("rete.pending=null") &&
+      block.includes("s.prot=0") &&
+      block.includes("s.ferro=false") &&
+      block.includes("s.avvocato=false") &&
+      !block.includes("G.gente=[]") &&
+      !block.includes("s.precedenti=0");
+  })());
 test("punto 21: ex giro blocca colpi, riciclaggio, opportunità e meeting criminali",
   crime.includes("Hai mollato il giro: non fai più passare denaro sporco.") &&
   crime.includes("Hai mollato il giro: non accetti più colpi.") &&
@@ -1735,8 +1741,8 @@ test("UI principale mostra residuo e durata riciclaggio",
   crimeui.includes("const launderCap=") &&
   crimeui.includes('GAME_TIME.durationFor("ricicla")') &&
   crimeui.includes('"Limite settimanale raggiunto"'));
-test("UI legacy disabilita il riciclaggio a capacità zero",
-  crime.includes("rip.disabled = !!s.arresto || s.sporchi <= 0 || ripCap <= 0"));
+test("UI legacy disabilita il riciclaggio a capacità zero e quando sei fuori dal giro",
+  crime.includes("rip.disabled = !!s.arresto || !partecipa || s.sporchi <= 0 || ripCap <= 0"));
 
 console.log("\nPunto 1 — controllo tempo globale coerente");
 test("controller tempo globale è caricato dopo i motori eventi",
