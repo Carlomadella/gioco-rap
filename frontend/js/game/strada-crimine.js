@@ -2914,6 +2914,12 @@ function stradaNpcGruppiPersona(p){
       if(Array.isArray(out)) return out.filter(Boolean);
     }
   }catch(_){}
+  try{
+    const gruppi=typeof window!=="undefined" ? window.ADF_NPC_GRUPPI : null;
+    if(gruppi && typeof gruppi.gruppiPerPersona==="function" &&
+       typeof G!=="undefined" && Array.isArray(G.npcGruppi))
+      return gruppi.gruppiPerPersona(G.npcGruppi,p.id);
+  }catch(_){}
   return [];
 }
 
