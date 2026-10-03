@@ -126,6 +126,15 @@ describe("Strada · punto 20 carcere come fonte di relazioni",()=>{
     expect(Array.from(out.rivali).map(x=>x.id)).toEqual([p.id]);
     expect(p.strada.known).toBe(true);
     expect(p.strada.rivalita).toBe(true);
+    expect(p.circoloSbloccato).toBe(false);
+    expect(p.carcere.returnAfterAbsoluteDay).toBe(128);
+    expect(p.carcere.outsideFollowupDone).toBe(false);
+  });
+
+  it("il conto nato dentro riappare fuori come rivalità, non come dialogo neutro",()=>{
+    expect(posto).toContain('jailOutside:"rival"');
+    expect(posto).toContain('"jail-rival-reunion"');
+    expect(posto).toContain('stradaModificaTensionePersona(p,1,"carcere-rivale-reincontro")');
   });
 
   it("gli eventi rapporti/crime sono collegati a profili persistenti",()=>{
