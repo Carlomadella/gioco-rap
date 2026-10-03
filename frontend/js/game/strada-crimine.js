@@ -938,10 +938,14 @@ function stradaRischioCriminaleAttivo(){
 function stradaPassatoCandidati(){
   return (G.gente||[]).filter(p=>p&&!p.via&&p.strada&&p.strada.known).map(p=>{
     const st=stradaPersonaMeta(p),cons=stradaConseguenzePersona(p);
-    const kind=st.rivalita?"rival":Number(cons.debiti||0)>0?"debt":
-      (stradaFiduciaValore(p)>=35 || p.origine==="carcere")?"contact":null;
+    const favori=stradaFavoriValore(p);
+    const kind=st.rivalita?"rival":
+      Number(cons.debiti||0)>0?"debt":
+      favori>0?"favor":
+      (stradaRelazioneForte(p) || p.origine==="carcere")?"contact":null;
     if(!kind)return null;
-    const peso=(kind==="rival"?6:kind==="debt"?5:2)+stradaFiduciaValore(p)/40;
+    const peso=(kind==="rival"?6:kind==="debt"?5:kind==="favor"?4:2)+
+      stradaFiduciaValore(p)/40;
     return {p,kind,peso};
   }).filter(Boolean);
 }
@@ -984,7 +988,10 @@ function stradaPassatoSettimana(roll,variantRoll){
   }else if(scelta.kind==="debt"){
     G.wellbeing=clamp(Number(G.wellbeing||0)-1,0,100);
     if(typeof pushLog==="function")
-      pushLog("<b>"+p.n+" non ha dimenticato il favore.</b> Non ti propone un colpo: ti ricorda soltanto che certi conti restano.","");
+      pushLog("<b>"+p.n+" non ha dimenticato il debito.</b> Non ti propone un colpo: ti ricorda soltanto che certi conti restano.","");
+  }else if(scelta.kind==="favor"){
+    if(typeof pushLog==="function")
+      pushLog("<b>"+p.n+" ricompare.</b> Tra voi c'è ancora un favore aperto. Hai lasciato il giro, non il rapporto.","");
   }else{
     if(typeof pushLog==="function")
       pushLog("<b>"+p.n+" ricompare.</b> Non ti sta riportando nel giro: è una persona che faceva parte di quella vita e non è sparita quando hai mollato.","");
@@ -3720,8 +3727,12 @@ function stCompraAttivita(id){
 }
 function stMollaIlGiro(){
   const s=G.strada,u=stradaUscitaStato();
+  if(s.arresto) return "Da dentro non si molla niente.";
   if(u.mollato) return "Hai già mollato il giro.";
-  const costo=Math.max(1500,Math.round(s.sporchi*.3));
+  const costo=Math.max(1500,Math.round(Number(s.sporchi||0)*.3));
+  const disponibili=Math.max(0,Number(s.sporchi||0))+Math.max(0,Number(G.money||0));
+  if(disponibili<costo)
+    return "Per mollare il giro ti servono "+fmt(costo)+" € complessivi. Ne hai "+fmt(disponibili)+" €.";
   if(s.sporchi>=costo)s.sporchi-=costo;
   else{G.money=Math.max(0,G.money-(costo-s.sporchi));s.sporchi=0;}
 
@@ -3735,6 +3746,8 @@ function stMollaIlGiro(){
   const opp=stradaOpportunitaStato();
   opp.pending=null;opp.pendingChoices=[];opp.active=null;
   const rete=stradaEventoReteStato();rete.pending=null;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.clearCrimeLeads==="function")
+    ADF_WORK_EVENTS.clearCrimeLeads("left-giro");
   const prot=stradaProtezioneStato();
   if(Number(s.prot||0)>0)prot.history.push({status:"ended-left-giro",absoluteDay:oggi,providerPersonId:prot.providerPersonId||null});
   s.prot=0;prot.level=0;prot.prepaidWeekKey=null;
@@ -5275,13 +5288,19 @@ $("st-molla").onclick = () => {
   hubTap();
   if(G.strada.arresto){ stToast("Da dentro non si molla niente."); return; }
   if(!stradaPartecipazioneAttiva()){ stToast("Hai già mollato il giro."); return; }
-  const costo = Math.max(1500, Math.round(G.strada.sporchi * .3));
+  const costo = Math.max(1500, Math.round(Number(G.strada.sporchi||0) * .3));
+  const disponibili=Math.max(0,Number(G.strada.sporchi||0))+Math.max(0,Number(G.money||0));
+  const manca=Math.max(0,costo-disponibili);
   STRADA_SCENA = {k:"Uscirne", titolo:"Molla il giro",
     testo:"Ti costa " + fmt(costo) + " € — il 30% dei soldi sporchi, e mai meno di 1.500 € — " +
       "e la reputazione di strada cala di un terzo. In cambio ti torna la testa per la musica. Qualcuno se la lega al dito.",
     opts:[
-      {n:"Mollo", d:"Chiudi i conti e sparisci dal giro", hot:true,
-       run(){ stMollaIlGiro(); STRADA_SCENA = null; stToast("Hai mollato il giro."); }},
+      {n:"Mollo", d:manca?"Ti mancano "+fmt(manca)+" €":"Chiudi i conti e sparisci dal giro", hot:true, no:manca>0,
+       run(){
+         const t=stMollaIlGiro();
+         if(stradaPartecipazioneAttiva()){ stToast(t); return; }
+         STRADA_SCENA = null; stToast(t);
+       }},
       {n:"Lascia stare", d:"Resti dentro al giro", run(){ STRADA_SCENA = null; }}
     ]};
   renderStScheda();
