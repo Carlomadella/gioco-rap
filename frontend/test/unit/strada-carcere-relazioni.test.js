@@ -8,6 +8,7 @@ const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
 const ui=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8");
+const posto=fs.readFileSync(path.join(ROOT,"js/game/posto.js"),"utf8");
 
 const helpers=crime.slice(
   crime.indexOf("const CARCERE_RELAZIONI_PROFILI"),
@@ -95,6 +96,26 @@ describe("Strada · punto 20 carcere come fonte di relazioni",()=>{
     expect(out.contatti).toHaveLength(0);
     expect(G.gente[0].carcere.rapporto).toBe(2);
     expect(G.gente[0].strada).toBeUndefined();
+    expect(G.gente[0].carcere.returnAfterAbsoluteDay).toBe(142);
+    expect(G.gente[0].carcere.outsideFollowupDone).toBe(false);
+  });
+
+  it("una conoscenza debole ha un percorso reale per ricomparire fuori",()=>{
+    expect(crime).toContain("m.returnAfterAbsoluteDay=stradaAbsDay()+ritardo");
+    expect(posto).toContain("function postoRientroCarcereDisponibile(p)");
+    expect(posto).toContain('p.origineLuogo!=="carcere"');
+    expect(posto).toContain("p.circoloSbloccato=true");
+    expect(posto).toContain("dialogoCarcereFuori(p)");
+    expect(posto).toContain("m.releasedAbsoluteDay!=null");
+    expect(posto).toContain("m.returnAfterAbsoluteDay=quando");
+  });
+
+  it("il primo reincontro può trasformare un favore in continuità reale",()=>{
+    expect(posto).toContain('jailOutside:"favore"');
+    expect(posto).toContain('source:"carcere-reunion"');
+    expect(posto).toContain('stradaModificaFiducia(p,4,"carcere-favore-fuori")');
+    expect(posto).toContain('stradaAggiungiFavore(p,1,"carcere-favore-fuori")');
+    expect(posto).toContain("p.carcere.outsideFollowupDone=true");
   });
 
   it("un conto grave può uscire come rivalità, non come premio",()=>{
@@ -105,6 +126,15 @@ describe("Strada · punto 20 carcere come fonte di relazioni",()=>{
     expect(Array.from(out.rivali).map(x=>x.id)).toEqual([p.id]);
     expect(p.strada.known).toBe(true);
     expect(p.strada.rivalita).toBe(true);
+    expect(p.circoloSbloccato).toBe(false);
+    expect(p.carcere.returnAfterAbsoluteDay).toBe(128);
+    expect(p.carcere.outsideFollowupDone).toBe(false);
+  });
+
+  it("il conto nato dentro riappare fuori come rivalità, non come dialogo neutro",()=>{
+    expect(posto).toContain('jailOutside:"rival"');
+    expect(posto).toContain('"jail-rival-reunion"');
+    expect(posto).toContain('stradaModificaTensionePersona(p,1,"carcere-rivale-reincontro")');
   });
 
   it("gli eventi rapporti/crime sono collegati a profili persistenti",()=>{
