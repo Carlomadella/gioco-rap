@@ -71,9 +71,9 @@ describe("Strada · punto 11 peso e capacità senza ranghi",()=>{
       mondo:{chance:.05,cooldownGiorni:10,durataGiorni:7,trigger:"mondo"}
     };
     const make=cap=>new Function(
-      "STRADA_OPPORTUNITA_TRIGGER","stradaCapacitaRete",
+      "STRADA_OPPORTUNITA_TRIGGER","stradaCapacitaRete","stradaHeatProfilo",
       code+"\nreturn stradaOpportunitaTriggerConfig;"
-    )(base,()=>cap);
+    )(base,()=>cap,()=>({id:"basso",opportunita:1}));
 
     expect(make({piuChiamate:false,richiestaNome:false})("mondo"))
       .toMatchObject({chance:.05,cooldownGiorni:10});
@@ -128,12 +128,13 @@ describe("Strada · punto 11 peso e capacità senza ranghi",()=>{
     const api=new Function(
       "stradaEventoReteStato","stradaPersonaDaId","stradaRelazioneDisponibile",
       "stradaModificaFiducia","stradaAggiungiFavore","stradaAbsDay","stradaEcoMondo",
+      "stradaHeatSincronizzaPersone","stradaRelazioneOperativa",
       code+"\nreturn stradaRisolviEventoRete;"
     )(
       ()=>state,id=>people[id]||null,p=>!!p.available,
       (p,d,r)=>trust.push({id:p.id,d,r}),
       (p,d,r)=>fav.push({id:p.id,d,r}),
-      ()=>200,()=>null
+      ()=>200,()=>null,()=>[],p=>!!p.available
     );
 
     const out=api("cand");
@@ -158,12 +159,13 @@ describe("Strada · punto 11 peso e capacità senza ranghi",()=>{
     const api=new Function(
       "stradaEventoReteStato","stradaPersonaDaId","stradaRelazioneDisponibile",
       "stradaModificaFiducia","stradaAggiungiFavore","stradaAbsDay","stradaEcoMondo",
+      "stradaHeatSincronizzaPersone","stradaRelazioneOperativa",
       code+"\nreturn stradaRisolviEventoRete;"
     )(
       ()=>state,id=>people[id]||null,p=>!!p.available,
       (p,d,r)=>trust.push({id:p.id,d,r}),
       (p,d,r)=>fav.push({id:p.id,d,r}),
-      ()=>300,()=>null
+      ()=>300,()=>null,()=>[],p=>!!p.available
     );
 
     const out=api();
