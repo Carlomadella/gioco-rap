@@ -4934,6 +4934,13 @@ function renderStBarre(){
   const occhi = $("st-occhi");
   occhi.textContent = stOcchiAddosso();
   occhi.classList.toggle("hot", s.heat >= 50);
+
+  const molla=$("st-molla");
+  if(molla){
+    molla.textContent=partecipa?"Molla il giro":"Fuori dal giro";
+    molla.disabled=!partecipa||!!s.arresto;
+    molla.classList.toggle("no",!partecipa||!!s.arresto);
+  }
 }
 
 /* ---- il centro: i colpi, o il tempo che passa ---- */
@@ -5246,6 +5253,7 @@ document.querySelectorAll("#strada [data-sttab]").forEach(t => {
 $("st-molla").onclick = () => {
   hubTap();
   if(G.strada.arresto){ stToast("Da dentro non si molla niente."); return; }
+  if(!stradaPartecipazioneAttiva()){ stToast("Hai già mollato il giro."); return; }
   const costo = Math.max(1500, Math.round(G.strada.sporchi * .3));
   STRADA_SCENA = {k:"Uscirne", titolo:"Molla il giro",
     testo:"Ti costa " + fmt(costo) + " € — il 30% dei soldi sporchi, e mai meno di 1.500 € — " +
