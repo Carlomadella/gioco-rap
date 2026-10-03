@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:51dce728 -->
+## 03/10/26, 00:33 — feature/strada-punto14-fabbrica-storyline → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `51dce728`
+
+### Cosa è entrato
+
+- `216a6044` — test(lavoro): include la storyline Fabbrica nella catena post-turno — **mycolbraga**
+- `5e04c7e4` — test(fabbrica): adegua fixture alla storyline punto 14 — **mycolbraga**
+- `a44fa4fc` — fix(test): allinea copy Fabbrica alla maiuscola reale — **mycolbraga**
+- `22409d56` — fix(audit): allinea testo Fabbrica al copy reale — **mycolbraga**
+- `7feb2f4f` — chore(frontend): aggiorna cache punto 14 — **mycolbraga**
+- `579253dd` — test(audit): verifica storyline Fabbrica punto 14 — **mycolbraga**
+- `dcc7eeb1` — test(strada): copri storyline Fabbrica del punto 14 — **mycolbraga**
+- `8a03bc4f` — fix(strada): usa anzianita Fabbrica persistente tra i cicli — **mycolbraga**
+- `bb77eb8d` — feat(lavoro): persisti i turni totali realmente lavorati per sede — **mycolbraga**
+- `65647d47` — fix(eventi): impedisci intro generiche dopo il turno Fabbrica — **mycolbraga**
+- `6e1b8784` — feat(eventi): aggiungi accesso Fabbrica contestuale post-turno — **mycolbraga**
+- `4b3b0bb2` — feat(strada): rendi la Fabbrica una storyline d'accesso reale — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Modificato:** `frontend/test/unit/lavori-contatti.test.js`
+- **Aggiunto:** `frontend/test/unit/strada-fabbrica-storyline.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:0dedecc2 -->
 ## 03/10/26, 00:11 — feature/strada-punto13-conseguenze-persone-v2 → main
 
