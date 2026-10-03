@@ -342,12 +342,16 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
   hanno abilità, fama e carattere»*;
 - i rapporti coi beatmaker che non vanno mai in negativo: li puoi offendere quanto vuoi e
   il rapporto resta uguale (foglio dei punti nuovi, Alessio);
-- la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no.
-  Il simulatore di bilanciamento (29/09) aggiunge che non rende: con un colpo al giorno
-  l'anno finisce in carcere e in rosso (voce 65 di `problemi-riscontrati.md`);
-  **FATTO in parte (02/10/2026)** — le opportunità criminali hanno un pool generale, un dialogo con la
-  decisione e conseguenze vere, e arrivano anche fuori dalla Fabbrica (pull request #30 di Carletto,
-  segnata dal push degli altri; `frontend/js/game/strada-crimine.js`). Il bilanciamento resta da fare;
+- la vita simulata e il bilanciamento della criminalità restano da misurare sul sistema
+  corrente. **AGGIORNATO (03/10/2026)** — la Provincia non è più il sottosistema del 29/09:
+  oggi ha 30 colpi in 5 categorie, rete persistente, heat, lifestyle, attività di copertura,
+  carcere relazionale, uscita dal giro, fallout progressivo e intel contestuale. Per questo
+  i numeri del vecchio simulatore («un colpo al giorno», 300 giorni su 364 in carcere,
+  carriera in rosso) restano uno **snapshot storico**, non una diagnosi del runtime attuale.
+  La voce 65 di `problemi-riscontrati.md` resta aperta solo finché il simulatore non viene
+  rilanciato sul codice corrente. Il gap gameplay noto emerso dal reaudit è diverso:
+  i colpi consumano tempo reale ma non hanno ancora vere finestre
+  mattina/pomeriggio/notte/weekend;
   **FATTO in parte (03/10/2026)** — la Strada di Mycol, punti 9–24 (segnata dal push degli altri):
   il TrapPhone è uno sblocco del giro e non c'è più in una carriera nuova, l'heat cambia contatti e
   controlli, il rischio lifestyle confronta le spese con le entrate giustificabili, le persone del

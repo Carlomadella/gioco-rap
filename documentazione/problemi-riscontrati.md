@@ -37,13 +37,18 @@ bilanciamento dopo un anno: lucidità sempre fra 96 e 99 (la lucidità resta, de
 Carlo del 21/09: è da far mordere, non da togliere), scrittura al tetto entro l'anno,
 niente game over coi debiti, 2 € di spese a settimana per ogni pezzo mai registrato.
 
-**65.** Da decidere (29/09), dal simulatore di bilanciamento su sei carriere da un anno: **il
-crimine non paga** (−1.129 €, 300 giorni su 364 in carcere), **lavorare non rende** (chi fa
-il turno ogni giorno chiude con 346 €, chi sta fermo con 897), **la giornata rallenta da
-0,7 a 3,3 secondi** per chi lavora, **l'hype al tetto** per il musicista, **nessun
-contratto** in nessuna strategia. Le abilità al tetto sono la stessa cosa della voce 61.
-Una carriera per strategia: sono indizi, da riprovare su un centinaio. Il dettaglio nel
-giro del 29/09 in fondo, «Il simulatore di bilanciamento».
+**65.** Da decidere (29/09), dal simulatore di bilanciamento su sei carriere da un anno:
+nel **runtime di allora** il crimine non pagava (−1.129 €, 300 giorni su 364 in carcere),
+lavorare rendeva poco, la giornata rallentava per chi lavorava, l'hype arrivava al tetto e
+nessuna strategia otteneva un contratto. **AGGIORNAMENTO 03/10/2026:** quei numeri non
+descrivono più il sistema criminale corrente, perché dopo quella simulazione sono stati
+aggiunti/riscritti pool dei colpi, heat, lifestyle, relazioni, carcere, uscita dal giro,
+fallout e intel. La voce resta aperta come **verifica di bilanciamento da rifare**, non come
+affermazione che «oggi il crimine non paga». Il prossimo giro deve rilanciare il simulatore
+sul `main` attuale, idealmente su molte carriere per strategia, e confrontare soldi,
+giorni in carcere, heat, contratti e sostenibilità delle attività criminali. Le abilità al
+tetto restano collegate alla voce 61. Il dettaglio storico resta nel giro del 29/09 in fondo,
+«Il simulatore di bilanciamento».
 
 **66.** Da decidere (29/09): **«Via la lucidità» è ancora fra i lavori da fare** (voce 3 di «Da
 fare adesso», CARLO 8), ma Carlo il 21/09 ha detto che la lucidità resta (voce 61). O esce dalla
