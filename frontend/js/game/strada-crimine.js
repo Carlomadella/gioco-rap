@@ -3916,8 +3916,12 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
           : " La dritta arrivata dal lavoro è bruciata.")
       : "";
     if(squadraCopre){
+      const fallout=stradaApplicaFalloutFallimento(colpo,{
+        arrested:false,shielded:true,personaLead,personaSquadra
+      });
       STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. <b>" +
-          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." + notaLeadFallita + notaPersone,
+          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." +
+          notaLeadFallita + notaPersone + fallout.text,
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
       const ingressoProtetto = !stradaAttivitaSbloccate();
@@ -3951,7 +3955,19 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
           if(ferroSt.history.length>12) ferroSt.history.shift();
           ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
         }
-        s.arresto = {settimane:settimane, colpo:colpo.n};
+        s.arresto = {
+          settimane:settimane,
+          settimaneIniziali:settimane,
+          colpo:colpo.n,
+          colpoId:colpo.id,
+          falloutScore:null,
+          falloutBand:null
+        };
+        const fallout=stradaApplicaFalloutFallimento(colpo,{
+          arrested:true,shielded:false,personaLead,personaSquadra
+        });
+        s.arresto.falloutScore=fallout.score;
+        s.arresto.falloutBand=fallout.profilo.id;
         if(personaLead) stradaEcoMondo(personaLead,"street-arrest",0,{
           reason:"arresto-dopo-colpo",context:"carcere"
         });
@@ -3961,7 +3977,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
           });
         STRADA_SCENA = {k:"Com'è andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
-            ". Niente musica, niente strada: solo il tempo che passa." + notaLeadFallita + notaPersone,
+            ". Niente musica, niente strada: solo il tempo che passa." +
+            notaLeadFallita + notaPersone + fallout.text,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
       }
     }
@@ -5036,8 +5053,8 @@ function stradaSettimana(){
     const dentro = Math.round(weeklyCosts() * .6);
     G.money -= dentro;
     pushLog("Da dentro costa: <b>−" + fmt(dentro) + " €</b> fra pacchi, telefonate e spese extra, oltre alle spese di fuori.", "bad");
-    if(G.contract && Math.random() < .20){
-      pushLog("<b>L'etichetta ha rescisso.</b> I giornali ci sono andati pesante.", "bad");
+    if(G.contract && Math.random() < stradaRischioContrattoCarcere(s.arresto)){
+      pushLog("<b>L'etichetta ha rescisso.</b> Più pesa la caduta, più settimane passano e più diventa difficile tenere in piedi anche la carriera pulita.", "bad");
       G.contract = null;
       /* senza contratto la consegna non esiste più: lasciata lì, alla
          scadenza advanceWeek() cercava la penale su un contratto che non c'è
@@ -5489,6 +5506,7 @@ function renderStColpi(){
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip">' + stradaDurataColpoLabel(c) + '</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
+        '<span class="stchip ' + stradaCadutaClasse(c) + '">Caduta ' + stradaCadutaProfilo(c).label + '</span>' +
         (lead
           ? '<span class="stchip money">' + fonteLead + ' ' +
             (Number(lead.bonusPct||0)>=0?'+':'') + Number(lead.bonusPct||0) + '% · ' +
