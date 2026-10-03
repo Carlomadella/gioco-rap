@@ -913,6 +913,15 @@ function stradaApplicaPreparazione(colpo,prepId,personId){
   if(minuti>0){
     if(typeof GAME_TIME==="undefined")
       return {ok:false,reason:"Il sistema del tempo non è ancora disponibile."};
+
+    /* La preparazione non deve mangiare tempo per poi scoprire che il colpo
+       non entra più nella sua finestra. Controlliamo il momento in cui
+       finirebbe la preparazione prima di spendere un solo minuto. */
+    if(typeof GAME_TIME.now==="function"){
+      const finestraDopo=stradaFinestraColpoStato(colpo,GAME_TIME.now()+minuti);
+      if(!finestraDopo.ok) return {ok:false,reason:finestraDopo.message};
+    }
+
     const gate=typeof GAME_TIME.canSpend==="function"
       ? GAME_TIME.canSpend(minuti)
       : {ok:typeof GAME_TIME.remaining!=="function" || GAME_TIME.remaining()>=minuti};
