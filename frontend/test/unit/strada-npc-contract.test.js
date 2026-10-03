@@ -106,7 +106,7 @@ describe("Strada · punto 22 contratto crime verso sistema NPC",()=>{
 
   it("la rete criminale attiva è già filtrabile per città senza implementare Milano",()=>{
     expect(crime).toContain("function stradaContattiAttivi(citta)");
-    expect(crime).toContain("stradaNpcPersone({cityId:stradaCittaContesto(citta)})");
+    expect(crime).toContain("stradaNpcPersone({cityId})");
     expect(crime).toContain('return "provincia"');
   });
 
