@@ -2265,8 +2265,10 @@ test("il reparto Vestiti vende capi del camerino MakeHuman: ogni raw della vetri
     const capi = [...guardaroba.matchAll(/\{id:"[a-z0-9]+", raw:"([^"]+)", n:"[^"]+", slot:"([a-zA-Z]+)", p:(\d+)/g)];
     return capi.length >= 30 && capi.every(m => perRaw.get(m[1]) === m[2] && +m[3] > 0);
   })());
-test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, G.vestiti[raw] diventa true, si salva",
-  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
+test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, il capo diventa tuo, la spesa resta visibile e si salva",
+  negozio.includes("G.money -= prezzo;") &&
+  negozio.includes('lifestyleRegistraSpesaVisibile(prezzo,"vestiti",.65)') &&
+  negozio.includes("guardarobaPosseduti()[v.raw] = true;") &&
   negozio.includes("save(); renderGioco();") &&
   ui.includes('if(typeof renderAbbigliamento === "function") renderAbbigliamento();'));
 test("la vetrina e i capi tuoi arrivano al camerino: ponte → creator → init del camerino",
@@ -2378,7 +2380,8 @@ test("l'offerta vale solo su un capo ancora comprabile (non tuo, non bloccato), 
   offerte.includes("if(guardarobaPosseduto(v.raw) || (typeof shFitRequisito === \"function\" && shFitRequisito(v))) return null;") &&
   negozio.includes("function shFitPrezzo(v){") &&
   negozio.includes("const prezzo = shFitPrezzo(v);") &&
-  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
+  negozio.includes("G.money -= prezzo;") &&
+  negozio.includes("guardarobaPosseduti()[v.raw] = true;") &&
   negozio.includes('<span class="shprice off"><s>'));
 test("la sezione «Questa settimana» sta in testa al reparto, solo su «Tutti», e il diario dice cosa c'e' in offerta",
   negozio.includes('const offerte = SH_FIT_FILTRO === "tutti" && typeof offerteSezione === "function" ? offerteSezione() : "";') &&
