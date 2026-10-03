@@ -1246,10 +1246,10 @@ test("skip iniziato in carcere non apre report neanche se termina con scarcerazi
   ev.includes('if(report) report.classList.remove("on")'));
 
 console.log("\nBlocco 4 — riciclaggio / costi / tempo");
-test("capacità settimanale già usa anno:settimana e used",
+test("capacità settimanale usa anno:settimana e traccia i canali separatamente",
   crime.includes("function stradaLavaggioStato()") &&
-  crime.includes("s.lavaggio={key:key,used:0}") &&
-  crime.includes("stradaLavaggioStato().used += importo"));
+  crime.includes("s.lavaggio={key:key,used:0,canali:{}}") &&
+  crime.includes("lav.canali[canale.id]=Number(lav.canali[canale.id]||0)+passa"));
 test("riciclaggio costa 45 minuti",
   time.includes("ricicla:45") &&
   crime.includes('GAME_TIME.durationFor("ricicla")') &&
@@ -1471,29 +1471,66 @@ test("punto 16: i salvataggi legacy non ricevono una provenienza inventata",
   crime.includes('type:"legacy"') &&
   crime.includes("prima che il gioco iniziasse a tracciare il passaparola"));
 
-test("punto 17: gli esiti Strada entrano nella relazione sociale della stessa persona",
+test("punto 17: le attività sono imprese con ricavo, capienza e rischio propri",
+  crime.includes("ricavoPulito:80") &&
+  crime.includes("capienza:150") &&
+  crime.includes("capienza:240") &&
+  crime.includes("capienza:330") &&
+  crime.includes("rischio:.05") &&
+  crime.includes("rischio:.12"));
+test("punto 17: ogni attività posseduta crea persone reali persistenti",
+  crime.includes("function stradaAttivitaPersonaNuova(a,ruolo)") &&
+  crime.includes('p.origine="attivita"') &&
+  crime.includes('p.attivita={id:a.id,ruolo}') &&
+  crime.includes("partnerPersonId") &&
+  crime.includes("employeePersonId") &&
+  crime.includes('postoCollegaPersone(partner,employee,"attivita-lavoro")'));
+test("punto 17: il riciclaggio è per canale e importo scelto dal giocatore",
+  crime.includes("function stradaCanaliLavaggio()") &&
+  crime.includes("function stradaRipulisci(importo,canaleId)") &&
+  crime.includes("function stScenaLavaggioCanale(canaleId)") &&
+  crime.includes("Math.round(max*.25)") &&
+  crime.includes("Math.round(max*.5)") &&
+  crime.includes("Scegli prima <b>dove</b>, poi <b>quanto</b>"));
+test("punto 17: le attività producono reddito pulito normale e non sporco automatico",
+  crime.includes("redditoAttivita+=Number(esito.income||0)") &&
+  crime.includes("G._entratePulite=Number(G._entratePulite||0)+redditoAttivita") &&
+  !crime.includes("s.sporchi += Math.round(a.resa * .55)"));
+test("punto 17: problemi operativi, dipendenti e controlli hanno conseguenze reali",
+  crime.includes('id:"cassa"') &&
+  crime.includes('id:"fornitore"') &&
+  crime.includes('id:"controllo"') &&
+  crime.includes('scelta==="sistema"') &&
+  crime.includes('scelta==="pausa"') &&
+  crime.includes('business-issue-ignored'));
+test("punto 17: un'attività può diventare punto d'incontro della rete",
+  crime.includes("function stradaAttivitaIncontro(id)") &&
+  crime.includes('GAME_TIME.spend(45,"crime:business-meeting"') &&
+  crime.includes('postoCollegaPersone(persone.partner,contatto,"attivita-incontro")'));
+
+test("punto 13 esteso: gli esiti Strada entrano nella relazione sociale della stessa persona",
   posto.includes("function postoConseguenzeMondo(p)") &&
   posto.includes("function postoRegistraConseguenzaMondo(p,tipo,punti,meta)") &&
   crime.includes("function stradaEcoMondo(p,tipo,punti,meta)") &&
   crime.includes("postoRegistraConseguenzaMondo(p,tipo,punti"));
-test("punto 17: successo e fallimento propagano conseguenze fuori dal sottosistema criminale",
+test("punto 13 esteso: successo e fallimento propagano conseguenze fuori dal sottosistema criminale",
   crime.includes('successo?"crime-together-success":"crime-together-failure"') &&
   crime.includes('successo?"street-opportunity-success":"street-opportunity-failure"') &&
   crime.includes('stradaEcoMondo(personaLead,"street-arrest",0'));
-test("punto 17: il passaparola segue il presentatore reale invece di creare un effetto anonimo",
+test("punto 13 esteso: il passaparola segue il presentatore reale invece di creare un effetto anonimo",
   crime.includes("st.introducedByPersonId") &&
   crime.includes('"street-hearsay-"+String(tipo||"consequence")') &&
   crime.includes("relatedPersonId:p.id") &&
   crime.includes('stradaModificaFiducia(introd,ecoPunti,"passaparola-"'));
-test("punto 17: rifiutare con chiarezza e ignorare una persona non sono equivalenti",
+test("punto 13 esteso: rifiutare con chiarezza e ignorare una persona non sono equivalenti",
   crime.includes('stradaEcoMondo(persona,"street-opportunity-declined",0') &&
   crime.includes('stradaEcoMondo(persona,"street-opportunity-ignored",-1'));
-test("punto 17: i favori di rete hanno effetto anche sul rapporto generale",
+test("punto 13 esteso: i favori di rete hanno effetto anche sul rapporto generale",
   crime.includes('stradaEcoMondo(requester,"street-network-favor",1') &&
   crime.includes('stradaEcoMondo(candidato,"street-network-introduction",1') &&
   crime.includes('stradaEcoMondo(a,"street-network-bridge",1') &&
   crime.includes('stradaEcoMondo(b,"street-network-bridge",1'));
-test("punto 17: il Circolo può far riemergere una conseguenza recente senza regalare conoscenza",
+test("punto 13 esteso: il Circolo può far riemergere una conseguenza recente senza regalare conoscenza",
   posto.includes("postoUltimaConseguenzaMondo(p)") &&
   posto.includes("eco&&etaEco<=4") &&
   posto.includes("circoloUltimoVistoKey") &&
