@@ -138,6 +138,7 @@
 #strada .tab.on::after{content:"";position:absolute;left:18%;right:18%;bottom:-1px;height:2px;background:var(--gold)}
 #strada .tabpane{display:none;padding:14px 15px;min-height:0;overflow:hidden;flex:1}
 #strada .tabpane.on{display:flex;flex-direction:column}
+#strada #st-tab-attivita.tabpane{overflow-y:auto}
 #strada .cover-row{
   display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)
 }
