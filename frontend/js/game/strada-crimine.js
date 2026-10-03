@@ -2225,8 +2225,10 @@ function stradaContattoKey(nome){
      }
 
    Nessuno di questi metodi è obbligatorio: ogni funzione qui sotto ha fallback
-   compatibile col gioco attuale. La Strada conserva SOLO lo stato criminale
-   della relazione (p.strada); identità, città, legami e gruppi restano NPC-side. */
+   compatibile col gioco attuale. Quando l'adapter crea/restituisce una persona
+   deve restituire l'oggetto canonico e persistente del sistema NPC: la Strada
+   non ne crea una copia. La Strada conserva SOLO lo stato criminale della
+   relazione (p.strada); identità, città, legami e gruppi restano NPC-side. */
 const STRADA_NPC_CONTRACT_VERSION = 1;
 
 function stradaNpcAdapter(){
