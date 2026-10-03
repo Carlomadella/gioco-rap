@@ -28,7 +28,7 @@ function windowConLegami(){
 function postoRuntime(){
   const window=windowConLegami();
   const G={week:3,gente:[]};
-  const code=blocco(posto,"function postoLegamiApi()","/* Punto Strada 17:");
+  const code=blocco(posto,"function postoReteLegami(p)","/* Punto Strada 17:");
   const make=new Function(
     "window","G","totalWeeks","Number","Array","Object","Set",
     code+"\nreturn {collega:postoCollegaPersone,attivi:postoLegamiAttivi,raw:postoReteLegami};"
