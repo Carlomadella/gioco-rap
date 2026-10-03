@@ -1,10 +1,20 @@
 /* Creator RPG V24 — ponte isolato fra il creator approvato e la partita vera. */
 "use strict";
 (function(){
-  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=27";
+  const SRC_NORMALE = "media/creator-rpg-v24/creator.html?v=39";
   let overlay=null, frame=null;
   let modalita="normal";
   let aperta=false, overflowPrima="", faseAudioPrima=null;
+
+  /* Su mobile Avaturn viene montato direttamente nella pagina principale.
+     Evitiamo il vecchio percorso gioco -> creator -> camerino -> Avaturn,
+     che su Chrome Android può lasciare il web editor visibile ma non
+     correttamente raggiungibile dal touch. */
+  let avaturnMobileOverlay=null;
+  let avaturnMobileHost=null;
+  let avaturnMobileSdk=null;
+  let avaturnMobileToken=0;
+  let avaturnMobileWindow=null;
 
   function ensure(){
     if(overlay) return;
@@ -44,6 +54,189 @@
         doc.addEventListener("keydown", wake, {capture:true});
       }catch(e){}
     });
+  }
+
+  function usaAvaturnMobileTopLevel(){
+    return !!(
+      window.matchMedia &&
+      window.matchMedia("(orientation:landscape) and (max-width:980px) and (max-height:520px)").matches
+    );
+  }
+
+  function apriAvaturnMobileWindow(){
+    if(!usaAvaturnMobileTopLevel()) return false;
+
+    chiudiAvaturnMobile(false);
+
+    try{
+      if(avaturnMobileWindow && !avaturnMobileWindow.closed){
+        avaturnMobileWindow.focus();
+        return true;
+      }
+    }catch(e){ avaturnMobileWindow=null; }
+
+    const url=new URL(
+      "media/creator-rpg-v24/avaturn-mobile.html?v=1",
+      document.baseURI
+    ).href;
+
+    /* Deve essere chiamata direttamente dal tap nel camerino: così Chrome
+       Android conserva la user activation e non tratta Avaturn come popup
+       asincrono. */
+    let win=null;
+    try{
+      win=window.open(
+        url,
+        "adf-avaturn-mobile",
+        "popup=yes,width=960,height=640"
+      );
+    }catch(e){}
+
+    if(!win) return false;
+    avaturnMobileWindow=win;
+    try{ win.focus(); }catch(e){}
+    return true;
+  }
+
+  function comunicaCreator(type, extra){
+    if(!frame?.contentWindow) return;
+    try{
+      frame.contentWindow.postMessage(Object.assign({type},extra||{}),"*");
+    }catch(e){}
+  }
+
+  function chiudiAvaturnMobile(notifica){
+    const sdk=avaturnMobileSdk;
+    const node=avaturnMobileOverlay;
+    avaturnMobileToken++;
+    avaturnMobileSdk=null;
+    avaturnMobileOverlay=null;
+    avaturnMobileHost=null;
+
+    try{ if(sdk && typeof sdk.destroy==="function") sdk.destroy(); }catch(e){}
+    try{ node?.remove(); }catch(e){}
+
+    if(notifica) comunicaCreator("adf-rpg-v24-avaturn-mobile-cancel");
+  }
+
+  async function apriAvaturnMobile(){
+    if(!usaAvaturnMobileTopLevel()){
+      comunicaCreator("adf-rpg-v24-avaturn-mobile-fallback");
+      return;
+    }
+
+    chiudiAvaturnMobile(false);
+    const token=++avaturnMobileToken;
+
+    const host=document.createElement("div");
+    host.id="adf-rpg-v24-avaturn-mobile-host";
+    host.setAttribute("aria-label","Editor Avaturn");
+    host.style.cssText=[
+      "position:fixed",
+      "inset:0",
+      "width:100vw",
+      "height:100dvh",
+      "z-index:1000001",
+      "display:grid",
+      "grid-template-rows:34px minmax(0,1fr)",
+      "background:#0b0b0d",
+      "overflow:hidden"
+    ].join(";");
+
+    const head=document.createElement("div");
+    head.style.cssText=[
+      "display:flex",
+      "align-items:center",
+      "min-width:0",
+      "padding:0 7px 0 10px",
+      "border-bottom:1px solid rgba(255,255,255,.09)",
+      "background:#0d0d10",
+      "color:#d3aa5e",
+      "font:900 8px/1 Inter,Arial,sans-serif",
+      "letter-spacing:.12em",
+      "text-transform:uppercase"
+    ].join(";");
+    const title=document.createElement("span");
+    title.textContent="Modifica aspetto";
+    const closeBtn=document.createElement("button");
+    closeBtn.type="button";
+    closeBtn.id="adf-rpg-v24-avaturn-mobile-close";
+    closeBtn.setAttribute("aria-label","Chiudi Avaturn");
+    closeBtn.textContent="×";
+    closeBtn.style.cssText=[
+      "margin-left:auto",
+      "width:30px",
+      "height:30px",
+      "border:1px solid rgba(255,255,255,.13)",
+      "border-radius:7px",
+      "background:#1a181c",
+      "color:#fff",
+      "font:400 18px/1 Arial,sans-serif"
+    ].join(";");
+    closeBtn.addEventListener("click",()=>chiudiAvaturnMobile(true));
+    head.append(title,closeBtn);
+
+    const sdkHost=document.createElement("div");
+    sdkHost.id="adf-rpg-v24-avaturn-mobile-frame-host";
+    sdkHost.style.cssText=[
+      "position:relative",
+      "width:100%",
+      "height:100%",
+      "min-width:0",
+      "min-height:0",
+      "overflow:hidden",
+      "background:#101014"
+    ].join(";");
+
+    const loading=document.createElement("div");
+    loading.id="adf-rpg-v24-avaturn-mobile-loading";
+    loading.textContent="Carico Avaturn…";
+    loading.style.cssText=[
+      "position:absolute",
+      "inset:0",
+      "z-index:2",
+      "display:grid",
+      "place-items:center",
+      "background:#101014",
+      "color:#aaa",
+      "font:700 11px/1.3 Inter,Arial,sans-serif"
+    ].join(";");
+    sdkHost.appendChild(loading);
+    host.append(head,sdkHost);
+    document.body.appendChild(host);
+
+    avaturnMobileOverlay=host;
+    avaturnMobileHost=sdkHost;
+
+    try{
+      const mod=await import("https://cdn.jsdelivr.net/npm/@avaturn/sdk/dist/index.js");
+      if(token!==avaturnMobileToken || !avaturnMobileHost) return;
+
+      const sdk=new mod.AvaturnSDK();
+      avaturnMobileSdk=sdk;
+
+      /* Seguiamo l'integrazione ufficiale: dimensioniamo SOLO il container.
+         Il frame Avaturn resta con gli stili/default dell'SDK. */
+      await sdk.init(avaturnMobileHost,{url:"https://demo.avaturn.dev"});
+      if(token!==avaturnMobileToken || sdk!==avaturnMobileSdk){
+        try{ sdk.destroy(); }catch(e){}
+        return;
+      }
+
+      loading.remove();
+
+      sdk.on("export",data=>{
+        if(!data?.url) return;
+        comunicaCreator("adf-rpg-v24-avaturn-mobile-export",{data});
+        chiudiAvaturnMobile(false);
+      });
+    }catch(err){
+      if(token!==avaturnMobileToken) return;
+      console.error(err);
+      if(loading){
+        loading.textContent="Avaturn non si è caricato. Chiudi e riprova.";
+      }
+    }
   }
 
   function payloadIniziale(){
@@ -143,6 +336,11 @@
     if(!aperta && !overlay) return;
     const faseDaRipristinare=faseAudioPrima;
     aperta=false;
+    chiudiAvaturnMobile(false);
+    try{
+      if(avaturnMobileWindow && !avaturnMobileWindow.closed) avaturnMobileWindow.close();
+    }catch(e){}
+    avaturnMobileWindow=null;
 
     if(overlay){
       overlay.style.display="none";
@@ -217,11 +415,36 @@
   }
 
   window.addEventListener("message",e=>{
-    if(!aperta || !frame || e.source!==frame.contentWindow) return;
     const m=e.data||{};
+
+    /* La pagina Avaturn mobile dedicata è same-origin e vive fuori dal creator.
+       Gestiamo il suo export PRIMA del filtro e.source===creatorFrame. */
+    if(
+      avaturnMobileWindow &&
+      e.source===avaturnMobileWindow &&
+      e.origin===location.origin
+    ){
+      if(m.type==="adf-rpg-v24-avaturn-window-export" && m.data?.url){
+        comunicaCreator("adf-rpg-v24-avaturn-mobile-export",{data:m.data});
+        avaturnMobileWindow=null;
+        return;
+      }
+      if(m.type==="adf-rpg-v24-avaturn-window-cancel"){
+        comunicaCreator("adf-rpg-v24-avaturn-mobile-cancel");
+        avaturnMobileWindow=null;
+        return;
+      }
+    }
+
+    if(!aperta || !frame || e.source!==frame.contentWindow) return;
 
     if(m.type==="adf-rpg-v24-ready"){
       inviaStato();
+      return;
+    }
+
+    if(m.type==="adf-rpg-v24-avaturn-mobile-open"){
+      apriAvaturnMobile();
       return;
     }
 
@@ -290,7 +513,12 @@
 
   function install(){}
 
-  window.ADF_RPG_V24={open,openAppearance,close};
+  window.ADF_RPG_V24={
+    open,
+    openAppearance,
+    close,
+    openAvaturnMobileWindow:apriAvaturnMobileWindow
+  };
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",install);
   else install();
 })();

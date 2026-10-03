@@ -6,6 +6,151 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8cd436f6 -->
+## 03/10/26, 07:38 — feature/strada-punto20-carcere-relazioni → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `8cd436f6`
+
+### Cosa è entrato
+
+- `645dcd95` — Cache: aggiorna Strada punto 20 — **mycolbraga**
+- `bbaac7a0` — Audit: aggiungi gate Strada punto 20 — **mycolbraga**
+- `490864b2` — Test: carcere come seconda fonte di relazioni — **mycolbraga**
+- `b57737d5` — UI: mostra le relazioni costruite in carcere — **mycolbraga**
+- `9e435fcd` — Strada punto 20: porta relazioni e rivalità fuori dal carcere — **mycolbraga**
+- `ba59c903` — Strada punto 20: eventi e azioni costruiscono relazioni in carcere — **mycolbraga**
+- `61b79385` — Strada punto 20: persone persistenti conosciute in carcere — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-carcere-relazioni.test.js`
+
+**File interessati in questa categoria:** 4
+
+---
+
+<!-- merge:46b234e5 -->
+## 03/10/26, 01:51 — feature/strada-punto17-attivita-copertura → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `46b234e5`
+
+### Cosa è entrato
+
+- `b85e965e` — Test: fermo attività per sette giorni reali — **mycolbraga**
+- `3a8591af` — Fix: ferma attività per sette giorni reali — **mycolbraga**
+- `aac19cbe` — Cache: aggiorna attività di copertura — **mycolbraga**
+- `e19698bf` — Test: pausa attività di una settimana — **mycolbraga**
+- `3e6a902d` — Fix: limita la pausa attività a una settimana — **mycolbraga**
+- `f8b740e3` — Audit: riallinea il vero punto 17 attività — **mycolbraga**
+- `2cde081b` — Test: attività di copertura come gameplay — **mycolbraga**
+- `b55a204b` — UI: rendi scrollabile la gestione attività — **mycolbraga**
+- `cc604a79` — Strada punto 17: gestione attività dalla UI — **mycolbraga**
+- `d7e57be8` — Strada punto 17: problemi operativi e incontri nelle attività — **mycolbraga**
+- `72361ab2` — Strada punto 17: riciclaggio per impresa e importo — **mycolbraga**
+- `403d02d9` — Strada punto 17: traccia il riciclaggio per canale — **mycolbraga**
+- `7f3e6e4a` — Strada punto 17: attività come imprese persistenti — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/strada-crimine-v2.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:234a3d39 -->
+## 02/10/26, 18:43 — fix/pizzeria-secondo-audit → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `234a3d39`
+
+### Cosa è entrato
+
+- `72a1f5ba` — docs(roadmap): segna la Pizzeria v1 come completata — **mycolbraga**
+- `8e38e56e` — fix(tempo): completa il clock delle azioni lanciate dai luoghi — **mycolbraga**
+- `bb97d27e` — test(pizzeria): verifica che la storyline non si ripeta all'infinito — **mycolbraga**
+- `1593c29a` — fix(pizzeria): chiude le micro-storyline dopo il terzo episodio — **mycolbraga**
+- `753ccd41` — test(pizzeria): rispetta l'apertura durante lo spostamento — **mycolbraga**
+- `cba7b797` — test(pizzeria): copre tutte le fonti rete ripetibili — **mycolbraga**
+- `62bcf307` — fix(pizzeria): chiude le ultime ricompense rete ripetibili per persona — **mycolbraga**
+- `128980b2` — test(pizzeria): allinea il test storico alla carriera più lenta — **mycolbraga**
+- `93d7e7dc` — test(pizzeria): aspetta l'apertura prima del turno integrato — **mycolbraga**
+- `4668418d` — docs(famepedia): allinea carriera lenta e micro-storyline Pizzeria — **mycolbraga**
+- `eab0127d` — test(pizzeria): copre micro-storyline persistenti — **mycolbraga**
+- `e4f4c45e` — test(pizzeria): copre anti-farming dei contatti nelle chat — **mycolbraga**
+- `c3dccd69` — test(pizzeria): allinea carriera lenta e perimetro anti-farming — **mycolbraga**
+- `4a26a4e7` — test(pizzeria): usa NPC unici e prova musica-spostamento-conflitto-turno — **mycolbraga**
+- `eb27b1a5` — test(pizzeria): verifica che la carriera non domini il primo anno — **mycolbraga**
+- `ea94909f` — test(pizzeria): aggiorna stress test alla carriera più lenta — **mycolbraga**
+- `4c775ac8` — feat(pizzeria): aggiunge micro-storyline sociali persistenti — **mycolbraga**
+- `087a5bac` — fix(pizzeria): impedisce farming rete anche dalle chat — **mycolbraga**
+- `ccf97da2` — fix(pizzeria): limita l'anti-farming al solo perimetro Pizzeria — **mycolbraga**
+- `b9440958` — balance(pizzeria): rende la carriera lavorativa davvero secondaria — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/chat.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/test/e2e/pizzeria-workflow.spec.js`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Modificato:** `frontend/test/unit/lavori-contatti.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-bilanciamento.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-identita.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-sociale.test.js`
+
+**File interessati in questa categoria:** 13
+
+---
+
+<!-- merge:40f251c0 -->
+## 02/10/26, 17:00 — fix/mobile-creator-avatar-scroll → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `40f251c0`
+
+### Cosa è entrato
+
+- `62b2c2ed` — test(mobile): copre scroll selezione avatar — **mycolbraga**
+- `75058ec5` — fix(mobile): abilita scroll scelta Avaturn MakeHuman — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+
+**File interessati in questa categoria:** 1
+
+---
+
+<!-- merge:599ba725 -->
+## 02/10/26, 16:43 — fix/mobile-avvio-full-height → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `599ba725`
+
+### Cosa è entrato
+
+- `a50ef301` — chore(mobile): invalida cache landscape CSS — **mycolbraga**
+- `93424b02` — test(mobile): verifica menu Inizia interamente visibile — **mycolbraga**
+- `04018e2a` — fix(mobile): usa tutta l'altezza per il menu Inizia — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/css/mobile-landscape.css`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:2dcdfaa6 -->
 ## 02/10/26, 11:35 — fix/mobile-avvio-clean-background → main
 

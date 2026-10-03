@@ -9,7 +9,7 @@
 
 (function(){
   const MOBILE_QUERY="(max-width: 1180px) and (pointer: coarse)";
-  const MOBILE_MAKEHUMAN_BASE="../makehuman-mobile-v1/index.html?v=2";
+  const MOBILE_MAKEHUMAN_BASE="../makehuman-mobile-v1/index.html?v=4";
 
   function eMobile(){
     try{

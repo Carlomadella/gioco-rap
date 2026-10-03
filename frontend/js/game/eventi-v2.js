@@ -2337,6 +2337,106 @@ function adfFactoryOvertimeScenario(offerta){
   return scelta;
 }
 
+
+/* La Pizzeria usa lo stesso motore delle coperture ma un tono diverso:
+   niente straordinari "da stabilimento". Sono buchi reali del servizio,
+   abbastanza rari da restare eccezioni. Il motivo persiste nella richiesta
+   accettata e chi te lo chiede cambia con la mansione. */
+const ADF_PIZZERIA_OVERTIME_SCENARIOS = Object.freeze([
+  Object.freeze({
+    id:"collega-malato",
+    label:"collega assente all'ultimo",
+    title:"Uno ha dato forfait per domani",
+    body:"A fine servizio arriva il messaggio: una persona della cucina si è messa male e il turno del weekend è rimasto corto."
+  }),
+  Object.freeze({
+    id:"prenotazione-grossa",
+    label:"prenotazione più grossa del previsto",
+    title:"Domani entra una tavolata grossa",
+    body:"È arrivata una prenotazione che riempie buona parte della sala. Il servizio previsto non basta e stanno cercando una persona in più in cucina."
+  }),
+  Object.freeze({
+    id:"serata-zona",
+    label:"serata piena nel quartiere",
+    title:"Domani si prevede più gente del solito",
+    body:"Tra evento in zona e prenotazioni il locale si aspetta un picco. Non è un'emergenza: vogliono solo evitare di andare corti nel rush."
+  }),
+  Object.freeze({
+    id:"delivery-pieno",
+    label:"molte consegne già prenotate",
+    title:"Le consegne di domani sono già troppe",
+    body:"Prima ancora di aprire c'è già parecchio delivery segnato. Cercano una copertura in più per non far saltare cucina e ritiri insieme."
+  })
+]);
+
+const ADF_PIZZERIA_OVERTIME_ROLE_CONTEXT = Object.freeze({
+  lavapiatti:Object.freeze({
+    asker:"Il responsabile di cucina",
+    duty:"tenere coperti lavaggio e chiusura mentre il resto della cucina gira pieno"
+  }),
+  aiuto_cucina:Object.freeze({
+    asker:"Il responsabile di cucina",
+    duty:"coprire preparazioni e dare supporto durante il rush"
+  }),
+  aiuto_pizzaiolo:Object.freeze({
+    asker:"Il pizzaiolo",
+    duty:"dare copertura tra banco, preparazioni e forno"
+  }),
+  pizzaiolo:Object.freeze({
+    asker:"Il titolare",
+    duty:"tenere il forno e fare da riferimento alla cucina nel servizio extra"
+  })
+});
+
+function adfPizzeriaOvertimeRoleContext(){
+  const id=G.job && typeof lavoroLuogo==="function" && lavoroLuogo(G.job)==="pizzeria"
+    ? G.job.id : "lavapiatti";
+  return Object.assign(
+    {roleId:id},
+    ADF_PIZZERIA_OVERTIME_ROLE_CONTEXT[id]||ADF_PIZZERIA_OVERTIME_ROLE_CONTEXT.lavapiatti
+  );
+}
+
+function adfPizzeriaOvertimeScenario(offerta){
+  if(!offerta) return null;
+  const pool=ADF_PIZZERIA_OVERTIME_SCENARIOS;
+  const s=st();
+  const recent=Array.isArray(s.runtime.pizzeriaOvertimeRecent)
+    ? s.runtime.pizzeriaOvertimeRecent
+    : (s.runtime.pizzeriaOvertimeRecent=[]);
+  const candidati=pool.filter(x=>!recent.includes(x.id));
+  const sceltaBase=(candidati.length?candidati:pool)[
+    Math.floor(Math.random()*(candidati.length?candidati.length:pool.length))
+  ];
+  const ruolo=adfPizzeriaOvertimeRoleContext();
+  const scelta=Object.assign({},sceltaBase,{
+    roleId:ruolo.roleId,
+    asker:ruolo.asker,
+    duty:ruolo.duty
+  });
+
+  recent.unshift(scelta.id);
+  if(recent.length>3) recent.length=3;
+
+  offerta.scenarioId=scelta.id;
+  offerta.scenarioLabel=scelta.label;
+  offerta.scenarioRoleId=scelta.roleId;
+  offerta.scenarioAsker=scelta.asker;
+  offerta.scenarioDuty=scelta.duty;
+
+  if(typeof lavoroStraordinarioStato==="function"){
+    const overtime=lavoroStraordinarioStato("pizzeria");
+    if(overtime&&overtime.pendingOffer){
+      overtime.pendingOffer.scenarioId=scelta.id;
+      overtime.pendingOffer.scenarioLabel=scelta.label;
+      overtime.pendingOffer.scenarioRoleId=scelta.roleId;
+      overtime.pendingOffer.scenarioAsker=scelta.asker;
+      overtime.pendingOffer.scenarioDuty=scelta.duty;
+    }
+  }
+  return scelta;
+}
+
 function adfWorkOvertimeAfterShift(){
   if(!G.job || typeof lavoroLuogo!=="function") return false;
   const luogo=lavoroLuogo(G.job);
@@ -2366,23 +2466,27 @@ function adfWorkOvertimeAfterShift(){
 
   const fabbrica=luogo==="fabbrica";
   const domenica=offerta.tipo==="domenica";
-  const scenario=fabbrica ? adfFactoryOvertimeScenario(offerta) : null;
+  const scenario=fabbrica
+    ? adfFactoryOvertimeScenario(offerta)
+    : adfPizzeriaOvertimeScenario(offerta);
   const ruoloStraordinario=fabbrica
-    ? (scenario||adfFactoryOvertimeRoleContext()) : null;
+    ? (scenario||adfFactoryOvertimeRoleContext())
+    : (scenario||adfPizzeriaOvertimeRoleContext());
   const nome=fabbrica?"Fabbrica":"Pizzeria";
-  const titolo=fabbrica
-    ? (scenario ? scenario.title : (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?"))
-    : "Riesci a coprire un altro servizio?";
-  const descrizione=fabbrica
-    ? ((scenario
-        ? scenario.body
-        : (domenica
+  const titolo=scenario
+    ? scenario.title
+    : (fabbrica
+      ? (domenica?"Ti serve anche domenica?":"Puoi coprire anche sabato?")
+      : "Riesci a coprire un altro servizio?");
+  const descrizione=((scenario
+      ? scenario.body
+      : (fabbrica
+        ? (domenica
           ? "Domani la Fabbrica sarebbe chiusa per il tuo contratto, ma manca personale."
-          : "Hai già coperto i cinque giorni del contratto. Domani serve una copertura extra in stabilimento.")) +
-      "<br><br>"+ruoloStraordinario.asker+" ti chiede se puoi entrare <b>"+giorno+
-      "</b> per "+ruoloStraordinario.duty+".")
-    : ("Hai già coperto i quattro servizi del contratto. Nel weekend la sala è piena e manca una persona in cucina." +
-      "<br><br>Il titolare ti chiede se puoi coprire anche <b>"+giorno+"</b>.");
+          : "Hai già coperto i cinque giorni del contratto. Domani serve una copertura extra in stabilimento.")
+        : "Hai già coperto i quattro servizi del contratto. Nel weekend manca una persona in cucina.")) +
+    "<br><br>"+ruoloStraordinario.asker+" ti chiede se puoi entrare <b>"+giorno+
+    "</b> per "+ruoloStraordinario.duty+".");
 
   afterClear(()=>showEvent({
     k:nome+" · "+(fabbrica?"Straordinario":"Copertura extra"),
@@ -2426,39 +2530,173 @@ function adfWorkOvertimeAfterShift(){
    L'offerta arriva dal pool generale della Strada e non ha bisogno di essere
    collegata al lavoro. Prima c'è un dialogo breve, poi la decisione con i
    numeri reali del gameplay davanti. */
+
+function adfStreetIntroDecision(proposta){
+  if(!proposta || typeof stradaAccettaIngresso!=="function") return;
+  showEvent({
+    k:"Una strana proposta",
+    t:proposta.titolo||"Un favore",
+    d:"<b>"+(proposta.persona||"Una conoscenza")+":</b> "+
+      (proposta.pitch||"Ti propone qualcosa di chiaramente losco.")+
+      "<br><br>Non è ancora un accesso alla Strada: è un favore piccolo. "+
+      "Se continui a rispondere a queste chiamate, quel mondo inizierà ad aprirsi.",
+    annulla(){
+      if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+    },
+    opts:[
+      {n:"Accetta",d:"Serve "+Number(proposta.energia||0)+" energia",run(){
+        const out=stradaAccettaIngresso(Math.random(),Math.random());
+        if(!out) return {t:"La proposta non è più disponibile.",c:""};
+        if(out.ok===false) return {t:out.reason||"Oggi non riesci a prenderti questo favore.",c:""};
+        try{ if(typeof renderHub==="function") renderHub(); }catch(_){}
+        if(out.unlocked){
+          return {
+            t:out.success
+              ? "Il favore va a buon fine. <b>"+(out.persona||"Il contatto")+" ti mette in mano un TrapPhone</b>: da ora le cose che non passano faccia a faccia arrivano lì. <b>Attività criminali è comparso sulla mappa.</b>"
+              : "Il favore salta e ti costa, ma non finisci dentro. <b>"+(out.persona||"Il contatto")+" ti consegna comunque un TrapPhone</b>: ormai sei dentro abbastanza da ricevere le dritte. <b>Attività criminali è comparso sulla mappa.</b>",
+            c:out.success?"good":"bad"
+          };
+        }
+        return {
+          t:out.success
+            ? "Il favore va bene. Ti porti a casa qualcosa, ma per ora il resto del giro rimane nascosto."
+            : "Il favore salta. Perdi soldi e attiri attenzione, ma non sei ancora abbastanza esposto da finire dentro.",
+          c:out.success?"good":"bad"
+        };
+      }},
+      {n:"Rifiuta",d:"Non apri quella porta",run(){
+        if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+        return {t:"Hai lasciato perdere. La tua vita continua normalmente.",c:""};
+      }}
+    ]
+  });
+}
+
+function adfStreetIntroAfterAction(a){
+  if(!a || typeof stradaTentaIngresso!=="function") return false;
+  /* Punto 14: dopo un turno Fabbrica l'unico accesso criminale ammesso è la
+     storyline dedicata del collega reale. Niente proposta generica che cada
+     casualmente proprio all'uscita dallo stabilimento. */
+  if(a.id==="turno" && G.job && typeof lavoroLuogo==="function" &&
+     lavoroLuogo(G.job)==="fabbrica") return false;
+  if(typeof stradaAttivitaSbloccate==="function" && stradaAttivitaSbloccate()) return false;
+
+  const stato=st();
+  if(stato.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaIngresso(Math.random(),Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-intro")) return false;
+
+  stato.lastHookEventDay=absDay();
+  afterClear(()=>showEvent({
+    k:"Una strana proposta",
+    t:(proposta.persona||"Una conoscenza")+" ti prende da parte",
+    d:"Non arriva da un menu e non è un contatto anonimo: è una persona che hai già incontrato."+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»"),
+    annulla(){
+      if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+    },
+    opts:[
+      {n:"Sentiamo",d:"Gli lasci spiegare",run(){
+        afterClear(()=>adfStreetIntroDecision(proposta),60);
+        return null;
+      }},
+      {n:"Lascia stare",d:"Non vuoi sapere altro",run(){
+        if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+        return {t:"Hai tagliato corto. Nessuna attività criminale viene sbloccata.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
 function adfStreetOpportunityDecision(proposta){
   if(!proposta) return;
-  const termini=typeof stradaDescriviOpportunita==="function"
-    ? stradaDescriviOpportunita(proposta)
+  const pendenti=typeof stradaOpportunitaPendenti==="function"
+    ? stradaOpportunitaPendenti()
+    : [proposta];
+  const scelte=pendenti.length ? pendenti : [proposta];
+
+  const terminiDi=p=>typeof stradaDescriviOpportunita==="function"
+    ? stradaDescriviOpportunita(p)
     : "";
+  const causaDi=p=>p&&p.networkCauseText
+    ? "<span><b>Come ci sei arrivato:</b> "+p.networkCauseText+"</span><br>"
+    : "";
+  const risultatoLead=lead=>{
+    if(!lead) return {t:"La proposta non è più disponibile.",c:""};
+    let colpo=lead.colpoId||"indicato";
+    try{
+      if(typeof STRADA_COLPI!=="undefined"){
+        const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
+        if(c) colpo=c.n;
+      }
+    }catch(_){}
+    return {
+      t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
+        colpo+"</b> nella Strada finché non la usi o scade.",
+      c:"good"
+    };
+  };
+
+  if(scelte.length>1){
+    const righe=scelte.map(p=>{
+      const termini=terminiDi(p);
+      return "<b>"+(p.persona||"Un contatto")+" · "+(p.titolo||"Proposta")+"</b><br>"+
+        causaDi(p)+(p.pitch||"Ti spiega cosa vuole.")+
+        (termini ? "<br><span>"+termini+"</span>" : "");
+    }).join("<br><br>");
+
+    showEvent({
+      k:"Strada · Più porte aperte",
+      t:"Adesso puoi scegliere chi ascoltare",
+      d:"Non è una promozione e nessuno ti ha dato un titolo. Semplicemente, ormai più di una persona pensa a te quando c'è qualcosa da fare.<br><br>"+
+        righe+
+        "<br><br>Puoi prenderne <b>una sola</b>: scegliere una proposta equivale a rispondere alle altre, non a ignorarle.",
+      annulla(){
+        if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
+      },
+      opts:[
+        ...scelte.map(p=>({
+          n:"Accetta · "+(p.persona||p.titolo||"Proposta"),
+          d:(p.titolo||"Proposta")+" · "+terminiDi(p),
+          run(){
+            const lead=typeof stradaAccettaPropostaFabbrica==="function"
+              ? stradaAccettaPropostaFabbrica(p.id)
+              : null;
+            return risultatoLead(lead);
+          }
+        })),
+        {n:"Rifiuta entrambe",d:"Rispondi no: nessun ghosting verso i contatti",run(){
+          if(typeof stradaRifiutaPropostaFabbrica==="function")
+            stradaRifiutaPropostaFabbrica();
+          return {t:"Hai risposto a entrambe le proposte e hai lasciato perdere.",c:""};
+        }}
+      ]
+    });
+    return;
+  }
+
+  const singola=scelte[0]||proposta;
+  const termini=terminiDi(singola);
   showEvent({
     k:"Strada · Proposta",
-    t:proposta.titolo||"Una proposta",
-    d:"<b>"+(proposta.persona||"La persona")+":</b> "+(proposta.pitch||"Ti spiega cosa vuole.")+
+    t:singola.titolo||"Una proposta",
+    d:causaDi(singola)+"<b>"+(singola.persona||"La persona")+":</b> "+(singola.pitch||"Ti spiega cosa vuole.")+
       (termini ? "<br><br><b>Se accetti:</b> "+termini+"." : "")+
-      "<br><br>L'offerta resta valida per <b>"+Number(proposta.durataGiorni||7)+" giorni</b>.",
+      "<br><br>L'offerta resta valida per <b>"+Number(singola.durataGiorni||7)+" giorni</b>.",
     annulla(){
-      if(typeof stradaRifiutaPropostaFabbrica==="function")
-        stradaRifiutaPropostaFabbrica();
+      if(typeof stradaIgnoraPropostaFabbrica==="function")
+        stradaIgnoraPropostaFabbrica();
     },
     opts:[
       {n:"Accetta",d:termini||"Ti prendi il rischio e l'occasione",run(){
         const lead=typeof stradaAccettaPropostaFabbrica==="function"
-          ? stradaAccettaPropostaFabbrica()
+          ? stradaAccettaPropostaFabbrica(singola.id)
           : null;
-        if(!lead) return {t:"La proposta non è più disponibile.",c:""};
-        let colpo=lead.colpoId||"indicato";
-        try{
-          if(typeof STRADA_COLPI!=="undefined"){
-            const c=STRADA_COLPI.find(x=>x.id===lead.colpoId);
-            if(c) colpo=c.n;
-          }
-        }catch(_){}
-        return {
-          t:"Hai accettato <b>"+(lead.titolo||"la proposta")+"</b>. La trovi su <b>"+
-            colpo+"</b> nella Strada finché non la usi o scade.",
-          c:"good"
-        };
+        return risultatoLead(lead);
       }},
       {n:"Rifiuta",d:"Nessun effetto: lasci perdere l'occasione",run(){
         if(typeof stradaRifiutaPropostaFabbrica==="function")
@@ -2467,6 +2705,166 @@ function adfStreetOpportunityDecision(proposta){
       }}
     ]
   });
+}
+
+function adfStreetFerroAfterAction(a){
+  if(!a || a.id==="turno") return false;
+  if(typeof stradaTentaPropostaFerro!=="function") return false;
+
+  const stato=st();
+  if(stato.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaPropostaFerro(Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-ferro")){
+    if(typeof stradaAnnullaPropostaFerro==="function") stradaAnnullaPropostaFerro();
+    return false;
+  }
+
+  stato.lastHookEventDay=absDay();
+  try{
+    if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+      TRAPHONE16.receiveStorySms({
+        id:"ferro-offer-"+String(absDay()),
+        family:"street-ferro",
+        voice:"contact",
+        from:proposta.persona||"SCONOSCIUTO",
+        text:"Se vuoi fare un salto di qualità, conosco uno che può procurarti una cosa. Non è roba da chiedere due volte.",
+        tags:["street","danger"]
+      });
+    }
+  }catch(_){}
+
+  afterClear(()=>showEvent({
+    k:"TrapPhone",
+    t:(proposta.persona||"Un contatto")+" apre una porta",
+    d:"Il messaggio è corto. Non ti sta vendendo un oggetto da catalogo: si sta prendendo il rischio di presentarti a qualcuno."+
+      "<br><br><b>Costo:</b> "+fmt(proposta.costo||0)+" €"+
+      "<br><b>Rischio:</b> se ti trovano con il ferro, un controllo può diventare carcere anche senza un colpo in corso.",
+    annulla(){
+      if(typeof stradaRifiutaFerro==="function") stradaRifiutaFerro();
+    },
+    opts:[
+      {n:"Prendilo",d:"Chiudi il favore tramite "+(proposta.persona||"il contatto"),run(){
+        const out=typeof stradaAccettaFerro==="function" ? stradaAccettaFerro() : null;
+        if(!out || out.ok===false)
+          return {t:(out&&out.reason)||"La cosa non si chiude.",c:"bad"};
+        return {t:"<b>"+(out.persona||proposta.persona||"Il contatto")+"</b> te lo procura. Da ora il ferro è tuo, ma anche tenerlo è un rischio.",c:"bad"};
+      }},
+      {n:"Lascia stare",d:"Non vuoi avere quella cosa addosso",run(){
+        if(typeof stradaRifiutaFerro==="function") stradaRifiutaFerro();
+        return {t:"Hai chiuso la porta. Non è detto che qualcuno te la riapra presto.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
+function adfStreetNetworkAfterAction(a){
+  if(!a || a.id==="turno" || typeof stradaTentaEventoRete!=="function") return false;
+
+  const stato=st();
+  if(stato.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaEventoRete(Math.random(),Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("street-network")){
+    if(typeof stradaAnnullaEventoRete==="function") stradaAnnullaEventoRete();
+    return false;
+  }
+
+  stato.lastHookEventDay=absDay();
+
+  if(proposta.mode==="ask-name"){
+    const nomi=Array.isArray(proposta.candidateNames)?proposta.candidateNames:[];
+    try{
+      if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+        TRAPHONE16.receiveStorySms({
+          id:"network-name-"+String(absDay()),
+          family:"street-network",
+          voice:"contact",
+          from:proposta.requesterName||"SCONOSCIUTO",
+          text:"Mi serve una persona affidabile. Tu chi chiameresti?",
+          tags:["street","network"]
+        });
+      }
+    }catch(_){}
+
+    afterClear(()=>showEvent({
+      k:"Strada · Rete",
+      t:(proposta.requesterName||"Un contatto")+" ti chiede un nome",
+      d:"Non ti sta offrendo un lavoro. Ti sta chiedendo <b>chi chiameresti tu</b>. È il tipo di domanda che arriva solo quando gli altri iniziano a considerare utile la tua rete.",
+      annulla(){
+        if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+      },
+      opts:[
+        ...nomi.map((nome,i)=>({
+          n:"Fai il nome di "+nome,
+          d:"Metti in gioco la tua credibilità fra due persone reali",
+          run(){
+            const id=(proposta.candidateIds||[])[i];
+            const out=typeof stradaRisolviEventoRete==="function"
+              ? stradaRisolviEventoRete(id)
+              : null;
+            if(!out || out.ok===false)
+              return {t:(out&&out.reason)||"La presentazione non si chiude.",c:"bad"};
+            return {t:"Hai fatto il nome di <b>"+out.persona+"</b> a <b>"+out.requester+
+              "</b>. Adesso entrambi sanno che la presentazione è passata da te.",c:"good"};
+          }
+        })),
+        {n:"Non fare nomi",d:"Non metti nessuno della tua rete in mezzo",run(){
+          if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+          return {t:"Hai tenuto fuori i tuoi contatti. Nessuna relazione cambia.",c:""};
+        }}
+      ]
+    }),80);
+    return true;
+  }
+
+  if(proposta.mode==="bridge"){
+    try{
+      if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+        TRAPHONE16.receiveStorySms({
+          id:"network-bridge-"+String(absDay()),
+          family:"street-network",
+          voice:"contact",
+          from:"RETE",
+          text:"Due persone del giro potrebbero servirsi a vicenda. La presentazione dipende da te.",
+          tags:["street","network"]
+        });
+      }
+    }catch(_){}
+
+    afterClear(()=>showEvent({
+      k:"Strada · Rete",
+      t:"Questa volta il ponte sei tu",
+      d:"<b>"+(proposta.personAName||"Un contatto")+"</b> e <b>"+
+        (proposta.personBName||"un altro contatto")+
+        "</b> non si stanno cercando tramite un capo o una gerarchia. Sei tu ad avere abbastanza rapporti da capire che vale la pena farli incontrare.",
+      annulla(){
+        if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+      },
+      opts:[
+        {n:"Mettili in contatto",d:"La relazione nasce perché fai tu la presentazione",run(){
+          const out=typeof stradaRisolviEventoRete==="function"
+            ? stradaRisolviEventoRete()
+            : null;
+          if(!out || out.ok===false)
+            return {t:(out&&out.reason)||"Il ponte non si chiude.",c:"bad"};
+          return {t:"Hai messo in contatto <b>"+out.personaA+"</b> e <b>"+out.personaB+
+            "</b>. Ora entrambi ti devono qualcosa per aver aperto quella porta.",c:"good"};
+        }},
+        {n:"Non immischiarti",d:"Lasci che si arrangino senza usare la tua rete",run(){
+          if(typeof stradaRifiutaEventoRete==="function") stradaRifiutaEventoRete();
+          return {t:"Hai lasciato correre. Nessuna relazione cambia.",c:""};
+        }}
+      ]
+    }),80);
+    return true;
+  }
+
+  if(typeof stradaAnnullaEventoRete==="function") stradaAnnullaEventoRete();
+  return false;
 }
 
 function adfStreetOpportunityAfterAction(a){
@@ -2486,23 +2884,91 @@ function adfStreetOpportunityAfterAction(a){
   }
 
   s.lastHookEventDay=absDay();
+  const scelte=Array.isArray(proposta.choices)&&proposta.choices.length
+    ? proposta.choices
+    : [proposta];
+  try{
+    if(window.TRAPHONE16 && typeof TRAPHONE16.receiveStorySms==="function"){
+      for(const p of scelte){
+        TRAPHONE16.receiveStorySms({
+          id:"opportunity-"+String(p.id||p.colpoId||"street")+"-"+String(absDay()),
+          family:"street-opportunity",
+          voice:"contact",
+          from:p.persona||"SCONOSCIUTO",
+          text:p.intro||"Ho una cosa da proporti.",
+          tags:["street","deal"]
+        });
+      }
+    }
+  }catch(_){}
+
+  const multipla=scelte.length>1;
+  const causaBreve=p=>p&&p.networkCauseText
+    ? "<b>Perché ti cerca:</b> "+p.networkCauseText+"<br>"
+    : "";
+  const corpo=multipla
+    ? "Il <b>TrapPhone</b> vibra più di una volta. Non hai ricevuto un grado nuovo: semplicemente, ormai più persone pensano a te.<br><br>"+
+      scelte.map(p=>causaBreve(p)+"<b>"+(p.persona||"Un contatto")+":</b> "+(p.intro||"«Ho una cosa da proporti.»")).join("<br><br>")
+    : "Più tardi vibra il <b>TrapPhone</b>: è il canale che ti hanno dato proprio per queste cose."+
+      "<br><br>"+causaBreve(proposta)+"<b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»");
+
   afterClear(()=>showEvent({
     k:"Strada",
-    t:(proposta.persona||"Qualcuno")+" si fa vivo",
-    d:"Più tardi, mentre sei fuori, ti arriva un messaggio corto da una persona del giro."+
-      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
-      (proposta.intro||"«Ho una cosa da proporti.»"),
+    t:multipla ? "Più di una persona si fa viva" : (proposta.persona||"Qualcuno")+" si fa vivo",
+    d:corpo,
     annulla(){
-      if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
+      if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
     },
     opts:[
-      {n:"Sentiamo",d:"Ti fai spiegare la proposta",run(){
+      {n:multipla?"Guarda le proposte":"Sentiamo",d:multipla?"Confronta le due occasioni prima di sceglierne una":"Ti fai spiegare la proposta",run(){
         afterClear(()=>adfStreetOpportunityDecision(proposta),60);
         return null;
       }},
-      {n:"Ignora",d:"Non vuoi aprire quella porta oggi",run(){
-        if(typeof stradaRifiutaOpportunita==="function") stradaRifiutaOpportunita();
-        return {t:"Hai ignorato il messaggio. Nessun effetto sulla Strada.",c:""};
+      {n:"Ignora",d:multipla?"Non rispondi a nessuno dei due contatti":"Non rispondi: se succede spesso, smetteranno di cercarti",run(){
+        if(typeof stradaIgnoraOpportunita==="function") stradaIgnoraOpportunita();
+        return {t:multipla
+          ? "Hai lasciato cadere entrambi i messaggi. Tutti e due i contatti se lo ricordano."
+          : "Hai lasciato cadere il messaggio. Il contatto se lo ricorda.",c:""};
+      }}
+    ]
+  }),80);
+  return true;
+}
+
+function adfFactoryStreetIntroAfterShift(){
+  if(!G.job || typeof lavoroLuogo!=="function" || lavoroLuogo(G.job)!=="fabbrica")
+    return false;
+  if(typeof stradaAttivitaSbloccate==="function" && stradaAttivitaSbloccate())
+    return false;
+  if(typeof stradaTentaIngressoFabbrica!=="function") return false;
+
+  const s=st();
+  if(s.runtime.lastAutoEventKey===eventMinuteKey()) return false;
+
+  const proposta=stradaTentaIngressoFabbrica(Math.random());
+  if(!proposta) return false;
+  if(!claimAutoEvent("factory-street-intro")) return false;
+
+  s.lastHookEventDay=absDay();
+  afterClear(()=>showEvent({
+    k:"Fabbrica · Dopo il turno",
+    t:(proposta.persona||"Un collega")+" cambia tono",
+    d:"Non è la Fabbrica che ti sta offrendo un crimine. È una persona con cui hai già condiviso abbastanza turni da non essere più soltanto una faccia sulla linea."+
+      "<br><br>Fuori dal cancello <b>"+(proposta.persona||"il collega")+"</b> aspetta che gli altri si allontanino e ti prende da parte."+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      (proposta.intro||"«Ho una cosa da proporti.»"),
+    annulla(){
+      if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+    },
+    opts:[
+      {n:"Sentiamo",d:"Capisci finalmente che fuori dal turno ha altri collegamenti",run(){
+        afterClear(()=>adfStreetIntroDecision(proposta),60);
+        return null;
+      }},
+      {n:"Lascia stare",d:"Per te resta soltanto un collega di Fabbrica",run(){
+        if(typeof stradaRifiutaIngresso==="function") stradaRifiutaIngresso();
+        return {t:"Hai chiuso lì. La Fabbrica resta la Fabbrica e la porta della Strada non si apre.",c:""};
       }}
     ]
   }),80);
@@ -2529,12 +2995,14 @@ function adfFactoryStreetAfterShift(){
 
   s.lastHookEventDay=absDay();
 
+  const riconosciuta=proposta.factoryWasKnown===true;
   afterClear(()=>showEvent({
     k:"Fuori dalla Fabbrica",
     t:(proposta.persona||"Qualcuno")+" ti ferma un attimo",
-    d:"Hai appena finito il turno. Fuori dal cancello riconosci una faccia del giro. " +
-      "Il lavoro non c'entra: è semplicemente dove vi siete incrociati.<br><br>"+
-      "<b>"+(proposta.persona||"La persona")+":</b> "+(proposta.intro||"«Ho una cosa da proporti.»"),
+    d:(riconosciuta
+      ? "Hai appena finito il turno. Con <b>"+(proposta.persona||"questa persona")+"</b> non serve più fingere di non sapere: vi conoscete già anche dall'altra parte."
+      : "Hai appena finito il turno. <b>"+(proposta.persona||"Un collega")+"</b> con cui lavori da abbastanza tempo cambia tono. Non è un crimine della Fabbrica: capisci soltanto che sa che sei già nel giro.")+
+      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+(proposta.intro||"«Ho una cosa da proporti.»"),
     annulla(){
       if(typeof stradaRifiutaPropostaFabbrica==="function")
         stradaRifiutaPropostaFabbrica();
@@ -2595,46 +3063,68 @@ function adfWorkContactAfterShift(){
     dettaglio="Gira tra serate e locali e conosce parecchie persone del giro.";
   else if(p.ruolo==="collega")
     dettaglio="È una persona che lavori accanto abbastanza spesso da poterci costruire un rapporto vero.";
+  else if(p.ruolo==="cliente")
+    dettaglio="È una faccia che torna spesso: vi riconoscete ormai anche fuori dalla comanda.";
+  else if(p.ruolo==="fornitore")
+    dettaglio="Passa per rifornimenti e consegne: a forza di incrociarvi avete iniziato a parlare.";
+  else if(p.ruolo==="rider")
+    dettaglio="Lo incroci spesso durante i ritiri: ormai non è più soltanto una faccia di passaggio.";
   else if(p.ruolo==="strada")
     dettaglio="Lo riconosci come una persona che frequenta lo stesso giro della Strada.";
 
   const origine=p.origineDettaglio || "contatto conosciuto al lavoro";
   const titoloLavoro=G.job && G.job.n ? G.job.n : "Lavoro";
+  const pizzeriaSociale=chiave==="pizzeria";
+  const puoScambiareNumero=!pizzeriaSociale || giaVisto || Number(p.rel||0)>0;
+  const opzioniContatto=[];
+
+  /* Punto 15: il primo incontro in Pizzeria resta volutamente ambiguo.
+     Prima una faccia diventa familiare, poi eventualmente entra in rubrica. */
+  if(puoScambiareNumero){
+    opzioniContatto.push({n:"Scambiatevi il numero", d:"Diventa un contatto persistente nelle chat", run(){
+      const x=typeof postoScambiaNumeroLavoro==="function"
+        ? postoScambiaNumeroLavoro(p) : null;
+      if(!x) return {t:"Non siete riusciti a scambiarvi il numero.",c:""};
+      if(typeof gain==="function") gain("rete",0.5);
+      return {
+        t:"<b>"+p.n+"</b> è adesso nella tua rete: "+ruolo.toLowerCase()+
+          " · "+origine+". Lo trovi nelle chat.",
+        c:"good"
+      };
+    }});
+  }
+
+  opzioniContatto.push({n:"Parlate un po'", d:pizzeriaSociale&&!puoScambiareNumero
+    ? "È il primo incontro: costruisci familiarità, senza forzare subito il numero"
+    : "Costruisci il rapporto senza scambiarvi ancora il numero", run(){
+    if(typeof postoAvvicinaContattoLavoro==="function")
+      postoAvvicinaContattoLavoro(p,2);
+    if(chiave==="pizzeria" && typeof lavoroBonusRetePersona==="function")
+      lavoroBonusRetePersona(p,"work-contact-talk",0.2,2);
+    else if(typeof gain==="function") gain("rete",0.2);
+    return {
+      t:pizzeriaSociale&&!puoScambiareNumero
+        ? "Con <b>"+p.n+"</b> adesso c'è una faccia, un nome e una conversazione. Se vi rincrocerete, il rapporto potrà andare avanti."
+        : "Con <b>"+p.n+"</b> non è rimasta solo una chiacchiera da turno. Potrà ricapitare.",
+      c:""
+    };
+  }});
+  opzioniContatto.push({n:"Saluta e vai", d:"Nessun passo avanti nel rapporto", run(){
+    return {t:"Vi conoscete di vista. Se vi rincrocerete, il rapporto ripartirà da qui.",c:""};
+  }});
 
   afterClear(()=>showEvent({
     k:titoloLavoro+" · Contatti",
     t:giaVisto ? p.n+" torna a fermarti dopo il turno" : "Una conoscenza dopo il turno",
     d:"Hai appena finito di lavorare e finisci a parlare con <b>"+p.n+"</b>. " +
       dettaglio+"<br><br><b>"+ruolo+"</b> · "+origine+". " +
-      "Se nasce un contatto, resta una persona vera della tua rete e può ricomparire anche dopo.",
+      (pizzeriaSociale&&!puoScambiareNumero
+        ? "Qui il valore è riconoscersi e rivedersi: al primo incontro non c'è ancora motivo di scambiarsi il numero."
+        : "Se nasce un contatto, resta una persona vera della tua rete e può ricomparire anche dopo."),
     annulla(){
       /* Chiudere il popup non cancella la persona: ormai vi siete conosciuti. */
     },
-    opts:[
-      {n:"Scambiatevi il numero", d:"Diventa un contatto persistente nelle chat", run(){
-        const x=typeof postoScambiaNumeroLavoro==="function"
-          ? postoScambiaNumeroLavoro(p) : null;
-        if(!x) return {t:"Non siete riusciti a scambiarvi il numero.",c:""};
-        if(typeof gain==="function") gain("rete",0.5);
-        return {
-          t:"<b>"+p.n+"</b> è adesso nella tua rete: "+ruolo.toLowerCase()+
-            " · "+origine+". Lo trovi nelle chat.",
-          c:"good"
-        };
-      }},
-      {n:"Parlate un po'", d:"Costruisci il rapporto senza scambiarvi ancora il numero", run(){
-        if(typeof postoAvvicinaContattoLavoro==="function")
-          postoAvvicinaContattoLavoro(p,2);
-        if(typeof gain==="function") gain("rete",0.2);
-        return {
-          t:"Con <b>"+p.n+"</b> non è rimasta solo una chiacchiera da turno. Potrà ricapitare.",
-          c:""
-        };
-      }},
-      {n:"Saluta e vai", d:"Nessun passo avanti nel rapporto", run(){
-        return {t:"Vi conoscete di vista. Se vi rincrocerete, il rapporto ripartirà da qui.",c:""};
-      }}
-    ]
+    opts:opzioniContatto
   }),80);
 
   return true;
@@ -3038,12 +3528,21 @@ function adfShiftOutcomeEvent(luogo,jobBefore,flags){
   }else if(flags.contact){
     const sede=G.workplaces && G.workplaces[luogo];
     const row=sede && sede.network && Array.isArray(sede.network.history)
-      ? sede.network.history[0] : null;
+      ? sede.network.history[sede.network.history.length-1] : null;
     const p=row && (G.gente||[]).find(x=>x && x.id===row.personId);
     event={
       type:"contact",
       title:"Contatto dopo il turno",
       detail:p ? p.n : "Una conoscenza nata sul lavoro"
+    };
+  }else if(flags.intro){
+    const p=G.strada && G.strada.ingressoPending;
+    event={
+      type:"crime-intro",
+      title:"Una strana proposta",
+      detail:p
+        ? ((p.persona ? p.persona+" · " : "")+(p.titolo||"Un favore"))
+        : "Una conoscenza ti ha aperto una porta che prima non vedevi"
     };
   }else{
     const s=window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.stateForJob==="function"
@@ -3079,17 +3578,29 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
   } : null;
 
   const overtimeShown = a.id==="turno" ? adfWorkOvertimeAfterShift() : false;
-  const streetShown = a.id==="turno" && !overtimeShown
+  const factoryIntroShown = a.id==="turno" && !overtimeShown
+    ? adfFactoryStreetIntroAfterShift()
+    : false;
+  const streetShown = a.id==="turno" && !overtimeShown && !factoryIntroShown
     ? adfFactoryStreetAfterShift()
     : false;
-  const workFamilyShown = a.id==="turno" && !overtimeShown && !streetShown &&
+  const workFamilyShown = a.id==="turno" && !overtimeShown && !factoryIntroShown && !streetShown &&
     window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.afterShift==="function"
       ? ADF_WORK_EVENTS.afterShift(shiftPayload)
       : false;
-  const contactShown = a.id==="turno" && !overtimeShown && !streetShown && !workFamilyShown
+  const contactShown = a.id==="turno" && !overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown
     ? adfWorkContactAfterShift()
     : false;
-  const streetOpportunityShown = a.id!=="turno"
+  const introShown = !overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown && !contactShown
+    ? adfStreetIntroAfterAction(a)
+    : false;
+  const ferroShown = a.id!=="turno" && !introShown
+    ? adfStreetFerroAfterAction(a)
+    : false;
+  const networkShown = a.id!=="turno" && !introShown && !ferroShown
+    ? adfStreetNetworkAfterAction(a)
+    : false;
+  const streetOpportunityShown = a.id!=="turno" && !introShown && !ferroShown && !networkShown
     ? adfStreetOpportunityAfterAction(a)
     : false;
 
@@ -3098,13 +3609,14 @@ function adfCompletaHookAzione(a,jobBefore,endedAt){
       overtime:overtimeShown,
       street:streetShown,
       workFamily:workFamilyShown,
-      contact:contactShown
+      contact:contactShown,
+      intro:factoryIntroShown||introShown
     });
   }
 
-  if(!overtimeShown && !streetShown && !workFamilyShown && !contactShown && !streetOpportunityShown)
+  if(!overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown && !contactShown && !introShown && !ferroShown && !networkShown && !streetOpportunityShown)
     emitHook("after_action",{action_id:a.id});
-  if(a.id==="turno" && G.job && !overtimeShown && !streetShown && !workFamilyShown && !contactShown)
+  if(a.id==="turno" && G.job && !overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown && !contactShown && !introShown)
     emitHook("after_job_shift",shiftPayload || {
       action_id:"turno",
       job_id:G.job.id,

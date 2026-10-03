@@ -2272,6 +2272,264 @@ body::before{
 
 /* ADF_INTRO_META_CONTRAST_V1_END */
 </style>
+
+<style>
+/* ADF_MOBILE_APPEARANCE_SCROLL_V2
+   Solo viewport landscape da telefono. Non dipende dal tipo di puntatore:
+   alcuni browser/iframe mobili possono esporre un primary pointer non-coarse.
+   A 844x390 la scelta deve stare nello schermo; sui telefoni piu' bassi
+   l'intera area resta scrollabile con un gesto verticale nativo. */
+@media (orientation:landscape) and (max-width:980px){
+  /* Il breakpoint mobile (<980) e quello "notebook basso" (>800 e <740h)
+     si sovrappongono a 844x390. Durante il solo step Aspetto azzeriamo
+     quell'offset doppio: topbar compatta, viewport subito sotto, niente
+     scroll del documento esterno. Gli altri step restano invariati. */
+  html:has(#pageAppearance.on),
+  body:has(#pageAppearance.on){
+    height:100%;
+    min-height:100%;
+    overflow:hidden;
+  }
+
+  body:has(#pageAppearance.on) .topbar{
+    position:sticky;
+    top:0;
+    height:54px;
+    min-height:54px;
+    padding:
+      0
+      max(14px,env(safe-area-inset-right,0px))
+      0
+      max(14px,env(safe-area-inset-left,0px));
+  }
+
+  /* Il ritorno dello step Aspetto vive visivamente nella topbar:
+     piccolo, a destra, stessa grammatica del creator. Il ::before amplia
+     l'area touch senza rendere il pulsante di nuovo ingombrante. */
+  body:has(#pageAppearance.on) .creator-exit-game{
+    left:auto;
+    right:max(12px,env(safe-area-inset-right,0px));
+    top:max(8px,env(safe-area-inset-top,0px));
+    bottom:auto;
+    width:auto;
+    min-width:78px;
+    height:38px;
+    min-height:38px;
+    padding:0 10px;
+    border:1px solid rgba(211,170,94,.22);
+    border-radius:9px;
+    background:rgba(255,255,255,.025);
+    color:#d8ccb8;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.018);
+    backdrop-filter:blur(8px);
+  }
+
+  body:has(#pageAppearance.on) .creator-exit-game::before{
+    content:"";
+    position:absolute;
+    inset:-3px;
+  }
+
+  body:has(#pageAppearance.on) .creator-exit-game::after{
+    content:"← Indietro";
+    font:800 9.5px/1 Inter,Arial,sans-serif;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+
+  body:has(#pageAppearance.on) .viewport{
+    position:relative;
+    inset:auto;
+    top:auto;
+    min-height:calc(100dvh - 54px);
+    height:calc(100dvh - 54px);
+    overflow:hidden;
+  }
+
+  #pageAppearance{
+    position:relative;
+    min-height:calc(100dvh - 54px);
+    height:calc(100dvh - 54px);
+    overflow:hidden;
+  }
+
+  #pageAppearance .layout{
+    position:absolute;
+    inset:0;
+    display:block;
+    width:100%;
+    height:100%;
+    min-height:0;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior-y:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+  }
+
+  #pageAppearance .content{
+    width:100%;
+    min-height:100%;
+    height:auto;
+    margin:0;
+    padding:
+      10px
+      max(14px,env(safe-area-inset-right,0px))
+      max(14px,env(safe-area-inset-bottom,0px))
+      max(14px,env(safe-area-inset-left,0px));
+    overflow:visible;
+    touch-action:pan-y;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(7,8,10,.56) 0%,
+        rgba(7,8,10,.80) 42%,
+        rgba(7,8,10,.96) 100%
+      );
+  }
+
+  #pageAppearance .eyebrow{
+    margin-bottom:4px;
+    font-size:8px;
+  }
+
+  #pageAppearance .content h1{
+    font-size:clamp(29px,8vh,38px);
+    line-height:.88;
+  }
+
+  #pageAppearance .lead{
+    margin:5px 0 8px;
+    font-size:8.5px;
+    line-height:1.30;
+  }
+
+  #pageAppearance .avatar-method-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    max-width:none;
+  }
+
+  #pageAppearance .avatar-method{
+    min-height:126px;
+    padding:8px 10px 22px;
+    border-radius:12px;
+  }
+
+  #pageAppearance .avatar-method .n{
+    margin-top:4px;
+    font-size:22px;
+  }
+
+  #pageAppearance .avatar-method .d{
+    margin-top:4px;
+    max-width:none;
+    font-size:8px;
+    line-height:1.25;
+  }
+
+  #pageAppearance .avatar-features{
+    gap:4px;
+    margin-top:6px;
+    padding-bottom:0;
+  }
+
+  #pageAppearance .avatar-features span{
+    padding:4px 6px;
+    font-size:6.7px;
+  }
+
+  #pageAppearance .avatar-method .mini{
+    left:10px;
+    right:10px;
+    bottom:7px;
+    font-size:6.5px;
+  }
+
+  #pageAppearance .avatar-selection-note{
+    min-height:36px;
+    margin-top:6px;
+    padding:6px 9px;
+    border-radius:10px;
+    font-size:7.5px;
+    line-height:1.25;
+  }
+
+  /* Su mobile le due card sono gia' le azioni finali: nessun secondo
+     pulsante di conferma sotto. Il desktop mantiene il flusso seleziona+continua. */
+  #pageAppearance .bottom{
+    display:none;
+  }
+}
+
+@media (orientation:landscape) and (max-width:980px) and (max-height:340px){
+  #pageAppearance .content{
+    padding-top:8px;
+    padding-bottom:10px;
+  }
+
+  #pageAppearance .content h1{
+    font-size:28px;
+  }
+
+  #pageAppearance .lead{
+    font-size:8px;
+  }
+
+  #pageAppearance .avatar-method{
+    min-height:118px;
+  }
+}
+
+/* Camerino mobile: l'iframe è la schermata, non un contenuto sotto la topbar.
+   Nasconde anche il ritorno globale perché il camerino ha già "Torna indietro". */
+@media (orientation:landscape) and (max-width:980px) and (max-height:520px){
+  html:has(#pageDressingRoom.on),
+  body:has(#pageDressingRoom.on){
+    width:100%;
+    height:100%;
+    min-height:100%;
+    overflow:hidden;
+  }
+
+  body:has(#pageDressingRoom.on) .topbar{
+    display:none!important;
+  }
+
+  body:has(#pageDressingRoom.on) .viewport{
+    position:relative!important;
+    inset:auto!important;
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    overflow:hidden!important;
+  }
+
+  #pageDressingRoom.on{
+    position:relative!important;
+    inset:auto!important;
+    width:100%!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    overflow:hidden!important;
+  }
+
+  #pageDressingRoom .dressing-room-frame{
+    width:100%!important;
+    height:100%!important;
+  }
+
+  body:has(#pageDressingRoom.on) .creator-exit-game{
+    display:none!important;
+  }
+
+  /* MakeHuman ha già il suo Indietro nella barra azioni. Evitiamo il secondo
+     pulsante del creator sopra all'editor mobile. */
+  body:has(#localEditorOverlay.on) .creator-exit-game{
+    display:none!important;
+  }
+}
+</style>
 </head>
 <body>
 <div class="app">
@@ -2346,7 +2604,7 @@ body::before{
     </section>
 
     <section class="page" id="pageDressingRoom">
-      <iframe class="dressing-room-frame" id="dressingRoomFrame" src="camerino.html" title="Camerino personaggio"></iframe>
+      <iframe class="dressing-room-frame" id="dressingRoomFrame" src="camerino.html?v=7" title="Camerino personaggio"></iframe>
     </section>
 
     <section class="page" id="pageIdentity">
@@ -2948,7 +3206,9 @@ function renderAvatarSource(){
   const note = $('avatarSelectionNote');
   const go = $('goIdentity');
   if(!selected){
-    note.textContent = 'Seleziona uno dei due metodi. Dopo l’editor scelto passerai dal camerino prima di entrare nell’identità.';
+    note.textContent = mobileAvatarDirectTapEnabled()
+      ? 'Tocca Avaturn o MakeHuman per aprire subito l’editor scelto.'
+      : 'Seleziona uno dei due metodi. Dopo l’editor scelto passerai dal camerino prima di entrare nell’identità.';
     go.textContent = 'Seleziona un metodo';
     go.disabled = true;
     return;
@@ -3215,7 +3475,14 @@ function showResult(){
 }
 
 document.querySelectorAll('[data-avatar-source]').forEach(btn=>{
-  btn.addEventListener('click', ()=>selectAvatarSource(btn.dataset.avatarSource));
+  btn.addEventListener('click', ()=>{
+    const source=btn.dataset.avatarSource;
+    selectAvatarSource(source);
+
+    /* Mobile landscape: la card e' gia' un vero bottone touch. Evitiamo il
+       doppio passaggio "seleziona + conferma" e apriamo subito il metodo. */
+    if(mobileAvatarDirectTapEnabled()) activateAvatarSource(source);
+  });
 });
 
 const localEditorOverlay = $('localEditorOverlay');
@@ -3306,14 +3573,29 @@ function closeLocalEditor(){
   localEditorOverlay.setAttribute('aria-hidden','true');
 }
 
-$('goIdentity').onclick = ()=>{
-  const source = selectedAvatarSource();
-  if(!source) return;
+function mobileAvatarDirectTapEnabled(){
+  return !!(
+    window.matchMedia &&
+    window.matchMedia('(orientation:landscape) and (max-width:980px)').matches
+  );
+}
+
+function activateAvatarSource(source){
+  if(source!=='avaturn' && source!=='local') return;
   state.avatarPendingSource=source;
-  if(source==='local'){ openLocalEditor(); return; }
-  /* Avaturn vive dentro al camerino: il bottone MODIFICA CON AVATURN apre
-     l’SDK e Continua rimane disabilitato finché non esiste un export reale. */
+
+  if(source==='local'){
+    openLocalEditor();
+    return;
+  }
+
+  /* Avaturn vive dentro al camerino: da li' il comando MODIFICA CON AVATURN
+     apre l'SDK e Continua resta disabilitato finche' non esiste un export reale. */
   openDressingRoom(false);
+}
+
+$('goIdentity').onclick = ()=>{
+  activateAvatarSource(selectedAvatarSource());
 };
 
 $('backAppearance').onclick = ()=>{
@@ -3344,6 +3626,25 @@ window.addEventListener('message', e=>{
     }
     if(msg.type==='adf-rpg-v24-quick-makehuman'){
       startQuickMakeHuman();
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-avaturn-mobile-export'){
+      frame?.contentWindow?.postMessage({
+        type:'adf-avatar-room-avaturn-mobile-export',
+        data:msg.data||{}
+      },'*');
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-avaturn-mobile-cancel'){
+      frame?.contentWindow?.postMessage({
+        type:'adf-avatar-room-avaturn-mobile-cancel'
+      },'*');
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-avaturn-mobile-fallback'){
+      frame?.contentWindow?.postMessage({
+        type:'adf-avatar-room-avaturn-mobile-fallback'
+      },'*');
       return;
     }
     /* «Fallo a mano» dalla schermata d'attesa del gioco: l'avvio rapido si
@@ -3504,6 +3805,14 @@ window.addEventListener('message', e=>{
   if(!frame || e.source!==frame.contentWindow) return;
   if(msg.type==='adf-avatar-room-ready'){
     sendDressingRoomInit(false);
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-open'){
+    if(window.parent!==window){
+      window.parent.postMessage({type:'adf-rpg-v24-avaturn-mobile-open'},'*');
+    }else{
+      frame.contentWindow.postMessage({type:'adf-avatar-room-avaturn-mobile-fallback'},'*');
+    }
     return;
   }
   if(msg.type==='adf-avatar-room-continue'){

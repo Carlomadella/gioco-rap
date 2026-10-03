@@ -23,6 +23,7 @@ const ev = leggi("js/game/eventi-v2.js");
 const tel = leggi("js/game/telefono.js");
 const chatjs = leggi("js/game/chat.js");
 const actions = leggi("js/game/actions.js");
+const lavoroEventi = leggi("js/game/lavoro-eventi.js");
 const posto = leggi("js/game/posto.js");
 const studio = leggi("js/game/studio.js");
 const studioEl = leggi("js/game/studio-elementi.js");
@@ -49,6 +50,8 @@ const crimeuiPiatto = crimeui.replace(/\s+/g, "");
 const crime = leggi("js/game/strada-crimine.js");
 const state = leggi("js/game/state.js");
 const sim = leggi("js/game/sim.js");
+const lifestyle = leggi("js/game/lifestyle.js");
+const phases = leggi("js/game/phases.js");
 const telefono = leggi("js/game/telefono.js");
 const covers = leggi("js/game/covers.js");
 const skip = leggi("js/game/skip.js");
@@ -1245,30 +1248,610 @@ test("skip iniziato in carcere non apre report neanche se termina con scarcerazi
   ev.includes('if(report) report.classList.remove("on")'));
 
 console.log("\nBlocco 4 — riciclaggio / costi / tempo");
-test("capacità settimanale già usa anno:settimana e used",
+test("capacità settimanale usa anno:settimana e traccia i canali separatamente",
   crime.includes("function stradaLavaggioStato()") &&
-  crime.includes("s.lavaggio={key:key,used:0}") &&
-  crime.includes("stradaLavaggioStato().used += importo"));
+  crime.includes("s.lavaggio={key:key,used:0,canali:{}}") &&
+  crime.includes("lav.canali[canale.id]=Number(lav.canali[canale.id]||0)+passa"));
 test("riciclaggio costa 45 minuti",
   time.includes("ricicla:45") &&
   crime.includes('GAME_TIME.durationFor("ricicla")') &&
   crime.includes('GAME_TIME.advance(minuti, "crime:launder")'));
 test("riciclaggio non parte se manca tempo prima delle 04:00",
   crime.includes("GAME_TIME.remaining() < minuti"));
-test("uomini vengono ridotti al numero realmente pagabile",
-  crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)"));
-test("protezione decade se non pagabile",
-  crime.includes("s.prot = 0") &&
+test("la Provincia usa un pool ampio e quattro offerte giornaliere non vincolate alle categorie",
+  crime.includes("const STRADA_CATEGORIE_COLPO") &&
+  crime.includes("function stradaGeneraOfferteColpi") &&
+  crime.includes("function stradaColpiDisponibili") &&
+  crime.includes("const offerte = stradaColpiDisponibili()") &&
+  crime.includes("griglia.innerHTML = offerte.map") &&
+  crime.includes("Nessun bonus per diversità categoria") &&
+  (crime.match(/categoria:"/g)||[]).length>=30);
+test("le categorie dei colpi modificano davvero chance, resa, sporco, attenzione e reputazione",
+  crime.includes("categoria.chance") &&
+  crime.includes("effettiCategoria.guadagno") &&
+  crime.includes("effettiCategoria.sporco") &&
+  crime.includes("effettiCategoria.heat") &&
+  crime.includes("effettiCategoria.rep"));
+test("punto 8: ogni colpo passa da una sola preparazione prima dell'approccio",
+  crime.includes("const STRADA_PREPARAZIONI") &&
+  crime.includes("function stScenaPreparazione(colpo)") &&
+  crime.includes("STRADA_SCENA = stScenaPreparazione(colpo)") &&
+  crime.includes("Una sola scelta: poi si decide come affrontare il colpo."));
+test("punto 8: prepararsi costa tempo reale o un favore per-persona",
+  crime.includes('minuti:45') &&
+  crime.includes('minuti:90') &&
+  crime.includes('GAME_TIME.spend(minuti,"crime:prepare"') &&
+  crime.includes("function stradaPersoneConFavore()") &&
+  crime.includes("function stradaConsumaFavore") &&
+  crime.includes("favoriEventi"));
+test("punto 8: i favori si guadagnano facendo qualcosa per un contatto e non si comprano",
+  crime.includes('stradaAggiungiFavore(personaIngresso,1,"intro-"+step+"-success")') &&
+  crime.includes('stradaAggiungiFavore(personaLead,1,"opportunita-success")') &&
+  crime.includes("Math.min(3") &&
+  !crime.includes("STRADA_FAVORE_COSTO"));
+test("punto 8: la preparazione cambia davvero riuscita e attenzione",
+  crime.includes("p += prep.chance") &&
+  crime.includes("effettiPreparazione.heat") &&
+  crime.includes("stradaChanceConOpportunita(colpo,approccio,opportunita,personaSquadra,preparazione)"));
+test("punto 9: i colpi consumano tempo reale della giornata",
+  crime.includes("const STRADA_DURATA_BASE_CATEGORIA") &&
+  crime.includes("function stradaDurataColpo(colpo)") &&
+  crime.includes('GAME_TIME.spend(minuti,"crime:job"') &&
+  crime.includes("const tempoColpo=stradaSpendiTempoColpo(colpo);"));
+test("punto 9: il tempo viene impegnato prima di energia, dado e consumo opportunità",
+  crime.indexOf("const tempoColpo=stradaSpendiTempoColpo(colpo);") <
+  crime.indexOf("G.energy -= colpo.energia;") &&
+  crime.indexOf("G.energy -= colpo.energia;") <
+  crime.indexOf("const successo = Math.random() < stradaChanceConOpportunita") &&
+  crime.indexOf("const successo = Math.random() < stradaChanceConOpportunita") <
+  crime.indexOf("stradaConsumaOpportunita(colpoId, successo)"));
+test("punto 9: durata visibile prima di scegliere e range compatibile con la Pizzeria",
+  crime.includes('stradaDurataColpoLabel(colpo)+" di tempo"') &&
+  crime.includes("stradaDurataColpoLabel(c)") &&
+  crime.includes("Math.min(150,base+extra)") &&
+  time.includes("pizzeria:300"));
+test("punto 10: le relazioni criminali decadono per stato, non con -1 fisso a settimana",
+  crime.includes("const STRADA_RELAZIONI") &&
+  crime.includes('streetStatus:"active"') &&
+  crime.includes("function stradaAggiornaRelazioniCriminali") &&
+  crime.includes("ignoredLimit:3") &&
+  crime.includes("unreachableAfterDays:168"));
+test("punto 10: tre offerte ignorate possono rendere un contatto inattivo senza cancellare la persona",
+  crime.includes("function stradaIgnoraContatto") &&
+  crime.includes('stradaRelazioneTransizione(p,"inactive","ignored-three-times"') &&
+  crime.includes("function stradaIgnoraOpportunita()") &&
+  !crime.includes("p.via=true"));
+test("punto 10: inattivi e non raggiungibili non valgono come crew/favori/copertura",
+  crime.includes(".filter(p=>stradaRelazioneDisponibile(p) && stradaFavoriValore(p)>0)") &&
+  crime.includes(".filter(stradaRelazioneDisponibile)") &&
+  crime.includes("stradaRelazioneDisponibile(p) &&") &&
+  crime.includes("dormienti=tuttiContatti.filter"));
+test("punto 10: una storia forte può riemergere più fredda",
+  crime.includes('stradaRelazioneTransizione(p,"cold","old-history-resurfaces"') &&
+  crime.includes("coldTrustLoss:15") &&
+  crime.includes("coldReturnAfterDays:84"));
+test("punto 10: ghosting, rifiuto e cancellazione tecnica sono distinti",
+  ev.includes('typeof stradaIgnoraOpportunita==="function"') &&
+  ev.includes('typeof stradaIgnoraPropostaFabbrica==="function"') &&
+  ev.includes('typeof stradaRifiutaPropostaFabbrica==="function"') &&
+  crime.includes("Cancellazione tecnica"));
+test("punto 11: crescita criminale per capacità e non per grado",
+  crime.includes("const STRADA_CAPACITA_RETE") &&
+  crime.includes("function stradaCapacitaRete()") &&
+  crime.includes("piuChiamate") &&
+  crime.includes("sceltaOpportunita") &&
+  crime.includes("richiestaNome") &&
+  crime.includes("creaPonte") &&
+  !crime.includes("livelloCriminale") &&
+  !crime.includes("gradoCriminale"));
+test("punto 11: il peso nel giro aumenta davvero la frequenza delle chiamate",
+  crime.includes("function stradaOpportunitaTriggerConfig") &&
+  crime.includes("chance+=.035") &&
+  crime.includes("cooldown=Math.max(7,cooldown-2)") &&
+  crime.includes('trigger==="mondo" && cap.piuChiamate'));
+test("punto 11: con abbastanza rete si sceglie tra due opportunità reali",
+  crime.includes("pendingChoices") &&
+  crime.includes("function stradaSelezionaOpportunita") &&
+  crime.includes('type:"not-selected"') &&
+  ev.includes("Più di una persona si fa viva") &&
+  ev.includes("Guarda le proposte"));
+test("punto 11: gli altri possono chiedere un nome e il giocatore può fare da ponte",
+  crime.includes("function stradaTentaEventoRete") &&
+  crime.includes('mode==="ask-name"') &&
+  crime.includes('mode==="bridge"') &&
+  crime.includes('type:"name-given"') &&
+  crime.includes('type:"bridge-made"') &&
+  ev.includes("ti chiede un nome") &&
+  ev.includes("Questa volta il ponte sei tu"));
+test("punto 11: rete avanzata usa persone e favori reali, non una valuta-rango",
+  crime.includes('stradaModificaFiducia(requester,2,"rete-nome-dato")') &&
+  crime.includes('stradaAggiungiFavore(requester,1,"rete-nome-dato")') &&
+  crime.includes('stradaAggiungiFavore(a,1,"rete-ponte")') &&
+  crime.includes('stradaAggiungiFavore(b,1,"rete-ponte")'));
+test("punto 12: reputazione globale e fiducia personale hanno API e stato distinti",
+  crime.includes("function stradaReputazioneGlobale()") &&
+  crime.includes("function stradaModificaReputazione") &&
+  crime.includes("function stradaFiduciaValore(p)") &&
+  crime.includes("function stradaModificaFiducia(p,delta,motivo)") &&
+  state.includes("repStato:{history:[]}"));
+test("punto 12: i gate leggono separatamente nome globale e fiducia della persona",
+  crime.includes("stradaReputazioneGlobale()<req.rep") &&
+  crime.includes("stradaFiduciaValore(p)<req.fiducia") &&
+  crime.includes("stradaReputazioneGlobale()<STRADA_FERRO_REP_MIN") &&
+  crime.includes("stradaFiduciaValore(p)>=STRADA_FERRO_FIDUCIA_MIN"));
+test("punto 12: la UI distingue nome nel giro e fiducia",
+  index.includes("<span>Nome nel giro</span>") &&
+  crime.includes("p.n + ' · Fiducia: ' + stradaFiduciaEtichetta(p)") &&
+  crime.includes('"nome nel giro "+stradaSegno(p.successRep)'));
+test("punto 13: i risultati dei colpi persistono anche sulle persone",
+  crime.includes("debitiGiocatore:0") &&
+  crime.includes("tensione:0") &&
+  crime.includes("rivalita:false") &&
+  crime.includes("conseguenzeEventi:[]") &&
+  crime.includes("function stradaRegistraConseguenzaPersona"));
+test("punto 13: chi ti copre può creare un debito personale che un successo futuro ripaga",
+  crime.includes('stradaModificaDebitoPersona(personaSquadra,1,"si-prende-il-casino")') &&
+  crime.includes('stradaModificaDebitoPersona(personaSquadra,-1,"colpo-insieme-success")') &&
+  crime.includes("adesso gli devi un favore") &&
+  crime.includes("chiudi uno dei conti rimasti aperti"));
+test("punto 13: fallimenti ripetuti possono trasformare tensione in rivalità",
+  crime.includes("function stradaModificaTensionePersona") &&
+  crime.includes('stradaModificaTensionePersona(personaLead,1,"opportunita-failure")') &&
+  crime.includes('stradaRegistraConseguenzaPersona(p,"rivalry-start"') &&
+  crime.includes("!st.rivalita"));
+test("punto 13: un successo forte può produrre una presentazione reale in G.gente",
+  crime.includes("function stradaPresentazioneDopoSuccesso") &&
+  crime.includes('source:"referral-after-success"') &&
+  crime.includes("introducedByPersonId:persona.id") &&
+  crime.includes("ti apre un'altra porta e ti presenta"));
+test("punto 13: la UI mostra debiti e rivalità senza cancellare le persone",
+  crime.includes("Gli devi '+stradaConseguenzePersona(p).debiti+' favore/i") &&
+  crime.includes("p.n+' · Rivalità") &&
+  crime.includes("const rivali=tuttiContatti.filter(stradaRivalitaAttiva)"));
+test("punto 14: la Fabbrica ha un percorso criminale dedicato dopo almeno 10 turni reali",
+  crime.includes("const STRADA_FABBRICA_STORY_MIN_TURNI = 10") &&
+  crime.includes("function stradaFabbricaTurniLavorati") &&
+  crime.includes("function stradaFabbricaPersonaCandidata") &&
+  crime.includes('lavoroTurniTotaliSede("fabbrica")'));
+test("punto 14: serve un collega Fabbrica realmente incontrato",
+  crime.includes("function stradaFabbricaPersonaConosciuta") &&
+  crime.includes("p.workEncountered || p.numero || Number(p.rel)>0 || Number(p.pt)>0") &&
+  crime.includes("stradaFabbricaPersonaMatura(p)"));
+test("punto 14: i colleghi Fabbrica sono esclusi dall'intro criminale generica",
+  crime.includes('if(p.origineLuogo==="fabbrica") return false') &&
+  ev.includes("function adfFactoryStreetIntroAfterShift()") &&
+  ev.includes('claimAutoEvent("factory-street-intro")') &&
+  ev.includes('lavoroLuogo(G.job)==="fabbrica") return false'));
+test("punto 14: la Fabbrica non genera crimini, rivela il lato Strada di una persona reale",
+  ev.includes("Non è la Fabbrica che ti sta offrendo un crimine") &&
+  ev.includes("Non è un crimine della Fabbrica") &&
+  crime.includes("if(!stradaFabbricaPersonaCandidata()) return null") &&
+  crime.includes('source:"factory-opportunity"'));
+test("punto 14: l'anzianità di sede persiste oltre il cartellino mensile",
+  actions.includes("function lavoroTurniTotaliSede(luogo)") &&
+  actions.includes("sede.totalShiftsWorked=totaliPrima+1") &&
+  actions.includes("totaliSede:sede.totalShiftsWorked"));
+test("punto 15: la Pizzeria usa soprattutto contatti sociali quotidiani",
+  actions.includes("socialOnly:true") &&
+  actions.includes('ruoli:Object.freeze(["collega","collega","rider","cliente","cliente","fornitore","rapper","promoter"])') &&
+  actions.includes('ruoli:Object.freeze(["collega","collega","collega","rider","cliente","cliente"])'));
+test("punto 15: la Pizzeria non genera conoscenze Strada neppure a giro avviato",
+  actions.includes('if(lavoroReteChiave(job)==="pizzeria" || (cfg&&cfg.socialOnly===true))') &&
+  actions.includes('return ruoli.filter(r => r !== "strada")'));
+test("punto 15: il primo incontro Pizzeria non regala subito il numero",
+  ev.includes('const puoScambiareNumero=!pizzeriaSociale || giaVisto || Number(p.rel||0)>0') &&
+  ev.includes("al primo incontro non c'è ancora motivo di scambiarsi il numero") &&
+  ev.includes("opts:opzioniContatto"));
+test("punto 15: il lavoro Pizzeria non produce direttamente lead crime",
+  lavoroEventi.includes('if(workKey(job)==="pizzeria") return false') &&
+  lavoroEventi.includes("function showCrime(job,s,roll)"));
+
+test("punto 16: le persone possono avere legami sociali persistenti e bidirezionali",
+  posto.includes("function postoReteLegami(p)") &&
+  posto.includes("function postoCollegaPersone(a,b,motivo)") &&
+  posto.includes("function postoLegamiAttivi(p)") &&
+  posto.includes('reason:motivo||"contatto-comune"'));
+test("punto 16: il Circolo favorisce ricorrenze e contatti comuni senza regalare il nome",
+  posto.includes("circoloPresenze") &&
+  posto.includes("postoLegamiAttivi(p).reduce") &&
+  posto.includes("circoloUltimoVistoKey") &&
+  posto.includes("Ricordiamo solo che la faccia è passata dal Circolo"));
+test("punto 16: le opportunità del mondo hanno una causa narrativa persistente",
+  crime.includes("function stradaCausaOpportunita(variante,trigger)") &&
+  crime.includes("networkCauseText") &&
+  crime.includes("introducedByPersonId") &&
+  crime.includes('stradaNpcCollega(causa.introducedBy,p,"strada-introduzione")'));
+test("punto 16: nome dato e ponte costruiscono davvero la rete tra persone",
+  crime.includes('stradaNpcCollega(requester,candidato,"strada-nome")') &&
+  crime.includes('stradaNpcCollega(a,b,"strada-ponte")') &&
+  crime.includes('stradaNpcCollega(persona,nuovo,"strada-referral")'));
+test("punto 16: la UI spiega perché una persona si fa viva",
+  ev.includes("Come ci sei arrivato:") &&
+  ev.includes("Perché ti cerca:") &&
+  ev.includes("networkCauseText"));
+test("punto 16: i salvataggi legacy non ricevono una provenienza inventata",
+  crime.includes('type:"legacy"') &&
+  crime.includes("prima che il gioco iniziasse a tracciare il passaparola"));
+
+test("punto 17: le attività sono imprese con ricavo, capienza e rischio propri",
+  crime.includes("ricavoPulito:80") &&
+  crime.includes("capienza:150") &&
+  crime.includes("capienza:240") &&
+  crime.includes("capienza:330") &&
+  crime.includes("rischio:.05") &&
+  crime.includes("rischio:.12"));
+test("punto 17: ogni attività posseduta crea persone reali persistenti",
+  crime.includes("function stradaAttivitaPersonaNuova(a,ruolo)") &&
+  crime.includes('p.origine="attivita"') &&
+  crime.includes('p.attivita={id:a.id,ruolo}') &&
+  crime.includes("partnerPersonId") &&
+  crime.includes("employeePersonId") &&
+  crime.includes('stradaNpcCollega(partner,employee,"attivita-lavoro")'));
+test("punto 17: il riciclaggio è per canale e importo scelto dal giocatore",
+  crime.includes("function stradaCanaliLavaggio()") &&
+  crime.includes("function stradaRipulisci(importo,canaleId)") &&
+  crime.includes("function stScenaLavaggioCanale(canaleId)") &&
+  crime.includes("Math.round(max*.25)") &&
+  crime.includes("Math.round(max*.5)") &&
+  crime.includes("Scegli prima <b>dove</b>, poi <b>quanto</b>"));
+test("punto 17: le attività producono reddito pulito normale e non sporco automatico",
+  crime.includes("redditoAttivita+=Number(esito.income||0)") &&
+  crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")') &&
+  crime.includes("G._entratePulite=Number(G._entratePulite||0)+redditoAttivita") &&
+  !crime.includes("s.sporchi += Math.round(a.resa * .55)"));
+test("punto 17: problemi operativi, dipendenti e controlli hanno conseguenze reali",
+  crime.includes('id:"cassa"') &&
+  crime.includes('id:"fornitore"') &&
+  crime.includes('id:"controllo"') &&
+  crime.includes('scelta==="sistema"') &&
+  crime.includes('scelta==="pausa"') &&
+  crime.includes('business-issue-ignored'));
+test("punto 17: un'attività può diventare punto d'incontro della rete",
+  crime.includes("function stradaAttivitaIncontro(id)") &&
+  crime.includes('GAME_TIME.spend(45,"crime:business-meeting"') &&
+  crime.includes('stradaNpcCollega(persone.partner,contatto,"attivita-incontro")'));
+
+test("punto 22: il crime espone un contratto NPC opzionale senza possedere il sistema PERSONA",
+  crime.includes("const STRADA_NPC_CONTRACT_VERSION = 1") &&
+  crime.includes("window.ADF_CRIME_NPC_CONTRACT") &&
+  crime.includes('adapterGlobal:"ADF_CRIME_NPC"') &&
+  crime.includes('"personById","findPerson","createPerson","people"') &&
+  crime.includes('"linkPeople","cityOf","groupsForPerson","markContext"'));
+test("punto 22: senza il nuovo manager la Strada continua a usare G.gente e nuovaPersona",
+  crime.includes("return (G.gente||[]).find(p=>p&&p.id===id&&!p.via) || null") &&
+  crime.includes('if(typeof nuovaPersona!=="function") return {person:null,managed:false}') &&
+  crime.includes('const p=nuovaPersona(request.roleHint||"strada")'));
+test("punto 22: col nuovo manager ricerca, creazione e legami passano dal bridge crime",
+  crime.includes('typeof a.findPerson==="function"') &&
+  crime.includes('typeof a.createPerson==="function"') &&
+  crime.includes('typeof adapter.linkPeople==="function"') &&
+  crime.includes("let p=stradaNpcTrovaPersona({crimeKey:key,name:nome,cityId})") &&
+  crime.includes("stradaNpcCollega(a,b,reason)"));
+test("punto 22: città e gruppi NPC entrano solo come contesto della rete criminale",
+  crime.includes("function stradaNpcCittaPersona(p)") &&
+  crime.includes("function stradaNpcGruppiPersona(p)") &&
+  crime.includes("function stradaNpcContestoPersona(p,cityId)") &&
+  crime.includes("function stradaContattiAttivi(citta)") &&
+  crime.includes("stradaNpcPersone({cityId})") &&
+  crime.includes("variante.networkCityId=stradaCittaContesto()") &&
+  crime.includes("variante.networkGroupIds=networkCtx.groupIds") &&
+  crime.includes("firstLinkedCityId:null") &&
+  crime.includes("lastLinkedCityId:null"));
+
+test("punto 23: la caduta cresce col peso del colpo senza introdurre un rango criminale",
+  crime.includes("const STRADA_CADUTA_FASCE=Object.freeze([") &&
+  crime.includes("function stradaCadutaPunteggio(colpo,heat,precedenti)") &&
+  crime.includes("Number(colpo.difficolta||0)*45") &&
+  crime.includes("Number(colpo.minRep||0)*.55") &&
+  crime.includes("Number(colpo.pena||0)*2.2") &&
+  !crime.includes("falloutRank"));
+test("punto 23: i colpi pesanti possono propagare perdite economiche, relazionali e sulle attività",
+  crime.includes("function stradaApplicaFalloutFallimento(colpo,ctx)") &&
+  crime.includes("function stradaFalloutPerditaTarget(colpo,score,arrested,shielded,costoErrore)") &&
+  crime.includes('stradaRelazioneTransizione(persona,stato,"major-crime-fallout"') &&
+  crime.includes('candidata.st.issue={id:"controllo"') &&
+  crime.includes('type:"crime-fallout"'));
+test("punto 23: il carcere lega il rischio contratto alla gravità della caduta",
+  crime.includes("function stradaRischioContrattoCarcere(arresto)") &&
+  crime.includes("settimaneIniziali:settimane") &&
+  crime.includes("s.arresto.falloutScore=fallout.score") &&
+  crime.includes("Math.random() < stradaRischioContrattoCarcere(s.arresto)"));
+test("punto 23: il giocatore vede separati rischio di fallire e costo della caduta",
+  crime.includes("Rischio ' + stRischio(c).toLowerCase()") &&
+  crime.includes("Caduta ' + stradaCadutaProfilo(c).label") &&
+  crime.includes("stradaCadutaClasse(c)"));
+
+test("punto 24: chiedere informazioni produce intel concreto e temporaneo sul colpo",
+  crime.includes("const STRADA_INTEL_TIPI=Object.freeze({") &&
+  crime.includes("function stradaIntelStato()") &&
+  crime.includes("function stradaIntelCrea(colpo,source,persona)") &&
+  crime.includes("function stradaIntelPerColpo(colpoId)") &&
+  crime.includes('intelId:String(stradaAbsDay())+":"+key'));
+test("punto 24: la dritta modifica realmente chance e attenzione solo se l'approccio la sfrutta",
+  crime.includes("function stradaPreparazioneEffetti(ctx,approccio)") &&
+  crime.includes("usa?baseChance:Math.min(.02,baseChance*.3)") &&
+  crime.includes("usa?baseHeat:1-(1-baseHeat)*.25") &&
+  crime.includes("intelSfruttata:usa"));
+test("punto 24: informazione e sotterfugio diventano una decisione leggibile, non un bonus nascosto",
+  crime.includes('...(intel?[{t:"Intel: "+(typeof stradaIntelDescrizione==="function"') &&
+  crime.includes('"Stima "+stima+"% · "+(usaIntel?"sfrutta la dritta":baseDx)') &&
+  crime.includes("stradaChanceConOpportunita(colpo,a,lead,personaStima,preparazione)"));
+test("punto 24: l'intel nasce da tempo, osservazione o persone reali e viene consumato sul colpo",
+  crime.includes('stradaIntelCrea(colpo,"contatto",p)') &&
+  crime.includes('stradaIntelCrea(colpo,prep.id,null)') &&
+  crime.includes('source==="finestra" ? "Osservazione sul posto" : "Informazioni raccolte"') &&
+  crime.includes("stradaIntelConsuma(colpo.id);"));
+
+
+test("punto 18: il rischio lifestyle ha un registro settimanale e una media mobile",
+  state.includes("rischioLifestyle:{key:null,entrate:0,fonti:{}") &&
+  lifestyle.includes("function lifestyleRischioStato()") &&
+  lifestyle.includes("function lifestyleMediaRischio(includiCorrente,correnteCompleta)") &&
+  lifestyle.includes("st.history.slice(-3)") &&
+  lifestyle.includes("const progresso=completa ? 1") &&
+  lifestyle.includes("function lifestyleClassificaRischio(media)"));
+test("punto 18: il giocatore vede un giudizio leggibile, non una dichiarazione fiscale",
+  lifestyle.includes('"coerente",label:"Coerente"') &&
+  lifestyle.includes('"tirato",label:"Tirato"') &&
+  lifestyle.includes('"sopra",label:"Sopra le entrate"') &&
+  lifestyle.includes('"esposto",label:"Troppo esposto"') &&
+  crime.includes("<strong>Tenore di vita</strong>") &&
+  crime.includes("€/sett. giustificabili"));
+test("punto 18: lavoro, live, streaming, trasferte, etichetta e attività sono giustificabili",
+  actions.includes('lifestyleRegistraEntrata(incassoLive,"live")') &&
+  actions.includes('lifestyleRegistraEntrata(paga.totale,"lavoro")') &&
+  sim.includes('lifestyleRegistraEntrata(gross,"streaming")') &&
+  transfers.includes('lifestyleRegistraEntrata(soldi,"trasferta")') &&
+  transfers.includes('lifestyleRegistraEntrata(soldi,"data-fuori-citta")') &&
+  ui.includes('lifestyleRegistraEntrata(o.advance,"anticipo-etichetta")') &&
+  crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")') &&
+  phases.includes('lifestyleRegistraEntrata(9000,"tour")'));
+test("punto 18: vestiti indossati, acquisti e viaggi alimentano la visibilità",
+  lifestyle.includes("function lifestyleValoreVestitiVisibili()") &&
+  lifestyle.includes("stileAddosso().reduce") &&
+  negozio.includes('lifestyleRegistraSpesaVisibile(prezzo,"vestiti",.65)') &&
+  transfers.includes('lifestyleRegistraSpesaVisibile(inv.offerta.viaggio,"viaggio",.35)'));
+test("punto 18: il lifestyle non crea heat senza rischio criminale attivo",
+  lifestyle.includes('const giro=(typeof stradaRischioCriminaleAttivo==="function")') &&
+  lifestyle.includes("!!stradaRischioCriminaleAttivo()") &&
+  lifestyle.includes("if(giro && !G.strada.arresto && classe.gap>0)"));
+test("punto 18: denaro criminale e riciclaggio non diventano reddito giustificabile",
+  (() => {
+    const successo=crime.slice(crime.indexOf("if(successo){"),crime.indexOf("}else{",crime.indexOf("if(successo){")));
+    const ricicla=crime.slice(crime.indexOf("function stradaRipulisci("),crime.indexOf("function stScenaLavaggioCanale"));
+    return !successo.includes("lifestyleRegistraEntrata") && !ricicla.includes("lifestyleRegistraEntrata");
+  })());
+test("punto 18: il rischio viene chiuso dopo la Strada, così include i ricavi delle attività",
+  sim.indexOf('if(typeof stradaSettimana === "function") stradaSettimana();') <
+  sim.indexOf('if(typeof lifestyleChiudiSettimanaRischio==="function") lifestyleChiudiSettimanaRischio();'));
+
+test("punto 19: l'heat ha quattro fasce condivise da gameplay e UI",
+  crime.includes("const STRADA_HEAT_FASCE = Object.freeze([") &&
+  crime.includes('id:"basso",min:0') &&
+  crime.includes('id:"medio",min:25') &&
+  crime.includes('id:"alto",min:50') &&
+  crime.includes('id:"critico",min:75') &&
+  crime.includes("function stradaHeatProfilo(valore)") &&
+  crime.includes("return stradaHeatProfilo().occhi"));
+test("punto 19: i contatti deboli diventano prudenti senza sparire dal mondo",
+  crime.includes("function stradaHeatSincronizzaPersone()") &&
+  crime.includes("fa-fb; /* si tirano indietro prima i legami più deboli */") &&
+  crime.includes("st.heatCaution=dopo") &&
+  crime.includes("function stradaRelazioneOperativa(p)") &&
+  crime.includes("stradaRelazioneDisponibile(p) && !stradaHeatPersonaCauta(p)"));
+test("punto 19: heat alto frena opportunità nuove e può bruciare quelle già aperte",
+  crime.includes("chance*=Number(heat.opportunita||1)") &&
+  crime.includes('if(heat.id==="alto") cooldown+=2') &&
+  crime.includes('else if(heat.id==="critico") cooldown+=4') &&
+  crime.includes("function stradaHeatBruciaOpportunita(roll,silent)") &&
+  crime.includes('type:"burned-by-heat"') &&
+  crime.includes("st.active=null") &&
+  crime.includes("st.pendingChoices=[]"));
+test("punto 19: heat alto genera richieste esplicite di abbassare il profilo",
+  state.includes("heatMondo:{lastStopRequestAbsoluteDay:null,history:[]}") &&
+  crime.includes("function stradaHeatRichiestaFermati(silent)") &&
+  crime.includes('type:"stop-request"') &&
+  crime.includes("ti ha chiesto di abbassare il profilo"));
+test("punto 19: controlli e costo degli errori crescono con la pressione",
+  crime.includes("function stradaHeatRischioControllo()") &&
+  crime.includes("const rischioControllo=stradaHeatRischioControllo();") &&
+  crime.includes("function stradaHeatCostoErrore()") &&
+  crime.includes("(rumore + rumoreLead) * costoErrore") &&
+  crime.includes("stradaHeatChanceSoloDenuncia(.6)") &&
+  crime.includes("stradaHeatPenaMoltiplicatore()"));
+test("punto 19: chi si tiene basso non partecipa a colpi, incontri o ponti",
+  crime.includes(".filter(p=>stradaRelazioneOperativa(p) &&") &&
+  crime.includes("stradaContattiAttivi().filter(p=>p&&!esclusi.has(p.id)&&!stradaHeatPersonaCauta(p))") &&
+  crime.includes("stradaContattiAttivi().filter(p=>!stradaHeatPersonaCauta(p))") &&
+  crime.includes("!stradaRelazioneOperativa(requester) || !stradaRelazioneOperativa(candidato)") &&
+  crime.includes("!stradaRelazioneOperativa(a) || !stradaRelazioneOperativa(b)"));
+test("punto 19: la Strada spiega al giocatore come il giro reagisce all'heat",
+  crime.includes("<strong>Pressione sul giro</strong>") &&
+  crime.includes("heatMondo.mondo") &&
+  crime.includes("si tiene basso") &&
+  crime.includes("stradaHeatMuoviMondo(Math.random(),false)"));
+
+test("punto 20: il carcere crea persone persistenti dentro G.gente",
+  crime.includes("const CARCERE_RELAZIONI_PROFILI") &&
+  crime.includes('p.origine="carcere"') &&
+  crime.includes('p.origineLuogo="carcere"') &&
+  crime.includes("G.gente.push(p)") &&
+  crime.includes("function carcerePersonaProfilo(profilo,crea)"));
+test("punto 20: il rapporto carcere resta separato dalla fiducia criminale",
+  crime.includes("function carcerePersonaMeta(p)") &&
+  crime.includes("rapporto:0") &&
+  crime.includes("function carcereModificaRapporto(profilo,delta,motivo)") &&
+  crime.includes("m.rapporto=clamp") &&
+  crime.includes("linkedStreet:false"));
+test("punto 20: eventi e scelte high muovono relazioni con persone concrete",
+  crime.includes("const CARCERE_EVENTO_RELAZIONE") &&
+  crime.includes("carcereApplicaRelazioneEvento(e,r)") &&
+  crime.includes("carcereApplicaRelazioneHigh(e,o,r)") &&
+  crime.includes('jail_faccia_giro:Object.freeze({profilo:"giro",delta:3})') &&
+  crime.includes('jail_conto_vecchio:Object.freeze({profilo:"conto",delta:-2})'));
+test("punto 20: parlare con il giro costruisce un rapporto e non solo reputazione",
+  crime.includes('carcerePersonaProfilo("giro",true)') &&
+  crime.includes('carcereModificaRapporto(profilo,2,"azione-giro")') &&
+  crime.includes("ma soprattutto il rapporto resta"));
+test("punto 20: solo legami forti escono come contatti e i conti gravi come rivalità",
+  crime.includes("function carcereScarcerazioneRelazioni(c)") &&
+  crime.includes("if(rapporto>=4)") &&
+  crime.includes('source:"carcere"') &&
+  crime.includes("else if(rapporto<=-4)") &&
+  crime.includes('stradaModificaTensionePersona(p,2,"carcere-conto-uscita")'));
+test("punto 20: il gate relazioni viene applicato prima della scarcerazione",
+  crime.indexOf("const relazioniUscita=carcereScarcerazioneRelazioni(jailFx);") <
+  crime.indexOf("s.arresto = null;",crime.indexOf("const relazioniUscita=carcereScarcerazioneRelazioni(jailFx);")));
+test("punto 20: la UI carcere mostra facce e stato del rapporto",
+  crime.includes("persone:carcerePersone().map") &&
+  crime.includes("carcereRelazioneEtichetta(p)") &&
+  crimeui.includes("Persone qui dentro") &&
+  crimeui.includes('id="adf-jail-people"') &&
+  crimeui.includes("v.persone&&v.persone.length"));
+test("punto 20: anche le conoscenze deboli possono riemergere fuori dopo settimane o mesi",
+  crime.includes("m.returnAfterAbsoluteDay=stradaAbsDay()+ritardo") &&
+  posto.includes("function postoRientroCarcereDisponibile(p)") &&
+  posto.includes('p.origineLuogo!==\"carcere\"') &&
+  posto.includes("m.releasedAbsoluteDay!=null") &&
+  posto.includes("m.returnAfterAbsoluteDay=quando") &&
+  posto.includes("p.circoloSbloccato=true"));
+test("punto 20: il reincontro fuori può chiudere un favore rimasto dal carcere",
+  posto.includes('jailOutside:\"favore\"') &&
+  posto.includes('source:\"carcere-reunion\"') &&
+  posto.includes('stradaModificaFiducia(p,4,\"carcere-favore-fuori\")') &&
+  posto.includes('stradaAggiungiFavore(p,1,\"carcere-favore-fuori\")'));
+test("punto 20: una rivalità nata dentro riappare fuori come conto aperto",
+  crime.includes("m.returnAfterAbsoluteDay=stradaAbsDay()+28") &&
+  posto.includes('jailOutside:\"rival\"') &&
+  posto.includes('\"jail-rival-reunion\"') &&
+  posto.includes('stradaModificaTensionePersona(p,1,\"carcere-rivale-reincontro\")'));
+
+test("punto 21: mollare è uno stato persistente separato dall'essere entrato nel giro",
+  state.includes("uscitaGiro:{mollato:false") &&
+  crime.includes("function stradaUscitaStato()") &&
+  crime.includes("function stradaPartecipazioneAttiva()") &&
+  crime.includes("function stradaRischioCriminaleAttivo()") &&
+  !crime.includes("s.giroAvviato=false"));
+test("punto 21: la memoria dura da mesi ad anni in base alla profondità",
+  crime.includes("function stradaProfonditaUscita()") &&
+  crime.includes("function stradaMemoriaGiorni(profondita)") &&
+  crime.includes("p<25 ? 120 : p<50 ? 365 : p<75 ? 730 : 1460") &&
+  crime.includes("u.memoryUntilAbsoluteDay=oggi+memoria"));
+test("punto 21: uscire chiude meccaniche operative ma conserva persone e precedenti",
+  (() => {
+    const a=crime.indexOf("function stMollaIlGiro()");
+    const b=crime.indexOf("/* ==================== CARCERE EVENTI",a);
+    const block=crime.slice(a,b);
+    return block.includes("opp.pending=null;opp.pendingChoices=[];opp.active=null") &&
+      block.includes("rete.pending=null") &&
+      block.includes("s.prot=0") &&
+      block.includes("s.ferro=false") &&
+      block.includes("s.avvocato=false") &&
+      !block.includes("G.gente=[]") &&
+      !block.includes("s.precedenti=0");
+  })());
+test("punto 21: ex giro blocca colpi, riciclaggio, opportunità e meeting criminali",
+  crime.includes("Hai mollato il giro: non fai più passare denaro sporco.") &&
+  crime.includes("Hai mollato il giro: non accetti più colpi.") &&
+  crime.includes("if(!stradaPartecipazioneAttiva() || !stradaGiroAvviato()") &&
+  crime.includes("if(!stradaPartecipazioneAttiva())return false;") &&
+  crime.includes("l'attività resta un'impresa, non un punto d'incontro criminale"));
+test("punto 21: le attività normali continuano anche dopo l'uscita",
+  crime.indexOf("redditoAttivita+=Number(esito.income||0)") <
+  crime.indexOf("if(!stradaPartecipazioneAttiva()){",crime.indexOf("redditoAttivita+=Number(esito.income||0)")) &&
+  crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")'));
+test("punto 21: le attività possedute restano imprese, ma il lato criminale non viene più proposto",
+  crime.includes('return "Hai mollato il giro: le attività che possiedi restano imprese normali') &&
+  crime.includes("if(partecipa&&!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)") &&
+  crime.includes("if(partecipa&&!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)") &&
+  crime.includes("'lato criminale chiuso · '") &&
+  crime.includes("(partecipa?'Rileva':'Fuori dal giro')"));
+test("punto 21: il passato bussa attraverso persone e conti già esistenti",
+  crime.includes("function stradaPassatoCandidati()") &&
+  crime.includes("function stradaPassatoSettimana(roll,variantRoll)") &&
+  crime.includes('type:"past-knock"') &&
+  crime.includes('kind=st.rivalita?"rival"') &&
+  crime.includes('Number(cons.debiti||0)>0?"debt"') &&
+  crime.includes('favori>0?"favor"') &&
+  crime.includes('stradaRelazioneForte(p) || p.origine==="carcere"'));
+test("punto 21: dopo l'uscita il lavoro non genera nuove dritte criminali",
+  lavoroEventi.includes('if(typeof stradaPartecipazioneAttiva==="function")') &&
+  lavoroEventi.includes("return !!stradaPartecipazioneAttiva()") &&
+  lavoroEventi.includes("if(!streetStarted()) return null;") &&
+  lavoroEventi.includes("function clearCrimeLeads(reason)") &&
+  lavoroEventi.includes("clearCrimeLeads,") &&
+  crime.includes('ADF_WORK_EVENTS.clearCrimeLeads("left-giro")'));
+test("punto 21: il costo di uscita è un costo reale, non può essere pagato con soldi inesistenti",
+  crime.includes("const disponibili=Math.max(0,Number(s.sporchi||0))+Math.max(0,Number(G.money||0))") &&
+  crime.includes("if(disponibili<costo)") &&
+  crime.includes('"Per mollare il giro ti servono "+fmt(costo)') &&
+  crime.includes('d:manca?"Ti mancano "+fmt(manca)+" €"') &&
+  crime.includes("if(stradaPartecipazioneAttiva()){ stToast(t); return; }"));
+test("punto 21: lifestyle smette di trattarti come criminale quando la memoria è scaduta",
+  lifestyle.includes('typeof stradaRischioCriminaleAttivo==="function"') &&
+  lifestyle.includes("!!stradaRischioCriminaleAttivo()"));
+test("punto 21: UI distingue chiaramente ex giro da giro attivo",
+  crime.includes("<b>Hai mollato il giro</b>") &&
+  crime.includes("Il passato però è ancora vicino") &&
+  crime.includes('molla.textContent=partecipa?"Molla il giro":"Fuori dal giro"'));
+
+test("punto 13 esteso: gli esiti Strada entrano nella relazione sociale della stessa persona",
+  posto.includes("function postoConseguenzeMondo(p)") &&
+  posto.includes("function postoRegistraConseguenzaMondo(p,tipo,punti,meta)") &&
+  crime.includes("function stradaEcoMondo(p,tipo,punti,meta)") &&
+  crime.includes("postoRegistraConseguenzaMondo(p,tipo,punti"));
+test("punto 13 esteso: successo e fallimento propagano conseguenze fuori dal sottosistema criminale",
+  crime.includes('successo?"crime-together-success":"crime-together-failure"') &&
+  crime.includes('successo?"street-opportunity-success":"street-opportunity-failure"') &&
+  crime.includes('stradaEcoMondo(personaLead,"street-arrest",0'));
+test("punto 13 esteso: il passaparola segue il presentatore reale invece di creare un effetto anonimo",
+  crime.includes("st.introducedByPersonId") &&
+  crime.includes('"street-hearsay-"+String(tipo||"consequence")') &&
+  crime.includes("relatedPersonId:p.id") &&
+  crime.includes('stradaModificaFiducia(introd,ecoPunti,"passaparola-"'));
+test("punto 13 esteso: rifiutare con chiarezza e ignorare una persona non sono equivalenti",
+  crime.includes('stradaEcoMondo(persona,"street-opportunity-declined",0') &&
+  crime.includes('stradaEcoMondo(persona,"street-opportunity-ignored",-1'));
+test("punto 13 esteso: i favori di rete hanno effetto anche sul rapporto generale",
+  crime.includes('stradaEcoMondo(requester,"street-network-favor",1') &&
+  crime.includes('stradaEcoMondo(candidato,"street-network-introduction",1') &&
+  crime.includes('stradaEcoMondo(a,"street-network-bridge",1') &&
+  crime.includes('stradaEcoMondo(b,"street-network-bridge",1'));
+test("punto 13 esteso: il Circolo può far riemergere una conseguenza recente senza regalare conoscenza",
+  posto.includes("postoUltimaConseguenzaMondo(p)") &&
+  posto.includes("eco&&etaEco<=4") &&
+  posto.includes("circoloUltimoVistoKey") &&
+  !posto.includes("p.visto=true; // conseguenza mondo"));
+
+test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
+  crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
+  !crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)") &&
+  !crime.includes("p += Math.min(s.uomini, 5) * .025") &&
+  !crime.includes("s.uomini--") &&
+  crime.includes("function stradaPersoneSquadra()") &&
+  crime.includes("stradaPersonaSquadra(personaSquadraId)") &&
+  crime.includes("Non puoi comprare la fiducia di qualcuno"));
+test("protezione è un accordo reale, prepagato all'avvio e decade se non pagabile",
+  crime.includes("function stScenaProtezione()") &&
+  crime.includes("providerPersonId") &&
+  crime.includes("prepaidWeekKey=stradaWeekKey()") &&
+  crime.includes('status:"unpaid"') &&
+  crime.includes('stradaModificaFiducia(provider,-5,"protezione-non-pagata")') &&
   crime.includes("Protezione saltata."));
-test("avvocato decade se non pagabile",
-  crime.includes("s.avvocato = false") &&
-  crime.includes("La parcella non era coperta."));
+test("avvocato privato è una persona reale e decade se non pagabile",
+  crime.includes("function stScenaAvvocato()") &&
+  crime.includes("function stradaAvvocatiConosciuti()") &&
+  crime.includes("STRADA_AVVOCATO_REL_MIN") &&
+  crime.includes('source="relationship"') &&
+  crime.includes("s.avvocato=false") &&
+  crime.includes("La parcella non era coperta.") &&
+  crime.includes("difensore d'ufficio"));
 test("UI principale mostra residuo e durata riciclaggio",
   crimeui.includes("const launderCap=") &&
   crimeui.includes('GAME_TIME.durationFor("ricicla")') &&
   crimeui.includes('"Limite settimanale raggiunto"'));
-test("UI legacy disabilita il riciclaggio a capacità zero",
-  crime.includes("rip.disabled = !!s.arresto || s.sporchi <= 0 || ripCap <= 0"));
+test("UI legacy disabilita il riciclaggio a capacità zero e quando sei fuori dal giro",
+  crime.includes("rip.disabled = !!s.arresto || !partecipa || s.sporchi <= 0 || ripCap <= 0"));
 
 console.log("\nPunto 1 — controllo tempo globale coerente");
 test("controller tempo globale è caricato dopo i motori eventi",
@@ -1459,10 +2042,12 @@ test("ora d'aria e giro hanno limiti giorno/settimana",
   crime.includes("if(c.daily.aria)") &&
   crime.includes("if(c.weekly.giro)") &&
   crime.includes('GAME_TIME.advance(minuti,"jail:"+id'));
-test("il ricorso dell'avvocato è una volta per detenzione e toglie solo 1 settimana",
+test("il ricorso legale è una volta per detenzione: privato affidabile, d'ufficio senza garanzia",
   crime.includes("if(c.ricorsoUsato)") &&
   crime.includes("a.settimane=Math.max(1,(Number(a.settimane)||1)-1)") &&
-  crime.includes("STRADA_AVVOCATO_COSTO"));
+  crime.includes("stradaHaAvvocatoPrivato()") &&
+  crime.includes("Math.random()<.35") &&
+  crime.includes("difensore d'ufficio"));
 test("sim sostituisce street e chat con carcereGiorno durante la detenzione",
   sim.includes("if(G.strada && G.strada.arresto)") &&
   sim.includes('typeof carcereGiorno === "function"') &&
@@ -1923,8 +2508,10 @@ test("il reparto Vestiti vende capi del camerino MakeHuman: ogni raw della vetri
     const capi = [...guardaroba.matchAll(/\{id:"[a-z0-9]+", raw:"([^"]+)", n:"[^"]+", slot:"([a-zA-Z]+)", p:(\d+)/g)];
     return capi.length >= 30 && capi.every(m => perRaw.get(m[1]) === m[2] && +m[3] > 0);
   })());
-test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, G.vestiti[raw] diventa true, si salva",
-  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
+test("comprare un vestito e' la stessa economia dell'attrezzatura: G.money scende, il capo diventa tuo, la spesa resta visibile e si salva",
+  negozio.includes("G.money -= prezzo;") &&
+  negozio.includes('lifestyleRegistraSpesaVisibile(prezzo,"vestiti",.65)') &&
+  negozio.includes("guardarobaPosseduti()[v.raw] = true;") &&
   negozio.includes("save(); renderGioco();") &&
   ui.includes('if(typeof renderAbbigliamento === "function") renderAbbigliamento();'));
 test("la vetrina e i capi tuoi arrivano al camerino: ponte → creator → init del camerino",
@@ -2036,7 +2623,8 @@ test("l'offerta vale solo su un capo ancora comprabile (non tuo, non bloccato), 
   offerte.includes("if(guardarobaPosseduto(v.raw) || (typeof shFitRequisito === \"function\" && shFitRequisito(v))) return null;") &&
   negozio.includes("function shFitPrezzo(v){") &&
   negozio.includes("const prezzo = shFitPrezzo(v);") &&
-  negozio.includes("G.money -= prezzo; guardarobaPosseduti()[v.raw] = true;") &&
+  negozio.includes("G.money -= prezzo;") &&
+  negozio.includes("guardarobaPosseduti()[v.raw] = true;") &&
   negozio.includes('<span class="shprice off"><s>'));
 test("la sezione «Questa settimana» sta in testa al reparto, solo su «Tutti», e il diario dice cosa c'e' in offerta",
   negozio.includes('const offerte = SH_FIT_FILTRO === "tutti" && typeof offerteSezione === "function" ? offerteSezione() : "";') &&

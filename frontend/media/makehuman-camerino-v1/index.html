@@ -2,7 +2,13 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>
+/* Il camerino desktop resta identico. Solo il relay mobile aggiunge ?mobile=1. */
+if(new URLSearchParams(location.search).get('mobile')==='1'){
+  document.documentElement.classList.add('adf-mobile');
+}
+</script>
 <title>Anni di Fame — MakeHuman Modifier Stack V2.13.6</title>
 <style>
 :root{
@@ -699,7 +705,218 @@ document.addEventListener('DOMContentLoaded', function(){
 .adf-hidden-player-control{
   display:none !important;
 }
-</style></head>
+</style>
+<style id="adf-makehuman-mobile-landscape-v1">
+/* ADF_MAKEHUMAN_MOBILE_LANDSCAPE_V1
+   Geometria isolata: runtime/modifier sono gli stessi del desktop. */
+html.adf-mobile,
+html.adf-mobile body{
+  width:100%;
+  height:100%;
+  min-height:100%;
+  overflow:hidden;
+}
+
+@media (orientation:landscape) and (max-width:1180px) and (max-height:600px){
+  html.adf-mobile .room-backdrop .room-clean{
+    background-size:cover;
+    background-position:center center;
+  }
+
+  /* Il canvas continua a renderizzare alla dimensione reale del viewport
+     (niente stretching), ma riceve tocchi e resta visibile solo nella zona avatar. */
+  html.adf-mobile #stage{
+    transform:none!important;
+    clip-path:inset(0 55vw 0 0);
+    -webkit-clip-path:inset(0 55vw 0 0);
+  }
+
+  html.adf-mobile .camera-switcher{
+    left:22.5vw;
+    right:auto;
+    top:max(7px,env(safe-area-inset-top,0px));
+    width:min(280px,42vw);
+    min-width:0;
+    transform:translateX(-50%);
+    gap:3px;
+    padding:4px;
+    border-radius:12px;
+    backdrop-filter:blur(12px);
+  }
+  html.adf-mobile .camera-switcher button{
+    flex:1 1 0;
+    min-width:0;
+    min-height:38px;
+    padding:0 6px;
+    border-radius:9px;
+    font-size:8px;
+    letter-spacing:.07em;
+  }
+
+  html.adf-mobile .editor-sidebar{
+    left:45vw!important;
+    right:max(6px,env(safe-area-inset-right,0px))!important;
+    top:max(6px,env(safe-area-inset-top,0px))!important;
+    bottom:calc(66px + env(safe-area-inset-bottom,0px))!important;
+    width:auto!important;
+    min-width:0!important;
+    border-radius:14px!important;
+    backdrop-filter:blur(16px);
+  }
+
+  html.adf-mobile .editor-head{
+    flex:0 0 auto;
+    padding:8px 9px 7px!important;
+  }
+  html.adf-mobile .kicker{
+    font-size:6.5px!important;
+    line-height:1.2!important;
+    letter-spacing:.12em!important;
+  }
+  html.adf-mobile .editor-head h1{
+    margin:3px 0 0!important;
+    font-size:14px!important;
+    line-height:1!important;
+    letter-spacing:.05em!important;
+  }
+  html.adf-mobile .editor-tabs{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:4px!important;
+    margin-top:7px!important;
+  }
+  html.adf-mobile .editor-tabs button{
+    min-height:36px!important;
+    padding:5px 4px!important;
+    border-radius:8px!important;
+    font-size:7px!important;
+    line-height:1.05!important;
+    letter-spacing:.035em!important;
+  }
+
+  html.adf-mobile .editor-scroll{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-y;
+    padding:8px 9px 13px!important;
+  }
+  html.adf-mobile .section-copy{
+    margin-bottom:8px!important;
+    font-size:9.5px!important;
+    line-height:1.35!important;
+  }
+  html.adf-mobile .box{
+    margin-bottom:8px!important;
+    padding:9px!important;
+    border-radius:10px!important;
+  }
+  html.adf-mobile .box h2{
+    margin-bottom:7px!important;
+    font-size:8.5px!important;
+  }
+  html.adf-mobile .grid2{
+    gap:7px!important;
+  }
+
+  html.adf-mobile .editor-sidebar select,
+  html.adf-mobile .editor-sidebar input[type=text]{
+    min-height:40px!important;
+    padding:8px 9px!important;
+    border-radius:9px!important;
+    font-size:10px!important;
+  }
+  html.adf-mobile .editor-sidebar .minor-btn,
+  html.adf-mobile .editor-sidebar .customize-color,
+  html.adf-mobile .editor-sidebar .gender-quick button,
+  html.adf-mobile .editor-sidebar .slot button,
+  html.adf-mobile .editor-sidebar .box button{
+    min-height:40px!important;
+    padding:7px 8px!important;
+    border-radius:9px!important;
+    font-size:8.5px!important;
+  }
+  html.adf-mobile .editor-sidebar .slot label,
+  html.adf-mobile .editor-sidebar .row label{
+    margin-bottom:4px!important;
+    font-size:8.5px!important;
+  }
+  html.adf-mobile .editor-sidebar .small,
+  html.adf-mobile .editor-sidebar .modifier-help{
+    font-size:9.5px!important;
+    line-height:1.35!important;
+  }
+  html.adf-mobile .modifier-container{
+    gap:7px!important;
+  }
+  html.adf-mobile .modifier-group{
+    border-radius:10px!important;
+  }
+  html.adf-mobile .modifier-group-head{
+    padding:8px 9px!important;
+    font-size:8.5px!important;
+  }
+  html.adf-mobile .modifier-list{
+    padding:4px 8px 7px!important;
+  }
+  html.adf-mobile .modifier-row{
+    padding:8px 0 10px!important;
+  }
+  html.adf-mobile .modifier-label b{
+    font-size:10px!important;
+    line-height:1.25!important;
+  }
+  html.adf-mobile .modifier-row input[type=range]{
+    min-height:28px!important;
+  }
+
+  /* Le azioni vivono sotto l'editor: nessun pulsante sopra al personaggio. */
+  html.adf-mobile .bottom-bar{
+    left:45vw!important;
+    right:max(6px,env(safe-area-inset-right,0px))!important;
+    bottom:max(5px,env(safe-area-inset-bottom,0px))!important;
+    width:auto!important;
+    transform:none!important;
+    grid-template-columns:.82fr .9fr 1fr .95fr 1.15fr!important;
+    gap:4px!important;
+    padding:4px!important;
+    border-radius:12px!important;
+    backdrop-filter:blur(14px);
+  }
+  html.adf-mobile .bottom-bar button{
+    min-width:0!important;
+    min-height:43px!important;
+    padding:4px 5px!important;
+    border-radius:9px!important;
+    font-size:7px!important;
+    line-height:1.05!important;
+    letter-spacing:.045em!important;
+  }
+
+  html.adf-mobile.preview-mode #stage{
+    clip-path:none;
+    -webkit-clip-path:none;
+  }
+  html.adf-mobile.preview-mode .camera-switcher{
+    left:50%;
+  }
+  html.adf-mobile.preview-mode .bottom-bar{
+    left:12px!important;
+    right:12px!important;
+  }
+
+  html.adf-mobile .bootstrap-fatal{
+    width:calc(100vw - 24px);
+    max-height:calc(100vh - 24px);
+    padding:12px 14px;
+    font-size:10px;
+  }
+}
+</style>
+
+</head>
 <body>
 <div class="room-backdrop" aria-hidden="true">
   <div class="room-blur"></div>

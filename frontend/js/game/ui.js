@@ -455,6 +455,8 @@ function renderGioco(){
     btn.onclick = () => {
       const o = OFFERS.find(x => x.id === btn.dataset.sign);
       G.contract = o; G.money += o.advance;
+      if(typeof lifestyleRegistraEntrata==="function")
+        lifestyleRegistraEntrata(o.advance,"anticipo-etichetta");
       if(o.deliver) G.obligation = {need:o.deliver, left:o.weeks, from:totalWeeks()};
       G.goals.g6 = true;
       pushLog("<b>Hai firmato con " + o.label + ".</b> Anticipo di " + fmt(o.advance) + " €.", "good");

@@ -11,20 +11,27 @@ const leggi = file => fs.readFileSync(path.join(ROOT, file), "utf8");
 function helperStradaFabbrica(){
   const source = leggi("js/game/strada-crimine.js");
 
-  const colpiStart = source.indexOf("const STRADA_COLPI = [");
+  const colpiStart = source.indexOf("const STRADA_CATEGORIE_COLPO");
   const colpiEnd = source.indexOf("const STRADA_COLPI_MILANO", colpiStart);
+  const prepDataStart = source.indexOf("const STRADA_APPROCCI = [");
+  const prepDataEnd = source.indexOf("const STRADA_ATTIVITA", prepDataStart);
   const cfgStart = source.indexOf("const STRADA_FABBRICA_LEAD");
   const cfgEnd = source.indexOf("/* ==================== LA SCENA IN CORSO", cfgStart);
+  const prepStart = source.indexOf("function stradaPreparazioneDaId");
+  const prepEnd = source.indexOf("/* ==================== TENTARE UN COLPO", prepStart);
   const giroStart = source.indexOf("function stradaGiroAvviato(){");
   const chanceStart = source.indexOf("function stradaChance", giroStart);
   const chanceEnd = source.indexOf("function stradaLavaggioStato", chanceStart);
 
-  if(colpiStart < 0 || colpiEnd < 0 || cfgStart < 0 || cfgEnd < 0 ||
+  if(colpiStart < 0 || colpiEnd < 0 || prepDataStart < 0 || prepDataEnd < 0 ||
+     cfgStart < 0 || cfgEnd < 0 || prepStart < 0 || prepEnd < 0 ||
      giroStart < 0 || chanceStart < 0 || chanceEnd < 0)
     throw new Error("helper proposta Fabbrica/Strada non trovato");
 
   return source.slice(colpiStart, colpiEnd) + "\n" +
+    source.slice(prepDataStart, prepDataEnd) + "\n" +
     source.slice(cfgStart, cfgEnd) + "\n" +
+    source.slice(prepStart, prepEnd) + "\n" +
     source.slice(giroStart, chanceEnd);
 }
 
@@ -34,6 +41,11 @@ function contestoStrada(overrides = {}){
     week:1,
     day:5,
     job:{id:"operaio",place:"fabbrica",n:"Operaio"},
+    gente:[{
+      id:"pf1",n:"Luca",ruolo:"collega",origine:"lavoro",origineLuogo:"fabbrica",
+      rel:1,pt:0,via:false,circoloSbloccato:true,workEncountered:true,
+      strada:{known:true,key:"intro:pf1",sources:["intro"],opportunityIds:[]}
+    }],
     strada:{
       rep:0,
       heat:0,
@@ -57,6 +69,7 @@ function contestoStrada(overrides = {}){
     ...overrides
   };
   const logs = [];
+  let personaSeq=0;
   const ctx = {
     G,
     Object,
@@ -64,8 +77,19 @@ function contestoStrada(overrides = {}){
     Math,
     Array,
     Set,
+    String,
+    window:{},
+    nuovaPersona:ruolo=>({
+      id:"ps"+(++personaSeq),ruolo,n:"Cobra",rel:0,pt:0,via:false,
+      attivita:{},car:"pratico",fama:10,circoloSbloccato:false
+    }),
     clamp:(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0)),
     lavoroLuogo: job => job && job.place || null,
+    lavoroTurniTotaliSede: luogo => luogo==="fabbrica" ? 20 : 0,
+    lavoroCartellino: luogo => luogo==="fabbrica" ? {totale:20} : null,
+    lavoroReteStato: luogo => luogo==="fabbrica"
+      ? {turniVisti:20,history:[{personId:"pf1"},{personId:"pf2"}]}
+      : null,
     pushLog:(msg, cls) => logs.push({msg, cls})
   };
   vm.createContext(ctx);
@@ -109,6 +133,8 @@ describe("Fabbrica × Strada", () => {
     const proposta = vm.runInContext("stradaTentaPropostaFabbrica(0,0)", ctx);
     expect(proposta.id).toBe("giro-breve");
     expect(proposta.colpoId).toBe("consegne");
+    expect(proposta.personId).toBe("pf1");
+    expect(proposta.persona).toBe("Luca");
     expect(proposta.bonusPct).toBe(15);
     expect(proposta.chanceDelta).toBeCloseTo(.08);
     expect(proposta.successHeat).toBe(1);
@@ -121,6 +147,40 @@ describe("Fabbrica × Strada", () => {
     expect(attiva.expiresAbsoluteDay).toBe(12);
     expect(G.strada.fabbricaLead.pending).toBeNull();
     expect(G.strada.fabbricaLead.active.colpoId).toBe("consegne");
+  });
+
+  it("un collega reale puo rivelare il suo lato Strada senza cambiare identita",()=>{
+    const {ctx,G}=contestoStrada({
+      gente:[{
+        id:"pf2",n:"Marco",ruolo:"collega",origine:"lavoro",origineLuogo:"fabbrica",
+        rel:2,pt:1,via:false,circoloSbloccato:false,workEncountered:true
+      }],
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]}
+      }
+    });
+    const proposta=vm.runInContext("stradaTentaPropostaFabbrica(0,0)",ctx);
+    expect(proposta).not.toBeNull();
+    expect(proposta.personId).toBe("pf2");
+    expect(proposta.persona).toBe("Marco");
+    expect(G.gente).toHaveLength(1);
+    expect(G.gente[0].ruolo).toBe("collega");
+    expect(G.gente[0].strada.known).toBe(true);
+    expect(G.gente[0].circoloSbloccato).toBe(true);
+  });
+
+  it("la Fabbrica non inventa una faccia criminale se nel posto non esiste nessun contatto reale",()=>{
+    const {ctx}=contestoStrada({
+      gente:[],
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        fabbricaLead:{lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]}
+      }
+    });
+    expect(vm.runInContext("stradaTentaPropostaFabbrica(0,0)",ctx)).toBeNull();
   });
 
   it("usa un pool generale ampio e non lega le offerte alla mansione", () => {
@@ -142,7 +202,28 @@ describe("Fabbrica × Strada", () => {
     expect(testo).toContain("guadagno");
     expect(testo).toContain("riuscita");
     expect(testo).toContain("attenzione");
-    expect(testo).toContain("reputazione");
+    expect(testo).toContain("nome nel giro");
+  });
+
+  it("un contatto del mondo entra una volta sola in G.gente e viene riusato",()=>{
+    const {ctx,G}=contestoStrada({
+      gente:[],
+      strada:{
+        rep:20,heat:2,sporchi:0,uomini:0,prot:0,ferro:false,avvocato:false,
+        attivita:{},precedenti:0,arresto:null,giroAvviato:true,
+        badgeSbloccato:true,
+        traphone:{owned:true,sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:1,source:"test"},
+        fabbricaLead:{lastCheckAbsoluteDay:null,lastOfferAbsoluteDay:null,pending:null,active:null,history:[]}
+      }
+    });
+    const a=vm.runInContext('stradaRisolviContattoOpportunita(STRADA_OPPORTUNITA[0],"mondo",false)',ctx);
+    const count=G.gente.length;
+    const b=vm.runInContext('stradaRisolviContattoOpportunita(STRADA_OPPORTUNITA[0],"mondo",false)',ctx);
+    expect(a.id).toBe(b.id);
+    expect(G.gente).toHaveLength(count);
+    expect(a.strada.known).toBe(true);
+    expect(a.strada.opportunityIds).toContain("giro-breve");
+    expect(a.circoloSbloccato).toBe(true);
   });
 
   it("evita di riproporre subito la stessa opportunità", () => {
@@ -319,6 +400,16 @@ describe("Fabbrica × Strada", () => {
     expect(logs.some(x => x.msg.includes("opportunità della Strada è scaduta"))).toBe(true);
   });
 
+  it("il Circolo gestisce anche ruoli di vita/Strada senza consumare gli slot del cast musicale",()=>{
+    const posto=leggi("js/game/posto.js");
+    const circolo=leggi("js/game/circolo-stanze.js");
+    expect(posto).toContain("const DIALOGHI_VITA");
+    expect(posto).toContain("DIALOGHI[p.ruolo] || DIALOGHI_VITA");
+    expect(posto).toContain("!(p.strada && p.strada.known)");
+    expect(circolo).toContain("Sai che è collegato alla Strada");
+    expect(circolo).toContain("strada:{aperto:");
+  });
+
   it("collega popup fuori dal cancello, timer e bonus al colpo reale", () => {
     const eventi = leggi("js/game/eventi-v2.js");
     const strada = leggi("js/game/strada-crimine.js");
@@ -332,8 +423,9 @@ describe("Fabbrica × Strada", () => {
     expect(eventi).toContain('claimAutoEvent("factory-street")');
     expect(eventi).toContain("stradaAggiornaPropostaFabbrica(false)");
     expect(eventi).toContain('const streetShown = a.id==="turno" && !overtimeShown');
-    expect(eventi).toContain("!overtimeShown && !streetShown && !workFamilyShown && !contactShown");
-    expect(eventi).toContain("Il lavoro non c'entra: è semplicemente dove vi siete incrociati.");
+    expect(eventi).toContain("!overtimeShown && !factoryIntroShown && !streetShown && !workFamilyShown && !contactShown");
+    expect(eventi).toContain("Non è la Fabbrica che ti sta offrendo un crimine");
+    expect(eventi).toContain("function adfFactoryStreetIntroAfterShift()");
     expect(eventi).toContain("function adfStreetOpportunityAfterAction(a)");
     expect(eventi).toContain('stradaTentaOpportunita("mondo",Math.random(),Math.random())');
     expect(eventi).toContain('const streetOpportunityShown = a.id!=="turno"');

@@ -573,6 +573,15 @@ function chatMandaBeat(p){
   return b;
 }
 
+function chatReteLavoro(p,fonte,n){
+  n=Math.max(0,Number(n||0));
+  if(!n) return 0;
+  if(p && p.origineLuogo==="pizzeria" && typeof lavoroBonusRetePersona==="function")
+    return lavoroBonusRetePersona(p,"pizzeria-chat:"+String(fonte||"contatto"),n,2);
+  chRete(n);
+  return n;
+}
+
 function chatSpuntiBeatmaker(p){
   return [
     {id:"manda", peso:3,
@@ -600,7 +609,7 @@ function chatSpuntiBeatmaker(p){
      testo: () => "Sabato ho la sala libera. Se passi, facciamo qualcosa da zero.",
      opts:[
        {n:"Ci sono", d:"−energia, +rete",
-        run(){ chEnergia(-20); chRete(2); chatAvvicina(p, 1);
+        run(){ chEnergia(-20); chatReteLavoro(p,"contact-chat",2); chatAvvicina(p, 1);
           return "Perfetto. Porta anche le barre non finite, quelle servono di più."; }},
        {n:"Sabato no", run:() => "Peccato. La prossima volta avvisa prima."}
      ]},
@@ -608,9 +617,9 @@ function chatSpuntiBeatmaker(p){
      testo: () => "Ma adesso su che roba stai? Che se lo so ti preparo le cose giuste.",
      opts:[
        {n:"Roba dura", d:"+rete",
-        run(){ chRete(1); chatAvvicina(p, 1); return "Ottimo. Ti mando qualcosa che spacca il vetro."; }},
+        run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1); return "Ottimo. Ti mando qualcosa che spacca il vetro."; }},
        {n:"Qualcosa di più aperto", d:"+rete",
-        run(){ chRete(1); chatAvvicina(p, 1); return "Ho capito. Ti tiro fuori due accordi e vediamo."; }},
+        run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1); return "Ho capito. Ti tiro fuori due accordi e vediamo."; }},
        {n:"Non lo so ancora",
         run:() => "Allora vieni in sala. Si capisce li', non al telefono."}
      ]},
@@ -628,7 +637,7 @@ function chatSpuntiBeatmaker(p){
        {n:"Grazie davvero", d:"+benessere",
         run(){ chBene(5); chatAvvicina(p, 2); return "Figurati. Poi però esci qualcosa."; }},
        {n:"Preferisco pagarti subito", d:"+rete",
-        run(){ chRete(1); return "Come vuoi. Rispetto."; }}
+        run(){ chatReteLavoro(p,"contact-chat",1); return "Come vuoi. Rispetto."; }}
      ]}
   ];
 }
@@ -639,7 +648,7 @@ function chatSpuntiFonico(p){
      testo: () => "Hai roba da mixare? Ho una finestra libera e le orecchie fresche.",
      opts:[
        {n:"Ce l'ho, passo in sala", d:"+rete",
-        run(){ chRete(1); chatAvvicina(p, 1);
+        run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1);
           return "Portala. E portala grezza, non toccarla ancora tu."; }},
        {n:"Non è pronta",
         run:() => "Meglio. Una cosa non pronta mixata bene resta una cosa non pronta."}
@@ -653,7 +662,7 @@ function chatSpuntiFonico(p){
                   "Il pezzo però c'è. È solo la mano che manca."]; },
         poi:[
           {n:"Me lo rifai tu?", d:"+rete",
-           run(){ chRete(1); chatAvvicina(p, 1); return "Portamelo. Due ore e te lo cambio."; }},
+           run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1); return "Portamelo. Due ore e te lo cambio."; }},
           {n:"Ci lavoro io", run:() => "Bene. Alza la voce di tre dB e senti che succede."}
         ]},
        {n:"I complimenti", d:"−lucidità",
@@ -694,7 +703,7 @@ function chatSpuntiVideomaker(p){
      testo: m => "Su " + chatPezzo(m) + " ci farei un video. Ho già in testa dove.",
      opts:[
        {n:"Dimmi dove", d:"+rete",
-        run(){ chRete(1); chatAvvicina(p, 1);
+        run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1);
           return ["Il piazzale dietro alla stazione, di notte, con le luci arancioni.",
                   "Passa in sala che ti faccio vedere due riferimenti."]; }},
        {n:"Adesso non ho i soldi",
@@ -712,7 +721,7 @@ function chatSpuntiVideomaker(p){
      testo: () => "Adesso che ti guarda un po' di gente, devi decidere come ti si vede. Se non decidi tu, decide internet.",
      opts:[
        {n:"Aiutami a decidere", d:"+rete",
-        run(){ chRete(1); chatAvvicina(p, 1);
+        run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1);
           return "Semplice: un colore, un posto, una faccia. Le stesse tre cose per sei mesi."; }},
        {n:"Io resto come sono", d:"+lucidità",
         run(){ addLuc(4); chatAvvicina(p, 1); return "Anche quella è una scelta. Basta che sia una scelta."; }}
@@ -721,7 +730,7 @@ function chatSpuntiVideomaker(p){
      testo: () => "Se ci metti trecento euro di luci, il prossimo video sembra un altro mestiere.",
      opts:[
        {n:"Prendile", d:"−soldi, +rete",
-        run(){ G.money = Math.max(0, (G.money || 0) - 300); chRete(1); chatAvvicina(p, 2);
+        run(){ G.money = Math.max(0, (G.money || 0) - 300); chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 2);
           return "Fatto. Da adesso in poi si vede la differenza."; }},
        {n:"Giriamo con quello che abbiamo",
         run:() => "Va bene. Si è sempre girato così, ma si vede anche quello."}
@@ -755,14 +764,14 @@ function chatSpuntiLavoroGenerici(p){
     {id:"serate", peso:3,
      testo:() => "Sto chiudendo due serate per il weekend. In provincia gira poca roba, ma se ti fai vedere la gente si ricorda.",
      opts:[
-       {n:"Tienimi presente", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Ti tengo in lista. Prima fammi vedere che continui a muoverti."; }},
+       {n:"Tienimi presente", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Ti tengo in lista. Prima fammi vedere che continui a muoverti."; }},
        {n:"Per ora penso ai pezzi", d:"+lucidità", run(){ addLuc(3); return "Giusto. Una serata senza roba pronta serve a poco."; }}
      ]},
     {id:"locale", peso:2,
      testo:() => "Il locale dove giro io sta cercando facce nuove. Non ti prometto niente, ma sapere chi chiamare conta.",
      opts:[
-       {n:"Ci sentiamo quando ho qualcosa fuori", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Quello è il momento giusto."; }},
-       {n:"Mandami almeno il nome del posto", d:"+rete", run(){ chRete(1); return "Te lo mando. Poi muoviti tu."; }}
+       {n:"Ci sentiamo quando ho qualcosa fuori", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Quello è il momento giusto."; }},
+       {n:"Mandami almeno il nome del posto", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); return "Te lo mando. Poi muoviti tu."; }}
      ]}
   ];
   if(p.ruolo === "strada") return [
@@ -770,13 +779,13 @@ function chatSpuntiLavoroGenerici(p){
      testo:() => "Ti ho visto in giro. Non confondere chi conosci col poterti fidare di chiunque.",
      opts:[
        {n:"Tengo gli occhi aperti", d:"+lucidità", run(){ addLuc(3); chatAvvicina(p,1); return "Meglio. Le occasioni buone non hanno scritto sopra che lo sono."; }},
-       {n:"Io so con chi parlo", d:"+rete", run(){ chRete(1); return "Vedremo. Intanto hai il mio numero."; }}
+       {n:"Io so con chi parlo", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); return "Vedremo. Intanto hai il mio numero."; }}
      ]},
     {id:"calma", peso:2,
      testo:() => "Quando lavori tutto il giorno e poi fai il resto di notte, prima o poi sbagli per stanchezza.",
      opts:[
        {n:"Hai ragione", d:"+benessere", run(){ chBene(3); chatAvvicina(p,1); return "Ogni tanto fermarsi è parte del gioco."; }},
-       {n:"Finché reggo, reggo", d:"+rete", run(){ chRete(1); return "Basta che sai quando smettere."; }}
+       {n:"Finché reggo, reggo", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); return "Basta che sai quando smettere."; }}
      ]}
   ];
   if(p.ruolo === "collega") return [
@@ -789,24 +798,41 @@ function chatSpuntiLavoroGenerici(p){
     {id:"pausa", peso:2,
      testo:() => "Alla prossima pausa prendiamoci un caffè con calma, senza parlare del turno.",
      opts:[
-       {n:"Ci sto", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Perfetto. Almeno per dieci minuti si parla d'altro."; }},
+       {n:"Ci sto", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Perfetto. Almeno per dieci minuti si parla d'altro."; }},
        {n:"Vediamo come gira la giornata", d:"+benessere", run(){ chBene(2); return "Ci sta. Tanto ci rivediamo qui."; }}
      ]}
   ];
+  if(["cliente","fornitore","rider"].includes(p.ruolo)){
+    const etichetta=p.ruolo==="cliente" ? "qui" : p.ruolo==="fornitore" ? "in giro per lavoro" : "tra un ritiro e l'altro";
+    return [
+      {id:"zona", peso:3,
+       testo:() => "A forza di incrociarci "+etichetta+", ormai ci si riconosce. Tu conosci parecchia gente da queste parti?",
+       opts:[
+         {n:"Qualcuno sì", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Alla fine funziona così: prima le facce, poi i nomi."; }},
+         {n:"Non così tanta", d:"+benessere", run(){ chBene(2); return "Meglio pochi buoni che cento numeri salvati a caso."; }}
+       ]},
+      {id:"vita-fuori", peso:2,
+       testo:() => "È buffo quante persone conosci solo perché passi sempre dallo stesso posto.",
+       opts:[
+         {n:"È anche il bello del quartiere", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Esatto. Senza accorgertene costruisci un giro."; }},
+         {n:"Finché resta naturale", d:"+lucidità", run(){ addLuc(2); return "Sì. Appena inizi a forzarlo, si sente."; }}
+       ]}
+    ];
+  }
   /* Rapper incontrato lavorando: resta un artista, ma il rapporto nasce fuori
      dal Circolo e non gli attribuiamo servizi che non ha. */
   return [
     {id:"pezzi", peso:3,
      testo:() => "Oh, ma quindi fai musica davvero? Prima o poi fammi sentire qualcosa.",
      opts:[
-       {n:"Quando ho il pezzo giusto", d:"+rete", run(){ chRete(1); chatAvvicina(p,1); return "Perfetto. Meglio una cosa buona che dieci mezze."; }},
+       {n:"Quando ho il pezzo giusto", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Perfetto. Meglio una cosa buona che dieci mezze."; }},
        {n:"Ti mando qualcosa appena esce", d:"+lucidità", run(){ addLuc(3); return "Ci sta. Così lo sento finito."; }}
      ]},
     {id:"gavetta", peso:2,
      testo:() => "È strano beccarsi al lavoro e poi scoprire che stiamo provando a fare la stessa cosa fuori.",
      opts:[
        {n:"Almeno ci capiamo", d:"+benessere", run(){ chBene(3); chatAvvicina(p,1); return "Esatto. Non devi spiegare perché sei stanco."; }},
-       {n:"Vediamo chi arriva prima", d:"+rete", run(){ chRete(1); return "Ah, quindi la metti così. Va bene."; }}
+       {n:"Vediamo chi arriva prima", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); return "Ah, quindi la metti così. Va bene."; }}
      ]}
   ];
 }
@@ -815,7 +841,7 @@ function chatSpuntiLavoroGenerici(p){
 function chatTuLavoroGenerico(p){
   if(p.ruolo === "promoter") return [
     {n:"Che gira nei locali?", d:"+rete",
-     run(){ chRete(1); chatAvvicina(p,1); return "Poche serate, ma le persone giuste si vedono sempre. Ti aggiorno se cambia qualcosa."; }},
+     run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Poche serate, ma le persone giuste si vedono sempre. Ti aggiorno se cambia qualcosa."; }},
     {n:"Quando conviene farsi vedere?", d:"+lucidità",
      run(){ addLuc(3); return "Quando hai qualcosa da far ricordare, non solo per esserci."; }}
   ];
@@ -823,29 +849,35 @@ function chatTuLavoroGenerico(p){
     {n:"Come reggi i turni?", d:"+benessere",
      run(){ chBene(3); chatAvvicina(p,1); return "Male, ma almeno adesso ho qualcuno con cui dirlo senza fare scena."; }},
     {n:"Ci prendiamo un caffè in pausa?", d:"+rete",
-     run(){ chRete(1); return "Sì. Niente lavoro per cinque minuti però."; }}
+     run(){ chatReteLavoro(p,"contact-chat",1); return "Sì. Niente lavoro per cinque minuti però."; }}
+  ];
+  if(["cliente","fornitore","rider"].includes(p.ruolo)) return [
+    {n:"Tu giri spesso da queste parti?", d:"+rete",
+     run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Abbastanza da riconoscere quasi tutte le facce. È un quartiere piccolo quando lo vivi davvero."; }},
+    {n:"Com'è la zona ultimamente?", d:"+lucidità",
+     run(){ addLuc(2); return "Cambia poco alla volta. Però se ci passi sempre, te ne accorgi."; }}
   ];
   if(p.ruolo === "strada") return [
     {n:"Com'è il giro?", d:"+lucidità",
      run(){ addLuc(3); chatAvvicina(p,1); return "Sempre uguale finché non cambia all'improvviso. Non correre dietro a ogni voce."; }},
     {n:"Ci sentiamo se serve", d:"+rete",
-     run(){ chRete(1); return "Va bene. Ma niente messaggi inutili."; }}
+     run(){ chatReteLavoro(p,"contact-chat",1); return "Va bene. Ma niente messaggi inutili."; }}
   ];
   return [
     {n:"Che stai ascoltando?", d:"+rete",
-     run(){ chRete(1); chatAvvicina(p,1); return "Un po' di tutto. Mandami qualcosa di tuo quando ce l'hai."; }},
+     run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p,1); return "Un po' di tutto. Mandami qualcosa di tuo quando ce l'hai."; }},
     {n:"Come concili lavoro e musica?", d:"+benessere",
      run(){ chBene(3); return "Male, come tutti. Però almeno sappiamo perché lo facciamo."; }}
   ];
 }
 
 function chatTuSala(p, fonico){
-  if(["rapper","promoter","collega","strada"].includes(p.ruolo))
+  if(["rapper","promoter","collega","cliente","fornitore","rider","strada"].includes(p.ruolo))
     return chatTuLavoroGenerico(p);
   if(p.ruolo === "videomaker") return [
     {n:"Quando giriamo?",
      run:() => "Quando vuoi. Dimmi solo che pezzo e dove ti immagini.",
-     poi:[{n:"Decidi tu", d:"+rete", run(){ chRete(1); chatAvvicina(p, 1); return "Allora preparo tutto io. Tu porta la faccia."; }},
+     poi:[{n:"Decidi tu", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1); return "Allora preparo tutto io. Tu porta la faccia."; }},
           {n:"Ti faccio sapere", run:() => "Fammi sapere presto, che la luce buona dura poco."}]},
     {n:"Come vengo nei video?", d:"+lucidità",
      run(){ addLuc(4); chatAvvicina(p, 1);
@@ -854,7 +886,7 @@ function chatTuSala(p, fonico){
   return fonico ? [
     {n:"Quando hai un buco in sala?",
      run:() => "Questa settimana ho martedì e giovedì. Dimmi tu.",
-     poi:[{n:"Martedì", d:"+rete", run(){ chRete(1); chatAvvicina(p, 1); return "Segnato."; }},
+     poi:[{n:"Martedì", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1); return "Segnato."; }},
           {n:"Ti faccio sapere", run:() => "Fammi sapere presto, che si riempie."}]},
     {n:"Mi dai un parere onesto?", quando: m => m.usciti > 0, d:"+lucidità",
      run(){ addLuc(4); chatAvvicina(p, 1);
@@ -868,18 +900,18 @@ function chatTuSala(p, fonico){
           const b = chatMandaBeat(p);
           return b ? "Vai: «" + b.n + "», " + b.price + " €. È nel catalogo."
                    : "Passa in sala che te la faccio sentire."; }},
-       {n:"Passo in sala", d:"+rete", run(){ chRete(1); return "Ti aspetto."; }}
+       {n:"Passo in sala", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); return "Ti aspetto."; }}
      ]},
     {n:"Su che roba stai lavorando?",
      run:() => "Cose. Se vuoi sentirle prima degli altri, sai dove trovarmi.",
-     poi:[{n:"Fammi sentire", d:"+rete", run(){ chRete(1); chatAvvicina(p, 1); return "Domani ti mando."; }}]}
+     poi:[{n:"Fammi sentire", d:"+rete", run(){ chatReteLavoro(p,"contact-chat",1); chatAvvicina(p, 1); return "Domani ti mando."; }}]}
   ];
 }
 
 function chatContattoSala(p){
   const fonico = p.ruolo === "fonico";
   const video = p.ruolo === "videomaker";
-  const generico = ["rapper","promoter","collega","strada"].includes(p.ruolo);
+  const generico = ["rapper","promoter","collega","cliente","fornitore","rider","strada"].includes(p.ruolo);
   const r = (typeof POSTO_RUOLI === "object" && POSTO_RUOLI[p.ruolo]) || {k:"#94A3B8", n:"Contatto"};
   const origine = p.origineLuogo
     ? " · " + (p.origineDettaglio || "conosciuto al lavoro")
@@ -894,7 +926,7 @@ function chatContattoSala(p){
       : fonico ? "cursori"
       : p.ruolo === "rapper" ? "mic"
       : p.ruolo === "promoter" ? "fama"
-      : p.ruolo === "collega" ? "persona"
+      : ["collega","cliente","fornitore","rider"].includes(p.ruolo) ? "persona"
       : p.ruolo === "strada" ? "maschera"
       : "manopole",
     k: r.k,
@@ -914,7 +946,7 @@ function chatContattoSala(p){
    Può essere una persona conosciuta alla Sala oppure sul lavoro: in entrambi
    i casi è la stessa persona persistente in G.gente, non un contatto finto. */
 const CHAT_MESTIERI = ["beatmaker","fonico","videomaker"];
-const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","strada"];
+const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","cliente","fornitore","rider","strada"];
 function chatDaSala(){
   return (G.gente || [])
     .filter(x => x.numero && !x.via && (
@@ -944,6 +976,8 @@ function chatPresentazione(p){
           ? intro + "Giro tra locali e serate. Se passa qualcosa di sensato, ti scrivo."
           : p.ruolo === "collega"
             ? intro + "Ci vediamo già al lavoro. Se hai bisogno di staccare un attimo dal turno, scrivimi."
+            : ["cliente","fornitore","rider"].includes(p.ruolo)
+              ? intro + "Ci siamo incrociati abbastanza volte da scambiarci il numero. Ci si sente."
             : p.ruolo === "strada"
               ? intro + "Hai il mio numero. Usalo solo quando serve."
               : intro + "Anche io faccio musica. Quando hai qualcosa fuori, mandamela.";

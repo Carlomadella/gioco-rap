@@ -145,7 +145,7 @@
   function street(){ return G.strada; }
   function crimeVisualState(){
     const s=street(), a=(typeof A!=="undefined"&&A)||{};
-    return {rep:+s.rep||0,heat:+s.heat||0,dirty:+s.sporchi||0,men:+s.uomini||0,protection:+s.prot||0,gun:!!s.ferro,lawyer:!!s.avvocato,precedents:+s.precedenti||0,arrest:!!s.arresto,arresto:s.arresto,owned:s.attivita||{},businessCount:Object.values(s.attivita||{}).filter(Boolean).length,city:String(a.city||a.citta||"provincia").toLowerCase(),level:(typeof livello==="function"?livello().lvl:1),fame:+G.fans||0,hype:+G.hype||0,goat:(typeof livello==="function"?livello().lvl>=60:false)};
+    return {rep:+s.rep||0,heat:+s.heat||0,dirty:+s.sporchi||0,men:+s.uomini||0,protection:+s.prot||0,gun:!!s.ferro,lawyer:!!s.avvocato,precedents:+s.precedenti||0,arrest:!!s.arresto,arresto:s.arresto,owned:s.attivita||{},businessCount:Object.values(s.attivita||{}).filter(Boolean).length,hasTrapPhone:(typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned)),trapPhone:s.traphone||null,city:String(a.city||a.citta||"provincia").toLowerCase(),level:(typeof livello==="function"?livello().lvl:1),fame:+G.fans||0,hype:+G.hype||0,goat:(typeof livello==="function"?livello().lvl>=60:false)};
   }
   window.crimeVisualState=crimeVisualState;
   function toast(t){const el=q("#crimeToast");if(!el)return;el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),1900)}
@@ -194,6 +194,10 @@
       .adf-jail-act b{display:block;font-size:12px}.adf-jail-act span{display:block;margin-top:3px;color:#aeb3bd;font-size:10px;line-height:1.3}
       .adf-jail-act:disabled{opacity:.42;cursor:not-allowed}@media (hover:hover){.adf-jail-act:not(:disabled):hover{border-color:#ff315b;background:rgba(255,49,91,.09)}}
       .adf-jail-result{min-height:18px;margin-top:8px;color:#d9dde4;font-size:11px;line-height:1.35}
+      .adf-jail-people{margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
+      .adf-jail-people>small{display:block;margin-bottom:8px;color:#9aa0aa;font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+      .adf-jail-person{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.07)}
+      .adf-jail-person:first-of-type{border-top:0}.adf-jail-person b{font-size:11px}.adf-jail-person span{color:#9fa5af;font-size:10px;text-align:right}
       .adf-jail-feed{margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
       .adf-jail-event{padding:7px 0;border-top:1px solid rgba(255,255,255,.07)}.adf-jail-event:first-of-type{border-top:0}
       .adf-jail-event b{display:block;font-size:11px}.adf-jail-event span{display:block;margin-top:2px;color:#9fa5af;font-size:10px;line-height:1.35}
@@ -258,6 +262,10 @@
             <small>Cosa puoi fare qui dentro</small>
             <div class="adf-jail-actions" id="adf-jail-actions"></div>
             <div class="adf-jail-result" id="adf-jail-result"></div>
+          </div>
+          <div class="adf-jail-people">
+            <small>Persone qui dentro</small>
+            <div id="adf-jail-people"></div>
           </div>
           <div class="adf-jail-feed">
             <small>Dentro succede</small>
@@ -334,7 +342,8 @@
     },24000);
   }
   function renderJailLoop(el){
-    const box=el.querySelector("#adf-jail-actions"), feed=el.querySelector("#adf-jail-events");
+    const box=el.querySelector("#adf-jail-actions"), feed=el.querySelector("#adf-jail-events"),
+      people=el.querySelector("#adf-jail-people");
     if(!window.ADF_JAIL || typeof ADF_JAIL.view!=="function"){
       if(box) box.innerHTML='<div class="adf-jail-empty">Meccaniche carcere non disponibili.</div>';
       return;
@@ -344,6 +353,11 @@
       '<button class="adf-jail-act" type="button" data-jail-action="'+esc(a.id)+'" '+(a.disabled?"disabled":"")+'>'+
         '<b>'+esc(a.n)+'</b><span>'+esc(a.reason||a.d||"")+'</span></button>'
     ).join("");
+    if(people){
+      people.innerHTML=(v.persone&&v.persone.length)
+        ? v.persone.map(p=>'<div class="adf-jail-person"><b>'+esc(p.n)+'</b><span>'+esc(p.stato)+'</span></div>').join("")
+        : '<div class="adf-jail-empty">Non hai ancora costruito un rapporto vero con nessuno qui dentro.</div>';
+    }
     if(feed){
       feed.innerHTML=(v.eventi&&v.eventi.length)
         ? v.eventi.map(e=>'<div class="adf-jail-event"><b>'+esc(e.t)+'</b><span>'+esc(e.txt)+'</span></div>').join("")
@@ -411,7 +425,7 @@
   function renderCrimes(){const s=street();q("#crimes").innerHTML=STRADA_COLPI.map((c,i)=>{const ok=G.energy>=c.energia&&canDoCrime(c.id)&&!s.arresto;return `<button class="crime${ok?"":" disabled"}" data-crime="${esc(c.id)}" type="button" ${ok?"":"disabled"}><span class="num">0${i+1}</span><b>${esc(c.n)}</b><p>${esc(c.d)}</p><div class="chips"><span class="chip money">${money(c.min)}–${money(c.max)} €</span><span class="chip">${c.energia} energia</span><span class="chip">${window.GAME_TIME?GAME_TIME.formatDuration(durationFor(c.id)):""}</span></div><span class="go">→</span></button>`}).join("")}
   function renderBusinesses(){const s=street();q("#businessList").innerHTML=STRADA_ATTIVITA.map(a=>{const own=!!s.attivita[a.id];return `<div class="activity ${own?"owned":""}"><div class="a-top"><strong>${esc(a.n)}</strong><span class="price">${own?"TUA":money(a.costo)+" €"}</span></div><p>${own?`Resa ${money(a.resa)} €/sett. · 45% pulito / 55% sporco · −${money(a.gestione)} € gestione`:`Resa ${money(a.resa)} €/sett. · aumenta la capacità di riciclaggio.`}</p>${own?"":`<button class="pill" data-buy="${esc(a.id)}" type="button" ${G.money<a.costo?"disabled":""}>Rileva</button>`}</div>`}).join("")}
   function renderScene(){const modal=q("#crimeModal");if(!STRADA_SCENA){modal.classList.remove("on");return}q("#sceneK").textContent="DECISIONE";q("#mTitle").textContent=STRADA_SCENA.titolo||"—";q("#mDesc").innerHTML=STRADA_SCENA.testo||"";q("#crimeOptions").innerHTML=(STRADA_SCENA.opts||[]).map((o,i)=>`<button class="approach ${i===2?"hot":""}" data-scene-opt="${i}" type="button"><span class="a-num">0${i+1}</span><b>${esc(o.n)}</b><p>${esc(o.d||"")}</p></button>`).join("");modal.classList.add("on")}
-  function sync(){const s=street(),art=window.ARTIST||{},city=(String(art.city||art.citta||"").trim()||"Provincia");q("#crimeCity").textContent=city;q("#crimeWhere").textContent="IL GIRO // "+city.toUpperCase();q("#dirty").textContent=money(s.sporchi)+" €";q("#clean").textContent=money(G.money)+" €";q("#energy").textContent=Math.round(G.energy)+" / "+Math.round(G.maxEnergy||100);q("#repN").textContent=Math.round(s.rep);q("#repBar").style.width=clampN(s.rep,0,100)+"%";q("#heatN").textContent=Math.round(s.heat);q("#heatBar").style.width=clampN(s.heat,0,100)+"%";q("#precedents").textContent=Math.round(s.precedenti||0);q("#pressure").textContent=pressure(s.heat);q("#menCount").textContent=`(${s.uomini}/5)`;q("#addMan").disabled=s.uomini>=5||G.money<500;const launderCap=typeof stradaCapienza==="function"?stradaCapienza():400;const launderMin=window.GAME_TIME&&GAME_TIME.durationFor?GAME_TIME.durationFor("ricicla"):45;const launderTime=window.GAME_TIME&&GAME_TIME.formatDuration?GAME_TIME.formatDuration(launderMin):launderMin+" min";q("#launder").textContent=launderCap>0?"Ripulisci fino a "+money(launderCap)+" € · "+launderTime:"Limite settimanale raggiunto";q("#launder").disabled=s.sporchi<=0||launderCap<=0||!!s.arresto;q("#gun").textContent=s.ferro?"Ce l'hai":"900 €";q("#gun").classList.toggle("on",!!s.ferro);q("#gun").disabled=!!s.ferro||G.money<900;q("#lawyer").textContent=s.avvocato?"Ce l'hai":"Prendilo";q("#lawyer").classList.toggle("on",!!s.avvocato);q("#prot").textContent=(STRADA_PROT[s.prot]||STRADA_PROT[0]).n;q("#prot").classList.toggle("on",s.prot>0);q("#weekly").textContent=money(weeklyCost())+" €/sett.";q("#crimeWeek").textContent=String(G.week||1).padStart(2,"0");q("#crimeClock").textContent=timeText();const tc=q("#trapClock");if(tc)tc.textContent=timeText();const ar=!!s.arresto;q("#crimeCenter").classList.toggle("locked",ar);q("#crimeLock").style.display=ar?"flex":"";if(ar){q("#lockTitle").textContent="Sei dentro.";q("#lockReq").textContent=(s.arresto.settimane||0)+" settimane rimaste · "+(s.arresto.colpo||"arresto")};renderCrimes();renderBusinesses();renderScene();try{if(window.TRAPHONE16){const snap=TRAPHONE16.snapshot();q("#trapDockStatus").textContent=(snap.unread||0)+" NON LETTI"}}catch(_){} }
+  function sync(){const s=street(),art=window.ARTIST||{},city=(String(art.city||art.citta||"").trim()||"Provincia");q("#crimeCity").textContent=city;q("#crimeWhere").textContent="IL GIRO // "+city.toUpperCase();q("#dirty").textContent=money(s.sporchi)+" €";q("#clean").textContent=money(G.money)+" €";q("#energy").textContent=Math.round(G.energy)+" / "+Math.round(G.maxEnergy||100);q("#repN").textContent=Math.round(s.rep);q("#repBar").style.width=clampN(s.rep,0,100)+"%";q("#heatN").textContent=Math.round(s.heat);q("#heatBar").style.width=clampN(s.heat,0,100)+"%";q("#precedents").textContent=Math.round(s.precedenti||0);q("#pressure").textContent=pressure(s.heat);q("#menCount").textContent=`(${s.uomini}/5)`;q("#addMan").disabled=s.uomini>=5||G.money<500;const launderCap=typeof stradaCapienza==="function"?stradaCapienza():400;const launderMin=window.GAME_TIME&&GAME_TIME.durationFor?GAME_TIME.durationFor("ricicla"):45;const launderTime=window.GAME_TIME&&GAME_TIME.formatDuration?GAME_TIME.formatDuration(launderMin):launderMin+" min";q("#launder").textContent=launderCap>0?"Ripulisci fino a "+money(launderCap)+" € · "+launderTime:"Limite settimanale raggiunto";q("#launder").disabled=s.sporchi<=0||launderCap<=0||!!s.arresto;q("#gun").textContent=s.ferro?"Ce l'hai":"900 €";q("#gun").classList.toggle("on",!!s.ferro);q("#gun").disabled=!!s.ferro||G.money<900;q("#lawyer").textContent=s.avvocato?"Ce l'hai":"Prendilo";q("#lawyer").classList.toggle("on",!!s.avvocato);q("#prot").textContent=(STRADA_PROT[s.prot]||STRADA_PROT[0]).n;q("#prot").classList.toggle("on",s.prot>0);q("#weekly").textContent=money(weeklyCost())+" €/sett.";q("#crimeWeek").textContent=String(G.week||1).padStart(2,"0");q("#crimeClock").textContent=timeText();const tc=q("#trapClock");if(tc)tc.textContent=timeText();const trapOwned=typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned);const trapDock=q("#traphoneDock");if(trapDock)trapDock.hidden=!trapOwned;const ar=!!s.arresto;q("#crimeCenter").classList.toggle("locked",ar);q("#crimeLock").style.display=ar?"flex":"";if(ar){q("#lockTitle").textContent="Sei dentro.";q("#lockReq").textContent=(s.arresto.settimane||0)+" settimane rimaste · "+(s.arresto.colpo||"arresto")};renderCrimes();renderBusinesses();renderScene();try{if(window.TRAPHONE16&&trapOwned){const snap=TRAPHONE16.snapshot();q("#trapDockStatus").textContent=(snap.unread||0)+" NON LETTI"}}catch(_){} }
 
   function close(){root.classList.remove("on");try{window.dispatchEvent(new CustomEvent("crime-ui:closed"))}catch(_){} }
   function open(){if(street().arresto)return openJail();if(typeof hubTap==="function")hubTap();STRADA_SCENA=null;sync();root.classList.add("on");chooseBackground(!q("#bgA").style.backgroundImage);if(!bgTimer)bgTimer=setInterval(()=>{if(root.classList.contains("on"))chooseBackground(false)},15000); }

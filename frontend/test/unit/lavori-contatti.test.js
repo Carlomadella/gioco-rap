@@ -131,17 +131,23 @@ describe("identità sociale dei lavori", () => {
     const telefono = leggi("js/game/telefono.js");
 
     expect(posto).toContain('promoter: {n:"Promoter"');
+    expect(posto).toContain('cliente: {n:"Cliente abituale"');
+    expect(posto).toContain('fornitore: {n:"Fornitore"');
+    expect(posto).toContain('rider: {n:"Rider"');
     expect(posto).toContain('collega: {n:"Collega"');
     expect(posto).toContain('strada: {n:"Conoscenza della Strada"');
     expect(posto).toContain("p.origineLavoro = meta.jobId || luogo;");
     expect(posto).toContain("function postoContattoLavoroCandidato(luogo, daRiprendere, maxContatti, ruoli, meta)");
 
-    expect(chat).toContain('const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","strada"]');
+    expect(chat).toContain('const CHAT_MESTIERI_LAVORO = ["rapper","promoter","collega","cliente","fornitore","rider","strada"]');
     expect(chat).toContain("function chatSpuntiLavoroGenerici(p)");
     expect(chat).toContain('p.ruolo === "promoter"');
     expect(chat).toContain('p.ruolo === "collega"');
     expect(chat).toContain('p.ruolo === "strada"');
     expect(telefono).toContain('promoter:"Promoter"');
+    expect(telefono).toContain('cliente:"Cliente abituale"');
+    expect(telefono).toContain('fornitore:"Fornitore"');
+    expect(telefono).toContain('rider:"Rider"');
     expect(telefono).toContain('collega:"Collega"');
     expect(telefono).toContain('strada:"Conoscenza della Strada"');
     expect(telefono).toContain('data-chat="sala:' + "' + p.id + '" + '"');
@@ -154,7 +160,7 @@ describe("identità sociale dei lavori", () => {
     expect(eventi).toContain("function adfWorkContactAfterShift()");
     expect(eventi).toContain('claimAutoEvent("work-contact")');
     expect(eventi).toContain('lavoroTentaIncontroContatto(chiave,Math.random(),G.job)');
-    expect(eventi).toContain('const contactShown = a.id==="turno" && !overtimeShown && !streetShown');
+    expect(eventi).toContain('const contactShown = a.id==="turno" && !overtimeShown && !factoryIntroShown && !streetShown');
     expect(eventi).toContain("? adfWorkContactAfterShift()");
     expect(eventi).toContain('t:giaVisto ? p.n+" torna a fermarti dopo il turno"');
   });
@@ -167,4 +173,13 @@ describe("identità sociale dei lavori", () => {
     expect(famepedia).toContain("il Fonico junior incrocia più facilmente beatmaker, artisti e tecnici");
     expect(famepedia).toContain("diventa una persona persistente");
   });
+
+  it("i contatti nati in Pizzeria usano un budget rete per-persona anche nelle chat", () => {
+    const chat=leggi("js/game/chat.js");
+    expect(chat).toContain("function chatReteLavoro(p,fonte,n)");
+    expect(chat).toContain('p.origineLuogo==="pizzeria"');
+    expect(chat).toContain('lavoroBonusRetePersona(p,"pizzeria-chat:"');
+    expect(chat).toContain('chatReteLavoro(p,"contact-chat",1)');
+  });
+
 });

@@ -145,10 +145,18 @@ const POSTO_RUOLI = {
      al Circolo: sono contatti persistenti della vita fuori dalla Sala. */
   promoter: {n:"Promoter", k:"#FB7185",
     d:"Lavora con serate e locali. Può farti arrivare occasioni che al Circolo non passano."},
+  cliente: {n:"Cliente abituale", k:"#D6B98C",
+    d:"Una faccia che torna spesso. Non è dentro alla musica per definizione: è semplicemente parte del giro del locale."},
+  fornitore: {n:"Fornitore", k:"#A7B5C6",
+    d:"Passa per consegne e rifornimenti. Conosce persone e posti, ma non è una scorciatoia musicale."},
+  rider: {n:"Rider", k:"#8FD3C8",
+    d:"Incrocia la Pizzeria durante i ritiri. È una conoscenza del quartiere, non un contatto professionale della musica."},
   collega: {n:"Collega", k:"#94A3B8",
     d:"Una persona conosciuta sul posto di lavoro. Non è per forza dentro alla musica."},
   strada: {n:"Conoscenza della Strada", k:"#F97316",
-    d:"Una persona legata al giro della Strada. Compare solo se quel giro lo hai già avviato."}
+    d:"Una persona legata al giro della Strada. Compare solo se quel giro lo hai già avviato."},
+  avvocato: {n:"Avvocato", k:"#E2E8F0",
+    d:"Un professionista che può diventare il tuo legale di fiducia. Conoscerlo non significa automaticamente averlo a libro paga."}
 };
 
 const POSTO_NOMI = {
@@ -158,8 +166,12 @@ const POSTO_NOMI = {
   giornalista: ["Marta", "Dario", "Elisa", "Toni"],
   videomaker: ["Ciro", "Vale", "Manu", "Bea", "Tommy", "Zeta"],
   promoter: ["Riky", "Mauri", "Simo", "Vale P.", "Dado", "Nina"],
+  cliente: ["Giulia", "Davide", "Elena", "Mattia", "Irene", "Pietro", "Chiara", "Lorenzo"],
+  fornitore: ["Stefano", "Mauro", "Claudia", "Fabio", "Enzo", "Lucia"],
+  rider: ["Leo", "Sam", "Noemi", "Teo", "Miki", "Ari"],
   collega: ["Luca", "Marco", "Simo", "Vale", "Ale", "Marta", "Nico", "Sara"],
-  strada: ["Cobra", "Lupo", "Moro", "Zero", "Nox", "Rami"]
+  strada: ["Cobra", "Lupo", "Moro", "Zero", "Nox", "Rami"],
+  avvocato: ["Avv. Ferri", "Avv. Riva", "Avv. Sala", "Avv. Conti", "Avv. Greco", "Avv. Villa"]
 };
 
 const CARATTERI = [
@@ -418,6 +430,97 @@ const DIALOGHI = {
   ]
 };
 
+
+/* Persone nate fuori dal circuito musicale (lavoro, quartiere, Strada).
+   Prima del punto 3 potevano esistere in G.gente ma, una volta rese visibili
+   al Circolo, parlaCon() non aveva dialoghi per loro. Questi sono dialoghi
+   sociali normali: fanno crescere il rapporto personale, NON la futura
+   fiducia criminale del punto 4. */
+function dialogoCarcereFuori(p){
+  const rapporto=Number(p&&p.carcere&&p.carcere.rapporto||0);
+  if((p.strada&&p.strada.rivalita===true) || rapporto<=-4){
+    return {
+      jailOutside:"rival",
+      t:"Vi riconoscete subito. "+p.n+
+        " non ha dimenticato come vi siete lasciati dentro, e fuori non c'è più una porta a separarvi.",
+      o:[
+        ["Gli dici che non vuoi riaprire il conto",1,"pratico"],
+        ["Non gli concedi niente e tiri dritto",0,"diffidente"]
+      ]
+    };
+  }
+  if(rapporto>=1){
+    return {
+      jailOutside:"favore",
+      t:"Vi siete già visti dietro una porta che adesso non c'è più. "+p.n+
+        " ti ricorda una cosa fatta insieme dentro e ti chiede una mano per rimettere in ordine una faccenda fuori.",
+      o:[
+        ["Gli dai una mano",2,"pratico"],
+        ["Gli dici che il carcere è finito e vuoi tenerlo lì",0,"diffidente"]
+      ]
+    };
+  }
+  return {
+    jailOutside:"reincontro",
+    t:"Per un secondo vi riconoscete senza sapere bene se salutarvi. Dentro dividevate lo stesso spazio; fuori siete di nuovo due persone libere.",
+    o:[
+      ["Ti fermi e scambi due parole",1,"aperto"],
+      ["Fai un cenno e tieni le distanze",0,"diffidente"]
+    ]
+  };
+}
+
+const DIALOGHI_VITA = Object.freeze([
+  Object.freeze({
+    t:"Ti fa un cenno e resta appoggiato al bancone. «Com'è che gira, ultimamente?»",
+    o:[
+      ["Gli racconti una cosa vera della tua settimana",2,"aperto"],
+      ["Gli chiedi prima come sta lui",2,"diffidente"],
+      ["Gli dici che va tutto alla grande",1,"gasato"]
+    ]
+  }),
+  Object.freeze({
+    t:"Per un attimo finite a parlare della gente che passa sempre dagli stessi posti.",
+    o:[
+      ["Ascolti più di quanto parli",2,"diffidente"],
+      ["Racconti chi hai incontrato tu",2,"aperto"],
+      ["Tagli corto: non ti interessa",0,"pratico"]
+    ]
+  }),
+  Object.freeze({
+    t:"«La provincia è piccola. Prima o poi le facce tornano tutte.»",
+    o:[
+      ["Gli chiedi quali facce vede più spesso",2,"pratico"],
+      ["Gli dici che è proprio quello il bello",1,"aperto"],
+      ["Gli dici che tu non ti fai notare",2,"diffidente"]
+    ]
+  }),
+  Object.freeze({
+    t:"Ti chiede cosa stai combinando fuori dalla musica.",
+    o:[
+      ["Gli rispondi senza raccontargli tutta la tua vita",2,"diffidente"],
+      ["Gli racconti davvero come stai messo",2,"aperto"],
+      ["Gli dici che ti fai i fatti tuoi",1,"pratico"]
+    ]
+  }),
+  Object.freeze({
+    t:"Si mette a parlare di orari, soldi e gente che promette più di quanto mantiene.",
+    o:[
+      ["Gli dici che guardi soprattutto chi mantiene la parola",2,"pratico"],
+      ["Gli racconti di una promessa andata male",2,"aperto"],
+      ["Gli dici che basta saper comandare",1,"gasato"]
+    ]
+  }),
+  Object.freeze({
+    t:"La conversazione si ferma per qualche secondo. Nessuno dei due sembra avere fretta di riempire il silenzio.",
+    o:[
+      ["Resti lì senza forzare il discorso",2,"diffidente"],
+      ["Gli fai una domanda personale ma semplice",2,"aperto"],
+      ["Tiri fuori il telefono e cambi aria",0,null]
+    ]
+  })
+]);
+
 /* ==================== LA GENTE ==================== */
 function relNome(p){ return REL_NOMI[clamp(p.rel, 0, 5)]; }
 function relSoglia(p){ return 3 + p.rel; }         /* più sali, più costa salire */
@@ -433,8 +536,8 @@ function nuovaPersona(ruolo){
   /* punto 65: un'età vera, non un numero a caso — i fonici e i giornalisti
      sono il mestiere di chi ha già fatto qualche anno di gavetta, gli altri
      due partono dalla stessa fascia del giocatore */
-  const etaMin = {fonico:26, giornalista:28, videomaker:22}[ruolo] || 18;
-  const etaMax = {fonico:52, giornalista:58, videomaker:45}[ruolo] || 32;
+  const etaMin = {fonico:26, giornalista:28, videomaker:22, avvocato:30}[ruolo] || 18;
+  const etaMax = {fonico:52, giornalista:58, videomaker:45, avvocato:62}[ruolo] || 32;
   return {
     id: "p" + Math.floor(Math.random() * 1e9),
     ruolo: ruolo,
@@ -545,8 +648,148 @@ function postoScambiaNumeroLavoro(p){
   return p;
 }
 
+function postoRientroCarcereDisponibile(p){
+  if(!p || p.via || p.origineLuogo!=="carcere" || p.circoloSbloccato || !p.carcere)
+    return false;
+  const m=p.carcere;
+  if(m.currentJailId) return false;
+  const oggi=typeof stradaAbsDay==="function"
+    ? stradaAbsDay()
+    : (((Math.max(1,Number(G.year)||1)-1)*52+(Math.max(1,Number(G.week)||1)-1))*7+
+       (Math.max(1,Number(G.day)||1)-1)+1);
+
+  let quando=Number(m.returnAfterAbsoluteDay);
+  /* Migrazione dei salvataggi creati dalla prima versione del punto 20:
+     avevano releasedAbsoluteDay ma nessuna data di riemersione. */
+  if(!Number.isFinite(quando) && m.releasedAbsoluteDay!=null &&
+     m.linkedStreet!==true && m.outsideFollowupDone!==true){
+    const rapporto=Number(m.rapporto||0);
+    const ritardo=rapporto>=2?42:rapporto>=1?56:rapporto===0?84:63;
+    quando=Number(m.releasedAbsoluteDay)+ritardo;
+    m.returnAfterAbsoluteDay=quando;
+  }
+  if(!Number.isFinite(quando) || oggi<quando) return false;
+
+  /* Il carcere non genera un contatto gratis: sblocca soltanto la possibilità
+     di ritrovare FUORI la stessa persona. Il seguito dipenderà da cosa fai
+     quando la incontri davvero. */
+  p.circoloSbloccato=true;
+  m.returnAfterAbsoluteDay=null;
+  if(typeof pushLog==="function")
+    pushLog("<b>Una faccia del carcere è tornata fuori.</b> "+p.n+
+      " ha ricominciato a girare in provincia. Prima o poi potreste incrociarvi.","");
+  if(typeof save==="function") save();
+  return true;
+}
+
 function postoSoloLavoro(p){
+  postoRientroCarcereDisponibile(p);
   return !!(p && p.origineLuogo && !p.circoloSbloccato);
+}
+
+/* Punto Strada 16: la rete sociale è fatta di legami tra persone, non di
+   percentuali visibili al giocatore. I legami sono generici e persistenti:
+   possono nascere da una presentazione della Strada, da un favore o da un
+   contatto comune, senza trasformare la persona in un "NPC criminale". */
+function postoReteLegami(p){
+  if(!p || p.via) return [];
+  if(!Array.isArray(p.reteLegami)) p.reteLegami=[];
+  return p.reteLegami;
+}
+
+function postoCollegaPersone(a,b,motivo){
+  if(!a || !b || a===b || a.via || b.via || !a.id || !b.id) return false;
+  const sett=typeof totalWeeks==="function" ? totalWeeks() : Number(G.week||1);
+  const aggiungi=(da,aChi)=>{
+    const legami=postoReteLegami(da);
+    let legame=legami.find(x=>x&&x.personId===aChi.id);
+    if(!legame){
+      legame={personId:aChi.id,reason:motivo||"contatto-comune",sinceWeek:sett};
+      legami.push(legame);
+    }else if(motivo){
+      legame.reason=motivo;
+    }
+  };
+  aggiungi(a,b);
+  aggiungi(b,a);
+  return true;
+}
+
+function postoLegamiAttivi(p){
+  const ids=new Set(postoReteLegami(p).map(x=>x&&x.personId).filter(Boolean));
+  return (G.gente||[]).filter(x=>x && !x.via && ids.has(x.id));
+}
+
+/* Punto Strada 17: una persona non ha una memoria diversa per ogni schermata.
+   Quello che succede nella Strada lascia quindi una traccia sociale generica
+   sulla STESSA persona che poi puoi ritrovare al lavoro, al Circolo o altrove.
+   Non sostituisce p.strada (fiducia/debiti/tensione criminali): è il ponte
+   minimo che rende quei fatti parte della vita intera del personaggio. */
+function postoConseguenzeMondo(p){
+  if(!p || p.via) return [];
+  if(!Array.isArray(p.conseguenzeMondo)) p.conseguenzeMondo=[];
+  return p.conseguenzeMondo;
+}
+
+function postoUltimaConseguenzaMondo(p){
+  const eventi=postoConseguenzeMondo(p);
+  return eventi.length ? eventi[eventi.length-1] : null;
+}
+
+function postoRegistraConseguenzaMondo(p,tipo,punti,meta){
+  if(!p || p.via) return null;
+
+  const delta=Number.isFinite(Number(punti)) ? Math.trunc(Number(punti)) : 0;
+  const relPrima=Math.max(0,Number(p.rel||0));
+  const ptPrima=Number(p.pt||0);
+
+  if(delta){
+    p.pt=ptPrima+delta;
+
+    /* Stessa grammatica relazionale dei dialoghi: una conseguenza positiva
+       può far maturare un rapporto; una negativa può raffreddarlo di un
+       gradino. Non crea però un Opp musicale "di nascosto": quello resta una
+       conseguenza esplicita dei dialoghi dedicati. */
+    while(p.pt>=relSoglia(p) && p.rel<5){
+      p.pt-=relSoglia(p);
+      p.rel++;
+    }
+    if(p.pt<0 && p.rel>0){
+      p.rel--;
+      p.pt=0;
+    }else if(p.rel===0 && p.pt<-2){
+      p.pt=-2;
+    }
+  }
+
+  const sett=typeof totalWeeks==="function" ? totalWeeks() : Number(G.week||1);
+  const m=meta&&typeof meta==="object" ? meta : {};
+  const evento={
+    type:String(tipo||"world-consequence"),
+    source:String(m.source||"mondo"),
+    week:sett,
+    absoluteDay:typeof stradaAbsDay==="function" ? stradaAbsDay() : null,
+    points:delta,
+    reason:m.reason==null?null:String(m.reason),
+    relatedPersonId:m.relatedPersonId||null,
+    relatedPersonName:m.relatedPersonName||null,
+    context:m.context||null,
+    relBefore:relPrima,
+    relAfter:Number(p.rel||0)
+  };
+  const eventi=postoConseguenzeMondo(p);
+  eventi.push(evento);
+  if(eventi.length>20) eventi.shift();
+
+  return {
+    persona:p,
+    evento,
+    relBefore:relPrima,
+    relAfter:Number(p.rel||0),
+    ptBefore:ptPrima,
+    ptAfter:Number(p.pt||0),
+    relChanged:Number(p.rel||0)!==relPrima
+  };
 }
 
 /* Quanta gente gira: all'inizio tre facce, poi ne arriva una ogni due settimane.
@@ -556,8 +799,18 @@ function postoSoloLavoro(p){
    fa arrivare — se no due feat comprati in Cabina volevano dire due persone
    in meno alla Sala, magari il videomaker o il giornalista
    (problemi-riscontrati, 15/09; chiuso il 21/09). */
-function genteDellaSala(){
+function genteBaseDellaSala(){
+  /* Invariante storico, lasciato esplicito anche per il gate regressioni:
+     classifica e contatti confinati al lavoro non consumano slot della Sala. */
   return (G.gente || []).filter(p => p && !p.rivale && !postoSoloLavoro(p));
+}
+function genteDellaSala(){
+  /* Punto 3: dal conteggio generativo escludiamo in più i contatti Strada già
+     scoperti. Possono comunque comparire in presentiOggi(): semplicemente non
+     sostituiscono beatmaker/rapper/fonici che sistemaGente deve garantire. */
+  return genteBaseDellaSala().filter(p =>
+    !(p.strada && p.strada.known) && p.ruolo!=="avvocato"
+  );
 }
 function sistemaGente(){
   if(!G.gente) G.gente = [];
@@ -574,7 +827,30 @@ function sistemaGente(){
     /* uno slot ogni tanto lo prende il giornalista, se è ora */
     else if(n >= 4 && POSTO_RUOLI.giornalista.da(G) &&
        !G.gente.some(p => p.ruolo === "giornalista")) r = "giornalista";
-    G.gente.push(nuovaPersona(r));
+    const p=nuovaPersona(r);
+    p.origine="circolo";
+    p.origineDettaglio="persona del Circolo";
+    p.storia="È una faccia che gira al Circolo.";
+    p.circoloSbloccato=true;
+    G.gente.push(p);
+  }
+
+  /* Punto Strada 6: il legale privato è una persona del mondo, non un toggle.
+     Dopo essere entrato davvero nella Strada e aver costruito un minimo di
+     reputazione, può comparire una volta al Circolo senza rubare slot al cast
+     musicale. Conoscerlo non equivale ancora ad assumerlo. */
+  const puoConoscereLegale=!!(G.strada&&G.strada.badgeSbloccato) &&
+    (Number(G.strada.rep||0)>=8 || Number(G.strada.precedenti||0)>0);
+  if(puoConoscereLegale && !G.gente.some(p=>p&&p.ruolo==="avvocato"&&!p.via)){
+    const legale=nuovaPersona("avvocato");
+    legale.origine="circolo";
+    legale.origineLuogo=null;
+    legale.origineDettaglio="conosciuto al Circolo";
+    legale.storia="Vi siete conosciuti al Circolo, fuori dal contesto di un arresto.";
+    legale.circoloSbloccato=true;
+    legale.numero=false;
+    legale.numDa=null;
+    G.gente.push(legale);
   }
 }
 
@@ -585,13 +861,61 @@ function presentiOggi(quanti){
   sistemaGente();
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
   const vivi = G.gente.filter(p => !p.via && !postoSoloLavoro(p));
-  const ord = vivi.slice().sort((a, b) => {
-    const ka = (a.id.charCodeAt(1) * 31 + sett * 17) % 97;
-    const kb = (b.id.charCodeAt(1) * 31 + sett * 17) % 97;
-    /* chi conosci meglio è più facile trovarlo: il giro è quello */
-    return (kb + b.rel * 12) - (ka + a.rel * 12);
+
+  const punteggio=p=>{
+    const k=(p.id.charCodeAt(1)*31+sett*17)%97;
+    const strada=p.strada&&p.strada.known ? 8 : 0;
+    const ritorno=Math.min(6,Math.max(0,Number(p.circoloPresenze||0))*2);
+    /* Una conseguenza recente non genera un popup casuale: rende semplicemente
+       più probabile rivedere quella stessa persona, se già appartiene al mondo
+       sociale del Circolo. Così il seguito di una storia può avvenire faccia
+       a faccia invece di sparire nel sottosistema che l'ha creata. */
+    const eco=postoUltimaConseguenzaMondo(p);
+    const etaEco=eco ? Math.max(0,sett-Number(eco.week||sett)) : 99;
+    const conseguenza=eco&&etaEco<=4 ? Math.max(0,8-etaEco*2) : 0;
+    /* I contatti comuni pesano davvero: chi è collegato a persone che già
+       frequenti ha più probabilità di ricomparire nello stesso ambiente. */
+    const rete=Math.min(10,postoLegamiAttivi(p).reduce((n,x)=>
+      n+(Number(x.rel||0)>=1 || (x.strada&&x.strada.known) ? 4 : 1),0));
+    return k+Number(p.rel||0)*12+strada+ritorno+rete+conseguenza;
+  };
+
+  const ord=vivi.slice().sort((a,b)=>punteggio(b)-punteggio(a));
+  const limite=Math.max(0,Number(quanti||3));
+  const scelti=[];
+  const presi=new Set();
+
+  for(const p of ord){
+    if(scelti.length>=limite) break;
+    if(presi.has(p.id)) continue;
+    scelti.push(p); presi.add(p.id);
+
+    /* Se una persona è già davvero nella tua rete, un suo legame può
+       comparire insieme a lei. Questo trasforma "un contatto comune" in una
+       relazione del mondo, non in un nuovo tiro casuale scollegato. */
+    if(scelti.length<limite &&
+       (Number(p.rel||0)>0 || (p.strada&&p.strada.known))){
+      const legato=postoLegamiAttivi(p)
+        .filter(x=>!presi.has(x.id) && vivi.includes(x))
+        .sort((a,b)=>punteggio(b)-punteggio(a))[0] || null;
+      if(legato){
+        scelti.push(legato);
+        presi.add(legato.id);
+      }
+    }
+  }
+
+  /* Ricordiamo solo che la faccia è passata dal Circolo, non il suo nome:
+     "visto" resta riservato a quando il giocatore ci parla davvero. */
+  const giorno=[Number(G.year||1),Number(G.week||1),Number(G.day||1)].join(":");
+  scelti.forEach(p=>{
+    if(p.circoloUltimoVistoKey!==giorno){
+      p.circoloUltimoVistoKey=giorno;
+      p.circoloPresenze=Math.max(0,Number(p.circoloPresenze||0))+1;
+    }
   });
-  return ord.slice(0, quanti || 3);
+
+  return scelti.slice(0,limite);
 }
 
 /* ==================== DOVE SI INCONTRA ====================
@@ -744,8 +1068,12 @@ function parlaCon(id){
   if(poTempoBlocca("parla")) return;
   G.energy -= PO_COSTO.parla;
   poTempoAvanza("parla");
-  const pool = DIALOGHI[p.ruolo];
-  POSTO_PARLA = {p:p, sit:pick(pool)};
+  const pool = DIALOGHI[p.ruolo] || DIALOGHI_VITA;
+  const jailFollowup=(p.origine==="carcere" && p.carcere &&
+    p.carcere.releasedAbsoluteDay!=null && !p.carcere.outsideFollowupDone)
+      ? dialogoCarcereFuori(p)
+      : null;
+  POSTO_PARLA = {p:p, sit:jailFollowup||pick(pool)};
   SFX.tap(); save(); renderPosto();
   if(typeof renderHub === "function") renderHub();
 }
@@ -786,6 +1114,47 @@ function poRispondi(i){
   p.pt += pt;
   gain("rete", pt > 0 ? 0.5 : 0.1);
   addLuc(1);
+
+  /* Punto Strada 20: il primo vero incontro DOPO il carcere chiude il filo
+     sospeso. Se il rapporto dentro era positivo, la persona può chiedere un
+     favore: ricambiarlo non regala una relazione, ma rende concreto il ponte
+     fra rapporto carcerario, rete sociale e fiducia della Strada. */
+  if(sit.jailOutside && p.carcere){
+    p.carcere.outsideFollowupDone=true;
+    if(sit.jailOutside==="favore"){
+      if(i===0){
+        if(typeof stradaSegnaPersona==="function")
+          stradaSegnaPersona(p,{
+            key:"carcere:"+p.id,
+            source:"carcere-reunion",
+            story:"Vi siete conosciuti dentro e vi siete ritrovati fuori."
+          });
+        if(typeof stradaModificaFiducia==="function")
+          stradaModificaFiducia(p,4,"carcere-favore-fuori");
+        if(typeof stradaAggiungiFavore==="function")
+          stradaAggiungiFavore(p,1,"carcere-favore-fuori");
+        if(typeof postoRegistraConseguenzaMondo==="function")
+          postoRegistraConseguenzaMondo(p,"jail-reunion-helped",1,{
+            source:"carcere",reason:"favore-ricambiato-fuori",context:"circolo"
+          });
+      }else if(typeof postoRegistraConseguenzaMondo==="function"){
+        postoRegistraConseguenzaMondo(p,"jail-reunion-declined",0,{
+          source:"carcere",reason:"favore-rifiutato-fuori",context:"circolo"
+        });
+      }
+    }else if(sit.jailOutside==="rival"){
+      if(typeof postoRegistraConseguenzaMondo==="function")
+        postoRegistraConseguenzaMondo(p,"jail-rival-reunion",i===0?0:-1,{
+          source:"carcere",reason:i===0?"conto-tenuto-freddo":"conto-riacceso",context:"circolo"
+        });
+      if(i!==0 && typeof stradaModificaTensionePersona==="function")
+        stradaModificaTensionePersona(p,1,"carcere-rivale-reincontro");
+    }else if(typeof postoRegistraConseguenzaMondo==="function"){
+      postoRegistraConseguenzaMondo(p,"jail-reunion",i===0?1:0,{
+        source:"carcere",reason:i===0?"reincontro-aperto":"reincontro-freddo",context:"circolo"
+      });
+    }
+  }
 
   /* si sale di un gradino alla volta */
   let salito = false;

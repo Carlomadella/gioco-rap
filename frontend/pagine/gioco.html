@@ -55,7 +55,7 @@
 <link rel="stylesheet" href="css/abilita.css?v=1">
 <link rel="stylesheet" href="css/negozio.css?v=12">
 <link rel="stylesheet" href="css/strada-crimine.css?v=13">
-<link rel="stylesheet" href="css/strada-crimine-v2.css?v=2">
+<link rel="stylesheet" href="css/strada-crimine-v2.css?v=3">
 <link rel="stylesheet" href="css/hub.css?v=18">
 <link rel="stylesheet" href="css/telefono.css?v=15">
 <!-- il telefono quando lo schermo è un telefono: sotto i 1180 si alza da un tasto -->
@@ -543,7 +543,7 @@
         <button class="launder" id="st-ripulisci">Ripulisci</button>
       </div>
       <div class="stat">
-        <div class="stat-head"><span>Reputazione di strada</span><b id="st-repn">0</b></div>
+        <div class="stat-head"><span>Nome nel giro</span><b id="st-repn">0</b></div>
         <div class="track"><i class="rep" id="st-repbar" style="width:0%"></i></div>
       </div>
       <div class="stat">
@@ -682,19 +682,19 @@
 <script src="js/creator/portrait.js?v=15"></script>
 <script src="js/creator/nav.js?v=14"></script>
 <script src="js/creator/guardaroba.js?v=2"></script>
-<script src="js/creator/rpg-v24-bridge.js?v=9"></script>
+<script src="js/creator/rpg-v24-bridge.js?v=21"></script>
 <!-- MakeHuman mobile: adattatore isolato. Sul desktop esce subito senza cambiare il ponte. -->
-<script src="js/mobile/makehuman-mobile.js?v=1"></script>
+<script src="js/mobile/makehuman-mobile.js?v=3"></script>
 
 <!-- Partita -->
-<script src="js/game/state.js?v=16"></script>
+<script src="js/game/state.js?v=26"></script>
 <script src="js/game/content.js?v=12"></script>
 <script src="js/game/beats.js?v=12"></script>
 <script src="js/game/covers.js?v=12"></script>
 <script src="js/game/rivals.js?v=12"></script>
-<script src="js/game/actions.js?v=43"></script>
+<script src="js/game/actions.js?v=46"></script>
 <script src="js/game/events.js?v=12"></script>
-<script src="js/game/phases.js?v=12"></script>
+<script src="js/game/phases.js?v=13"></script>
 <script src="js/game/sim.js?v=21"></script>
 <script src="js/game/writer.js?v=12"></script>
 <script src="js/game/versi.js?v=12"></script>
@@ -704,12 +704,12 @@
 <script src="js/game/scene-art.js?v=14"></script>
 <script src="js/game/beatplay.js?v=14"></script>
 <script src="js/game/ui.js?v=26"></script>
-<script src="js/game/lifestyle.js?v=12"></script>
+<script src="js/game/lifestyle.js?v=14"></script>
 <script src="js/game/stile.js?v=1"></script><!-- «Lo stile che conta»: i capi addosso pesano su hype, presenza e promo -->
 <script src="js/game/fx.js?v=14"></script>
 <script src="js/game/entry.js?v=3"></script><!-- ADF_AUDIO_ENTRY_PAGE_V1 -->
 <script src="js/game/skip.js?v=15"></script>
-<script src="js/game/posto.js?v=20"></script>
+<script src="js/game/posto.js?v=25"></script>
 <script src="js/game/studio.js?v=17"></script>
 <!-- subito dopo: le schede dei beat, le take, i cursori del banco e il quando -->
 <script src="js/game/studio-elementi.js?v=5"></script>
@@ -723,16 +723,16 @@
 <!-- il Circolo: la Sala e il Live Club insieme, dentro alla pagina dei posti -->
 <script src="js/game/circolo.js?v=2"></script>
 <script src="js/game/circolo-incontri.js?v=1"></script><!-- le mosse nuove delle stanze: il bancone, il backstage, i fan -->
-<script src="js/game/circolo-stanze.js?v=1"></script><!-- le quattro stanze, sui riferimenti bancone/sala/open_mic/backstage -->
+<script src="js/game/circolo-stanze.js?v=4"></script><!-- le quattro stanze, sui riferimenti bancone/sala/open_mic/backstage -->
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=13"></script>
-<script src="js/game/strada-crimine.js?v=17"></script>
-<script src="js/game/negozio.js?v=17"></script>
+<script src="js/game/strada-crimine.js?v=43"></script>
+<script src="js/game/negozio.js?v=18"></script>
 <script src="js/game/negozio-offerte.js?v=1"></script><!-- «Le offerte della settimana»: l'offerta del lunedì e il banco dell'usato -->
 <script src="js/game/uscita.js?v=13"></script>
 <!-- le transizioni video: prima di hub.js, che le chiama dai cartelli della mappa -->
 <script src="js/game/transizioni-video.js?v=2"></script>
-<script src="js/game/hub.js?v=33"></script>
+<script src="js/game/hub.js?v=34"></script>
 <script src="js/game/chat.js?v=18"></script>
 <script src="js/game/telefono.js?v=21"></script>
 <script src="js/game/telefono-feed-gente.js?v=2"></script><!-- LaFamegram: rivali e gente della Sala postano per conto loro -->
@@ -747,20 +747,20 @@
 <script src="js/game/spostamenti.js?v=12"></script>
 <script src="js/game/interruzioni.js?v=8"></script>
 <!-- Eventi V2 prima di eventi-tempo: proprietario di skip e Notifiche. -->
-<script src="js/game/eventi-v2.js?v=1235"></script>
+<script src="js/game/eventi-v2.js?v=1244"></script>
 <!-- Eventi a minuti: azioni/spostamenti; nessuna seconda app Notifiche. -->
 <script src="js/game/eventi-tempo.js?v=13"></script>
 <script src="js/game/trasferte.js?v=5"></script>
 <!-- L'agenda: gli appuntamenti segnati dalla plancia e le notifiche che
      arrivano quando è ora. Dopo eventi-v2, che è il centro notifiche. -->
-<script src="js/game/agenda.js?v=5"></script>
+<script src="js/game/agenda.js?v=6"></script>
 <!-- Eventi lavoro: usa Eventi V2 + Agenda, senza creare un secondo calendario. -->
-<script src="js/game/lavoro-eventi.js?v=8"></script>
+<script src="js/game/lavoro-eventi.js?v=10"></script>
 <script src="js/game/crime-backgrounds.js?v=1"></script>
 <script src="js/game/jail-backgrounds.js?v=1"></script>
-<script src="js/game/strada-crimine-ui.js?v=4"></script>
+<script src="js/game/strada-crimine-ui.js?v=6"></script>
 <script src="js/game/crime-caption.js?v=1"></script>
-<script src="js/game/traphone16.js?v=1"></script>
+<script src="js/game/traphone16.js?v=3"></script>
 <!-- Meteo globale: previsione coerente e persistente, senza effetti gameplay. -->
 <script src="js/game/meteo.js?v=2"></script>
 <!-- Widget unico tempo/meteo + controlli globali. -->

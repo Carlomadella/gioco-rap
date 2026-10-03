@@ -187,6 +187,8 @@ const ADF_LAVORO_CONTRATTI = Object.freeze({
     domenicaRiposo:false,
     bonusSestoGiornoPct:20,
     bonusDomenicaPct:0,
+    ferieGiorniPerCiclo:1,
+    ferieAnticipoMinimoGiorni:1,
     cicloSettimane:4
   })
 });
@@ -258,23 +260,30 @@ const ADF_PIZZERIA_CARRIERA = Object.freeze({
      principale per scegliere questo lavoro. Il valore della Pizzeria e'
      soprattutto tempo residuo e rete sociale. */
   aumento:Object.freeze({
-    cicliNelRuolo:2,
-    affidabilita:65,
+    /* La carriera qui e' volutamente secondaria: gli aumenti arrivano
+       molto piu' raramente della Fabbrica. */
+    cicliNelRuolo:4,
+    affidabilita:72,
     maxPerRuolo:1
   }),
   promozione:Object.freeze({
-    cicliNelRuolo:4,
-    affidabilita:75,
-    cicliPerfettiNelRuolo:2
+    /* Sei cicli = circa 24 settimane nello stesso ruolo. La Pizzeria
+       puo' portare fino a Pizzaiolo, ma non in un solo anno perfetto. */
+    cicliNelRuolo:6,
+    affidabilita:80,
+    cicliPerfettiNelRuolo:3
   }),
   disciplina:Object.freeze({
+    /* Part-time: una singola assenza pesa, ma non deve trasformare la Pizzeria
+       in una Fabbrica in miniatura. Il licenziamento arriva solo dopo una
+       recidiva chiara; un ciclo perfetto recupera rapidamente un richiamo. */
     assenzeLieveMax:1,
     assenzeRichiamoMin:2,
-    richiamiPrimaLicenziamento:2,
+    richiamiPrimaLicenziamento:3,
     bloccoRiassunzioneSettimane:4,
     recuperoRichiamoCicliPerfetti:1,
-    malusLieveAffidabilita:4,
-    malusRichiamoAffidabilita:8
+    malusLieveAffidabilita:2,
+    malusRichiamoAffidabilita:6
   }),
   straordinari:Object.freeze({
     /* Le coperture extra devono esistere, non dominare il part-time. */
@@ -373,40 +382,46 @@ const ADF_LAVORO_RETE = Object.freeze({
     })
   }),
   pizzeria:Object.freeze({
-    /* La Pizzeria paga meno della Fabbrica ma espone a piu' persone.
-       L'esposizione cresce col ruolo senza trasformarsi in una macchina
-       automatica di contatti: restano cooldown, cap e molti colleghi normali. */
-    chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
+    /* Punto 15: la Pizzeria vale soprattutto come esposizione sociale.
+       Tante facce quotidiane, pochi contatti immediatamente "utili": cliente,
+       rider, fornitore e collega devono pesare piu' di rapper/promoter/fonici.
+       Nessun ruolo Strada nasce direttamente da qui. */
+    chanceIncontro:0.24, cooldownGiorni:4, minTurni:1, maxContatti:6,
     reteBonusIncontro:0.10,
-    ruoli:Object.freeze(["collega","collega","collega","rapper","promoter"]),
+    socialOnly:true,
+    ruoli:Object.freeze(["collega","collega","rider","cliente","cliente","fornitore","rapper","promoter"]),
     dettaglio:"persona conosciuta durante il servizio in Pizzeria",
     storia:"Vi siete conosciuti lavorando nello stesso giro della Pizzeria.",
     perRuolo:Object.freeze({
       lavapiatti:Object.freeze({
-        chanceIncontro:0.22, cooldownGiorni:5, minTurni:1, maxContatti:5,
+        chanceIncontro:0.24, cooldownGiorni:4, minTurni:1, maxContatti:6,
         reteBonusIncontro:0.10,
-        ruoli:Object.freeze(["collega","collega","collega","rapper","promoter"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","collega","collega","rider","cliente","cliente"]),
         dettaglio:"persona conosciuta nel retro della Pizzeria",
         storia:"Vi siete conosciuti tra cucina, lavaggio e fine servizio."
       }),
       aiuto_cucina:Object.freeze({
-        chanceIncontro:0.24, cooldownGiorni:5, minTurni:1, maxContatti:6,
+        chanceIncontro:0.26, cooldownGiorni:4, minTurni:1, maxContatti:7,
         reteBonusIncontro:0.12,
-        ruoli:Object.freeze(["collega","collega","collega","rapper","promoter","fonico"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","collega","fornitore","rider","cliente","cliente","rapper"]),
         dettaglio:"persona conosciuta muovendoti tra cucina e servizio",
         storia:"Vi siete conosciuti mentre davi una mano tra preparazioni e servizio."
       }),
       aiuto_pizzaiolo:Object.freeze({
-        chanceIncontro:0.26, cooldownGiorni:4, minTurni:1, maxContatti:7,
+        chanceIncontro:0.28, cooldownGiorni:4, minTurni:1, maxContatti:8,
         reteBonusIncontro:0.15,
-        ruoli:Object.freeze(["collega","collega","rapper","promoter","fonico","rapper"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","fornitore","rider","rider","cliente","cliente","cliente","rapper","promoter"]),
         dettaglio:"persona conosciuta durante il servizio in Pizzeria",
         storia:"Vi siete conosciuti mentre lavoravi vicino al banco e al forno."
       }),
       pizzaiolo:Object.freeze({
-        chanceIncontro:0.28, cooldownGiorni:4, minTurni:1, maxContatti:8,
+        chanceIncontro:0.30, cooldownGiorni:3, minTurni:1, maxContatti:9,
         reteBonusIncontro:0.18,
-        ruoli:Object.freeze(["collega","collega","rapper","promoter","promoter","fonico","rapper"]),
+        socialOnly:true,
+        ruoli:Object.freeze(["collega","fornitore","rider","rider","cliente","cliente","cliente","cliente","rapper","promoter"]),
         dettaglio:"persona conosciuta come riferimento del servizio",
         storia:"Vi siete conosciuti mentre eri uno dei riferimenti della Pizzeria durante il servizio."
       })
@@ -464,7 +479,11 @@ function lavoroReteChiave(job){
 function lavoroReteDef(job){
   if(!job) return null;
   const chiave = lavoroReteChiave(job);
-  const base = ADF_LAVORO_RETE[job.id] || ADF_LAVORO_RETE[chiave] || null;
+  /* Se il lavoro appartiene a una sede strutturata, la sede e' la fonte di
+     verita' anche per la rete. Questo evita che l'id della mansione iniziale
+     (es. lavapiatti) scavalchi il profilo Pizzeria e continui a usare il
+     vecchio bacino legacy dopo l'introduzione della carriera per luogo. */
+  const base = ADF_LAVORO_RETE[chiave] || ADF_LAVORO_RETE[job.id] || null;
   if(!base) return null;
 
   /* I luoghi con carriera interna possono cambiare profilo rete senza cambiare
@@ -477,8 +496,13 @@ function lavoroReteDef(job){
 
 function lavoroReteRuoli(job, cfg){
   const ruoli = Array.isArray(cfg && cfg.ruoli) ? cfg.ruoli.slice() : [];
-  /* I lavori possono esporre alla Strada, ma non devono avviare quella
-     carriera al posto del giocatore. */
+  /* Punto 15: la Pizzeria resta sociale anche se il giocatore e' gia' nella
+     Strada. Conoscere piu' persone non significa generare automaticamente
+     "conoscenze della Strada". */
+  if(lavoroReteChiave(job)==="pizzeria" || (cfg&&cfg.socialOnly===true))
+    return ruoli.filter(r => r !== "strada");
+  /* Gli altri lavori possono esporre alla Strada, ma non devono avviarla al
+     posto del giocatore. */
   if(!(G.strada && G.strada.giroAvviato))
     return ruoli.filter(r => r !== "strada");
   return ruoli;
@@ -630,7 +654,7 @@ function lavoroFerieRichiedi(luogo,targetAbsoluteDay){
 
   const ciclo=lavoroCicloDaGiornoAssoluto(target);
   if(lavoroFerieDisponibili(luogo,ciclo)<=0)
-    return {ok:false,reason:"Hai già usato i 2 giorni di ferie di quel ciclo"};
+    return {ok:false,reason:"Hai già usato " + max + (max===1 ? " giorno" : " giorni") + " di ferie di quel ciclo"};
 
   const stato=lavoroFerieStato(luogo);
   const richiesta={
@@ -1802,6 +1826,28 @@ function lavoroSegnaEventoEsitoTurno(luogo,event){
   return out.event;
 }
 
+/* Evita che una singola conoscenza diventi una sorgente infinita di rete.
+   Le ricompense ripetibili legate al lavoro hanno rendimento decrescente:
+   prima volta piena, seconda dimezzata, poi zero per quella fonte/persona. */
+function lavoroBonusRetePersona(persona,fonte,base,maxVolte){
+  if(!persona || !fonte) return 0;
+  base=Math.max(0,Number(base||0));
+  maxVolte=Math.max(1,Number(maxVolte||2));
+  if(!base) return 0;
+
+  if(!persona.workNetworkRewards || typeof persona.workNetworkRewards!=="object")
+    persona.workNetworkRewards={};
+
+  const key=String(fonte);
+  const usi=Math.max(0,Number(persona.workNetworkRewards[key]||0));
+  if(usi>=maxVolte) return 0;
+
+  const delta=usi===0 ? base : base*.5;
+  persona.workNetworkRewards[key]=usi+1;
+  if(typeof gain==="function") gain("rete",delta);
+  return delta;
+}
+
 function lavoroReteStato(luogo){
   const sede = lavoroSede(luogo);
   if(!sede) return null;
@@ -1964,6 +2010,24 @@ function lavoroSede(luogo){
   return sede;
 }
 
+/* Turni totali realmente lavorati nella sede. A differenza del cartellino
+   mensile non si azzera al cambio ciclo: serve alle storyline che dipendono
+   dal tempo realmente passato con le persone di quel posto. */
+function lavoroTurniTotaliSede(luogo){
+  const sede=lavoroSede(luogo);
+  if(!sede) return 0;
+  if(!Number.isFinite(Number(sede.totalShiftsWorked))){
+    const corrente=sede.attendance&&Array.isArray(sede.attendance.turni)
+      ? sede.attendance.turni.length : 0;
+    const rete=sede.network&&Number.isFinite(Number(sede.network.turniVisti))
+      ? Number(sede.network.turniVisti) : 0;
+    /* Migrazione prudente: usiamo solo prove di turni già persistite. */
+    sede.totalShiftsWorked=Math.max(0,corrente,rete);
+  }
+  sede.totalShiftsWorked=Math.max(0,Math.floor(Number(sede.totalShiftsWorked)||0));
+  return sede.totalShiftsWorked;
+}
+
 function lavoroCartellino(luogo){
   const ciclo = lavoroCicloCorrente();
   const sede = lavoroSede(luogo);
@@ -2050,11 +2114,15 @@ function lavoroRegistraPresenza(luogo){
   const cartellino = lavoroCartellino(luogo);
   if(!cartellino) return null;
   const pos = lavoroPosizioneOggi();
-  const stato = lavoroSede(luogo).attendance;
+  const sede=lavoroSede(luogo);
+  const stato = sede.attendance;
+  const totaliPrima=lavoroTurniTotaliSede(luogo);
   stato.turni.push(pos);
+  sede.totalShiftsWorked=totaliPrima+1;
   return {
     luogo:luogo,
     totale:stato.turni.length,
+    totaliSede:sede.totalShiftsWorked,
     oggi:stato.turni.filter(n => n === pos).length,
     ciclo:cartellino.ciclo
   };
@@ -2613,7 +2681,10 @@ const ACTIONS = [
      const f = Math.round((rnd(8,30) + presenzaSulPalco()*1.4 + G.hype*0.7) * RITMO * molt);
      const m = Math.round((rnd(20,60) + G.hype*1.4) * RITMO * molt);
      const lbb = lifeBonus();
-     G.fans += Math.round(f*lbb.live); G.money += Math.round(m*lbb.live);
+     const incassoLive=Math.round(m*lbb.live);
+     G.fans += Math.round(f*lbb.live); G.money += incassoLive;
+     if(typeof lifestyleRegistraEntrata==="function")
+       lifestyleRegistraEntrata(incassoLive,"live");
      gain("presenza", 1.2 * (giaOggi ? 0.5 : 1)); G.wellbeing -= 3;
      adfSegnaOggi("live");
      diarioBordo().live++;
@@ -2654,6 +2725,8 @@ const ACTIONS = [
        : {base:j.pay, totale:j.pay, bonus:0, percentuale:0, tipo:null, etichetta:""};
      const effettiTurno = lavoroEffettiTurno(luogoLavoroAttuale,j);
      G.money += paga.totale;
+     if(typeof lifestyleRegistraEntrata==="function")
+       lifestyleRegistraEntrata(paga.totale,"lavoro");
      G.wellbeing += Number(effettiTurno.benessere || 0);
      if(typeof addLuc === "function") addLuc(Number(effettiTurno.lucidita || 0));
      G.shifts = (G.shifts||0) + 1;

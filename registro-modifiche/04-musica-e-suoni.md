@@ -6,6 +6,174 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:39cec21b -->
+## 02/10/26, 21:24 — feature/strada-punto3-persone → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `39cec21b`
+
+### Cosa è entrato
+
+- `356f0ae9` — fix(circolo): mantieni il contratto storico del cast Sala — **mycolbraga**
+- `5336d549` — fix(circolo): preserva esplicitamente il filtro storico della Sala — **mycolbraga**
+- `0b08aa07` — chore(frontend): aggiorna cache per persone Strada persistenti — **mycolbraga**
+- `929b6979` — test(strada): copri la rivelazione criminale di un collega reale — **mycolbraga**
+- `a4a1dfa6` — feat(strada): lascia emergere il lato criminale dei colleghi reali — **mycolbraga**
+- `82bccd79` — test(persone): copri persistenza e integrazione Circolo dei contatti Strada — **mycolbraga**
+- `e4110fef` — feat(strada): registra le opportunita sulla persona reale — **mycolbraga**
+- `b295ed0b` — test(strada): richiedi persone reali per le dritta della Fabbrica — **mycolbraga**
+- `2b8ff590` — test(strada): verifica continuita della persona introduttiva — **mycolbraga**
+- `9aea26fc` — feat(circolo): mostra con continuita i contatti della Strada — **mycolbraga**
+- `c97317cd` — feat(persone): integra i contatti Strada nel Circolo senza romperne i dialoghi — **mycolbraga**
+- `a93923a6` — feat(strada): trasforma i contatti criminali in persone persistenti — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/circolo-stanze.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/test/unit/fabbrica-strada.test.js`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+
+**File interessati in questa categoria:** 6
+
+---
+
+<!-- merge:234a3d39 -->
+## 02/10/26, 18:43 — fix/pizzeria-secondo-audit → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `234a3d39`
+
+### Cosa è entrato
+
+- `72a1f5ba` — docs(roadmap): segna la Pizzeria v1 come completata — **mycolbraga**
+- `8e38e56e` — fix(tempo): completa il clock delle azioni lanciate dai luoghi — **mycolbraga**
+- `bb97d27e` — test(pizzeria): verifica che la storyline non si ripeta all'infinito — **mycolbraga**
+- `1593c29a` — fix(pizzeria): chiude le micro-storyline dopo il terzo episodio — **mycolbraga**
+- `753ccd41` — test(pizzeria): rispetta l'apertura durante lo spostamento — **mycolbraga**
+- `cba7b797` — test(pizzeria): copre tutte le fonti rete ripetibili — **mycolbraga**
+- `62bcf307` — fix(pizzeria): chiude le ultime ricompense rete ripetibili per persona — **mycolbraga**
+- `128980b2` — test(pizzeria): allinea il test storico alla carriera più lenta — **mycolbraga**
+- `93d7e7dc` — test(pizzeria): aspetta l'apertura prima del turno integrato — **mycolbraga**
+- `4668418d` — docs(famepedia): allinea carriera lenta e micro-storyline Pizzeria — **mycolbraga**
+- `eab0127d` — test(pizzeria): copre micro-storyline persistenti — **mycolbraga**
+- `e4f4c45e` — test(pizzeria): copre anti-farming dei contatti nelle chat — **mycolbraga**
+- `c3dccd69` — test(pizzeria): allinea carriera lenta e perimetro anti-farming — **mycolbraga**
+- `4a26a4e7` — test(pizzeria): usa NPC unici e prova musica-spostamento-conflitto-turno — **mycolbraga**
+- `eb27b1a5` — test(pizzeria): verifica che la carriera non domini il primo anno — **mycolbraga**
+- `ea94909f` — test(pizzeria): aggiorna stress test alla carriera più lenta — **mycolbraga**
+- `4c775ac8` — feat(pizzeria): aggiunge micro-storyline sociali persistenti — **mycolbraga**
+- `087a5bac` — fix(pizzeria): impedisce farming rete anche dalle chat — **mycolbraga**
+- `ccf97da2` — fix(pizzeria): limita l'anti-farming al solo perimetro Pizzeria — **mycolbraga**
+- `b9440958` — balance(pizzeria): rende la carriera lavorativa davvero secondaria — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/chat.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/js/game/luoghi-foto.js`
+- **Modificato:** `frontend/test/e2e/pizzeria-workflow.spec.js`
+- **Modificato:** `frontend/test/unit/fabbrica-presenze.test.js`
+- **Modificato:** `frontend/test/unit/lavori-contatti.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-bilanciamento.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-identita.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-sociale.test.js`
+
+**File interessati in questa categoria:** 13
+
+---
+
+<!-- merge:21ca4050 -->
+## 02/10/26, 17:16 — fix/pizzeria-audit-chiusura → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `21ca4050`
+
+### Cosa è entrato
+
+- `7ba40290` — test(pizzeria): allinea il playtest alla UI carriera reale — **mycolbraga**
+- `09052f97` — test(lavoro): include i contatti normali Pizzeria — **mycolbraga**
+- `b0e5b996` — feat(pizzeria): etichetta i contatti normali nel telefono — **mycolbraga**
+- `0b4f5179` — test(pizzeria): aggiunge playtest browser su 24 servizi — **mycolbraga**
+- `c9e08341` — docs(famepedia): allinea la Pizzeria al gameplay attuale — **mycolbraga**
+- `69241ac3` — test(pizzeria): blocca rete troppo musicale e farming per persona — **mycolbraga**
+- `053a0830` — balance(pizzeria): rende decrescente la rete da dialoghi e autopromo — **mycolbraga**
+- `c91996a3` — balance(pizzeria): limita la rete dai reincontri post-turno — **mycolbraga**
+- `c35ff8f5` — balance(pizzeria): limita la rete farmabile dalla stessa persona — **mycolbraga**
+- `4e8bbf38` — feat(pizzeria): descrive i nuovi contatti sociali — **mycolbraga**
+- `0658fefe` — feat(pizzeria): porta i contatti normali nelle chat persistenti — **mycolbraga**
+- `1d4e1dfc` — feat(pizzeria): aggiunge contatti normali persistenti — **mycolbraga**
+- `998b6b54` — balance(pizzeria): rende la rete soprattutto sociale, non musicale — **mycolbraga**
+- `166adb88` — test(pizzeria): blocca regressione sul contatto più recente — **mycolbraga**
+- `81977bd7` — fix(pizzeria): mostra l'ultimo contatto nel riepilogo turno — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/famepedia.js`
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/chat.js`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Modificato:** `frontend/js/game/lavoro-eventi.js`
+- **Modificato:** `frontend/js/game/posto.js`
+- **Modificato:** `frontend/js/game/telefono.js`
+- **Aggiunto:** `frontend/test/e2e/pizzeria-workflow.spec.js`
+- **Modificato:** `frontend/test/unit/lavori-contatti.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-identita.test.js`
+- **Modificato:** `frontend/test/unit/pizzeria-ui.test.js`
+
+**File interessati in questa categoria:** 11
+
+---
+
+<!-- merge:e7463e6c -->
+## 02/10/26, 17:12 — fix/mobile-creator-cache-bust → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e7463e6c`
+
+### Cosa è entrato
+
+- `1f95a22d` — fix(cache): aggiorna bridge creator nel gioco — **mycolbraga**
+- `ac801195` — fix(cache): aggiorna bridge creator sulla landing — **mycolbraga**
+- `e645ea57` — fix(cache): forza nuova versione creator RPG — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/creator/rpg-v24-bridge.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:e460a62b -->
+## 02/10/26, 14:31 — task/pizzeria-bilanciamento-playtest → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e460a62b`
+
+### Cosa è entrato
+
+- `bbbf1087` — chore(pizzeria): aggiunge comando bilanciamento dedicato — **mycolbraga**
+- `26f85365` — test(pizzeria): copre bilanciamento annuale e convivenza con la musica — **mycolbraga**
+- `e013c5a4` — test(pizzeria): aggiunge stress test economico sociale e doppia vita — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/package.json`
+- **Aggiunto:** `frontend/test/unit/pizzeria-bilanciamento.test.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:3b581dea -->
 ## 02/10/26, 11:28 — fix/pizzeria-hours-badge → main
 

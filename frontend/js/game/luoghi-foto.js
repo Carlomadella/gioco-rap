@@ -440,12 +440,12 @@ function lfCartellinoLavoro(luogo){
 function lfFabbricaCartellino(){ return lfCartellinoLavoro("fabbrica"); }
 function lfPizzeriaCartellino(){ return lfCartellinoLavoro("pizzeria"); }
 
-function lfFabbricaFerie(){
-  const r=typeof lavoroFerieRiepilogo==="function" ? lavoroFerieRiepilogo("fabbrica") : null;
+function lfFerieLavoro(luogo,nome){
+  const r=typeof lavoroFerieRiepilogo==="function" ? lavoroFerieRiepilogo(luogo) : null;
   if(!r) return '<div class="stvuoto">Ferie non disponibili.</div>';
 
   const candidati=typeof lavoroFerieCandidati==="function"
-    ? lavoroFerieCandidati("fabbrica",35)
+    ? lavoroFerieCandidati(luogo,35)
     : [];
   const ciclo=typeof lavoroCicloCorrente==="function" ? lavoroCicloCorrente() : null;
   const prenotate=(r.future||[]).slice(0,4).map(x=>
@@ -457,22 +457,27 @@ function lfFabbricaFerie(){
       (ciclo!=null && Number(x.cycle)!==Number(ciclo) ? ' · prossimo ciclo' : '')+
     '</option>'
   ).join("");
+  const max=Math.max(0,Number(r.maxPerCiclo||0));
+  const quota=max===1 ? "1 giorno ogni 4 settimane" : max+" giorni ogni 4 settimane";
 
   return '<div class="lfferie">'+
     '<div class="lfferie-head"><span>Disponibili questo ciclo</span><b>'+
-      Number(r.disponibiliCiclo||0)+'/'+Number(r.maxPerCiclo||0)+'</b></div>'+
+      Number(r.disponibiliCiclo||0)+'/'+max+'</b></div>'+
     (r.oggi ? '<div class="lfferie-today">Oggi sei in ferie.</div>' : '')+
     (prenotate ? '<div class="lfferie-list"><small>Prenotate</small>'+prenotate+'</div>' : '')+
     '<label class="lfferie-pick"><span>Richiedi un giorno</span>'+
-      '<select data-ferie-select="fabbrica" '+(options?'':'disabled')+'>'+
+      '<select data-ferie-select="'+lfEsc(luogo)+'" '+(options?'':'disabled')+'>'+
         (options || '<option>Nessun giorno disponibile</option>')+
       '</select></label>'+
-    '<button type="button" class="lfferie-btn" data-ferie-request="fabbrica" '+(options?'':'disabled')+'>Chiedi ferie</button>'+
-    '<p>Massimo 2 giorni ogni 4 settimane. La richiesta va fatta almeno il giorno prima; il giorno stesso non si recupera.</p>'+
+    '<button type="button" class="lfferie-btn" data-ferie-request="'+lfEsc(luogo)+'" '+(options?'':'disabled')+'>Chiedi ferie</button>'+
+    '<p>Massimo '+quota+'. La richiesta va fatta almeno il giorno prima; il giorno stesso non si recupera.</p>'+
   '</div>';
 }
 
-function lfRichiediFerieFabbrica(targetAbsoluteDay){
+function lfFabbricaFerie(){ return lfFerieLavoro("fabbrica","Fabbrica"); }
+function lfPizzeriaFerie(){ return lfFerieLavoro("pizzeria","Pizzeria"); }
+
+function lfRichiediFerieLavoro(luogo,nome,targetAbsoluteDay){
   if(typeof lavoroFerieRichiedi!=="function") return;
   const target=Number(targetAbsoluteDay);
   const label=typeof lavoroFerieEtichetta==="function"
@@ -480,13 +485,13 @@ function lfRichiediFerieFabbrica(targetAbsoluteDay){
     : "giorno scelto";
 
   showEvent({
-    k:"Fabbrica · Ferie",
+    k:nome+" · Ferie",
     t:"Chiedere ferie?",
     d:"Vuoi usare un giorno di ferie per <b>"+lfEsc(label)+"</b>? Quel giorno non farai il turno e non verrà contato come assenza.",
     annulla(){},
     opts:[
       {n:"Conferma ferie",d:"La richiesta viene registrata adesso",run(){
-        const out=lavoroFerieRichiedi("fabbrica",target);
+        const out=lavoroFerieRichiedi(luogo,target);
         if(!out || !out.ok)
           return {t:out&&out.reason ? out.reason : "La richiesta non è disponibile.",c:"bad"};
         if(typeof pushLog==="function")
@@ -499,6 +504,13 @@ function lfRichiediFerieFabbrica(targetAbsoluteDay){
       {n:"Annulla",d:"Non usi nessun giorno",run(){ return null; }}
     ]
   });
+}
+
+function lfRichiediFerieFabbrica(targetAbsoluteDay){
+  return lfRichiediFerieLavoro("fabbrica","Fabbrica",targetAbsoluteDay);
+}
+function lfRichiediFeriePizzeria(targetAbsoluteDay){
+  return lfRichiediFerieLavoro("pizzeria","Pizzeria",targetAbsoluteDay);
 }
 
 function lfDimissioniLavoro(luogo, nome){
@@ -540,11 +552,11 @@ function lfSegnoTurno(v,unita){
   return (n>0?"+":n<0?"−":"")+Math.abs(n)+(unita||"");
 }
 
-function lfFabbricaEsitoTurno(){
+function lfEsitoTurnoLavoro(luogo){
   const e=LUOGO.esito||{};
   const p=LUOGO.prima||{};
   const out=typeof lavoroUltimoEsitoTurno==="function"
-    ? lavoroUltimoEsitoTurno("fabbrica")
+    ? lavoroUltimoEsitoTurno(luogo)
     : null;
   const pay=out&&out.pay ? out.pay : {};
   const presenza=out&&out.attendance ? out.attendance : null;
@@ -585,6 +597,9 @@ function lfFabbricaEsitoTurno(){
     '</div>';
 }
 
+function lfFabbricaEsitoTurno(){ return lfEsitoTurnoLavoro("fabbrica"); }
+function lfPizzeriaEsitoTurno(){ return lfEsitoTurnoLavoro("pizzeria"); }
+
 function lfCarrieraSegno(v){
   const n=Number(v||0);
   return (n>0?"+":n<0?"−":"")+Math.abs(n);
@@ -602,9 +617,9 @@ function lfCarrieraReq(label,req,suffisso){
   '</div>';
 }
 
-function lfFabbricaCarriera(){
+function lfCarrieraLavoro(luogo){
   const p=typeof lavoroProgressoCarriera==="function"
-    ? lavoroProgressoCarriera("fabbrica")
+    ? lavoroProgressoCarriera(luogo)
     : null;
   if(!p) return '<div class="stvuoto">Progressione non disponibile.</div>';
 
@@ -655,6 +670,9 @@ function lfFabbricaCarriera(){
     '<p class="lfcareer-note">Le soglie aprono una <b>candidatura</b>: aumento e promozione arrivano come proposta di carriera dopo un turno, non automaticamente.</p>'+
   '</div>';
 }
+
+function lfFabbricaCarriera(){ return lfCarrieraLavoro("fabbrica"); }
+function lfPizzeriaCarriera(){ return lfCarrieraLavoro("pizzeria"); }
 
 function lfFabbrica(){
   const baseDef = (typeof JOBS !== "undefined" ? JOBS : []).find(j => j.id === "operaio");
@@ -820,6 +838,10 @@ function lfPizzeria(){
     e:G.job.e,
     d:G.job.d || baseDef.d
   } : baseDef;
+  const effettiRuolo = mio && typeof lavoroEffettiTurno === "function"
+    ? lavoroEffettiTurno("pizzeria", G.job)
+    : null;
+  const energiaTurno = effettiRuolo ? Number(effettiRuolo.energia || def.e) : def.e;
 
   let stato = {ok:true, perche:""};
   let orario = "Turno serale";
@@ -849,12 +871,20 @@ function lfPizzeria(){
   else if(bloccoRiassunzione.active)
     stato = {ok:false, perche:"Riassunzione bloccata · " + bloccoRiassunzione.weeksRemaining +
       (bloccoRiassunzione.weeksRemaining === 1 ? " settimana" : " settimane")};
-  else if(stato.ok && G.energy < def.e) stato = {ok:false, perche:"Serve energia"};
+  else if(stato.ok && G.energy < energiaTurno) stato = {ok:false, perche:"Serve energia"};
+
+  const caricoRuolo = effettiRuolo
+    ? (lfSegnoTurno(Number(effettiRuolo.benessere || 0)) + " benessere · " +
+       lfSegnoTurno(Number(effettiRuolo.lucidita || 0)) + " lucidità" +
+       (effettiRuolo.fisico ? " · fisico " + lfEsc(effettiRuolo.fisico) : "") +
+       (effettiRuolo.stress ? " · stress " + lfEsc(effettiRuolo.stress) : ""))
+    : null;
 
   const sx = lfPan("La cucina",
     lfRiga("Mansione", def.n) +
     lfRiga("Paga", fmt(def.pay) + " €", "oro") +
-    lfRiga("Costo", "−" + def.e + " energia") +
+    lfRiga("Costo", "−" + energiaTurno + " energia") +
+    (caricoRuolo ? lfRiga("Impatto servizio", caricoRuolo) : "") +
     '<p class="stnota lfnotasotto">' + lfEsc(def.d) + '</p>' +
     (mio
       ? '<button type="button" class="lfdimissioni" data-dimissioni="pizzeria">Dai le dimissioni</button>'
@@ -884,7 +914,7 @@ function lfPizzeria(){
     on:true,
     n:mio ? "Il tuo servizio" : "Posto da lavapiatti",
     d:orario + (quota ? " · " + quota + " turni/settimana" : ""),
-    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + def.e + " energia") : stato.perche,
+    v:stato.ok ? (fmt(pagaTurno.totale) + " €" + notaBonus + " · −" + energiaTurno + " energia") : stato.perche,
     vCls:stato.ok ? "" : "calmo"
   });
 
@@ -895,14 +925,18 @@ function lfPizzeria(){
       : "Leggi e firma il contratto";
   const azioneLavoro = mio ? ' data-vai="turno"' : ' data-lavoro="' + baseDef.id + '"';
 
-  const mid = lfPan(mio ? "Prima del servizio" : "Vuoi lavorare qui?",
+  const mid = LUOGO.esito && LUOGO.esito.a === "turno" && mio
+    ? lfPan("Servizio completato", lfPizzeriaEsitoTurno(), "spunta")
+    : lfPan(mio ? "Prima del servizio" : "Vuoi lavorare qui?",
     '<p class="stnota">' +
       (mio
         ? (straordinarioOggi
             ? '<b>Copertura extra concordata oggi:</b> ' + lfEsc(straordinarioOggi.targetLabel) +
+              (straordinarioOggi.scenarioLabel ? ' · ' + lfEsc(straordinarioOggi.scenarioLabel) : '') +
               ' · maggiorazione +' + Number(straordinarioOggi.bonusPct || 0) + '%.'
             : straordinarioAccettato
               ? '<b>Copertura extra concordata:</b> ' + lfEsc(straordinarioAccettato.targetLabel) +
+                (straordinarioAccettato.scenarioLabel ? ' · ' + lfEsc(straordinarioAccettato.scenarioLabel) : '') +
                 ' · maggiorazione +' + Number(straordinarioAccettato.bonusPct || 0) + '%.'
               : pagaTurno.percentuale
                 ? '<b>' + lfEsc(pagaTurno.etichetta) + ':</b> hai già coperto i quattro servizi del contratto; questo turno è pagato di più.'
@@ -917,11 +951,13 @@ function lfPizzeria(){
       (stato.ok ? "" : " disabled") + '>' + lfIco("orologio") + lfEsc(testo) +
       ' · +' + fmt(pagaTurno.totale) + ' €' +
       (pagaTurno.percentuale ? ' (+' + pagaTurno.percentuale + '%)' : '') +
-      ' · −' + def.e + ' energia</button></div>' +
+      ' · −' + energiaTurno + ' energia</button></div>' +
     (stato.ok ? "" : '<p class="stperche">' + lfEsc(stato.perche) + '.</p>'),
     "orologio");
 
-  const dx = lfPan("Settimane in cucina", lfPizzeriaCartellino(), "orologio");
+  const dx = lfPan("Settimane in cucina", lfPizzeriaCartellino(), "orologio") +
+    (mio ? lfPan("Ferie", lfPizzeriaFerie(), "orologio") : "") +
+    (mio ? lfPan("Carriera", lfPizzeriaCarriera(), "spunta") : "");
 
   return {sx:sx, mid:mid, dx:dx};
 }
@@ -990,6 +1026,23 @@ if(typeof mostraScena === "function"){
         ? LUOGO.id : null;
     const id = a && (LUOGO_MOSSE[a.id] || turnoLuogo);
     if(!id) return lfScenaOriginale.apply(this, arguments);
+
+    /* ui.js chiude normalmente il clock con azioneFatta() prima di mostrare
+       la scena. Quando però la mossa parte da una pagina luogo già aperta,
+       overlayAperto() è vero e quel commit viene saltato: soldi/turno cambiano
+       ma l'orologio resta fermo. La scena locale è già la conferma che a.run()
+       è terminata, quindi qui completiamo la stessa transazione una sola volta.
+       Se un evento alto ha davvero sospeso l'azione, non la forziamo. */
+    try{
+      const sospesa = window.GAME_TIME && typeof GAME_TIME.suspended==="function"
+        ? GAME_TIME.suspended() : null;
+      const pendente = window.GAME_TIME && typeof GAME_TIME.pending==="function"
+        ? GAME_TIME.pending() : false;
+      if(pendente && !sospesa && typeof azioneFatta==="function") azioneFatta();
+    }catch(e){
+      console.error("[Anni di Fame] luoghi-foto: chiusura tempo azione",e);
+    }
+
     const esito = {a:a.id, msg:String(msg == null ? "" : msg), extra:String(extra == null ? "" : extra)};
     const mostra = () => {
       /* arrivata da fuori (una card degli eventi, l'agenda): la pagina si apre
@@ -1072,11 +1125,15 @@ if($("luogo")){
       return;
     }
     const ferie = e.target.closest("[data-ferie-request]");
-    if(ferie && !ferie.disabled && ferie.dataset.ferieRequest==="fabbrica"){
-      const select=$("luogo").querySelector('[data-ferie-select="fabbrica"]');
-      const target=select ? Number(select.value) : NaN;
-      if(Number.isFinite(target)) lfRichiediFerieFabbrica(target);
-      return;
+    if(ferie && !ferie.disabled){
+      const luogoFerie=ferie.dataset.ferieRequest;
+      if(luogoFerie==="fabbrica" || luogoFerie==="pizzeria"){
+        const select=$("luogo").querySelector('[data-ferie-select="'+luogoFerie+'"]');
+        const target=select ? Number(select.value) : NaN;
+        const nomeFerie=luogoFerie==="fabbrica" ? "Fabbrica" : "Pizzeria";
+        if(Number.isFinite(target)) lfRichiediFerieLavoro(luogoFerie,nomeFerie,target);
+        return;
+      }
     }
     const dimissioni = e.target.closest("[data-dimissioni]");
     if(dimissioni && !dimissioni.disabled){

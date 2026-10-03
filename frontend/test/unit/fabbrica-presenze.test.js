@@ -368,8 +368,9 @@ describe("cartellino presenze Fabbrica", () => {
     const css=leggi("css/luoghi-foto.css");
 
     expect(luoghi).toContain('lfPan("Ferie", lfFabbricaFerie(), "orologio")');
-    expect(luoghi).toContain('data-ferie-select="fabbrica"');
-    expect(luoghi).toContain('data-ferie-request="fabbrica"');
+    expect(luoghi).toContain('function lfFerieLavoro(luogo,nome)');
+    expect(luoghi).toContain("data-ferie-select=");
+    expect(luoghi).toContain("data-ferie-request=");
     expect(luoghi).toContain('const inFerie = feriePosizioni.has(pos) && !n;');
     expect(luoghi).toContain('il giorno stesso non si recupera');
     expect(hub).toContain('<b>Ferie</b>');
@@ -1594,7 +1595,9 @@ describe("cartellino presenze Fabbrica", () => {
     const css = leggi("css/luoghi-foto.css");
 
     expect(luoghi).toContain("function lfFabbricaCarriera()");
-    expect(luoghi).toContain('lavoroProgressoCarriera("fabbrica")');
+    expect(luoghi).toContain('function lfCarrieraLavoro(luogo)');
+    expect(luoghi).toContain('lavoroProgressoCarriera(luogo)');
+    expect(luoghi).toContain('function lfFabbricaCarriera(){ return lfCarrieraLavoro("fabbrica"); }');
     expect(luoghi).toContain('lfPan("Carriera", lfFabbricaCarriera(), "spunta")');
     expect(luoghi).toContain("Prossimo ruolo");
     expect(luoghi).toContain("Grado massimo raggiunto");
@@ -1680,7 +1683,7 @@ describe("Pizzeria strutturata", () => {
     expect(paga.etichetta).toBe("5° giorno");
   });
 
-  it("due assenze su quattro generano il richiamo Pizzeria e -8 affidabilità", () => {
+  it("due assenze su quattro generano il richiamo Pizzeria e -6 affidabilità", () => {
     const ctx = ctxBase({day:7});
     vm.runInContext(`
       G.workplaces = {
@@ -1699,7 +1702,7 @@ describe("Pizzeria strutturata", () => {
     expect(out.warningAdded).toBe(1);
     expect(out.dismissed).toBe(false);
     expect(vm.runInContext('lavoroCarriera("pizzeria").warnings', ctx)).toBe(1);
-    expect(vm.runInContext('lavoroCarriera("pizzeria").reliability', ctx)).toBe(42);
+    expect(vm.runInContext('lavoroCarriera("pizzeria").reliability', ctx)).toBe(44);
   });
 
   it("un ciclo 4/4 perfetto Pizzeria vale +8 affidabilità", () => {
@@ -1733,8 +1736,8 @@ describe("Pizzeria strutturata", () => {
         pizzeria:{
           contract:{signed:true,legacy:false,signedAbsoluteDay:1,roleAtSign:"lavapiatti"},
           career:{
-            reliability:76,cyclesCompleted:4,perfectCycles:3,perfectStreak:2,
-            cyclesInRole:4,perfectCyclesInRole:2,roleId:"lavapiatti",roleLevel:0,
+            reliability:82,cyclesCompleted:6,perfectCycles:4,perfectStreak:3,
+            cyclesInRole:6,perfectCyclesInRole:3,roleId:"lavapiatti",roleLevel:0,
             raisesByRole:{lavapiatti:1},payHistory:[],roleHistory:[],warnings:0,
             warningHistory:[],weeklyEvaluations:[],dismissals:0,blockedUntilWeek:null,evaluations:[]
           }

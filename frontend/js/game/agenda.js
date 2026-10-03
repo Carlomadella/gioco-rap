@@ -76,9 +76,17 @@
      nessuno — quello che serve è sapere cosa c'è **da qui a domenica**. Se la
      settimana è agli sgoccioli e non è rimasto niente, si mostra lo stesso
      quello che c'è stato, segnato «passato». */
+  function crimineSbloccato(){
+    try{
+      if(typeof stradaAttivitaSbloccate==="function") return !!stradaAttivitaSbloccate();
+    }catch(_){}
+    return !!(G.strada && G.strada.badgeSbloccato);
+  }
+
   function settimanali(){
     const seme = (Number(G.year) || 1) * 53 + (Number(G.week) || 1);
-    const giro = SETTIMANALI.map((_, i) => SETTIMANALI[(i + seme) % SETTIMANALI.length]);
+    const disponibili = SETTIMANALI.filter(e => !e.strada || crimineSbloccato());
+    const giro = disponibili.map((_, i) => disponibili[(i + seme) % disponibili.length]);
     const oggi = G.day || 1;
     const avanti = giro.filter(e => e.giorno >= oggi);
     const dietro = giro.filter(e => e.giorno < oggi);
@@ -89,6 +97,10 @@
   function ag(){
     if(!G.agenda || typeof G.agenda !== "object") G.agenda = {voci:[], ultimoGiorno:0};
     if(!Array.isArray(G.agenda.voci)) G.agenda.voci = [];
+    /* Prima dello sblocco non deve trapelare neppure un vecchio appuntamento
+       criminale rimasto in un salvataggio pulito. */
+    if(!crimineSbloccato())
+      G.agenda.voci = G.agenda.voci.filter(v => v && v.id!=="colpo");
     /* gli appuntamenti già onorati oggi (vedi onora): i salvataggi di prima
        non li hanno, si parte da vuoto */
     if(!Array.isArray(G.agenda.onorati)) G.agenda.onorati = [];

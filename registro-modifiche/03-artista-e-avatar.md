@@ -6,6 +6,95 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:dfe55047 -->
+## 03/10/26, 07:04 — feature/strada-punto18-lifestyle-reddito → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `dfe55047`
+
+### Cosa è entrato
+
+- `5f1d0a44` — CI: ritenta verifica Strada punto 18 — **mycolbraga**
+- `b38df1a2` — Audit: aggiorna i gate Shop per il rischio lifestyle — **mycolbraga**
+- `4b3c8710` — Merge main into feature/strada-punto18-lifestyle-reddito — **mycolbraga**
+- `8f785fa9` — Cache: aggiorna Strada punto 18 — **mycolbraga**
+- `28482e1d` — Fix audit: correggi newline gate lifestyle — **mycolbraga**
+- `1430fad0` — Audit: copri il rischio lifestyle progressivo — **mycolbraga**
+- `e75b0d97` — Test: snapshot completo per il valore vestiti — **mycolbraga**
+- `91cebc3a` — Fix: allinea testo e calcolo del rischio lifestyle — **mycolbraga**
+- `bbbc7469` — Fix: rendi progressivo il rischio lifestyle durante la settimana — **mycolbraga**
+- `54af0653` — Audit: aggiungi gate Strada punto 18 — **mycolbraga**
+- `f281fc4e` — Test: lifestyle e reddito giustificabile — **mycolbraga**
+- `490fde59` — Strada punto 18: cachet e tour tra le entrate giustificabili — **mycolbraga**
+- `488da8da` — Strada punto 18: anticipo etichetta giustifica il tenore di vita — **mycolbraga**
+- `22a9bacf` — Strada punto 18: vestiti come spesa visibile — **mycolbraga**
+- `4c1e993c` — Strada punto 18: trasferte tra entrate e spese visibili — **mycolbraga**
+- `dfe051ef` — Strada punto 18: collega attività e UI al rischio lifestyle — **mycolbraga**
+- `de2e31ca` — Strada punto 18: chiudi il rischio lifestyle a fine settimana — **mycolbraga**
+- `ad068d3f` — Strada punto 18: lavoro e live come reddito giustificabile — **mycolbraga**
+- `35596335` — Strada punto 18: rischio lifestyle su media mobile — **mycolbraga**
+- `53471b89` — Strada punto 18: stato rischio lifestyle — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/actions.js`
+- **Modificato:** `frontend/js/game/lifestyle.js`
+- **Modificato:** `frontend/js/game/negozio.js`
+- **Modificato:** `frontend/js/game/phases.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-lifestyle-reddito.test.js`
+
+**File interessati in questa categoria:** 11
+
+---
+
+<!-- merge:e7463e6c -->
+## 02/10/26, 17:12 — fix/mobile-creator-cache-bust → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `e7463e6c`
+
+### Cosa è entrato
+
+- `1f95a22d` — fix(cache): aggiorna bridge creator nel gioco — **mycolbraga**
+- `ac801195` — fix(cache): aggiorna bridge creator sulla landing — **mycolbraga**
+- `e645ea57` — fix(cache): forza nuova versione creator RPG — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/creator/rpg-v24-bridge.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+
+**File interessati in questa categoria:** 3
+
+---
+
+<!-- merge:40f251c0 -->
+## 02/10/26, 17:00 — fix/mobile-creator-avatar-scroll → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `40f251c0`
+
+### Cosa è entrato
+
+- `62b2c2ed` — test(mobile): copre scroll selezione avatar — **mycolbraga**
+- `75058ec5` — fix(mobile): abilita scroll scelta Avaturn MakeHuman — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/media/creator-rpg-v24/creator.html`
+- **Modificato:** `frontend/test/e2e/mobile-landscape.spec.js`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:2353662 -->
 ## 30/09/26, 12:23 — task/circolo-viewport-avatar → main
 

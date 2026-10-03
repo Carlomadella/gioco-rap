@@ -68,8 +68,8 @@ describe("identità gameplay Pizzeria", () => {
     const pizzeria = vm.runInContext("ADF_PIZZERIA_CARRIERA",ctx);
     const fabbrica = vm.runInContext("ADF_FABBRICA_CARRIERA",ctx);
 
-    expect(pizzeria.aumento.cicliNelRuolo).toBe(2);
-    expect(pizzeria.promozione.cicliNelRuolo).toBe(4);
+    expect(pizzeria.aumento.cicliNelRuolo).toBe(4);
+    expect(pizzeria.promozione.cicliNelRuolo).toBe(6);
     expect(pizzeria.promozione.cicliNelRuolo).toBeGreaterThan(fabbrica.promozione.cicliNelRuolo);
     expect(pizzeria.straordinari.chanceSestoGiorno).toBeLessThan(fabbrica.straordinari.chanceSestoGiorno);
     expect(pizzeria.straordinari.chanceDomenica).toBeLessThan(fabbrica.straordinari.chanceDomenica);
@@ -84,16 +84,16 @@ describe("identità gameplay Pizzeria", () => {
 
     const base = vm.runInContext("lavoroReteDef(G.job)",ctx);
     expect(base.roleId).toBe("lavapiatti");
-    expect(base.maxContatti).toBe(5);
-    expect(base.chanceIncontro).toBe(.22);
+    expect(base.maxContatti).toBe(6);
+    expect(base.chanceIncontro).toBe(.24);
     expect(base.chanceIncontro).toBeGreaterThan(vm.runInContext("ADF_LAVORO_RETE.fabbrica.chanceIncontro",ctx));
 
     ctx.G.job.id="pizzaiolo"; ctx.G.job.n="Pizzaiolo";
     const top = vm.runInContext("lavoroReteDef(G.job)",ctx);
     expect(vm.runInContext("lavoroReteChiave(G.job)",ctx)).toBe("pizzeria");
     expect(top.roleId).toBe("pizzaiolo");
-    expect(top.maxContatti).toBe(8);
-    expect(top.chanceIncontro).toBe(.28);
+    expect(top.maxContatti).toBe(9);
+    expect(top.chanceIncontro).toBe(.30);
     expect(top.reteBonusIncontro).toBeGreaterThan(base.reteBonusIncontro);
   });
 
@@ -125,11 +125,61 @@ describe("identità gameplay Pizzeria", () => {
     expect(G.skills.rete).toBeCloseTo(.10);
     expect(G.workplaces.pizzeria.network.history[0].networkBonus).toBeCloseTo(.10);
 
-    G.day=8;
+    G.week=2;
+    G.day=3;
     ctx.postoContattoLavoroCandidato=()=>persone[0];
     const ripreso = vm.runInContext('lavoroTentaIncontroContatto("pizzeria",0,G.job)',ctx);
     expect(ripreso.id).toBe(nuovo.id);
     expect(G.skills.rete).toBeCloseTo(.10);
     expect(G.workplaces.pizzeria.network.history.at(-1).networkBonus).toBe(0);
   });
+
+  it("mantiene una maggioranza di contatti normali a ogni livello Pizzeria", () => {
+    const ctx = contesto({
+      year:1,week:1,day:2,
+      job:{id:"lavapiatti",place:"pizzeria",n:"Lavapiatti",pay:100,e:18},
+      strada:{giroAvviato:false}
+    });
+    const musicali=new Set(["rapper","promoter","fonico","beatmaker","videomaker"]);
+    const ruoli=["lavapiatti","aiuto_cucina","aiuto_pizzaiolo","pizzaiolo"];
+
+    for(const id of ruoli){
+      ctx.G.job.id=id;
+      const cfg=vm.runInContext("lavoroReteDef(G.job)",ctx);
+      const pool=Array.from(cfg.ruoli);
+      const utili=pool.filter(x=>musicali.has(x)).length;
+      expect(utili).toBeLessThan(pool.length/2);
+    }
+  });
+
+  it("limita la rete ottenibile ripetendo la stessa interazione con la stessa persona", () => {
+    const G={
+      year:1,week:1,day:2,
+      job:{id:"lavapiatti",place:"pizzeria",n:"Lavapiatti",pay:100,e:18},
+      workplaces:{},gente:[],skills:{rete:0},strada:{giroAvviato:false}
+    };
+    const ctx=contesto(G,{
+      gain:(skill,v)=>{ G.skills[skill]=Number(G.skills[skill]||0)+Number(v||0); }
+    });
+    const p={id:"p1"};
+
+    ctx.p=p;
+    expect(vm.runInContext('lavoroBonusRetePersona(p,"social",0.2,2)',ctx)).toBeCloseTo(.2);
+    expect(vm.runInContext('lavoroBonusRetePersona(p,"social",0.2,2)',ctx)).toBeCloseTo(.1);
+    expect(vm.runInContext('lavoroBonusRetePersona(p,"social",0.2,2)',ctx)).toBe(0);
+    expect(G.skills.rete).toBeCloseTo(.3);
+    expect(p.workNetworkRewards.social).toBe(2);
+  });
+
+
+  it("conserva l'anti-farming del popup nel solo perimetro Pizzeria", () => {
+    const eventi=leggi("js/game/eventi-v2.js");
+    const start=eventi.indexOf("function adfWorkContactAfterShift");
+    const end=eventi.indexOf("function hookMatches",start);
+    const block=eventi.slice(start,end);
+
+    expect(block).toContain('if(chiave==="pizzeria" && typeof lavoroBonusRetePersona==="function")');
+    expect(block).toContain('else if(typeof gain==="function") gain("rete",0.2)');
+  });
+
 });

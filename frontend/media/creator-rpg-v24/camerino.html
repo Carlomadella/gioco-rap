@@ -537,16 +537,23 @@ input.disabled{opacity:.45}
   position:relative;
   width:100%;
   height:100%;
+  min-width:0;
+  min-height:0;
   overflow:hidden;
   background:#101014;
 }
-#avaturnFrameHost iframe{
+/* Avaturn crea e gestisce questo iframe. Dimensioniamo il contenitore e
+   applichiamo solo il minimo indispensabile al frame: niente min-size
+   forzate che possono creare un viewport virtuale più grande su mobile. */
+#avaturnFrameHost .avaturn-frame{
   width:100%!important;
   height:100%!important;
-  min-width:100%!important;
-  min-height:100%!important;
+  min-width:0!important;
+  min-height:0!important;
   border:0!important;
   display:block!important;
+  pointer-events:auto!important;
+  touch-action:auto!important;
 }
 .avaturn-loading{
   position:absolute;
@@ -1281,6 +1288,281 @@ html,body,button,input,select{
   }
 }
 
+/* ============================================================
+   ADF_CAMERINO_MOBILE_LANDSCAPE_V1
+   Mobile vero: niente sidebar desktop compressa. Personaggio a sinistra,
+   azioni essenziali a destra, progress minimale sotto.
+   ============================================================ */
+@media (orientation:landscape) and (max-width:980px) and (max-height:520px){
+  html,body,.stage{
+    width:100%;
+    height:100%;
+    min-height:100%;
+    overflow:hidden;
+  }
+
+  .brand{display:none!important}
+
+  .status{
+    left:max(10px,env(safe-area-inset-left,0px))!important;
+    right:auto!important;
+    top:max(8px,env(safe-area-inset-top,0px))!important;
+    max-width:54vw;
+    text-align:left!important;
+    font-size:7px!important;
+    line-height:1.15!important;
+    letter-spacing:.10em!important;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .status b{
+    display:inline!important;
+    margin:0 0 0 5px!important;
+    font-size:7px!important;
+    letter-spacing:.03em!important;
+  }
+
+  .room-exit{
+    left:auto!important;
+    right:max(10px,env(safe-area-inset-right,0px))!important;
+    top:max(6px,env(safe-area-inset-top,0px))!important;
+    min-width:104px;
+    min-height:36px;
+    padding:0 9px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(255,255,255,.10)!important;
+    border-radius:9px;
+    background:rgba(12,12,15,.58)!important;
+    color:#d8d0c4!important;
+    backdrop-filter:blur(10px);
+    font-size:7.5px!important;
+    letter-spacing:.075em!important;
+  }
+
+  .viewer{
+    left:0!important;
+    right:auto!important;
+    top:40px!important;
+    bottom:49px!important;
+    width:57vw!important;
+    height:auto!important;
+    transform:none!important;
+  }
+
+  .adf-empty-avatar{
+    left:49%!important;
+    top:48%!important;
+    width:43vw!important;
+  }
+  .adf-empty-avatar strong{
+    font-size:15px!important;
+    margin-bottom:4px!important;
+  }
+  .adf-empty-avatar span{
+    font-size:8.5px!important;
+    line-height:1.32!important;
+  }
+
+  .room-tools{
+    left:auto!important;
+    right:max(7px,env(safe-area-inset-right,0px))!important;
+    top:45px!important;
+    bottom:51px!important;
+    width:min(350px,41vw)!important;
+    max-height:none!important;
+    transform:none!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior:contain!important;
+    padding:5px!important;
+    border-radius:13px!important;
+  }
+
+  .room-tools .group{
+    flex:0 0 auto!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:6px 7px!important;
+    border-radius:9px!important;
+  }
+
+  /* L'azione primaria viene prima: entrando da Avaturn il tasto è subito lì. */
+  .room-tools .appearance-card{order:1}
+  .room-tools .avatar-summary{order:2}
+  .room-tools .view-card{order:3}
+  .room-tools .continue-card{order:4}
+
+  .room-tools .group label{
+    margin:0 0 4px!important;
+    font-size:6.7px!important;
+    line-height:1!important;
+    letter-spacing:.07em!important;
+  }
+  .room-tools .group label b{font-size:6.7px!important}
+
+  .avatar-summary{
+    min-height:31px!important;
+    padding:5px 7px!important;
+  }
+  .avatar-summary label{margin-bottom:2px!important}
+  .avatar-summary .status-line{
+    min-height:11px!important;
+    font-size:6.8px!important;
+    line-height:1.15!important;
+  }
+  .avatar-summary .room-help{display:none!important}
+
+  .appearance-card .av-small,
+  .view-card .av-small,
+  .continue-card .av-small{
+    display:none!important;
+  }
+
+  .room-tools .appearance-card .av-main-btn{
+    min-height:39px!important;
+    border-radius:8px!important;
+    font-size:7.6px!important;
+  }
+  .room-tools .appearance-card .av-switch-btn{
+    min-height:28px!important;
+    margin-top:4px!important;
+    border-radius:7px!important;
+    font-size:6.7px!important;
+  }
+
+  .view-card{padding-bottom:6px!important}
+  .room-view-buttons{gap:3px!important}
+  .room-view-buttons button{
+    min-height:31px!important;
+    padding:0 4px!important;
+    border-radius:7px!important;
+    font-size:6.7px!important;
+  }
+
+  .continue-card .av-next-btn{
+    min-height:38px!important;
+    border-radius:8px!important;
+    font-size:7.5px!important;
+  }
+
+  .room-progress{
+    left:max(7px,env(safe-area-inset-left,0px))!important;
+    right:max(7px,env(safe-area-inset-right,0px))!important;
+    bottom:max(4px,env(safe-area-inset-bottom,0px))!important;
+    width:auto!important;
+    min-height:41px!important;
+    height:41px!important;
+    transform:none!important;
+    grid-template-columns:1fr 16px 1fr 16px 1fr!important;
+    gap:2px!important;
+    padding:3px 5px!important;
+    border-radius:11px!important;
+  }
+  .room-progress-step{
+    min-height:31px!important;
+    grid-template-columns:21px 1fr!important;
+    grid-template-rows:1fr!important;
+    column-gap:4px!important;
+    padding:2px 4px!important;
+  }
+  .room-progress-step span{
+    grid-row:auto!important;
+    width:21px!important;
+    height:21px!important;
+    font-size:6.5px!important;
+  }
+  .room-progress-step b{
+    font-size:6.6px!important;
+    letter-spacing:.07em!important;
+  }
+  .room-progress-step small{display:none!important}
+
+  /* Avaturn vero occupa tutto lo schermo. Su mobile evitiamo anche
+     opacity/pointer-events animati sul genitore di un iframe cross-origin:
+     display on/off è più robusto per il touch nei browser mobili. */
+  .avaturn-overlay{
+    position:fixed!important;
+    inset:0!important;
+    display:none!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    touch-action:auto!important;
+    transition:none!important;
+  }
+  .avaturn-overlay.open{
+    display:block!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+  }
+  .avaturn-shell{
+    inset:0!important;
+    width:100dvw!important;
+    height:100dvh!important;
+    min-width:0!important;
+    min-height:0!important;
+    border:0!important;
+    border-radius:0!important;
+    grid-template-rows:32px minmax(0,1fr)!important;
+  }
+  .avaturn-head{
+    min-width:0!important;
+    min-height:0!important;
+    gap:7px!important;
+    padding:0 7px 0 9px!important;
+  }
+  #avaturnFrameHost{
+    width:100%!important;
+    height:auto!important;
+    min-width:0!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    touch-action:auto!important;
+  }
+  #avaturnFrameHost .avaturn-frame{
+    width:100%!important;
+    height:100%!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:none!important;
+    max-height:none!important;
+    pointer-events:auto!important;
+    touch-action:auto!important;
+  }
+  .avaturn-head .av-brand,
+  .avaturn-head .av-tip{
+    display:none!important;
+  }
+  .avaturn-head .av-section{
+    font-size:7.5px!important;
+    letter-spacing:.10em!important;
+  }
+  .avaturn-close{
+    width:30px!important;
+    height:30px!important;
+    border-radius:7px!important;
+    font-size:17px!important;
+  }
+}
+
+@media (orientation:landscape) and (max-width:760px) and (max-height:420px){
+  .viewer{width:56vw!important}
+  .room-tools{
+    width:42vw!important;
+    right:5px!important;
+  }
+  .room-exit{
+    min-width:96px;
+    font-size:7px!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1417,6 +1699,18 @@ let initializedByParent = false;
 let currentSource = null;
 let previewOnlyMode = false;
 
+function isMobileLandscapeRoom(){
+  return !!(
+    window.matchMedia &&
+    window.matchMedia('(orientation:landscape) and (max-width:980px) and (max-height:520px)').matches
+  );
+}
+
+/* Nel camerino mobile l'avatar arriva da un editor che mostra già il corpo
+   intero: qui il controllo utile di default è il volto. Sul desktop conserviamo
+   la vista intera storica. */
+let currentView = isMobileLandscapeRoom() ? 'face' : 'full';
+
 let renderer, scene, camera, controls, avatarRoot = null;
 let bones = {}, rest = {};
 let currentUrl = '';
@@ -1509,7 +1803,7 @@ function initViewer(){
   if(typeof ResizeObserver !== 'undefined'){
     const viewerResizeObserver = new ResizeObserver(()=>{
       resize();
-      if(avatarRoot) fitFull();
+      if(avatarRoot) applyRoomView(currentView,{syncButtons:false});
     });
     viewerResizeObserver.observe(viewer);
   }
@@ -1633,6 +1927,14 @@ function applyRoomVisualCenter(){
 
   camera.clearViewOffset?.();
 
+  /* In mobile landscape il canvas occupa già soltanto la metà libera a sinistra
+     della sidebar. Applicare anche il viewOffset calcolato sul viewport intero
+     spostava una seconda volta l'avatar verso sinistra. */
+  if(isMobileLandscapeRoom()){
+    camera.updateProjectionMatrix();
+    return;
+  }
+
   const sidebar=document.querySelector('.room-tools');
   if(!sidebar){
     camera.updateProjectionMatrix();
@@ -1714,6 +2016,25 @@ function fitFace({visualCenter=true}={}){
     camera.updateProjectionMatrix();
   }
   controls.update();
+}
+
+function syncViewButtons(){
+  document.querySelectorAll('[data-view]').forEach(btn=>{
+    btn.classList.toggle('on',btn.dataset.view===currentView);
+  });
+}
+
+function applyRoomView(view,{syncButtons=true}={}){
+  currentView=view==='face' ? 'face' : 'full';
+  if(syncButtons) syncViewButtons();
+  if(!avatarRoot) return;
+  currentView==='face' ? fitFace() : fitFull();
+}
+
+function applyDefaultRoomView(){
+  currentView=isMobileLandscapeRoom() ? 'face' : 'full';
+  syncViewButtons();
+  if(avatarRoot) applyRoomView(currentView,{syncButtons:false});
 }
 
 /* ADF_AVATURN_DETERMINISTIC_PROPIC_V1
@@ -1872,7 +2193,7 @@ async function loadAvatar(data,force=false){
     avatarDot.classList.add('ok');
     avatarMeta.textContent=[currentSource==='local'?'Locale':(currentSource==='avaturn'?'Avaturn':'Avatar'),data.gender||'',data.bodyId||'',data.avatarId?'ID salvato':''].filter(Boolean).join(' · ') || 'Avatar pronto';
     statusTop.textContent=(currentSource==='local' ? 'LOCALE' : (currentSource==='avaturn' ? 'AVATURN' : 'AVATAR'))+' · avatar pronto · camerino';
-    fitFull();
+    applyDefaultRoomView();
   },undefined,err=>{
     if(loadGeneration!==avatarLoadGeneration) return;
     console.error(err);
@@ -1895,6 +2216,7 @@ function renderLoop(){
 const overlay=$('avaturnOverlay');
 const frameHost=$('avaturnFrameHost');
 let sdk=null, sdkPromise=null;
+let avaturnDirectWindow=null;
 
 async function ensureSdk(){
   if(sdk) return sdk;
@@ -1906,6 +2228,20 @@ async function ensureSdk(){
       url:'https://demo.avaturn.dev',
       iframeClassName:'avaturn-frame'
     });
+
+    /* Il frame viene creato dal SDK. Su mobile deve restare un target touch
+       autonomo: nessuna dimensione minima ereditata dal vecchio layout e
+       scrolling esplicitamente consentito per i webview/browser più rigidi. */
+    const avaturnFrame=frameHost.querySelector('iframe');
+    if(avaturnFrame){
+      avaturnFrame.setAttribute('title','Editor Avaturn');
+      avaturnFrame.setAttribute('scrolling','yes');
+      avaturnFrame.style.setProperty('pointer-events','auto','important');
+      avaturnFrame.style.setProperty('touch-action','auto','important');
+      avaturnFrame.style.setProperty('min-width','0','important');
+      avaturnFrame.style.setProperty('min-height','0','important');
+    }
+
     $('avaturnLoading')?.remove();
 
     sdk.on('export',data=>{
@@ -1937,11 +2273,42 @@ function closeEditor(){
   overlay.setAttribute('aria-hidden','true');
 }
 
+function mobileAvaturnTopLevelEnabled(){
+  return !!(
+    window.parent!==window &&
+    window.matchMedia &&
+    window.matchMedia('(orientation:landscape) and (max-width:980px) and (max-height:520px)').matches
+  );
+}
+
 $('openAvaturn').onclick=()=>{
   if(currentSource!=='avaturn' && currentSource!=='local'){
     toast('Editor del personaggio non determinato'); return;
   }
-  if(currentSource==='avaturn'){ openEditor(); return; }
+  if(currentSource==='avaturn'){
+    if(mobileAvaturnTopLevelEnabled()){
+      /* Questa chiamata avviene direttamente dentro l'handler del tap.
+         Niente bridge intermedio: il browser vede chiaramente la user activation. */
+      const url=new URL('avaturn-mobile.html?v=3',location.href).href;
+      let win=null;
+      try{
+        win=window.open(url,'adf-avaturn-mobile');
+      }catch(e){}
+
+      if(win){
+        avaturnDirectWindow=win;
+        try{win.focus();}catch(e){}
+        return;
+      }
+
+      /* Non torniamo più silenziosamente al portal rotto: se il browser blocca
+         la finestra, lo diciamo esplicitamente all'utente. */
+      toast('Il browser ha bloccato Avaturn. Consenti popup per questa pagina e riprova.');
+      return;
+    }
+    openEditor();
+    return;
+  }
   if(window.parent!==window){
     window.parent.postMessage({type:'adf-avatar-room-edit-request',source:'local'},'*'); return;
   }
@@ -1966,14 +2333,14 @@ document.addEventListener('keydown',e=>{
 
 document.querySelectorAll('[data-view]').forEach(btn=>{
   btn.onclick=()=>{
-    document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('on',x===btn));
-    btn.dataset.view==='face' ? fitFace() : fitFull();
+    applyRoomView(btn.dataset.view);
   };
 });
 
 $('resetCamera').onclick=()=>{
-  document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('on',x.dataset.view==='full'));
-  fitFull();
+  /* "Centra" mantiene l'inquadratura scelta: su mobile non deve riportare
+     automaticamente alla figura intera. */
+  applyRoomView(currentView);
 };
 
 function optionHtml(items, current){
@@ -2083,7 +2450,7 @@ function applyParentInit(msg){
     resize();
     requestAnimationFrame(()=>{
       resize();
-      if(avatarRoot) fitFull();
+      if(avatarRoot) applyRoomView(currentView);
     });
   });
   roomMode=msg.mode==='edit' ? 'edit' : 'new';
@@ -2125,9 +2492,51 @@ function applyParentInit(msg){
 
 window.addEventListener('message',e=>{
   const msg=e.data||{};
-  if(msg.type==='adf-avatar-room-init') applyParentInit(msg);
+
+  /* La pagina mobile dedicata è aperta DIRETTAMENTE dal camerino; il suo
+     window.opener è quindi questo frame. Gestiamo export/cancel qui. */
+  if(
+    avaturnDirectWindow &&
+    e.source===avaturnDirectWindow &&
+    e.origin===location.origin
+  ){
+    if(msg.type==='adf-rpg-v24-avaturn-window-export' && msg.data?.url){
+      const saved=saveExport(msg.data);
+      avaturnDirectWindow=null;
+      if(saved?.url){
+        loadAvatar(saved,true);
+        toast('Avatar aggiornato');
+      }
+      return;
+    }
+    if(msg.type==='adf-rpg-v24-avaturn-window-cancel'){
+      avaturnDirectWindow=null;
+      return;
+    }
+  }
+
+  if(msg.type==='adf-avatar-room-init'){
+    applyParentInit(msg);
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-export'){
+    const saved=saveExport(msg.data||{});
+    if(saved?.url){
+      loadAvatar(saved,true);
+      toast('Avatar aggiornato');
+    }
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-fallback'){
+    openEditor();
+    return;
+  }
+  if(msg.type==='adf-avatar-room-avaturn-mobile-cancel'){
+    return;
+  }
 });
 
+syncViewButtons();
 initViewer();
 resetRoomVisual();
 window.parent.postMessage({type:'adf-avatar-room-ready'},'*');

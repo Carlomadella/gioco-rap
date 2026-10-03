@@ -34,7 +34,48 @@ const START = () => ({
   promoSaturation:{key:"", baseFans:0, pctUsed:0},
   /* punto 21: la Strada. Ricostruita da claude/carriera-criminale.md */
   strada:{rep:0, heat:0, sporchi:0, uomini:0, prot:0, ferro:false, avvocato:false,
+    /* Punto Strada 12: rep resta il valore globale legacy/compatibile.
+       Lo storico globale vive qui; la fiducia personale resta invece dentro
+       ogni persona (p.strada.fiducia) e non viene duplicata. */
+    repStato:{history:[]},
+    protezioneStato:{providerPersonId:null,providerName:null,level:0,source:null,prepaidWeekKey:null,history:[]},
+    avvocatoStato:{personId:null,name:null,retained:false,source:null,prepaidWeekKey:null,history:[]},
+    ferroStato:{sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null,lastCheckAbsoluteDay:null,nextOfferAbsoluteDay:null,pending:null,history:[]},
+    offerteColpi:{absoluteDay:null,ids:[],previousIds:[]},
     attivita:{}, precedenti:0, arresto:null, giroAvviato:false,
+    /* Punto Strada 1: il mondo criminale nasce nascosto. La "strana proposta"
+       apre una fase introduttiva di due lavoretti protetti; solo dopo compare
+       il badge Attività criminali e il giro diventa stabile. */
+    badgeSbloccato:false,
+    ingressoFase:"locked",
+    ingressoPersonaId:null,
+    ingressoPersonaNome:null,
+    ingressoTentativi:0,
+    ingressoLastOfferAbsoluteDay:null,
+    ingressoNextOfferAbsoluteDay:null,
+    ingressoLastShownAbsoluteDay:null,
+    /* Punto Strada 2: gli sblocchi devono esistere nel mondo. Il TrapPhone
+       non è più un oggetto sempre disponibile: conserva chi l'ha consegnato
+       e quando è entrato davvero nella vita del personaggio. */
+    traphone:{owned:false,sourcePersonId:null,sourceName:null,acquiredAbsoluteDay:null,source:null},
+    /* Punto Strada 11: nessun rango criminale persistito. Salviamo soltanto
+       gli eventi di rete realmente accaduti e i loro cooldown. */
+    reteInfluenza:{lastCheckAbsoluteDay:null,nextEventAbsoluteDay:null,pending:null,history:[],connectionsMade:0},
+    /* Punto Strada 18: niente dichiarazione fiscale da compilare. Conserviamo
+       soltanto il totale delle entrate giustificabili e delle spese visibili
+       della settimana, più quattro snapshot per rendere il rischio stabile. */
+    rischioLifestyle:{key:null,entrate:0,fonti:{},speseExtra:0,speseFonti:{},
+      history:[],closedKey:null,last:null},
+    /* Punto Strada 19: l'heat non è solo una barra. Qui resta la memoria
+       minima degli effetti che ha prodotto sul mondo (porte chiuse, richieste
+       di abbassare il profilo, controlli). La cautela delle persone resta
+       invece sulla persona stessa, non duplicata qui. */
+    heatMondo:{lastStopRequestAbsoluteDay:null,history:[]},
+    /* Punto Strada 21: mollare il giro ferma la partecipazione, non cancella
+       la storia. La memoria residua viene misurata in giorni assoluti e può
+       durare da pochi mesi a diversi anni in base a quanto eri coinvolto. */
+    uscitaGiro:{mollato:false,leftAbsoluteDay:null,profondita:0,memoryUntilAbsoluteDay:null,
+      lastKnockAbsoluteDay:null,history:[]},
     /* Proposte che nascono FUORI dal lavoro quando la carriera criminale è
        già avviata. Campo top-level di strada così i vecchi salvataggi lo
        ricevono automaticamente dal merge difensivo di partitaDaSalvataggio(). */
@@ -97,7 +138,7 @@ const CHIAVE_PARTITA = () => (typeof slotKey === "function" ? slotKey(SAVE_KEY) 
    `strada.giroAvviato` mancante è un salvataggio di prima del flag, e
    stradaGiroAvviato() lo ricava dalle prove (precedenti, ferro, attività).
    Messo a false da qui, una carriera criminale vecchia tornava «pulita». */
-const NON_COMPLETARE = {strada:["giroAvviato"]};
+const NON_COMPLETARE = {strada:["giroAvviato","badgeSbloccato","traphone"]};
 function partitaDaSalvataggio(dati){
   const base = START(), g = Object.assign(base, dati || {});
   const iniziali = START();

@@ -160,10 +160,22 @@ const CC_CITAZIONI = {
   giornalista:{aperto:"Scrivo di chi suona qui. Magari un giorno di te.",
     diffidente:"Le storie belle le scopro da sola, non me le vendono.",
     gasato:"Un mio articolo e domani ti conoscono tutti.",
-    pratico:"Dammi una notizia vera e la scrivo."}
+    pratico:"Dammi una notizia vera e la scrivo."},
+  strada:{aperto:"Qui la gente parla molto. Io preferisco ricordarmi chi mantiene la parola.",
+    diffidente:"Se devo dirti qualcosa, te la dico quando serve. Non prima.",
+    gasato:"Conosco più facce di quante ne voglia vedere tutte insieme.",
+    pratico:"Le cose semplici funzionano: orario giusto, posto giusto, poche parole."},
+  avvocato:{aperto:"Fuori dal tribunale preferisco conoscere le persone prima dei loro problemi.",
+    diffidente:"Prima capisco chi ho davanti, poi eventualmente si parla di lavoro.",
+    gasato:"Di situazioni brutte ne ho viste parecchie. Quasi tutte potevano essere gestite meglio.",
+    pratico:"Se un giorno ti serve davvero, meglio conoscerci prima che dopo."},
+  vita:{aperto:"Alla fine ci si incontra sempre negli stessi posti.",
+    diffidente:"Prima capisco con chi sto parlando, poi mi apro.",
+    gasato:"La provincia è piccola: se giri abbastanza, conosci tutti.",
+    pratico:"Parliamo chiaro e ci capiamo prima."}
 };
 function ccCitazione(p){
-  const c = CC_CITAZIONI[p.ruolo] || CC_CITAZIONI.rapper;
+  const c = CC_CITAZIONI[p.ruolo] || CC_CITAZIONI.vita;
   return circoloSconosciuto(p) ? "Ti guarda, ma non ha ancora detto niente." : (p.scoperto ? c[p.car] : c.aperto);
 }
 function ccSala(f){
@@ -200,6 +212,8 @@ function ccSala(f){
           '<ul><li>' + ccIco("info") + 'Città di provincia</li>' +
             (gen ? '<li>' + ccIco("nota") + ccEsc(gen) + '</li>' : "") +
             '<li>' + ccIco("gente") + (p.fama >= 30 ? "Conosce molti nella scena locale" : "Gira nel giro da poco") + '</li>' +
+            (p.strada && p.strada.known ? '<li>' + ccIco("rischio") + 'Sai che è collegato alla Strada' +
+              (typeof stradaFiduciaEtichetta==="function" ? ' · fiducia: ' + stradaFiduciaEtichetta(p) : '') + '</li>' : "") +
             (p.scoperto ? '<li>' + ccIco("faccia") + 'Carattere: ' + (CIRCOLO_CARATTERE[p.car] || p.car) + '</li>' : "") +
           '</ul></div>' +
         '<div class="cc-shfoto">' + ccFaccia(p) + '</div>' +

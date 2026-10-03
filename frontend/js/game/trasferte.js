@@ -818,6 +818,8 @@ function accetta(iid){
     resa:{fan:0, hype:0, soldi:0}, conosciuti:[], righe:[], daFare:null
   };
   G.money -= inv.offerta.viaggio;
+  if(typeof lifestyleRegistraSpesaVisibile==="function")
+    lifestyleRegistraSpesaVisibile(inv.offerta.viaggio,"viaggio",.35);
   G.energy = Math.max(0, (G.energy || 0) - Math.round(inv.offerta.energia * .35));
   aggiornaBadge();
   salva();
@@ -889,6 +891,8 @@ function applicaEvento(e, riuscito){
   G.fans += fan;
   G.hype = cl((G.hype || 0) + hype, 0, 100);
   G.money += soldi;
+  if(typeof lifestyleRegistraEntrata==="function")
+    lifestyleRegistraEntrata(soldi,"trasferta");
   G.wellbeing = cl((G.wellbeing || 0) + (e.well || 0), 0, 100);
   G.energy = Math.max(0, (G.energy || 0) - Math.round(a.offerta.energia * .65 * (e.energia == null ? 1 : e.energia)));
   if(e.skill && typeof gain === "function")
@@ -1309,6 +1313,8 @@ const OCCASIONI = {
     run(p){
       const soldi = Math.round(120 + (p.fama || 10) * 9);
       G.money += soldi;
+      if(typeof lifestyleRegistraEntrata==="function")
+        lifestyleRegistraEntrata(soldi,"data-fuori-citta");
       const f = Math.round(70 + (G.fans || 0) * .03);
       G.fans += f;
       cittaStato(p.citta).rep = cl((cittaStato(p.citta).rep || 0) + 5, 0, 100);
