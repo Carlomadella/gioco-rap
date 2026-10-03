@@ -8,6 +8,7 @@ const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const appartenenze=fs.readFileSync(path.join(ROOT,"js/game/npc-appartenenze.js"),"utf8");
 const selezione=fs.readFileSync(path.join(ROOT,"js/game/npc-selezione.js"),"utf8");
+const geografia=fs.readFileSync(path.join(ROOT,"js/game/npc-geografia.js"),"utf8");
 const posto=fs.readFileSync(path.join(ROOT,"js/game/posto.js"),"utf8");
 
 function blocco(source,start,end){
@@ -23,6 +24,7 @@ function runtime(){
   vm.createContext(ctx);
   vm.runInContext(appartenenze,ctx);
   vm.runInContext(selezione,ctx);
+  vm.runInContext(geografia,ctx);
   return window;
 }
 
@@ -228,5 +230,26 @@ describe("NPC · punto 8 selezione e ricomparsa",()=>{
     fn(2);
     expect(a.circoloPresenze).toBe(2);
     expect(b.circoloPresenze).toBe(2);
+  });
+
+  it("il Circolo può riusare un contatto Trasferte rientrato davvero in provincia",()=>{
+    const w=runtime();
+    const rientrato=p("f1",{rel:10,fuori:true,citta:"milano"});
+    const ancoraFuori=p("f2",{rel:99,fuori:true,citta:"roma"});
+    w.ADF_NPC_GEOGRAFIA.sposta(rientrato,{
+      cittaId:"provincia",dalGiorno:2,fonte:"evento:rientro"
+    });
+    const G={year:1,week:1,day:2,gente:[ancoraFuori,rientrato]};
+    const fn=new Function(
+      "window","G","sistemaGente","postoSoloLavoro","postoLegamiAttivi","postoUltimaConseguenzaMondo",
+      blocco(posto,"function presentiOggi(quanti)","/* ==================== DOVE SI INCONTRA")+\
+        "\nreturn presentiOggi;"
+    )(
+      w,G,()=>{},()=>false,()=>[],()=>null
+    );
+
+    expect(fn(1)).toEqual([rientrato]);
+    expect(rientrato.fuori).toBe(true);
+    expect(ancoraFuori.circoloPresenze).toBeUndefined();
   });
 });
