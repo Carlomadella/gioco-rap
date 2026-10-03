@@ -1444,6 +1444,33 @@ test("punto 15: il lavoro Pizzeria non produce direttamente lead crime",
   lavoroEventi.includes('if(workKey(job)==="pizzeria") return false') &&
   lavoroEventi.includes("function showCrime(job,s,roll)"));
 
+test("punto 16: le persone possono avere legami sociali persistenti e bidirezionali",
+  posto.includes("function postoReteLegami(p)") &&
+  posto.includes("function postoCollegaPersone(a,b,motivo)") &&
+  posto.includes("function postoLegamiAttivi(p)") &&
+  posto.includes('reason:motivo||"contatto-comune"'));
+test("punto 16: il Circolo favorisce ricorrenze e contatti comuni senza regalare il nome",
+  posto.includes("circoloPresenze") &&
+  posto.includes("postoLegamiAttivi(p).reduce") &&
+  posto.includes("circoloUltimoVistoKey") &&
+  posto.includes("Ricordiamo solo che la faccia è passata dal Circolo"));
+test("punto 16: le opportunità del mondo hanno una causa narrativa persistente",
+  crime.includes("function stradaCausaOpportunita(variante,trigger)") &&
+  crime.includes("networkCauseText") &&
+  crime.includes("introducedByPersonId") &&
+  crime.includes('postoCollegaPersone(causa.introducedBy,p,"strada-introduzione")'));
+test("punto 16: nome dato e ponte costruiscono davvero la rete tra persone",
+  crime.includes('postoCollegaPersone(requester,candidato,"strada-nome")') &&
+  crime.includes('postoCollegaPersone(a,b,"strada-ponte")') &&
+  crime.includes('postoCollegaPersone(persona,nuovo,"strada-referral")'));
+test("punto 16: la UI spiega perché una persona si fa viva",
+  ev.includes("Come ci sei arrivato:") &&
+  ev.includes("Perché ti cerca:") &&
+  ev.includes("networkCauseText"));
+test("punto 16: i salvataggi legacy non ricevono una provenienza inventata",
+  crime.includes('type:"legacy"') &&
+  crime.includes("prima che il gioco iniziasse a tracciare il passaparola"));
+
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
   !crime.includes("Math.floor(Math.max(0, G.money) / STRADA_UOMO_UPKEEP)") &&

@@ -2622,6 +2622,9 @@ function adfStreetOpportunityDecision(proposta){
   const terminiDi=p=>typeof stradaDescriviOpportunita==="function"
     ? stradaDescriviOpportunita(p)
     : "";
+  const causaDi=p=>p&&p.networkCauseText
+    ? "<span><b>Come ci sei arrivato:</b> "+p.networkCauseText+"</span><br>"
+    : "";
   const risultatoLead=lead=>{
     if(!lead) return {t:"La proposta non è più disponibile.",c:""};
     let colpo=lead.colpoId||"indicato";
@@ -2642,7 +2645,7 @@ function adfStreetOpportunityDecision(proposta){
     const righe=scelte.map(p=>{
       const termini=terminiDi(p);
       return "<b>"+(p.persona||"Un contatto")+" · "+(p.titolo||"Proposta")+"</b><br>"+
-        (p.pitch||"Ti spiega cosa vuole.")+
+        causaDi(p)+(p.pitch||"Ti spiega cosa vuole.")+
         (termini ? "<br><span>"+termini+"</span>" : "");
     }).join("<br><br>");
 
@@ -2681,7 +2684,7 @@ function adfStreetOpportunityDecision(proposta){
   showEvent({
     k:"Strada · Proposta",
     t:singola.titolo||"Una proposta",
-    d:"<b>"+(singola.persona||"La persona")+":</b> "+(singola.pitch||"Ti spiega cosa vuole.")+
+    d:causaDi(singola)+"<b>"+(singola.persona||"La persona")+":</b> "+(singola.pitch||"Ti spiega cosa vuole.")+
       (termini ? "<br><br><b>Se accetti:</b> "+termini+"." : "")+
       "<br><br>L'offerta resta valida per <b>"+Number(singola.durataGiorni||7)+" giorni</b>.",
     annulla(){
@@ -2900,11 +2903,14 @@ function adfStreetOpportunityAfterAction(a){
   }catch(_){}
 
   const multipla=scelte.length>1;
+  const causaBreve=p=>p&&p.networkCauseText
+    ? "<b>Perché ti cerca:</b> "+p.networkCauseText+"<br>"
+    : "";
   const corpo=multipla
     ? "Il <b>TrapPhone</b> vibra più di una volta. Non hai ricevuto un grado nuovo: semplicemente, ormai più persone pensano a te.<br><br>"+
-      scelte.map(p=>"<b>"+(p.persona||"Un contatto")+":</b> "+(p.intro||"«Ho una cosa da proporti.»")).join("<br><br>")
+      scelte.map(p=>causaBreve(p)+"<b>"+(p.persona||"Un contatto")+":</b> "+(p.intro||"«Ho una cosa da proporti.»")).join("<br><br>")
     : "Più tardi vibra il <b>TrapPhone</b>: è il canale che ti hanno dato proprio per queste cose."+
-      "<br><br><b>"+(proposta.persona||"La persona")+":</b> "+
+      "<br><br>"+causaBreve(proposta)+"<b>"+(proposta.persona||"La persona")+":</b> "+
       (proposta.intro||"«Ho una cosa da proporti.»");
 
   afterClear(()=>showEvent({
