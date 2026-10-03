@@ -224,19 +224,43 @@
     return Object.freeze(out);
   }
 
+  function scopriLegame(p,personId,dettagli,meta){
+    persona(p);
+    const id=testo(personId,"personId");
+    const d=dettagli&&typeof dettagli==="object"?dettagli:{};
+    const fatti=[{tipo:"legame-esistenza",id}];
+
+    if(d.tipo!=null) fatti.push({tipo:"legame-tipo",id,valore:testo(d.tipo,"tipo legame")});
+    if(d.percezione!=null)
+      fatti.push({tipo:"legame-percezione",id,valore:testo(d.percezione,"percezione legame")});
+    if(d.sottotipo!=null)
+      fatti.push({tipo:"legame-sottotipo",id,valore:testo(d.sottotipo,"sottotipo legame")});
+
+    /* Validazione completa prima di scrivere: una richiesta incoerente non
+       deve lasciare una discovery parziale. */
+    for(const fatto of fatti){
+      if(!esiste(p,fatto))
+        throw new RangeError("non si puo scoprire un fatto non presente nella PERSONA");
+    }
+
+    return Object.freeze(fatti.map(fatto=>scopri(p,fatto,meta)));
+  }
+
   function profilo(p){
     persona(p);
     const legacyCar=(typeof p.car==="string" &&
       sa(p,{tipo:"carattere-legacy",id:p.car})) ? p.car : null;
+    const prov=sa(p,{tipo:"provenienza"}) &&
+      p.identita&&p.identita.provenienza
+      ? Object.freeze({...p.identita.provenienza})
+      : null;
 
     return Object.freeze({
       personId:p.id,
       carattereLegacy:legacyCar,
       tratti:trattiConosciuti(p),
       interessi:interessiConosciuti(p),
-      provenienza:sa(p,{tipo:"provenienza"})
-        ? (p.identita&&p.identita.provenienza)||null
-        : null,
+      provenienza:prov,
       appartenenze:appartenenzeConosciute(p),
       legami:legamiConosciuti(p)
     });
@@ -252,6 +276,7 @@
     interessiConosciuti,
     appartenenzeConosciute,
     legamiConosciuti,
+    scopriLegame,
     profilo
   });
 })(typeof window!=="undefined"?window:globalThis);
