@@ -78,27 +78,29 @@ test("la UI crime reale usa quattro offerte e non consuma il tempo due volte", a
   expect(errori).toEqual([]);
 });
 
-test("la mappa mantiene il gate 18:00 e il carcere resta accessibile sempre", async ({ page }) => {
+test("Attività criminali resta accessibile 24/7 e il carcere ha comunque priorità", async ({ page }) => {
   await page.goto("/pagine/gioco.html");
   await page.waitForFunction(() => window.GAME_HOURS && window.GAME);
 
   const stato = await page.evaluate(() => {
     G.strada.arresto=null;
-    const prima=GAME_HOURS.placeStatus("crimin",17*60);
-    const apertura=GAME_HOURS.placeStatus("crimin",18*60);
+    const mattina=GAME_HOURS.placeStatus("crimin",9*60);
+    const pomeriggio=GAME_HOURS.placeStatus("crimin",15*60);
+    const notte=GAME_HOURS.placeStatus("crimin",2*60+24*60);
     G.strada.arresto={settimane:2,colpo:"test"};
     const carcere=GAME_HOURS.placeStatus("crimin",10*60);
     G.strada.arresto=null;
     return {
-      prima:{open:prima.open,label:prima.label},
-      apertura:{open:apertura.open,label:apertura.label},
+      mattina:{open:mattina.open,allDay:mattina.allDay,label:mattina.label},
+      pomeriggio:{open:pomeriggio.open,allDay:pomeriggio.allDay,label:pomeriggio.label},
+      notte:{open:notte.open,allDay:notte.allDay,label:notte.label},
       carcere:{open:carcere.open,jail:carcere.jail,label:carcere.label}
     };
   });
 
-  expect(stato.prima.open).toBe(false);
-  expect(stato.prima.label).toContain("18:00");
-  expect(stato.apertura.open).toBe(true);
+  expect(stato.mattina).toEqual({open:true,allDay:true,label:"Sempre aperto"});
+  expect(stato.pomeriggio).toEqual({open:true,allDay:true,label:"Sempre aperto"});
+  expect(stato.notte).toEqual({open:true,allDay:true,label:"Sempre aperto"});
   expect(stato.carcere).toEqual({
     open:true,
     jail:true,
