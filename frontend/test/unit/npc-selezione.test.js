@@ -242,7 +242,7 @@ describe("NPC · punto 8 selezione e ricomparsa",()=>{
     const G={year:1,week:1,day:2,gente:[ancoraFuori,rientrato]};
     const fn=new Function(
       "window","G","sistemaGente","postoSoloLavoro","postoLegamiAttivi","postoUltimaConseguenzaMondo",
-      blocco(posto,"function presentiOggi(quanti)","/* ==================== DOVE SI INCONTRA")+\
+      blocco(posto,"function presentiOggi(quanti)","/* ==================== DOVE SI INCONTRA")+
         "\nreturn presentiOggi;"
     )(
       w,G,()=>{},()=>false,()=>[],()=>null
