@@ -1394,7 +1394,7 @@ test("punto 13: chi ti copre può creare un debito personale che un successo fut
 test("punto 13: fallimenti ripetuti possono trasformare tensione in rivalità",
   crime.includes("function stradaModificaTensionePersona") &&
   crime.includes('stradaModificaTensionePersona(personaLead,1,"opportunita-failure")') &&
-  crime.includes('type:"rivalry-start"') &&
+  crime.includes('stradaRegistraConseguenzaPersona(p,"rivalry-start"') &&
   crime.includes("!st.rivalita"));
 test("punto 13: un successo forte può produrre una presentazione reale in G.gente",
   crime.includes("function stradaPresentazioneDopoSuccesso") &&
