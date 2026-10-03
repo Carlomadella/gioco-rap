@@ -1901,7 +1901,15 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
      l'offerta, lo storico e ogni ricomparsa futura. */
   if(trigger!=="fabbrica" || legacy===true){
     const key=variante.contactKey||stradaContattoKey(variante.persona);
-    const causa=stradaCausaOpportunita(variante,trigger);
+    const causa=legacy===true
+      ? {
+          type:"legacy",
+          person:null,
+          introducedBy:null,
+          text:"Questo contatto era già attivo prima che il gioco iniziasse a tracciare il passaparola fra le persone.",
+          label:"Contatto già attivo"
+        }
+      : stradaCausaOpportunita(variante,trigger);
     const esistente=causa&&causa.person ? causa.person : (G.gente||[]).find(x=>x && !x.via &&
       ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
     if(esistente && esistente.strada && esistente.strada.known &&
