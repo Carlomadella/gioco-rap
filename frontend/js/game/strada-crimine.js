@@ -1074,6 +1074,57 @@ function stradaRegistraConseguenzaPersona(p,type,meta){
   return e;
 }
 
+/* Punto Strada 17: porta l'esito criminale sulla relazione generale della
+   stessa persona. In questo modo un collega/Frequentatore del Circolo non
+   dimentica quello che è successo appena cambia schermata. Se quella persona
+   era arrivata tramite una presentazione reale, una versione attenuata
+   dell'esito torna anche a chi aveva fatto il nome: il passaparola del punto
+   16 produce quindi conseguenze, non solo accessi. */
+function stradaEcoMondo(p,tipo,punti,meta){
+  if(!p || p.via || typeof postoRegistraConseguenzaMondo!=="function") return null;
+
+  const m=meta&&typeof meta==="object" ? meta : {};
+  const diretto=postoRegistraConseguenzaMondo(p,tipo,punti,{
+    source:"strada",
+    reason:m.reason||tipo,
+    relatedPersonId:m.relatedPersonId||null,
+    relatedPersonName:m.relatedPersonName||null,
+    context:m.context||"strada"
+  });
+
+  const st=stradaPersonaMeta(p);
+  let passaparola=null;
+  if(m.noHearsay!==true && st.introducedByPersonId){
+    const introd=stradaPersonaDaId(st.introducedByPersonId);
+    if(introd && introd.id!==p.id && !introd.via){
+      const ecoPunti=Number(punti)>0 ? 1 : Number(punti)<0 ? -1 : 0;
+      passaparola=postoRegistraConseguenzaMondo(
+        introd,
+        "street-hearsay-"+String(tipo||"consequence"),
+        ecoPunti,
+        {
+          source:"strada",
+          reason:"passaparola-"+String(tipo||"consequence"),
+          relatedPersonId:p.id,
+          relatedPersonName:p.n,
+          context:"passaparola"
+        }
+      );
+      if(ecoPunti) stradaModificaFiducia(introd,ecoPunti,"passaparola-"+String(tipo||"consequence"));
+    }
+  }
+
+  if(diretto && diretto.relChanged && typeof pushLog==="function"){
+    const nomeRel=typeof relNome==="function" ? relNome(p) : "un rapporto diverso";
+    pushLog(
+      "<b>Con "+p.n+" la cosa esce dalla Strada.</b> Anche il rapporto fra voi cambia: "+nomeRel+".",
+      Number(punti)<0 ? "bad" : "good"
+    );
+  }
+
+  return {direct:diretto,hearsay:passaparola};
+}
+
 function stradaModificaDebitoPersona(p,delta,reason){
   if(!p || p.via || !delta) return 0;
   const st=stradaPersonaMeta(p);
@@ -2467,7 +2518,14 @@ function stradaRifiutaOpportunita(){
   const oggi=stradaAbsDay();
   for(const proposta of proposte){
     const persona=stradaPersonaDaId(proposta.personId);
-    if(persona) stradaRegistraInterazione(persona,"opportunity-declined");
+    if(persona){
+      stradaRegistraInterazione(persona,"opportunity-declined");
+      /* Dire no in faccia non viene punito: resta però memoria della scelta,
+         così una successiva scena con la stessa persona non nasce dal nulla. */
+      stradaEcoMondo(persona,"street-opportunity-declined",0,{
+        reason:"opportunity-declined",context:"trap-phone"
+      });
+    }
     st.history.push({
       type:"declined",
       absoluteDay:oggi,
@@ -2493,7 +2551,12 @@ function stradaIgnoraOpportunita(){
   const oggi=stradaAbsDay();
   for(const proposta of proposte){
     const persona=stradaPersonaDaId(proposta.personId);
-    if(persona) stradaIgnoraContatto(persona,"opportunity-ignored");
+    if(persona){
+      stradaIgnoraContatto(persona,"opportunity-ignored");
+      stradaEcoMondo(persona,"street-opportunity-ignored",-1,{
+        reason:"opportunity-ignored",context:"trap-phone"
+      });
+    }
     st.history.push({
       type:"ignored",
       absoluteDay:oggi,
@@ -2674,6 +2737,14 @@ function stradaRisolviEventoRete(personId){
 
     stradaModificaFiducia(requester,2,"rete-nome-dato");
     stradaModificaFiducia(candidato,2,"rete-presentato");
+    stradaEcoMondo(requester,"street-network-favor",1,{
+      reason:"rete-nome-dato",context:"rete",noHearsay:true,
+      relatedPersonId:candidato.id,relatedPersonName:candidato.n
+    });
+    stradaEcoMondo(candidato,"street-network-introduction",1,{
+      reason:"rete-presentato",context:"rete",noHearsay:true,
+      relatedPersonId:requester.id,relatedPersonName:requester.n
+    });
     stradaAggiungiFavore(requester,1,"rete-nome-dato");
     if(typeof postoCollegaPersone==="function")
       postoCollegaPersone(requester,candidato,"strada-nome");
@@ -2694,6 +2765,14 @@ function stradaRisolviEventoRete(personId){
 
     stradaModificaFiducia(a,3,"rete-ponte");
     stradaModificaFiducia(b,3,"rete-ponte");
+    stradaEcoMondo(a,"street-network-bridge",1,{
+      reason:"rete-ponte",context:"rete",noHearsay:true,
+      relatedPersonId:b.id,relatedPersonName:b.n
+    });
+    stradaEcoMondo(b,"street-network-bridge",1,{
+      reason:"rete-ponte",context:"rete",noHearsay:true,
+      relatedPersonId:a.id,relatedPersonName:a.n
+    });
     stradaAggiungiFavore(a,1,"rete-ponte");
     stradaAggiungiFavore(b,1,"rete-ponte");
     if(typeof postoCollegaPersone==="function")
@@ -2837,11 +2916,24 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       successo?(stessa?10:7):(stessa?-8:-6),
       successo?"colpo-insieme-success":"colpo-insieme-failure"
     );
+    stradaEcoMondo(
+      personaSquadra,
+      successo?"crime-together-success":"crime-together-failure",
+      successo?2:-1,
+      {reason:successo?"colpo-insieme-success":"colpo-insieme-failure",context:"colpo-squadra"}
+    );
     stradaPersonaMeta(personaSquadra).colpiInsieme++;
   }
-  if(personaLead && (!personaSquadra || personaLead.id!==personaSquadra.id))
+  if(personaLead && (!personaSquadra || personaLead.id!==personaSquadra.id)){
     stradaModificaFiducia(personaLead,successo?8:-5,
       successo?"opportunita-success":"opportunita-failure");
+    stradaEcoMondo(
+      personaLead,
+      successo?"street-opportunity-success":"street-opportunity-failure",
+      successo?2:-2,
+      {reason:successo?"opportunita-success":"opportunita-failure",context:"opportunita"}
+    );
+  }
   if(successo && personaLead)
     stradaAggiungiFavore(personaLead,1,"opportunita-success");
 
@@ -2859,12 +2951,24 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
   }else{
     if(personaLead){
       const tensione=stradaModificaTensionePersona(personaLead,1,"opportunita-failure");
-      if(tensione.rivalitaNata)
+      if(tensione.rivalitaNata){
+        stradaEcoMondo(personaLead,"street-rivalry-start",0,{
+          reason:"opportunita-failure",
+          context:"rivalita",
+          noHearsay:true
+        });
         notaPersone+=" <b>Con "+personaLead.n+" non è più solo un rapporto freddo: la cosa è diventata personale.</b>";
+      }
     }
     if(personaSquadra && squadraCopre){
-      if(stradaModificaDebitoPersona(personaSquadra,1,"si-prende-il-casino")>0)
+      if(stradaModificaDebitoPersona(personaSquadra,1,"si-prende-il-casino")>0){
+        stradaEcoMondo(personaSquadra,"street-debt-created",0,{
+          reason:"si-prende-il-casino",
+          context:"debito",
+          noHearsay:true
+        });
         notaPersone+=" <b>"+personaSquadra.n+" ti ha coperto: adesso gli devi un favore.</b>";
+      }
     }
   }
 
@@ -2946,6 +3050,13 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
           ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
         }
         s.arresto = {settimane:settimane, colpo:colpo.n};
+        if(personaLead) stradaEcoMondo(personaLead,"street-arrest",0,{
+          reason:"arresto-dopo-colpo",context:"carcere"
+        });
+        if(personaSquadra && (!personaLead || personaSquadra.id!==personaLead.id))
+          stradaEcoMondo(personaSquadra,"street-arrest",0,{
+            reason:"arresto-dopo-colpo",context:"carcere",noHearsay:true
+          });
         STRADA_SCENA = {k:"Com'è andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
             ". Niente musica, niente strada: solo il tempo che passa." + notaLeadFallita + notaPersone,

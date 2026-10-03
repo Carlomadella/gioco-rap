@@ -47,14 +47,15 @@ describe("Strada · punto 16 rete causale",()=>{
     const c={id:"p2",n:"Luca",rel:0,via:false};
     const G={year:1,week:1,day:2,gente:[a,b,c]};
     const fn=new Function(
-      "G","sistemaGente","postoSoloLavoro","postoLegamiAttivi",
+      "G","sistemaGente","postoSoloLavoro","postoLegamiAttivi","postoUltimaConseguenzaMondo",
       blocco(posto,"function presentiOggi(quanti)","/* ==================== DOVE SI INCONTRA")+
         "\nreturn presentiOggi;"
     )(
       G,
       ()=>{},
       ()=>false,
-      p=>p===a?[b]:[]
+      p=>p===a?[b]:[],
+      ()=>null
     );
 
     expect(fn(2).map(p=>p.id)).toEqual(["p9","p1"]);
