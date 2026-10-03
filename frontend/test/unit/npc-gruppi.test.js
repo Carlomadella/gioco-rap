@@ -183,6 +183,17 @@ describe("NPC · punto 14 gruppi emergenti",()=>{
       .toEqual(["g1","g2"]);
   });
 
+  it("rifiuta ingressi e spostamenti precedenti alla fondazione",()=>{
+    const w=runtime(),reg=[],ps=triangolo(w),d=p("d");
+    promuovi(w,reg,ps);
+    expect(()=>w.ADF_NPC_GRUPPI.aggiungiMembro(reg,"g1",d,{
+      giorno:9,fonte:"errore"
+    })).toThrow(/precedente alla creazione/);
+    expect(()=>w.ADF_NPC_GRUPPI.sposta(reg,"g1",{
+      giorno:9,cittaId:"milano",fonte:"errore"
+    })).toThrow(/precedente alla creazione/);
+  });
+
   it("sciogliere un gruppo conserva il record storico ma lo toglie dai gruppi attivi",()=>{
     const w=runtime(),reg=[],ps=triangolo(w);
     const g=promuovi(w,reg,ps);
@@ -192,6 +203,8 @@ describe("NPC · punto 14 gruppi emergenti",()=>{
       stato:"sciolto",scioltoGiorno:50,scioltoFonte:"evento:scioglimento"
     });
     expect(w.ADF_NPC_GRUPPI.gruppiPerPersona(reg,"a")).toEqual([]);
+    expect(w.ADF_NPC_GRUPPI.gruppiPerPersona(reg,"a",{includeSciolti:true}))
+      .toEqual([g]);
     expect(w.ADF_NPC_GRUPPI.trova(reg,"g1")).toBe(g);
     expect(g.membri.every(m=>m.uscitoGiorno===50)).toBe(true);
   });
