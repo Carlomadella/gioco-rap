@@ -438,6 +438,17 @@ const DIALOGHI = {
    fiducia criminale del punto 4. */
 function dialogoCarcereFuori(p){
   const rapporto=Number(p&&p.carcere&&p.carcere.rapporto||0);
+  if((p.strada&&p.strada.rivalita===true) || rapporto<=-4){
+    return {
+      jailOutside:"rival",
+      t:"Vi riconoscete subito. "+p.n+
+        " non ha dimenticato come vi siete lasciati dentro, e fuori non c'è più una porta a separarvi.",
+      o:[
+        ["Gli dici che non vuoi riaprire il conto",1,"pratico"],
+        ["Non gli concedi niente e tiri dritto",0,"diffidente"]
+      ]
+    };
+  }
   if(rapporto>=1){
     return {
       jailOutside:"favore",
@@ -1131,6 +1142,13 @@ function poRispondi(i){
           source:"carcere",reason:"favore-rifiutato-fuori",context:"circolo"
         });
       }
+    }else if(sit.jailOutside==="rival"){
+      if(typeof postoRegistraConseguenzaMondo==="function")
+        postoRegistraConseguenzaMondo(p,"jail-rival-reunion",i===0?0:-1,{
+          source:"carcere",reason:i===0?"conto-tenuto-freddo":"conto-riacceso",context:"circolo"
+        });
+      if(i!==0 && typeof stradaModificaTensionePersona==="function")
+        stradaModificaTensionePersona(p,1,"carcere-rivale-reincontro");
     }else if(typeof postoRegistraConseguenzaMondo==="function"){
       postoRegistraConseguenzaMondo(p,"jail-reunion",i===0?1:0,{
         source:"carcere",reason:i===0?"reincontro-aperto":"reincontro-freddo",context:"circolo"
