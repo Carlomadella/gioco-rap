@@ -118,7 +118,7 @@ describe("Strada · punto 17 attività di copertura",()=>{
     expect(strada).toContain('scelta==="sistema"');
     expect(strada).toContain('scelta==="pausa"');
     expect(strada).toContain('business-issue-ignored');
-    expect(strada).toContain("blockedUntilWeek=settimana+2");
+    expect(strada).toContain("blockedUntilWeek=settimana+1");
   });
 
   it("le attività possono diventare punti d'incontro della rete",()=>{
