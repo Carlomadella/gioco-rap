@@ -423,11 +423,17 @@ function stradaOpportunitaTriggerConfig(trigger){
     cooldown=Math.max(6,cooldown-1);
   }
 
+  const heat=stradaHeatProfilo();
+  chance*=Number(heat.opportunita||1);
+  if(heat.id==="alto") cooldown+=2;
+  else if(heat.id==="critico") cooldown+=4;
+
   return {
     chance:Math.min(.16,chance),
     cooldownGiorni:cooldown,
     durataGiorni:Number(base.durataGiorni||7),
-    trigger
+    trigger,
+    heatBand:heat.id
   };
 }
 
@@ -1503,6 +1509,7 @@ function stradaAggiornaRelazioniCriminali(silent){
         pushLog("<b>"+c.p.n+" è ricomparso.</b> La storia comune pesa ancora, ma il rapporto è molto più freddo.", "");
     }
   }
+  stradaHeatSincronizzaPersone();
   return cambi;
 }
 
@@ -1604,7 +1611,7 @@ function stradaPersoneConFavore(){
 function stradaPersoneSquadra(){
   stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>stradaRelazioneDisponibile(p) &&
+    .filter(p=>stradaRelazioneOperativa(p) &&
       stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) || Number(b.rel||0)-Number(a.rel||0));
 }
@@ -2165,8 +2172,10 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
       : stradaCausaOpportunita(variante,trigger);
     const esistente=causa&&causa.person ? causa.person : (G.gente||[]).find(x=>x && !x.via &&
       ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
-    if(esistente && esistente.strada && esistente.strada.known &&
-       !stradaRelazioneDisponibile(esistente)) return null;
+    if(esistente && esistente.strada && esistente.strada.known){
+      stradaHeatSincronizzaPersone();
+      if(!stradaRelazioneOperativa(esistente)) return null;
+    }
 
     variante.networkCause=causa?causa.type:null;
     variante.networkCauseText=causa?causa.text:null;
@@ -2185,13 +2194,16 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
     });
     if(p && causa&&causa.introducedBy && typeof postoCollegaPersone==="function")
       postoCollegaPersone(causa.introducedBy,p,"strada-introduzione");
-    return p && stradaRelazioneDisponibile(p) ? p : null;
+    stradaHeatSincronizzaPersone();
+    return p && stradaRelazioneOperativa(p) ? p : null;
   }
 
   /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Serve un
      collega già incontrato e abbastanza vita condivisa in stabilimento. */
   const p=stradaFabbricaPersonaCandidata();
   if(!p) return null;
+  stradaHeatSincronizzaPersone();
+  if(stradaHeatPersonaCauta(p)) return null;
   variante.factoryStory=true;
   variante.factoryPersonId=p.id;
   variante.factoryWasKnown=!!(p.strada&&p.strada.known);
@@ -3971,7 +3983,7 @@ function stradaAttivitaContattoIncontro(id){
   if(typeof stradaContattiAttivi!=="function") return null;
   const persone=stradaAttivitaPersone(id);
   const esclusi=new Set([persone.partner&&persone.partner.id,persone.employee&&persone.employee.id].filter(Boolean));
-  return stradaContattiAttivi().filter(p=>p&&!esclusi.has(p.id))
+  return stradaContattiAttivi().filter(p=>p&&!esclusi.has(p.id)&&!stradaHeatPersonaCauta(p))
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a))[0]||null;
 }
 
