@@ -938,10 +938,14 @@ function stradaRischioCriminaleAttivo(){
 function stradaPassatoCandidati(){
   return (G.gente||[]).filter(p=>p&&!p.via&&p.strada&&p.strada.known).map(p=>{
     const st=stradaPersonaMeta(p),cons=stradaConseguenzePersona(p);
-    const kind=st.rivalita?"rival":Number(cons.debiti||0)>0?"debt":
-      (stradaFiduciaValore(p)>=35 || p.origine==="carcere")?"contact":null;
+    const favori=stradaFavoriValore(p);
+    const kind=st.rivalita?"rival":
+      Number(cons.debiti||0)>0?"debt":
+      favori>0?"favor":
+      (stradaRelazioneForte(p) || p.origine==="carcere")?"contact":null;
     if(!kind)return null;
-    const peso=(kind==="rival"?6:kind==="debt"?5:2)+stradaFiduciaValore(p)/40;
+    const peso=(kind==="rival"?6:kind==="debt"?5:kind==="favor"?4:2)+
+      stradaFiduciaValore(p)/40;
     return {p,kind,peso};
   }).filter(Boolean);
 }
@@ -984,7 +988,10 @@ function stradaPassatoSettimana(roll,variantRoll){
   }else if(scelta.kind==="debt"){
     G.wellbeing=clamp(Number(G.wellbeing||0)-1,0,100);
     if(typeof pushLog==="function")
-      pushLog("<b>"+p.n+" non ha dimenticato il favore.</b> Non ti propone un colpo: ti ricorda soltanto che certi conti restano.","");
+      pushLog("<b>"+p.n+" non ha dimenticato il debito.</b> Non ti propone un colpo: ti ricorda soltanto che certi conti restano.","");
+  }else if(scelta.kind==="favor"){
+    if(typeof pushLog==="function")
+      pushLog("<b>"+p.n+" ricompare.</b> Tra voi c'è ancora un favore aperto. Hai lasciato il giro, non il rapporto.","");
   }else{
     if(typeof pushLog==="function")
       pushLog("<b>"+p.n+" ricompare.</b> Non ti sta riportando nel giro: è una persona che faceva parte di quella vita e non è sparita quando hai mollato.","");
@@ -3707,6 +3714,8 @@ function stCompraAttivita(id){
   const a = stradaAttivitaDef(id);
   if(!a) return "";
   if(G.strada.attivita[id]) return a.n + " è già tua.";
+  if(!stradaPartecipazioneAttiva())
+    return "Hai mollato il giro: le attività che possiedi restano imprese normali, ma non ne rilevi di nuove attraverso la Strada.";
   if(G.money < a.costo) return "Non hai " + fmt(a.costo) + " € per rilevare " + a.n.toLowerCase() + ".";
   G.money -= a.costo;
   G.strada.attivita[id] = true;
@@ -3720,8 +3729,12 @@ function stCompraAttivita(id){
 }
 function stMollaIlGiro(){
   const s=G.strada,u=stradaUscitaStato();
+  if(s.arresto) return "Da dentro non si molla niente.";
   if(u.mollato) return "Hai già mollato il giro.";
-  const costo=Math.max(1500,Math.round(s.sporchi*.3));
+  const costo=Math.max(1500,Math.round(Number(s.sporchi||0)*.3));
+  const disponibili=Math.max(0,Number(s.sporchi||0))+Math.max(0,Number(G.money||0));
+  if(disponibili<costo)
+    return "Per mollare il giro ti servono "+fmt(costo)+" € complessivi. Ne hai "+fmt(disponibili)+" €.";
   if(s.sporchi>=costo)s.sporchi-=costo;
   else{G.money=Math.max(0,G.money-(costo-s.sporchi));s.sporchi=0;}
 
@@ -3735,6 +3748,8 @@ function stMollaIlGiro(){
   const opp=stradaOpportunitaStato();
   opp.pending=null;opp.pendingChoices=[];opp.active=null;
   const rete=stradaEventoReteStato();rete.pending=null;
+  if(window.ADF_WORK_EVENTS && typeof ADF_WORK_EVENTS.clearCrimeLeads==="function")
+    ADF_WORK_EVENTS.clearCrimeLeads("left-giro");
   const prot=stradaProtezioneStato();
   if(Number(s.prot||0)>0)prot.history.push({status:"ended-left-giro",absoluteDay:oggi,providerPersonId:prot.providerPersonId||null});
   s.prot=0;prot.level=0;prot.prepaidWeekKey=null;
@@ -4507,27 +4522,34 @@ function stScenaAttivita(id){
   const contatto=stradaAttivitaContattoIncontro(id);
   const week=stradaAttivitaWeekIndex();
   const fermata=!stradaAttivitaOperativa(id);
+  const partecipa=stradaPartecipazioneAttiva();
   const rischio=a.rischio<.07?"basso":a.rischio<.1?"medio":"alto";
   const opts=[];
   if(st.issue) opts.push({n:"Problema aperto",d:(stradaAttivitaProblemaDef(st.issue.id)||{}).n||"Da gestire",
     hot:true,run(){STRADA_SCENA=stScenaProblemaAttivita(id);renderStScheda();}});
-  if(!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)
+  if(partecipa&&!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)
     opts.push({n:"Fai passare soldi",d:"Residuo "+fmt(residuo)+" € · scegli tu l'importo",
       run(){STRADA_SCENA=stScenaLavaggioCanale(id);renderStScheda();}});
-  if(!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)
+  if(partecipa&&!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)
     opts.push({n:"Fissa un incontro con "+contatto.n,d:"45 min · usa l'attività come luogo reale della rete",
       run(){const t=stradaAttivitaIncontro(id);STRADA_SCENA=stScenaAttivita(id);renderStScheda();stToast(t);}});
   opts.push({n:"Chiudi",d:"Torna alle attività",run(){STRADA_SCENA=null;}});
 
   return {
-    k:"Attività di copertura",titolo:a.n,
+    k:partecipa?"Attività di copertura":"Impresa",titolo:a.n,
     testo:(fermata?"<b>FERMA questa settimana.</b> ":"")+
       "Ricavi normali "+fmt(a.ricavoPulito)+" € − "+fmt(a.gestione)+" € di gestione. "+
-      "Capienza "+fmt(a.capienza)+" €, rischio "+rischio+". "+
+      (partecipa
+        ? "Capienza "+fmt(a.capienza)+" €, rischio "+rischio+". "
+        : "<b>Hai mollato il giro:</b> resta la gestione ordinaria, senza riciclaggio né incontri criminali. ")+
       (persone.partner?"Responsabile: <b>"+persone.partner.n+"</b>. ":"")+
       (persone.employee?"Dipendente: <b>"+persone.employee.n+"</b>.":""),
-    stats:[
+    stats:partecipa?[
       {t:"passati "+fmt(usato)+" €"},
+      {t:"pressione "+Math.round(Number(st.pressione||0))+"/100"},
+      {t:st.issue?"problema aperto":"operativa"}
+    ]:[
+      {t:"impresa normale"},
       {t:"pressione "+Math.round(Number(st.pressione||0))+"/100"},
       {t:st.issue?"problema aperto":"operativa"}
     ],
@@ -5131,6 +5153,7 @@ function renderStCopre(){
 
 function renderStAttivita(){
   const s = G.strada;
+  const partecipa=stradaPartecipazioneAttiva();
   $("st-tab-attivita").innerHTML =
     STRADA_ATTIVITA.map(a => {
       const tua=!!s.attivita[a.id];
@@ -5139,8 +5162,11 @@ function renderStAttivita(){
         return '<div class="activity">' +
           '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+fmt(a.costo)+' €</span></div>' +
           '<p>Ricavi normali '+fmt(a.ricavoPulito)+' €/sett. · −'+fmt(a.gestione)+' € gestione · '+
-            'capienza '+fmt(a.capienza)+' € · rischio '+rischio+'.</p>' +
-          '<button class="pill'+(G.money<a.costo?" no":"")+'" data-stattivita="'+a.id+'">Rileva</button>' +
+            (partecipa
+              ? 'capienza '+fmt(a.capienza)+' € · rischio '+rischio+'.'
+              : 'non rilevabile dalla Strada dopo che hai mollato il giro.')+'</p>' +
+          '<button class="pill'+(!partecipa||G.money<a.costo?" no":"")+'" data-stattivita="'+a.id+'"'+
+            (!partecipa?' disabled':'')+'>'+(partecipa?'Rileva':'Fuori dal giro')+'</button>' +
           '</div>';
       }
 
@@ -5152,12 +5178,16 @@ function renderStAttivita(){
         '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+stato+'</span></div>' +
         '<p>'+(persone.partner?persone.partner.n+' · ':'')+
           'netto normale '+fmt(Math.max(0,a.ricavoPulito-a.gestione))+' €/sett. · '+
-          'riciclaggio residuo '+fmt(residuo)+' € · pressione '+Math.round(Number(st.pressione||0))+'/100'+
+          (partecipa?'riciclaggio residuo '+fmt(residuo)+' € · ':'lato criminale chiuso · ')+
+          'pressione '+Math.round(Number(st.pressione||0))+'/100'+
           (st.issue?' · <b>'+(stradaAttivitaProblemaDef(st.issue.id)||{}).n+'</b>':'')+'.</p>' +
         '<button class="pill'+(st.issue?" danger":"")+'" data-stgestione="'+a.id+'">Gestisci</button>' +
         '</div>';
     }).join("") +
-    '<div class="business-foot">Sono imprese vere: producono reddito pulito, hanno persone e problemi. Il denaro sporco passa solo quando decidi tu quanto esporle.</div>';
+    '<div class="business-foot">'+(partecipa
+      ? 'Sono imprese vere: producono reddito pulito, hanno persone e problemi. Il denaro sporco passa solo quando decidi tu quanto esporle.'
+      : 'Le attività che possedevi restano imprese vere e continuano a produrre reddito pulito. Il lato criminale è chiuso.')+
+    '</div>';
 }
 
 /* ---- in basso: le tre città ---- */
@@ -5275,13 +5305,19 @@ $("st-molla").onclick = () => {
   hubTap();
   if(G.strada.arresto){ stToast("Da dentro non si molla niente."); return; }
   if(!stradaPartecipazioneAttiva()){ stToast("Hai già mollato il giro."); return; }
-  const costo = Math.max(1500, Math.round(G.strada.sporchi * .3));
+  const costo = Math.max(1500, Math.round(Number(G.strada.sporchi||0) * .3));
+  const disponibili=Math.max(0,Number(G.strada.sporchi||0))+Math.max(0,Number(G.money||0));
+  const manca=Math.max(0,costo-disponibili);
   STRADA_SCENA = {k:"Uscirne", titolo:"Molla il giro",
     testo:"Ti costa " + fmt(costo) + " € — il 30% dei soldi sporchi, e mai meno di 1.500 € — " +
       "e la reputazione di strada cala di un terzo. In cambio ti torna la testa per la musica. Qualcuno se la lega al dito.",
     opts:[
-      {n:"Mollo", d:"Chiudi i conti e sparisci dal giro", hot:true,
-       run(){ stMollaIlGiro(); STRADA_SCENA = null; stToast("Hai mollato il giro."); }},
+      {n:"Mollo", d:manca?"Ti mancano "+fmt(manca)+" €":"Chiudi i conti e sparisci dal giro", hot:true, no:manca>0,
+       run(){
+         const t=stMollaIlGiro();
+         if(stradaPartecipazioneAttiva()){ stToast(t); return; }
+         STRADA_SCENA = null; stToast(t);
+       }},
       {n:"Lascia stare", d:"Resti dentro al giro", run(){ STRADA_SCENA = null; }}
     ]};
   renderStScheda();

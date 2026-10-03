@@ -1688,13 +1688,33 @@ test("punto 21: le attività normali continuano anche dopo l'uscita",
   crime.indexOf("redditoAttivita+=Number(esito.income||0)") <
   crime.indexOf("if(!stradaPartecipazioneAttiva()){",crime.indexOf("redditoAttivita+=Number(esito.income||0)")) &&
   crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")'));
+test("punto 21: le attività possedute restano imprese, ma il lato criminale non viene più proposto",
+  crime.includes('return "Hai mollato il giro: le attività che possiedi restano imprese normali') &&
+  crime.includes("if(partecipa&&!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)") &&
+  crime.includes("if(partecipa&&!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)") &&
+  crime.includes("'lato criminale chiuso · '") &&
+  crime.includes("(partecipa?'Rileva':'Fuori dal giro')"));
 test("punto 21: il passato bussa attraverso persone e conti già esistenti",
   crime.includes("function stradaPassatoCandidati()") &&
   crime.includes("function stradaPassatoSettimana(roll,variantRoll)") &&
   crime.includes('type:"past-knock"') &&
   crime.includes('kind=st.rivalita?"rival"') &&
   crime.includes('Number(cons.debiti||0)>0?"debt"') &&
-  crime.includes('p.origine==="carcere"'));
+  crime.includes('favori>0?"favor"') &&
+  crime.includes('stradaRelazioneForte(p) || p.origine==="carcere"'));
+test("punto 21: dopo l'uscita il lavoro non genera nuove dritte criminali",
+  lavoroEventi.includes('if(typeof stradaPartecipazioneAttiva==="function")') &&
+  lavoroEventi.includes("return !!stradaPartecipazioneAttiva()") &&
+  lavoroEventi.includes("if(!streetStarted()) return null;") &&
+  lavoroEventi.includes("function clearCrimeLeads(reason)") &&
+  lavoroEventi.includes("clearCrimeLeads,") &&
+  crime.includes('ADF_WORK_EVENTS.clearCrimeLeads("left-giro")'));
+test("punto 21: il costo di uscita è un costo reale, non può essere pagato con soldi inesistenti",
+  crime.includes("const disponibili=Math.max(0,Number(s.sporchi||0))+Math.max(0,Number(G.money||0))") &&
+  crime.includes("if(disponibili<costo)") &&
+  crime.includes('"Per mollare il giro ti servono "+fmt(costo)') &&
+  crime.includes('d:manca?"Ti mancano "+fmt(manca)+" €"') &&
+  crime.includes("if(stradaPartecipazioneAttiva()){ stToast(t); return; }"));
 test("punto 21: lifestyle smette di trattarti come criminale quando la memoria è scaduta",
   lifestyle.includes('typeof stradaRischioCriminaleAttivo==="function"') &&
   lifestyle.includes("!!stradaRischioCriminaleAttivo()"));

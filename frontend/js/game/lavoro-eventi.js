@@ -1953,9 +1953,16 @@ function consumeMusicLead(kind){
 
 function streetStarted(){
   try{
-    if(typeof stradaGiroAvviato==="function") return !!stradaGiroAvviato();
+    /* Punto Strada 21: "sei mai entrato" non equivale a "stai ancora
+       partecipando". Dopo l'uscita il lavoro non deve generare nuovi agganci
+       criminali solo perché giroAvviato resta memoria storica. */
+    if(typeof stradaPartecipazioneAttiva==="function")
+      return !!stradaPartecipazioneAttiva();
+    if(typeof stradaGiroAvviato==="function")
+      return !!stradaGiroAvviato();
   }catch(_){}
-  return !!(G.strada&&G.strada.giroAvviato);
+  return !!(G.strada&&G.strada.giroAvviato&&
+    !(G.strada.uscitaGiro&&G.strada.uscitaGiro.mollato));
 }
 
 function showCrime(job,s,roll){
@@ -2008,7 +2015,31 @@ function showCrime(job,s,roll){
   return true;
 }
 
+function clearCrimeLeads(reason){
+  let cleared=0;
+  const today=absDay();
+  for(const sede of Object.values(G.workplaces||{})){
+    if(!sede || typeof sede!=="object" || !sede.workEvents ||
+       !sede.workEvents.crimeLead) continue;
+    const s=sede.workEvents,lead=s.crimeLead;
+    s.crimeLead=null;
+    if(!Array.isArray(s.history)) s.history=[];
+    s.history.unshift({
+      family:"crime",absoluteDay:today,
+      year:Number(G.year)||1,week:Number(G.week)||1,day:Number(G.day)||1,
+      status:"cancelled",reason:String(reason||"cleared"),
+      jobId:lead.sourceJobId||null,sourceLabel:lead.sourceLabel||null
+    });
+    if(s.history.length>40) s.history.length=40;
+    cleared++;
+  }
+  /* Niente save qui: quando l'uscita chiama questa funzione deve restare una
+     transazione unica, salvata solo dopo aver chiuso anche gli altri accordi. */
+  return cleared;
+}
+
 function crimeLeadActive(){
+  if(!streetStarted()) return null;
   const hit=activeLead("crimeLead");
   return hit ? Object.assign({},hit.lead) : null;
 }
@@ -2255,6 +2286,7 @@ window.ADF_WORK_EVENTS=Object.freeze({
   consumeMusicLead,
   crimeLeadActive,
   consumeCrimeLead,
+  clearCrimeLeads,
   stateForJob:state,
   conflictForShift,
   debug(){
