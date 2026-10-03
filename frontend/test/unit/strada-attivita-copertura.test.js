@@ -1,3 +1,4 @@
+import { crimeNpcBridge } from "../helpers/crime-npc-bridge.js";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -39,6 +40,7 @@ describe("Strada · punto 17 attività di copertura",()=>{
       postoCollegaPersone:(a,b,motivo)=>links.push([a.id,b.id,motivo])
     };
     vm.createContext(ctx);
+    vm.runInContext(crimeNpcBridge(strada),ctx);
     vm.runInContext(
       blocco(strada,"const STRADA_ATTIVITA =","/* Protezione a tre gradini"),
       ctx
@@ -84,6 +86,7 @@ describe("Strada · punto 17 attività di copertura",()=>{
       postoRegistraConseguenzaMondo:()=>null
     };
     vm.createContext(ctx);
+    vm.runInContext(crimeNpcBridge(strada),ctx);
     vm.runInContext(
       blocco(strada,"function stradaAttivitaProblemaDef","function stradaAttivitaRisolviProblema"),
       ctx

@@ -1,3 +1,4 @@
+import { crimeNpcBridge } from "../helpers/crime-npc-bridge.js";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -45,6 +46,7 @@ function contesto(heat=0, persone=[]){
     stradaRivalitaAttiva:p=>!!p?.strada?.rivalita
   };
   vm.createContext(ctx);
+    vm.runInContext(crimeNpcBridge(crime),ctx);
   vm.runInContext(heatSlice,ctx);
   return ctx;
 }

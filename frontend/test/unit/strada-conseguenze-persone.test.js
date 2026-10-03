@@ -1,3 +1,4 @@
+import { crimeNpcBridge } from "../helpers/crime-npc-bridge.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -78,7 +79,7 @@ describe("Strada · punto 13 conseguenze attraverso le persone",()=>{
       "stradaFiduciaValore","stradaAbsDay","stradaReputazioneGlobale",
       "stradaContattoKey","stradaCreaContatto","stradaModificaFiducia",
       "stradaRegistraConseguenzaPersona","Math",
-      code+"\nreturn stradaPresentazioneDopoSuccesso;"
+      crimeNpcBridge(crime)+code+"\nreturn stradaPresentazioneDopoSuccesso;"
     )(
       G,
       [

@@ -1,3 +1,4 @@
+import { crimeNpcBridge } from "../helpers/crime-npc-bridge.js";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -44,6 +45,7 @@ function runtime(mollato=false){
     pushLog:()=>null
   };
   vm.createContext(ctx);
+    vm.runInContext(crimeNpcBridge(crime),ctx);
   vm.runInContext(helpers,ctx);
   return {ctx,G};
 }

@@ -406,29 +406,30 @@ function stradaAttivitaDef(id){
 
 function stradaAttivitaPersonaNuova(a,ruolo){
   if(!a) return null;
-  G.gente=Array.isArray(G.gente)?G.gente:[];
-  let p=null;
-  if(typeof nuovaPersona==="function"){
-    p=nuovaPersona(ruolo==="socio"?"fornitore":"collega");
-  }else{
-    p={
-      id:"p"+Math.floor(Math.random()*1e9),
-      ruolo:ruolo==="socio"?"fornitore":"collega",
-      n:(ruolo==="socio"?"Socio ":"Dipendente ")+a.n,
-      rel:0,pt:0,ult:-1,via:false
-    };
+  const creato=stradaNpcCreaPersona({
+    roleHint:ruolo==="socio"?"fornitore":"collega",
+    name:(ruolo==="socio"?"Socio ":"Dipendente ")+a.n,
+    cityId:stradaCittaContesto(),
+    source:"attivita-"+a.id,
+    story:ruolo==="socio"
+      ? "Gestisce con te la parte ordinaria dell'attività."
+      : "Lavora qui e vede ogni settimana cosa succede davvero."
+  });
+  const p=creato.person;
+  if(!p) return null;
+  if(!creato.managed){
+    p.origine="attivita";
+    p.origineLuogo="attivita-"+a.id;
+    p.origineDettaglio=(ruolo==="socio"?"socio/responsabile della ":"dipendente della ")+a.n;
+    p.storia=(ruolo==="socio"
+      ?"Gestisce con te la parte ordinaria dell'attività."
+      :"Lavora qui e vede ogni settimana cosa succede davvero.");
+    p.circoloSbloccato=false;
+    p.visto=true;
   }
-  p.origine="attivita";
-  p.origineLuogo="attivita-"+a.id;
-  p.origineDettaglio=(ruolo==="socio"?"socio/responsabile della ":"dipendente della ")+a.n;
-  p.storia=(ruolo==="socio"
-    ?"Gestisce con te la parte ordinaria dell'attività."
-    :"Lavora qui e vede ogni settimana cosa succede davvero.");
-  p.circoloSbloccato=false;
-  p.visto=true;
   p.attivita={id:a.id,ruolo};
   if(ruolo==="socio") p.rel=Math.max(1,Number(p.rel||0));
-  G.gente.push(p);
+  stradaNpcSegnalaContesto(p,{source:"attivita-"+a.id});
   return p;
 }
 
@@ -451,7 +452,7 @@ function stradaAttivitaStato(id,creaPersone){
 
   const owned=!!(s.attivita&&s.attivita[id]);
   if(owned && creaPersone!==false){
-    const trova=pid=>(G.gente||[]).find(p=>p&&p.id===pid&&!p.via)||null;
+    const trova=pid=>stradaNpcPersonaDaId(pid);
     let partner=st.partnerPersonId?trova(st.partnerPersonId):null;
     let employee=st.employeePersonId?trova(st.employeePersonId):null;
     if(!partner){
@@ -474,7 +475,7 @@ function stradaAttivitaStato(id,creaPersone){
 
 function stradaAttivitaPersone(id){
   const st=stradaAttivitaStato(id,true);
-  const trova=pid=>(G.gente||[]).find(p=>p&&p.id===pid&&!p.via)||null;
+  const trova=pid=>stradaNpcPersonaDaId(pid);
   return {
     partner:st&&st.partnerPersonId?trova(st.partnerPersonId):null,
     employee:st&&st.employeePersonId?trova(st.employeePersonId):null
@@ -674,7 +675,7 @@ function stradaPresentazioneDopoSuccesso(persona,roll,variantRoll){
     if(stradaReputazioneGlobale()<Number(o.minRep||0)) return false;
     if(o.persona===persona.n) return false;
     const key=o.contactKey||stradaContattoKey(o.persona);
-    const existing=(G.gente||[]).find(p=>p && !p.via &&
+    const existing=stradaNpcPersone().find(p=>p && !p.via &&
       ((p.strada&&p.strada.key===key) || p.n===o.persona));
     return !existing || !existing.strada || !existing.strada.known;
   });
@@ -1063,7 +1064,7 @@ function stradaPartecipazioneAttiva(){
 
 function stradaProfonditaUscita(){
   const s=G.strada||{};
-  const contatti=(G.gente||[]).filter(p=>p&&!p.via&&p.strada&&p.strada.known);
+  const contatti=stradaNpcPersone().filter(p=>p&&!p.via&&p.strada&&p.strada.known);
   const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA).length;
   const rivali=contatti.filter(p=>stradaRivalitaAttiva(p)).length;
   const debiti=contatti.reduce((n,p)=>n+Math.max(0,Number(stradaConseguenzePersona(p).debiti||0)),0);
@@ -1099,7 +1100,7 @@ function stradaRischioCriminaleAttivo(){
 }
 
 function stradaPassatoCandidati(){
-  return (G.gente||[]).filter(p=>p&&!p.via&&p.strada&&p.strada.known).map(p=>{
+  return stradaNpcPersone().filter(p=>p&&!p.via&&p.strada&&p.strada.known).map(p=>{
     const st=stradaPersonaMeta(p),cons=stradaConseguenzePersona(p);
     const favori=stradaFavoriValore(p);
     const kind=st.rivalita?"rival":
@@ -1239,7 +1240,7 @@ function stradaColpiDisponibili(){
 /* ==================== INGRESSO NELLA STRADA ====================
    Punto 1 della revisione 02/10/2026.
    Una nuova partita non mostra Attività criminali. Prima serve una persona
-   reale già presente in G.gente, poi due piccoli favori introduttivi. In questa
+   reale già incontrata nel mondo, poi due piccoli favori introduttivi. In questa
    fase si possono perdere soldi, energia e accumulare attenzione, ma non si
    può finire in carcere. */
 const STRADA_INGRESSO = Object.freeze({
@@ -1357,7 +1358,7 @@ function stradaConsegnaTrapPhone(personId,personName,source){
 
 /* ==================== PERSONE DELLA STRADA ====================
    Punto 3: nessun nome criminale deve restare solo testo in un popup.
-   Ogni contatto vive in G.gente, conserva la propria identità/origine e può
+   Ogni contatto è una persona canonica del mondo, conserva identità/origine e può
    ricomparire nei sistemi sociali esistenti. Il punto 4 aggiungerà la fiducia
    criminale: qui costruiamo soltanto identità e continuità. */
 const STRADA_FIDUCIA_SQUADRA = 25;
@@ -1365,7 +1366,7 @@ const STRADA_FIDUCIA_SQUADRA = 25;
 /* Punto 10: una relazione criminale non perde un punto a settimana.
    Può invece cambiare stato quando il giocatore sparisce davvero oppure
    ignora ripetutamente la stessa persona. Il personaggio resta sempre in
-   G.gente: è il suo rapporto col giro a diventare inattivo/non raggiungibile. */
+   l'anagrafe: è il suo rapporto col giro a diventare inattivo/non raggiungibile. */
 const STRADA_RELAZIONI = Object.freeze({
   ignoredLimit:3,
   inactiveAfterDays:84,
@@ -1503,7 +1504,7 @@ function stradaPersonaMeta(p){
 function stradaHeatSincronizzaPersone(){
   const prof=stradaHeatProfilo();
   const oggi=stradaAbsDay();
-  const pool=(G.gente||[]).filter(p=>{
+  const pool=stradaNpcPersone().filter(p=>{
     if(!p || p.via || !p.strada || !p.strada.known) return false;
     const st=stradaPersonaMeta(p);
     return (st.streetStatus==="active" || st.streetStatus==="cold") && !st.rivalita;
@@ -1813,7 +1814,7 @@ function stradaHeatRichiestaFermati(silent){
   if(Number.isFinite(last)&&oggi-last<Number(p.stopCooldown)) return null;
 
   stradaHeatSincronizzaPersone();
-  const candidati=(G.gente||[]).filter(x=>
+  const candidati=stradaNpcPersone().filter(x=>
     x&&!x.via&&x.strada&&x.strada.known&&stradaRelazioneDisponibile(x)&&!stradaRivalitaAttiva(x)
   ).sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
   const persona=candidati[0]||null;
@@ -1848,7 +1849,7 @@ function stradaRelazioneForte(p){
 
 /* Punto 13: i risultati dei colpi lasciano conseguenze nelle persone, non
    soltanto nei contatori globali. Debiti, tensioni e rivalità vivono sulla
-   stessa persona persistente di G.gente. */
+   stessa persona persistente del mondo. */
 function stradaConseguenzePersona(p){
   const st=stradaPersonaMeta(p);
   if(!st) return null;
@@ -1980,9 +1981,7 @@ function stradaContattiAttivi(citta){
   stradaAggiornaRelazioniCriminali(true);
   const cityId=typeof stradaCittaContesto==="function"
     ? stradaCittaContesto(citta) : "provincia";
-  const persone=typeof stradaNpcPersone==="function"
-    ? stradaNpcPersone({cityId})
-    : (G.gente||[]);
+  const persone=stradaNpcPersone({cityId});
   return persone.filter(stradaRelazioneDisponibile);
 }
 
@@ -2070,7 +2069,7 @@ function stradaIgnoraContatto(p,reason){
 function stradaAggiornaRelazioniCriminali(silent){
   const oggi=stradaAbsDay();
   const cambi=[];
-  for(const p of (G.gente||[])){
+  for(const p of stradaNpcPersone()){
     if(!p || p.via || !p.strada || !p.strada.known) continue;
     const st=stradaPersonaMeta(p);
     const last=Number(st.lastPlayerStreetInteractionAbsoluteDay);
@@ -2202,7 +2201,7 @@ function stradaConsumaFavore(p,motivo){
 
 function stradaPersoneConFavore(){
   stradaAggiornaRelazioniCriminali(true);
-  return (G.gente||[])
+  return stradaNpcPersone()
     .filter(p=>stradaRelazioneDisponibile(p) && stradaFavoriValore(p)>0)
     .sort((a,b)=>stradaFavoriValore(b)-stradaFavoriValore(a) ||
       stradaFiduciaValore(b)-stradaFiduciaValore(a));
@@ -2210,7 +2209,7 @@ function stradaPersoneConFavore(){
 
 function stradaPersoneSquadra(){
   stradaAggiornaRelazioniCriminali(true);
-  return (G.gente||[])
+  return stradaNpcPersone()
     .filter(p=>stradaRelazioneOperativa(p) &&
       stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) || Number(b.rel||0)-Number(a.rel||0));
@@ -2218,7 +2217,7 @@ function stradaPersoneSquadra(){
 
 function stradaPersonaSquadra(id){
   if(!id) return null;
-  const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via) || null;
+  const p=stradaNpcPersonaDaId(id);
   if(!stradaRelazioneDisponibile(p)) return null;
   return stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA ? p : null;
 }
@@ -2262,7 +2261,7 @@ function stradaProtezioneProvider(livello){
   const req=STRADA_PROTEZIONE_REQ[livello];
   if(!req || livello<=0 || stradaReputazioneGlobale()<req.rep) return null;
   stradaAggiornaRelazioniCriminali(true);
-  return (G.gente||[])
+  return stradaNpcPersone()
     .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=req.fiducia)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
@@ -2301,7 +2300,7 @@ function stradaHaAvvocatoPrivato(){
 }
 
 function stradaAvvocatiConosciuti(){
-  return (G.gente||[])
+  return stradaNpcPersone()
     .filter(p=>p && !p.via && p.ruolo==="avvocato" &&
       Number(p.rel||0)>=STRADA_AVVOCATO_REL_MIN)
     .sort((a,b)=>Number(b.rel||0)-Number(a.rel||0) || Number(b.pt||0)-Number(a.pt||0));
@@ -2375,8 +2374,8 @@ function stScenaProtezione(){
 function stIncaricaAvvocato(personId){
   const s=G.strada,st=stradaAvvocatoStato();
   if(st.retained) return "Hai già un avvocato privato.";
-  const p=(G.gente||[]).find(x=>x&&x.id===personId&&!x.via&&x.ruolo==="avvocato")||null;
-  if(!p || Number(p.rel||0)<STRADA_AVVOCATO_REL_MIN)
+  const p=stradaNpcPersonaDaId(personId);
+  if(!p || p.ruolo!=="avvocato" || Number(p.rel||0)<STRADA_AVVOCATO_REL_MIN)
     return "Con questo avvocato non hai ancora un rapporto abbastanza solido.";
   if(Number(G.money||0)<STRADA_AVVOCATO_COSTO)
     return "Ti servono "+fmt(STRADA_AVVOCATO_COSTO)+" € per la prima settimana.";
@@ -2447,7 +2446,7 @@ function stradaFerroStato(){
 
 function stradaPersonaFerro(){
   stradaAggiornaRelazioniCriminali(true);
-  return (G.gente||[])
+  return stradaNpcPersone()
     .filter(p=>stradaRelazioneDisponibile(p) &&
       stradaFiduciaValore(p)>=STRADA_FERRO_FIDUCIA_MIN)
     .sort((a,b)=>
@@ -2585,8 +2584,10 @@ function stradaContattoKey(nome){
    Nessuno di questi metodi è obbligatorio: ogni funzione qui sotto ha fallback
    compatibile col gioco attuale. Quando l'adapter crea/restituisce una persona
    deve restituire l'oggetto canonico e persistente del sistema NPC: la Strada
-   non ne crea una copia. La Strada conserva SOLO lo stato criminale della
-   relazione (p.strada); identità, città, legami e gruppi restano NPC-side. */
+   non ne crea una copia. La Strada aggiorna lo stato della
+   relazione (p.strada), della detenzione (p.carcere) e dell’attività (p.attivita);
+   identità, città, legami e gruppi restano NPC-side. Creazione e accesso alle
+   persone crime passano sempre da questo bridge; G.gente è il fallback legacy. */
 const STRADA_NPC_CONTRACT_VERSION = 1;
 
 function stradaNpcAdapter(){
@@ -2628,7 +2629,7 @@ function stradaNpcPersonaDaId(id){
       if(p && !p.via) return p;
     }
   }catch(_){}
-  return (G.gente||[]).find(p=>p&&p.id===id&&!p.via) || null;
+  return stradaNpcPersone().find(p=>p.id===id) || null;
 }
 
 function stradaNpcPersone(query){
@@ -2677,9 +2678,16 @@ function stradaNpcCreaPersona(request){
     }
   }catch(_){}
 
-  if(typeof nuovaPersona!=="function") return {person:null,managed:false};
-  const p=nuovaPersona(request.roleHint||"strada");
-  if(!p) return {person:null,managed:false};
+  const role=request.roleHint||"strada";
+  let p=typeof nuovaPersona==="function" ? nuovaPersona(role) : null;
+  if(!p){
+    const base=String(request.name||"Contatto");
+    const usati=new Set((G.gente||[]).map(x=>x&&x.n).filter(Boolean));
+    let name=base,seq=2;
+    while(usati.has(name)) name=base+" "+seq++;
+    p={id:"p"+Math.floor(Math.random()*1e9),ruolo:role,n:name,
+      rel:0,pt:0,ult:-1,feat:-99,via:false};
+  }
   G.gente=Array.isArray(G.gente)?G.gente:[];
   if(!G.gente.some(x=>x&&x.id===p.id)) G.gente.push(p);
   return {person:p,managed:false};
@@ -2826,7 +2834,6 @@ function stradaFabbricaPersonaCandidata(){
 }
 
 function stradaCreaContatto(nome,key,meta){
-  if(!G.gente) G.gente=[];
   meta=meta||{};
   const cityId=stradaCittaContesto(meta.cityId);
 
@@ -2881,11 +2888,7 @@ function stradaCausaOpportunita(variante,trigger){
   const key=variante.contactKey||stradaContattoKey(variante.persona);
   const cityId=typeof stradaCittaContesto==="function"
     ? stradaCittaContesto() : "provincia";
-  const esistente=typeof stradaNpcTrovaPersona==="function"
-    ? stradaNpcTrovaPersona({crimeKey:key,name:variante.persona,cityId})
-    : (G.gente||[]).find(x=>x && !x.via &&
-        ((x.strada&&x.strada.key===key) ||
-         (variante.persona&&x.n===variante.persona))) || null;
+  const esistente=stradaNpcTrovaPersona({crimeKey:key,name:variante.persona,cityId});
 
   if(esistente){
     if(esistente.strada&&esistente.strada.known){
@@ -3060,14 +3063,14 @@ function stradaPersonaIngressoValida(p){
 function stradaPersonaIngresso(variantRoll,context){
   const s=stradaIngressoStato();
   if(s.ingressoPersonaId){
-    const stessa=(G.gente||[]).find(p=>p && p.id===s.ingressoPersonaId && !p.via);
+    const stessa=stradaNpcPersonaDaId(s.ingressoPersonaId);
     if(stessa){
       if(stessa.origineLuogo==="fabbrica" && context!=="fabbrica") return null;
       return stessa;
     }
   }
 
-  const pool=(G.gente||[]).filter(stradaPersonaIngressoValida);
+  const pool=stradaNpcPersone().filter(stradaPersonaIngressoValida);
   if(!pool.length) return null;
 
   /* Un rapporto già iniziato pesa più di una conoscenza appena nata, senza
@@ -4384,7 +4387,7 @@ function stMollaIlGiro(){
    I cinque HIGH sono obbligatori, persistono al refresh e bloccano il tempo. */
 
 /* Punto Strada 20: il carcere è una seconda fonte di relazioni.
-   Le persone conosciute dentro entrano in G.gente e restano le stesse dopo
+   Le persone conosciute dentro passano dal bridge NPC e restano le stesse dopo
    la scarcerazione. Il rapporto costruito qui è separato dalla fiducia della
    Strada: solo un legame davvero forte apre un contatto criminale fuori. */
 const CARCERE_RELAZIONI_PROFILI = Object.freeze({
@@ -4433,28 +4436,30 @@ function carcerePersonaMeta(p){
 
 function carcerePersonaNuova(profilo){
   const def=CARCERE_RELAZIONI_PROFILI[profilo]||CARCERE_RELAZIONI_PROFILI.cortile;
-  G.gente=Array.isArray(G.gente)?G.gente:[];
-  let p=null;
-  if(typeof nuovaPersona==="function") p=nuovaPersona(def.ruolo||"strada");
-  if(!p){
-    const usati=new Set(G.gente.map(x=>x&&x.n).filter(Boolean));
-    const basi={compagno:"Dani",veterano:"Bruno",cortile:"Rami",giro:"Nox",conto:"Moro"};
-    let n=basi[profilo]||"Rami",s=2;
-    while(usati.has(n)) n=(basi[profilo]||"Rami")+" "+s++;
-    p={id:"p"+Math.floor(Math.random()*1e9),ruolo:"strada",n,rel:0,pt:0,ult:-1,feat:-99,via:false};
+  const basi={compagno:"Dani",veterano:"Bruno",cortile:"Rami",giro:"Nox",conto:"Moro"};
+  const creato=stradaNpcCreaPersona({
+    roleHint:def.ruolo||"strada",
+    name:basi[profilo]||"Rami",
+    cityId:stradaCittaContesto(),
+    source:"carcere",
+    story:"Vi siete conosciuti durante una detenzione. Quello che è successo dentro non sparisce quando si apre il cancello."
+  });
+  const p=creato.person;
+  if(!p) return null;
+  if(!creato.managed){
+    p.origine="carcere";
+    p.origineLuogo="carcere";
+    p.origineDettaglio=def.dettaglio;
+    p.storia="Vi siete conosciuti durante una detenzione. Quello che è successo dentro non sparisce quando si apre il cancello.";
+    p.circoloSbloccato=false;
+    p.numero=false;
+    p.visto=true;
   }
-  p.origine="carcere";
-  p.origineLuogo="carcere";
-  p.origineDettaglio=def.dettaglio;
-  p.storia="Vi siete conosciuti durante una detenzione. Quello che è successo dentro non sparisce quando si apre il cancello.";
-  p.circoloSbloccato=false;
-  p.numero=false;
-  p.visto=true;
   const meta=carcerePersonaMeta(p);
   meta.profilo=profilo;
   meta.firstMetAbsoluteDay=stradaAbsDay();
   meta.lastMetAbsoluteDay=stradaAbsDay();
-  G.gente.push(p);
+  stradaNpcSegnalaContesto(p,{source:"carcere"});
   return p;
 }
 
@@ -4463,10 +4468,10 @@ function carcerePersonaProfilo(profilo,crea){
   if(!c) return null;
   if(!c.persone || typeof c.persone!=="object") c.persone={};
   const id=c.persone[profilo];
-  let p=id?(G.gente||[]).find(x=>x&&x.id===id&&!x.via):null;
+  let p=stradaNpcPersonaDaId(id);
   if(!p && crea!==false){
     p=carcerePersonaNuova(profilo);
-    c.persone[profilo]=p.id;
+    if(p) c.persone[profilo]=p.id;
   }
   if(p){
     const m=carcerePersonaMeta(p);
@@ -4525,7 +4530,7 @@ function carcereApplicaRelazioneHigh(e,o,r){
 function carcerePersone(){
   const c=carcereStato();
   if(!c||!c.persone) return [];
-  return Object.values(c.persone).map(id=>(G.gente||[]).find(p=>p&&p.id===id&&!p.via))
+  return Object.values(c.persone).map(id=>stradaNpcPersonaDaId(id))
     .filter(Boolean)
     .sort((a,b)=>Number(carcerePersonaMeta(b).rapporto||0)-Number(carcerePersonaMeta(a).rapporto||0));
 }
@@ -4539,7 +4544,7 @@ function carcereScarcerazioneRelazioni(c){
   if(!c||!c.persone) return {contatti:[],rivali:[]};
   const contatti=[],rivali=[];
   for(const id of Object.values(c.persone)){
-    const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via);
+    const p=stradaNpcPersonaDaId(id);
     if(!p) continue;
     const m=carcerePersonaMeta(p),rapporto=Number(m.rapporto||0);
     m.currentJailId=null;
@@ -5197,7 +5202,7 @@ function stradaSettimana(){
       }else if(Number(G.money||0)>=STRADA_AVVOCATO_COSTO){
         G.money-=STRADA_AVVOCATO_COSTO;
       }else{
-        const legale=avvStDentro.personId?(G.gente||[]).find(p=>p&&p.id===avvStDentro.personId&&!p.via):null;
+        const legale=stradaNpcPersonaDaId(avvStDentro.personId);
         if(legale) legale.rel=Math.max(0,Number(legale.rel||0)-1);
         s.avvocato=false;avvStDentro.retained=false;avvStDentro.prepaidWeekKey=null;
         avvStDentro.history.push({status:"unpaid-in-jail",personId:avvStDentro.personId||null,
@@ -5310,7 +5315,7 @@ function stradaSettimana(){
 
   const avvSt=stradaAvvocatoStato();
   if(avvSt.retained){
-    const legale=avvSt.personId?(G.gente||[]).find(p=>p&&p.id===avvSt.personId&&!p.via):null;
+    const legale=stradaNpcPersonaDaId(avvSt.personId);
     const legacy=avvSt.source==="legacy";
     if(!legacy && !legale){
       s.avvocato=false;avvSt.retained=false;avvSt.prepaidWeekKey=null;
@@ -5685,7 +5690,7 @@ function renderStCopre(){
   const prot = STRADA_PROT[s.prot];
   const protSt=stradaProtezioneStato();
   const avvSt=stradaAvvocatoStato();
-  const tuttiContatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via);
+  const tuttiContatti=stradaNpcPersone().filter(p=>p&&p.strada&&p.strada.known&&!p.via);
   const rivali=tuttiContatti.filter(stradaRivalitaAttiva);
   stradaHeatSincronizzaPersone();
   const contatti=tuttiContatti.filter(stradaRelazioneDisponibile)
