@@ -25,7 +25,13 @@ const START = () => ({
   life:{casa:0, auto:0, look:0, uscite:0, crew:0}, gear:{}, contract:null, obligation:null,
   offersSeen:{}, goals:{}, log:[], streak:0,
   phase:0, trialCd:0, trialsDone:{}, evCd:{}, seenLog:0,
-  rivals:[], gente:[], chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[], lafamegramGente:[],
+  rivals:[], gente:[],
+  /* Punto 22: G.gente resta l'anagrafe delle persone. Questo registro salva
+     soltanto ciò che appartiene alla popolazione nel suo insieme: piccoli
+     gruppi emergenti e sequenza ID. Le città restano sulle singole persone,
+     così aggiungerne altre in futuro non richiede cambiare lo schema globale. */
+  popolazione:{version:1,gruppi:[],nextGroupSeq:1},
+  chartPrev:99, streamsPrev:0, lafamegramMiei:[], lafamegramEventi:[], lafamegramGente:[],
   /* Sputa, la seconda app per postare (sputa.js): le barre tue, e a quali
      degli altri hai messo il fuoco */
   sputaMiei:[], sputaFuoco:{},
