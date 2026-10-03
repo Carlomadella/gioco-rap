@@ -101,7 +101,7 @@
         <aside class="panel side">
           <div class="panel-k">ADESSO</div>
           <div class="status-money"><span>Soldi sporchi</span><strong id="dirty">0 €</strong><button class="launder" id="launder" type="button">Ripulisci</button></div>
-          <div class="stat"><div class="stat-head"><span>Reputazione di strada</span><b id="repN">0</b></div><div class="track"><i class="rep" id="repBar"></i></div></div>
+          <div class="stat"><div class="stat-head"><span>Nome nel giro</span><b id="repN">0</b></div><div class="track"><i class="rep" id="repBar"></i></div></div>
           <div class="stat"><div class="stat-head heat-title"><span>Calore</span><b id="heatN">0</b></div><div class="track"><i class="heat" id="heatBar"></i></div></div>
           <div class="risk"><span>Energia</span><b id="energy">0 / 100</b></div>
           <div class="risk"><span>Contanti puliti</span><b id="clean">0 €</b></div>
