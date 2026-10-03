@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
-const html=fs.readFileSync(path.join(ROOT,"pagine/gioco.html"),"utf8");\nconst crimeUi=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8");
+const crimeUi=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8");
 
 function block(startText,endText){
   const a=crime.indexOf(startText);
