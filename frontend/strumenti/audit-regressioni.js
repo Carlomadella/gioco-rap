@@ -2708,6 +2708,13 @@ test("il recap conta come finestra aperta anche per il menu di sistema, le trasf
 test("il recap si spegne dalle impostazioni",
   leggi("js/impostazioni.js").includes("conferme:true, recap:true}") &&
   leggi("js/impostazioni-ui.js").includes('sw("gioco.recap")'));
+test("un colpo in Strada entra nel recap, mossa e riga del diario, e i soldi sporchi si vedono (voce 106)",
+  leggi("js/game/strada-crimine.js").includes('if(typeof recapMossa==="function") recapMossa({n:"Colpo: " + colpo.n});') &&
+  leggi("js/game/strada-crimine.js").includes('if(STRADA_SCENA) pushLog("<b>" + colpo.n + "</b> — "') &&
+  recapJs.includes("sporchi:recapSporchi(),") &&
+  recapJs.includes("' <i>Soldi sporchi '"));
+test("una notte andata in errore non butta la fotografia di stamattina (voce 107)",
+  ev.includes("if(!errore) recapFoto();") && !ev.includes("\n    recapFoto();\n  }"));
 
 console.log("\nMixtape e album \u2014 la linguetta Disco dello Studio");
 const progettiJs = leggi("js/game/progetti.js");

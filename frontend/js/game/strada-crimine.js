@@ -4138,6 +4138,12 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       }
     }
   }
+  /* Il recap di fine giornata (recap-giornata.js): il colpo è una mossa del
+     giorno, e com'è andata è una riga del diario — se no una giornata in
+     Strada usciva «ferma», coi soldi cambiati senza un perché. */
+  if(typeof recapMossa==="function") recapMossa({n:"Colpo: " + colpo.n});
+  if(STRADA_SCENA) pushLog("<b>" + colpo.n + "</b> — " + STRADA_SCENA.titolo.toLowerCase() + ".",
+    successo ? "good" : s.arresto ? "big" : "bad");
   if(typeof stradaIntelConsuma==="function")
     stradaIntelConsuma(colpo.id);
   save(); renderStrada(); renderGioco();

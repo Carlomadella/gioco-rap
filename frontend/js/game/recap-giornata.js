@@ -38,9 +38,12 @@ function recapOggi(){
   return (((G.year || 1) - 1) * 52 + ((G.week || 1) - 1)) * 7 + (G.day || 1);
 }
 function recapLuc(){ return typeof luc === "function" ? luc() : (G.lucidita || 0); }
+/* i soldi sporchi della Strada: un colpo li fa salire, ripulirli li sposta in cassa */
+function recapSporchi(){ return Number((G.strada && G.strada.sporchi) || 0); }
 function recapFoto(){
   G.giornata = {g:recapOggi(), day:G.day || 1, week:G.week || 1, year:G.year || 1,
     soldi:G.money, fan:G.fans, hype:G.hype, ben:G.wellbeing, luc:recapLuc(),
+    sporchi:recapSporchi(),
     logN:G.logN || 0, mosse:[]};
   return G.giornata;
 }
@@ -104,6 +107,8 @@ function recapDati(prep){
     hype:Math.round(G.hype - prep.hype),
     ben:Math.round(G.wellbeing - prep.ben),
     luc:Math.round(recapLuc() - prep.luc),
+    /* una fotografia di prima non li ha: meglio zero che inventarli */
+    sporchi:prep.sporchi == null ? 0 : Math.round(recapSporchi() - prep.sporchi),
     energia:prep.energia || 0,
     mosse:prep.mosse || [],
     highlights:h.voci,
@@ -140,6 +145,7 @@ function recapHtml(r){
           (r.energia ? ' · ' + r.energia + ' di energia' : '') + '<span>' + recapMosseTesto(r.mosse) + '</span>'
         : 'Nessuna mossa' + (r.energia ? ' · ' + r.energia + ' di energia' : '') + '.') +
       (r.luc ? ' <i>Lucidità ' + recapSegno(r.luc) + '.</i>' : '') +
+      (r.sporchi ? ' <i>Soldi sporchi ' + recapSegno(r.sporchi, " €") + '.</i>' : '') +
     '</p>' +
     (vuoto
       ? '<div class="rcvuoto">Una giornata ferma: niente da raccontare. Domani si riparte.</div>'

@@ -3456,11 +3456,13 @@ saltaGiorni=function(n){
   /* Il recap esce solo per la fine giornata di tutti i giorni: non il
      settimo (c'è il rapporto della settimana), non sui salti lunghi, non se
      la notte si è fermata su un evento, non in carcere. E la giornata nuova
-     riparte comunque da una fotografia nuova. */
+     riparte da una fotografia nuova — tranne dopo un errore: il giorno è
+     tornato com'era, e con lui la fotografia di stamattina e le sue mosse
+     (se invece qualche giorno è passato, recapGiornata se ne accorge). */
   if(typeof recapFoto==="function"){
     if(recapPrima && done===1 && weeks===0 && !errore && !interrotto &&
        !detenutoPrimaDelSalto && !adfInJail()) recapMostra(recapPrima);
-    recapFoto();
+    if(!errore) recapFoto();
   }
   if(interrotto){
     s.runtime.lastSkipInterruptedDay=absDay();

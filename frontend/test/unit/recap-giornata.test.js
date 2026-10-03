@@ -69,6 +69,18 @@ describe("il recap racconta la giornata", () => {
     expect(p.run("recapGiornata().day")).toBe(5);
   });
 
+  it("i soldi sporchi della Strada si vedono, e ripulirli non è un guadagno nascosto (voce 106)", () => {
+    p.G.strada = { sporchi: 20 };
+    p.run("recapFoto()");
+    p.G.strada.sporchi += 54; p.G.money += 40;      // un colpo andato bene
+    const r = p.run("recapDati(recapPrepara())");
+    expect([r.soldi, r.sporchi]).toEqual([40, 54]);
+    expect(p.run("recapHtml(recapDati(recapPrepara()))")).toContain("Soldi sporchi +54 €");
+    /* una fotografia di prima, senza i sporchi: zero, non tutto quello che hai */
+    const vecchia = Object.assign({}, p.run("recapPrepara()"), { sporchi: undefined });
+    expect(p.run("recapDati(" + JSON.stringify(vecchia) + ").sporchi")).toBe(0);
+  });
+
   it("si spegne dalle impostazioni", () => {
     expect(p.run("recapAcceso()")).toBe(true);
     p.ctx.SET.gioco.recap = false;

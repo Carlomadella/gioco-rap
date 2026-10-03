@@ -588,4 +588,5 @@ giorno e apre il recap dopo, `uscita.js` lo registra fra le finestre. Cinque pro
 
 Le mosse fatte fuori dalla plancia — i turni dentro la pagina della Fabbrica, la serata al
 Circolo — non passano da `avviaAzioneDiretta`: nel recap compaiono come righe del diario,
-non nel conto delle mosse.
+non nel conto delle mosse. I colpi in Strada sì (03/10/2026): non scrivevano niente nel diario, e una
+giornata di colpi usciva «ferma»; adesso sono una mossa, una riga del diario e i soldi sporchi.

@@ -203,7 +203,8 @@ che cresce per ruolo (segnata dal push degli altri).
 numeri del giorno (soldi, fan, hype, benessere, energia spesa), le mosse e gli highlights
 del diario scelti per peso; non il settimo giorno (c'è il rapporto della settimana), né sui
 salti lunghi. Si spegne dalle Impostazioni. «Il recap di fine giornata» in
-`05-carriera-e-tempo.md`.
+`05-carriera-e-tempo.md`. Il 03/10, con la Strada dentro: i colpi sono mosse e righe del
+diario, e i soldi sporchi si vedono.
 **FATTO (02/10/2026)** — le **ferie in Fabbrica** (pull request #39, segnate dal push degli
 altri): due giorni ogni ciclo di quattro settimane, chiesti almeno il giorno prima; il giorno
 di ferie non è un turno e non è un'assenza, copre la quota del contratto senza malus e non si
