@@ -22,7 +22,7 @@ describe("Strada · adapter UI finale allineato al motore crime",()=>{
   });
 
   it("non tratta più persone, protezione, ferro e avvocato come acquisti istantanei",()=>{
-    expect(ui).toContain("Persone fidate");
+    expect(ui).toContain("Persone del giro");
     expect(ui).toContain("stScenaProtezione()");
     expect(ui).toContain("stScenaAvvocato()");
     expect(ui).toContain("stCompraFerro()");
@@ -43,6 +43,16 @@ describe("Strada · adapter UI finale allineato al motore crime",()=>{
     expect(ui).toContain("stScenaRiciclaggio()");
     expect(ui).toContain('data-business="');
     expect(ui).toContain("stScenaAttivita(manage.dataset.business)");
+    expect(ui).toContain("stradaLavaggioResiduoCanale(a.id)");
+    expect(ui).toContain("stradaAttivitaProblemaDef(st.issue.id)");
+  });
+
+  it("non nasconde più feedback del nuovo sistema heat, lifestyle e dritte",()=>{
+    expect(ui).toContain("stradaHeatProfilo()");
+    expect(ui).toContain("lifestyleRiepilogoRischio()");
+    expect(ui).toContain("stradaOpportunitaAttiva()");
+    expect(ui).toContain("crimeLeadActive");
+    expect(ui).toContain("stradaCadutaProfilo(colpo)");
   });
 
   it("le scene rispettano opzioni disabilitate, hot, statistiche e dettagli",()=>{
