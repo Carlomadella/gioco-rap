@@ -257,11 +257,121 @@ const STRADA_PREPARAZIONI = Object.freeze([
    documento). Il documento non fissa costo d'acquisto né resa esatta per la
    provincia (lo fa solo per il tipo di reparto, 45% pulito/55% sporco): i
    numeri sotto sono un punto di partenza credibile, da tarare. */
+/* Punto Strada 17: le attività di copertura non sono più moltiplicatori
+   astratti. Ognuna è una piccola impresa con ricavi normali, capacità di
+   assorbire denaro sporco, rischio diverso e persone reali collegate.
+   `resa` resta come alias della capacità per compatibilità con strumenti e
+   salvataggi precedenti. */
 const STRADA_ATTIVITA = [
-  {id:"lavanderia", n:"Lavanderia", costo:1200, resa:90, gestione:15},
-  {id:"autolavaggio", n:"Autolavaggio", costo:1800, resa:130, gestione:20},
-  {id:"minimarket", n:"Minimarket", costo:2600, resa:190, gestione:30}
+  {id:"lavanderia", n:"Lavanderia", costo:1200, resa:150, capienza:150,
+    ricavoPulito:80, gestione:25, rischio:.05, heatMax:1.6, efficienza:.72,
+    nota:"piccoli importi, poca esposizione"},
+  {id:"autolavaggio", n:"Autolavaggio", costo:1800, resa:240, capienza:240,
+    ricavoPulito:120, gestione:35, rischio:.08, heatMax:2.2, efficienza:.78,
+    nota:"più volume, più occhi addosso"},
+  {id:"minimarket", n:"Minimarket", costo:2600, resa:330, capienza:330,
+    ricavoPulito:170, gestione:50, rischio:.12, heatMax:3.0, efficienza:.82,
+    nota:"molto volume, attività più esposta"}
 ];
+
+const STRADA_ATTIVITA_PROBLEMI = Object.freeze([
+  Object.freeze({id:"cassa", n:"La cassa non torna", tipo:"dipendente",
+    testo:"Qualcuno ha iniziato a fare domande sui movimenti che non riconosce.",
+    costo:120, heatIgnora:1.5}),
+  Object.freeze({id:"fornitore", n:"Fornitore bloccato", tipo:"operativo",
+    testo:"Una consegna saltata sta rallentando l'attività e il socio vuole una decisione.",
+    costo:90, heatIgnora:.5}),
+  Object.freeze({id:"controllo", n:"Controllo amministrativo", tipo:"controllo",
+    testo:"Sono passati a verificare documenti e contabilità. Finché la situazione non è chiusa conviene tenere il profilo basso.",
+    costo:180, heatIgnora:2.5})
+]);
+
+function stradaAttivitaDef(id){
+  return STRADA_ATTIVITA.find(x=>x.id===id)||null;
+}
+
+function stradaAttivitaPersonaNuova(a,ruolo){
+  if(!a) return null;
+  G.gente=Array.isArray(G.gente)?G.gente:[];
+  let p=null;
+  if(typeof nuovaPersona==="function"){
+    p=nuovaPersona(ruolo==="socio"?"fornitore":"collega");
+  }else{
+    p={
+      id:"p"+Math.floor(Math.random()*1e9),
+      ruolo:ruolo==="socio"?"fornitore":"collega",
+      n:(ruolo==="socio"?"Socio ":"Dipendente ")+a.n,
+      rel:0,pt:0,ult:-1,via:false
+    };
+  }
+  p.origine="attivita";
+  p.origineLuogo="attivita-"+a.id;
+  p.origineDettaglio=(ruolo==="socio"?"socio/responsabile della ":"dipendente della ")+a.n;
+  p.storia=(ruolo==="socio"
+    ?"Gestisce con te la parte ordinaria dell'attività."
+    :"Lavora qui e vede ogni settimana cosa succede davvero.");
+  p.circoloSbloccato=false;
+  p.visto=true;
+  p.attivita={id:a.id,ruolo};
+  if(ruolo==="socio") p.rel=Math.max(1,Number(p.rel||0));
+  G.gente.push(p);
+  return p;
+}
+
+function stradaAttivitaStato(id,creaPersone){
+  const a=stradaAttivitaDef(id);
+  if(!a) return null;
+  const s=G.strada||(G.strada={});
+  if(!s.attivitaStato || typeof s.attivitaStato!=="object") s.attivitaStato={};
+  let st=s.attivitaStato[id];
+  if(!st || typeof st!=="object"){
+    st=s.attivitaStato[id]={
+      partnerPersonId:null,employeePersonId:null,
+      pressione:0,issue:null,history:[],
+      blockedUntilWeek:null,lastMeetingWeek:null,lastIssueWeek:null
+    };
+  }
+  if(!Array.isArray(st.history)) st.history=[];
+  if(!Number.isFinite(Number(st.pressione))) st.pressione=0;
+  st.pressione=Math.max(0,Math.min(100,Number(st.pressione)||0));
+
+  const owned=!!(s.attivita&&s.attivita[id]);
+  if(owned && creaPersone!==false){
+    const trova=pid=>(G.gente||[]).find(p=>p&&p.id===pid&&!p.via)||null;
+    let partner=st.partnerPersonId?trova(st.partnerPersonId):null;
+    let employee=st.employeePersonId?trova(st.employeePersonId):null;
+    if(!partner){
+      partner=stradaAttivitaPersonaNuova(a,"socio");
+      if(partner) st.partnerPersonId=partner.id;
+    }
+    if(!employee){
+      employee=stradaAttivitaPersonaNuova(a,"dipendente");
+      if(employee) st.employeePersonId=employee.id;
+    }
+    if(partner&&employee&&typeof postoCollegaPersone==="function")
+      postoCollegaPersone(partner,employee,"attivita-lavoro");
+  }
+  return st;
+}
+
+function stradaAttivitaPersone(id){
+  const st=stradaAttivitaStato(id,true);
+  const trova=pid=>(G.gente||[]).find(p=>p&&p.id===pid&&!p.via)||null;
+  return {
+    partner:st&&st.partnerPersonId?trova(st.partnerPersonId):null,
+    employee:st&&st.employeePersonId?trova(st.employeePersonId):null
+  };
+}
+
+function stradaAttivitaWeekIndex(){
+  return (Math.max(1,Number(G.year)||1)-1)*52+Math.max(1,Number(G.week)||1);
+}
+
+function stradaAttivitaOperativa(id){
+  const st=stradaAttivitaStato(id,true);
+  if(!st) return false;
+  return st.blockedUntilWeek==null || stradaAttivitaWeekIndex()>=Number(st.blockedUntilWeek);
+}
 
 /* Protezione a tre gradini più "nessuna", coi tre prezzi del documento. */
 const STRADA_PROT = [
@@ -3134,14 +3244,19 @@ function stToggleAvvocato(){
   return "L'avvocato non è più un toggle: devi conoscerne uno e affidargli davvero l'incarico.";
 }
 function stCompraAttivita(id){
-  const a = STRADA_ATTIVITA.find(x => x.id === id);
+  const a = stradaAttivitaDef(id);
   if(!a) return "";
   if(G.strada.attivita[id]) return a.n + " è già tua.";
   if(G.money < a.costo) return "Non hai " + fmt(a.costo) + " € per rilevare " + a.n.toLowerCase() + ".";
-  G.money -= a.costo; G.strada.attivita[id] = true;
-  pushLog("Hai rilevato: <b>" + a.n + "</b>.", "good");
+  G.money -= a.costo;
+  G.strada.attivita[id] = true;
+  const st=stradaAttivitaStato(id,true);
+  const persone=stradaAttivitaPersone(id);
+  if(st) st.history.push({type:"acquired",week:stradaAttivitaWeekIndex()});
+  pushLog("Hai rilevato: <b>" + a.n + "</b>." +
+    (persone.partner?" A gestirla con te c'è <b>"+persone.partner.n+"</b>.":""), "good");
   save(); renderStrada(); renderGioco();
-  return a.n + " è tua. Adesso puoi ripulire di più.";
+  return a.n + " è tua. Da ora ha ricavi, persone, problemi e una capacità di riciclaggio propria.";
 }
 function stMollaIlGiro(){
   const s = G.strada;
