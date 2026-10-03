@@ -1636,6 +1636,50 @@ test("punto 20: la UI carcere mostra facce e stato del rapporto",
   crimeui.includes('id="adf-jail-people"') &&
   crimeui.includes("v.persone&&v.persone.length"));
 
+test("punto 21: mollare è uno stato persistente separato dall'essere entrato nel giro",
+  state.includes("uscitaGiro:{mollato:false") &&
+  crime.includes("function stradaUscitaStato()") &&
+  crime.includes("function stradaPartecipazioneAttiva()") &&
+  crime.includes("function stradaRischioCriminaleAttivo()") &&
+  !crime.includes("s.giroAvviato=false"));
+test("punto 21: la memoria dura da mesi ad anni in base alla profondità",
+  crime.includes("function stradaProfonditaUscita()") &&
+  crime.includes("function stradaMemoriaGiorni(profondita)") &&
+  crime.includes("p<25 ? 120 : p<50 ? 365 : p<75 ? 730 : 1460") &&
+  crime.includes("u.memoryUntilAbsoluteDay=oggi+memoria"));
+test("punto 21: uscire chiude meccaniche operative ma conserva persone e precedenti",
+  crime.includes("opp.pending=null;opp.pendingChoices=[];opp.active=null") &&
+  crime.includes("rete.pending=null") &&
+  crime.includes("s.prot=0") &&
+  crime.includes("s.ferro=false") &&
+  crime.includes("s.avvocato=false") &&
+  !crime.includes("G.gente=[]") &&
+  !crime.includes("s.precedenti=0"));
+test("punto 21: ex giro blocca colpi, riciclaggio, opportunità e meeting criminali",
+  crime.includes("Hai mollato il giro: non fai più passare denaro sporco.") &&
+  crime.includes("Hai mollato il giro: non accetti più colpi.") &&
+  crime.includes("if(!stradaPartecipazioneAttiva() || !stradaGiroAvviato()") &&
+  crime.includes("if(!stradaPartecipazioneAttiva())return false;") &&
+  crime.includes("l'attività resta un'impresa, non un punto d'incontro criminale"));
+test("punto 21: le attività normali continuano anche dopo l'uscita",
+  crime.indexOf("redditoAttivita+=Number(esito.income||0)") <
+  crime.indexOf("if(!stradaPartecipazioneAttiva()){",crime.indexOf("redditoAttivita+=Number(esito.income||0)")) &&
+  crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")'));
+test("punto 21: il passato bussa attraverso persone e conti già esistenti",
+  crime.includes("function stradaPassatoCandidati()") &&
+  crime.includes("function stradaPassatoSettimana(roll,variantRoll)") &&
+  crime.includes('type:"past-knock"') &&
+  crime.includes('kind=st.rivalita?"rival"') &&
+  crime.includes('Number(cons.debiti||0)>0?"debt"') &&
+  crime.includes('p.origine==="carcere"'));
+test("punto 21: lifestyle smette di trattarti come criminale quando la memoria è scaduta",
+  lifestyle.includes('typeof stradaRischioCriminaleAttivo==="function"') &&
+  lifestyle.includes("!!stradaRischioCriminaleAttivo()"));
+test("punto 21: UI distingue chiaramente ex giro da giro attivo",
+  crime.includes("<b>Hai mollato il giro</b>") &&
+  crime.includes("Il passato però è ancora vicino") &&
+  crime.includes('molla.textContent=partecipa?"Molla il giro":"Fuori dal giro"'));
+
 test("punto 13 esteso: gli esiti Strada entrano nella relazione sociale della stessa persona",
   posto.includes("function postoConseguenzeMondo(p)") &&
   posto.includes("function postoRegistraConseguenzaMondo(p,tipo,punti,meta)") &&
