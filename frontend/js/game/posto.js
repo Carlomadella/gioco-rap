@@ -651,6 +651,78 @@ function postoLegamiAttivi(p){
   return (G.gente||[]).filter(x=>x && !x.via && ids.has(x.id));
 }
 
+/* Punto Strada 17: una persona non ha una memoria diversa per ogni schermata.
+   Quello che succede nella Strada lascia quindi una traccia sociale generica
+   sulla STESSA persona che poi puoi ritrovare al lavoro, al Circolo o altrove.
+   Non sostituisce p.strada (fiducia/debiti/tensione criminali): è il ponte
+   minimo che rende quei fatti parte della vita intera del personaggio. */
+function postoConseguenzeMondo(p){
+  if(!p || p.via) return [];
+  if(!Array.isArray(p.conseguenzeMondo)) p.conseguenzeMondo=[];
+  return p.conseguenzeMondo;
+}
+
+function postoUltimaConseguenzaMondo(p){
+  const eventi=postoConseguenzeMondo(p);
+  return eventi.length ? eventi[eventi.length-1] : null;
+}
+
+function postoRegistraConseguenzaMondo(p,tipo,punti,meta){
+  if(!p || p.via) return null;
+
+  const delta=Number.isFinite(Number(punti)) ? Math.trunc(Number(punti)) : 0;
+  const relPrima=Math.max(0,Number(p.rel||0));
+  const ptPrima=Number(p.pt||0);
+
+  if(delta){
+    p.pt=ptPrima+delta;
+
+    /* Stessa grammatica relazionale dei dialoghi: una conseguenza positiva
+       può far maturare un rapporto; una negativa può raffreddarlo di un
+       gradino. Non crea però un Opp musicale "di nascosto": quello resta una
+       conseguenza esplicita dei dialoghi dedicati. */
+    while(p.pt>=relSoglia(p) && p.rel<5){
+      p.pt-=relSoglia(p);
+      p.rel++;
+    }
+    if(p.pt<0 && p.rel>0){
+      p.rel--;
+      p.pt=0;
+    }else if(p.rel===0 && p.pt<-2){
+      p.pt=-2;
+    }
+  }
+
+  const sett=typeof totalWeeks==="function" ? totalWeeks() : Number(G.week||1);
+  const m=meta&&typeof meta==="object" ? meta : {};
+  const evento={
+    type:String(tipo||"world-consequence"),
+    source:String(m.source||"mondo"),
+    week:sett,
+    absoluteDay:typeof stradaAbsDay==="function" ? stradaAbsDay() : null,
+    points:delta,
+    reason:m.reason==null?null:String(m.reason),
+    relatedPersonId:m.relatedPersonId||null,
+    relatedPersonName:m.relatedPersonName||null,
+    context:m.context||null,
+    relBefore:relPrima,
+    relAfter:Number(p.rel||0)
+  };
+  const eventi=postoConseguenzeMondo(p);
+  eventi.push(evento);
+  if(eventi.length>20) eventi.shift();
+
+  return {
+    persona:p,
+    evento,
+    relBefore:relPrima,
+    relAfter:Number(p.rel||0),
+    ptBefore:ptPrima,
+    ptAfter:Number(p.pt||0),
+    relChanged:Number(p.rel||0)!==relPrima
+  };
+}
+
 /* Quanta gente gira: all'inizio tre facce, poi ne arriva una ogni due settimane.
    Il giornalista compare solo quando qualcuno comincia a sapere chi sei. */
 /* La gente DELLA SALA: chi e' arrivato dalla classifica (`rivale`, studio.js)
@@ -725,11 +797,18 @@ function presentiOggi(quanti){
     const k=(p.id.charCodeAt(1)*31+sett*17)%97;
     const strada=p.strada&&p.strada.known ? 8 : 0;
     const ritorno=Math.min(6,Math.max(0,Number(p.circoloPresenze||0))*2);
+    /* Una conseguenza recente non genera un popup casuale: rende semplicemente
+       più probabile rivedere quella stessa persona, se già appartiene al mondo
+       sociale del Circolo. Così il seguito di una storia può avvenire faccia
+       a faccia invece di sparire nel sottosistema che l'ha creata. */
+    const eco=postoUltimaConseguenzaMondo(p);
+    const etaEco=eco ? Math.max(0,sett-Number(eco.week||sett)) : 99;
+    const conseguenza=eco&&etaEco<=4 ? Math.max(0,8-etaEco*2) : 0;
     /* I contatti comuni pesano davvero: chi è collegato a persone che già
        frequenti ha più probabilità di ricomparire nello stesso ambiente. */
     const rete=Math.min(10,postoLegamiAttivi(p).reduce((n,x)=>
       n+(Number(x.rel||0)>=1 || (x.strada&&x.strada.known) ? 4 : 1),0));
-    return k+Number(p.rel||0)*12+strada+ritorno+rete;
+    return k+Number(p.rel||0)*12+strada+ritorno+rete+conseguenza;
   };
 
   const ord=vivi.slice().sort((a,b)=>punteggio(b)-punteggio(a));
