@@ -914,6 +914,11 @@ function presentiOggi(quanti){
       Math.max(1,Number(G.day)||1);
 
     const cittaEsplicita=p=>{
+      try{
+        const geo=typeof window!=="undefined" ? window.ADF_NPC_GEOGRAFIA : null;
+        if(geo && typeof geo.cittaAttuale==="function")
+          return geo.cittaAttuale(p,oggi);
+      }catch(_){}
       const raw=p&&p.mondo&&p.mondo.cittaAttuale!=null
         ? p.mondo.cittaAttuale
         : p&&p.cittaAttuale!=null ? p.cittaAttuale : p&&p.citta;
@@ -927,11 +932,13 @@ function presentiOggi(quanti){
       /* Detenzione fisica esplicita: una faccia ancora dentro non può essere
          materializzata in Sala da un peso sociale o da un contatto comune. */
       if(p.carcere && p.carcere.currentJailId) return false;
-      /* Le Trasferte marcano le persone fuori città. Finché il punto 9 non
-         centralizza la geografia, questo resta un vincolo fisico legacy. */
-      if(p.fuori===true) return false;
       const citta=cittaEsplicita(p);
       if(citta && citta!=="provincia") return false;
+      /* "fuori" resta il marker legacy dei contatti nati nelle Trasferte.
+         Se manca qualunque città verificabile lo trattiamo ancora in modo
+         conservativo; una posizione esplicita futura può invece riportarlo
+         davvero in provincia senza dover cancellare la sua storia. */
+      if(!citta && p.fuori===true) return false;
       return true;
     };
 
