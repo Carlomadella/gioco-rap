@@ -942,7 +942,9 @@ function postoReteLegami(p){
 
 function postoCollegaPersone(a,b,motivo){
   if(!a || !b || a===b || a.via || b.via || !a.id || !b.id) return false;
-  popolazionePersonaMondo(a);popolazionePersonaMondo(b);
+  if(typeof popolazionePersonaMondo==="function"){
+    popolazionePersonaMondo(a);popolazionePersonaMondo(b);
+  }
   const sett=typeof totalWeeks==="function" ? totalWeeks() : Number(G.week||1);
   const aggiungi=(da,aChi)=>{
     const legami=postoReteLegami(da);
@@ -959,7 +961,8 @@ function postoCollegaPersone(a,b,motivo){
 
   /* La rete resta la fonte di verità. Solo quando un nuovo legame chiude una
      struttura sociale già plausibile il cluster può diventare gruppo. */
-  popolazioneValutaCluster(a,motivo);
+  if(typeof popolazioneValutaCluster==="function")
+    popolazioneValutaCluster(a,motivo);
   return true;
 }
 
