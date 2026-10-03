@@ -12,9 +12,11 @@
 
    Restano fuori dal perimetro attuale:
    - gameplay criminale completo di Milano e Los Angeles;
-   - casinò di Los Angeles;
-   - finestre temporali specifiche dei singoli colpi (oggi i colpi consumano tempo
-     reale ma non hanno ancora vincoli mattina/pomeriggio/notte/weekend).
+   - casinò di Los Angeles.
+
+   La schermata Attività criminali resta accessibile 24/7 dopo lo sblocco; sono
+   i singoli colpi ad avere finestre coerenti con il contesto
+   (giorno/sera/notte/weekend), oltre alla loro durata reale.
 
    File separato da `strada.js`: quello gestisce gli incontri per la via (fan,
    hater, opp...), mentre questo gestisce Attività criminali. */
@@ -172,10 +174,106 @@ function stradaDurataColpoLabel(colpo){
     : minuti+" min";
 }
 
+/* Punto 9 completato: Attività criminali è un luogo 24/7, ma non tutti i
+   lavori hanno senso a qualsiasi ora. Le finestre appartengono ai colpi e
+   restano nel core, così renderer legacy, UI V2 ed esecuzione leggono la
+   stessa regola. La giornata di gioco usa 08:00..04:00 (= 480..1680). */
+const STRADA_FINESTRE_PROFILI = Object.freeze({
+  sempre:Object.freeze({start:480,end:1680,label:"08:00–04:00"}),
+  giorno:Object.freeze({start:480,end:1200,label:"08:00–20:00"}),
+  ufficio:Object.freeze({start:540,end:1140,label:"09:00–19:00"}),
+  tardo:Object.freeze({start:720,end:1560,label:"12:00–02:00"}),
+  sera:Object.freeze({start:1020,end:1560,label:"17:00–02:00"}),
+  notte:Object.freeze({start:1200,end:1680,label:"20:00–04:00"}),
+  notteTarda:Object.freeze({start:1380,end:1680,label:"23:00–04:00"}),
+  weekend:Object.freeze({start:480,end:1680,label:"weekend · 08:00–04:00",days:Object.freeze([6,7])}),
+  weekendNotte:Object.freeze({start:1080,end:1680,label:"weekend · 18:00–04:00",days:Object.freeze([6,7])})
+});
+
+const STRADA_FINESTRE_COLPI = Object.freeze({
+  "consegne":"sempre",
+  "busta-chiusa":"giorno",
+  "passaggio-rapido":"tardo",
+  "giro-notturno":"notte",
+  "pacco-fuori-zona":"giorno",
+  "tratta-corta":"tardo",
+  "consegna-sensibile":"sera",
+
+  "scotta":"sempre",
+  "scatole-senza-marchio":"giorno",
+  "stock-sparito":"ufficio",
+  "merce-rientro":"tardo",
+  "deposito-caldo":"sera",
+  "partita-sbagliata":"notte",
+
+  "retrobottega":"notte",
+  "cassa":"notteTarda",
+  "serranda-abbassata":"notte",
+  "ufficio-vuoto":"weekend",
+  "deposito-weekend":"weekendNotte",
+  "incasso-notte":"notteTarda",
+
+  "scooter":"sempre",
+  "furgone":"sera",
+  "auto-parcheggio":"tardo",
+  "macchina":"sera",
+  "mezzo-commissione":"tardo",
+  "chiavi-giuste":"notte",
+
+  "conto-aperto":"ufficio",
+  "debito-vecchio":"giorno",
+  "quota-mancante":"tardo",
+  "favore-da-chiudere":"sera",
+  "conto-pesante":"notte"
+});
+
+function stradaFinestraColpoDef(colpo){
+  const key=STRADA_FINESTRE_COLPI[colpo&&colpo.id]||"sempre";
+  return STRADA_FINESTRE_PROFILI[key]||STRADA_FINESTRE_PROFILI.sempre;
+}
+
+function stradaFinestraColpoStato(colpo,at,day){
+  const def=stradaFinestraColpoDef(colpo);
+  const oggi=Math.max(1,Math.min(7,Number(day==null?(G.day||1):day)||1));
+  const now=Number(at==null
+    ? (typeof GAME_TIME!=="undefined"&&typeof GAME_TIME.now==="function"?GAME_TIME.now():480)
+    : at);
+  const durata=stradaDurataColpo(colpo);
+  const giorni=Array.isArray(def.days)?def.days:null;
+
+  if(giorni&&!giorni.includes(oggi)){
+    return {ok:false,reason:"day",label:def.label,start:def.start,end:def.end,
+      message:"Questo colpo gira solo nel weekend."};
+  }
+  if(now<def.start){
+    const ora=typeof GAME_TIME!=="undefined"&&GAME_TIME.format
+      ? GAME_TIME.format(def.start)
+      : String(Math.floor((def.start%1440)/60)).padStart(2,"0")+":00";
+    return {ok:false,reason:"before",label:def.label,start:def.start,end:def.end,
+      message:"È troppo presto per questo colpo: la finestra parte alle "+ora+"."};
+  }
+  if(now>=def.end){
+    return {ok:false,reason:"after",label:def.label,start:def.start,end:def.end,
+      message:"La finestra di questo colpo è finita per oggi."};
+  }
+  if(now+durata>def.end){
+    return {ok:false,reason:"too-late",label:def.label,start:def.start,end:def.end,
+      message:"Non fai più in tempo a chiuderlo nella sua finestra ("+def.label+")."};
+  }
+  return {ok:true,reason:null,label:def.label,start:def.start,end:def.end,finish:now+durata};
+}
+
+function stradaFinestraColpoLabel(colpo){
+  return stradaFinestraColpoDef(colpo).label;
+}
+
 function stradaSpendiTempoColpo(colpo){
   const minuti=stradaDurataColpo(colpo);
   if(typeof GAME_TIME==="undefined")
     return {ok:false,reason:"Il sistema del tempo non è disponibile."};
+
+  const finestra=stradaFinestraColpoStato(colpo);
+  if(!finestra.ok) return {ok:false,reason:finestra.message,window:finestra};
 
   const gate=typeof GAME_TIME.canSpend==="function"
     ? GAME_TIME.canSpend(minuti)
@@ -998,6 +1096,8 @@ function stAvviaColpo(colpoId){
   if(!stradaPartecipazioneAttiva()){stToast("Hai mollato il giro: non accetti più colpi.");return;}
   const colpo = STRADA_COLPI.find(c => c.id === colpoId);
   if(!colpo) return;
+  const finestra=stradaFinestraColpoStato(colpo);
+  if(!finestra.ok){stToast(finestra.message);return;}
   STRADA_SCENA = stScenaPreparazione(colpo);
   renderStrada();
 }
@@ -5652,7 +5752,9 @@ function renderStColpi(){
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
   griglia.innerHTML = offerte.map((c, i) => {
+    const finestra=stradaFinestraColpoStato(c);
     const senzaEnergia = G.energy < c.energia;
+    const nonDisponibile=!finestra.ok;
     const leadIncontroQui = leadIncontro && leadIncontro.colpoId === c.id ? leadIncontro : null;
     /* L'opportunità dell'incontro vale solo per il colpo indicato; sugli altri
        colpi un eventuale lead da Buttafuori/Fattorino continua a funzionare. */
@@ -5663,13 +5765,16 @@ function renderStColpi(){
     const fonteLead = leadIncontroQui
       ? (leadIncontroQui.titolo||"Opportunità")
       : (lead && lead.sourceLabel ? "Dritta " + lead.sourceLabel : "Dritta lavoro");
-    return '<button class="crime' + (senzaEnergia ? " no" : "") + '" data-stcolpo="' + c.id + '">' +
+    return '<button class="crime' + ((senzaEnergia||nonDisponibile) ? " no" : "") + '" data-stcolpo="' + c.id + '"' +
+      ((senzaEnergia||nonDisponibile)?' disabled':'') + '>' +
       '<span class="num">0' + (i + 1) + '</span><b>' + c.n + '</b><p>' + c.d + '</p>' +
       '<div class="stchips">' +
         '<span class="stchip">' + stradaCategoria(c).n + '</span>' +
         '<span class="stchip money">' + fmt(c.min) + '–' + fmt(c.max) + ' €</span>' +
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip">' + stradaDurataColpoLabel(c) + '</span>' +
+        '<span class="stchip' + (nonDisponibile ? ' risk-mid' : '') + '">' +
+          (nonDisponibile ? finestra.message : finestra.label) + '</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
         '<span class="stchip ' + stradaCadutaClasse(c) + '">Caduta ' + stradaCadutaProfilo(c).label + '</span>' +
         (lead
