@@ -12,7 +12,14 @@ async function preparaCrime(page, timeMinutes=18*60){
     typeof window.stradaColpiDisponibili === "function"
   );
 
-  await page.evaluate((minuti) => {
+  await page.evaluate(async (minuti) => {
+    GAME.enter();
+    await new Promise(res => setTimeout(res, 180));
+    for(const id of ["modal","report","recap","adf-result-overlay"]){
+      const el=document.getElementById(id);
+      if(el) el.classList.remove("on");
+    }
+
     G.strada.badgeSbloccato=true;
     G.strada.ingressoFase="unlocked";
     G.strada.giroAvviato=true;
