@@ -6,6 +6,27 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:3828b5bf -->
+## 03/10/26, 12:19 — docs/crime-roadmap-current-state → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `3828b5bf`
+
+### Cosa è entrato
+
+- `307b98a7` — docs: conserva stato corrente e gap crime — **mycolbraga**
+- `772cba18` — docs: aggiorna verifica bilanciamento crime — **mycolbraga**
+- `1eb83bf8` — docs: riallinea roadmap crime allo stato corrente — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 2
+
+---
+
 <!-- merge:246eec98 -->
 ## 03/10/26, 11:36 — task/test-strada-crlf → main
 
