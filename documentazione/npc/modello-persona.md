@@ -1053,3 +1053,153 @@ impiego/detenzione/città/impedimenti e manager centrale. Queste parti devono
 essere introdotte insieme alle appartenenze, geografia, selettori e
 centralizzazione senza creare una seconda fonte di verità concorrente.
 
+## Punto 7 — appartenenze agli ambienti
+
+**Stato:** modello riesaminato e modulo runtime ricostruito. Il modulo è caricato
+prima di `posto.js`, ma resta passivo finché un evento non registra o chiude
+esplicitamente un'appartenenza.
+
+File introdotti:
+
+- `frontend/js/game/npc-appartenenze.js`;
+- `frontend/test/unit/npc-appartenenze.test.js`.
+
+### Ambiente, appartenenza, gruppo e presenza
+
+I quattro concetti restano distinti:
+
+- **ambiente:** luogo/contesto concreto e identificabile;
+- **appartenenza:** legame persistente e motivato fra PERSONA e ambiente;
+- **gruppo:** cerchia sociale concreta, definita più avanti ai punti 13–14;
+- **presenza:** fatto dell'incontro odierno, deciso dal selettore del punto 8.
+
+Frequentare una Sala non significa far parte di una crew. Essere appartenente
+a un ambiente non significa essere presente oggi. Essere presente non implica
+che il protagonista conosca nome, telefono, tratti o altre informazioni.
+
+### Schema implementato
+
+Ogni episodio in `p.appartenenze` contiene:
+
+| Campo | Regola |
+| --- | --- |
+| `ambienteId` | ID opaco e stabile dell'ambiente concreto |
+| `tipo` | una delle famiglie `musica`, `lavoro`, `strada`, `carcere`, `quartiere`, `attivita`, `evento` |
+| `fonte` | evento/fatto che giustifica l'ingresso; obbligatorio |
+| `dalGiorno` | giorno assoluto positivo, incluso |
+| `alGiorno` | giorno finale escluso; `null` se non è prevista una fine |
+| `fonteFine` | evento che ha chiuso esplicitamente l'episodio |
+
+Gli intervalli sono quindi `[dalGiorno, alGiorno)`.
+
+L'`ambienteId` non viene interpretato dal modulo: `sala:provincia` e
+`sala:milano` sono riferimenti distinti, ma il significato geografico viene
+risolto dal futuro registro ambienti/geografia. Questo evita che il modulo
+inventi città o alias.
+
+### API implementata
+
+`window.ADF_NPC_APPARTENENZE` espone:
+
+- `perPersona(p)`: restituisce copie degli episodi persistiti;
+- `attive(p, giorno)`: restituisce gli episodi validi in quella data;
+- `registra(p, episodio)`: registra un fatto esplicito;
+- `chiudi(p, ambienteId, giorno, fonteFine)`: chiude l'episodio attivo
+  pertinente senza cancellarne la storia.
+
+Le letture non scrivono nel salvataggio e non deducono niente da `ruolo`,
+`origineLuogo`, `circoloSbloccato`, `p.citta`, `p.fuori`,
+`p.strada` o altri campi legacy.
+
+Il modulo non accede a `G`, non chiama `save()`, non genera log, ricompense
+o NPC e non tocca fiducia/relazioni.
+
+### Idempotenza e storia
+
+Ripetere la stessa registrazione con stesso ambiente, tipo, fonte e
+`dalGiorno` restituisce l'episodio già esistente senza duplicarlo, anche dopo
+una chiusura.
+
+Un rientro successivo nello stesso ambiente crea invece un nuovo episodio se:
+
+- inizia dopo la fine del precedente;
+- mantiene un `tipo` coerente con quell'ambiente;
+- usa una nuova fonte/data motivata.
+
+Gli episodi sovrapposti vengono rifiutati. Anche un cambio di `tipo` sullo
+stesso `ambienteId` viene rifiutato perché indicherebbe un registro ambienti
+incoerente.
+
+Una chiusura esplicita può anticipare una scadenza già prevista, ma non può
+chiudere un episodio prima/durante il suo ingresso.
+
+### Dati legacy: nessuna migrazione inventata
+
+Gli NPC storici possono non avere `p.appartenenze`. Questo è valido.
+
+In particolare:
+
+- `origineLuogo` resta storia dell'incontro;
+- `circoloSbloccato` resta filtro legacy e non crea appartenenza Sala;
+- `p.citta` / `p.fuori` non creano automaticamente ambienti;
+- `p.strada.known` non equivale a frequentazione di un ambiente Strada;
+- `p.carcere` non implica un'appartenenza carceraria perpetua;
+- `p.attivita` può fornire in futuro una fonte concreta per registrare
+  l'ambiente dell'attività, ma non viene migrato automaticamente qui.
+
+La migrazione conservativa è il punto 19.
+
+### Sufficienza rispetto ai sistemi esistenti
+
+Il modello è sufficiente per rappresentare senza duplicare PERSONA questi casi:
+
+1. collega che frequenta anche la Sala;
+2. musicista che compare in Sale di città diverse;
+3. socio/dipendente legato a una specifica attività;
+4. episodio in carcere con inizio/fine;
+5. frequentazione di un quartiere o contesto Strada senza trasformarlo in gruppo;
+6. rientro nello stesso ambiente dopo un'assenza reale.
+
+Non è ancora sufficiente da solo a decidere **chi compare oggi**: servono stato,
+geografia, vincoli e pesi del punto 8.
+
+### Sufficienza rispetto alla simulazione
+
+Il riferimento 300–800 rende corretta una struttura **sparsa per persona** e non
+una matrice PERSONA × ambiente.
+
+Un NPC salva soltanto gli episodi che sono realmente avvenuti. Nessun ambiente
+viene preassegnato per riempire il profilo e nessuna storia viene cancellata
+solo per rispettare un tetto artificiale.
+
+Il rischio residuo è la crescita di episodi in carriere molto lunghe o con
+ambienti ripetuti: va misurata al punto 18 sui save reali. Il punto 7 non
+introduce pruning perché cancellare storia può rompere ricorrenze e migrazioni.
+
+### Test ricostruiti
+
+La suite mirata copre:
+
+- nessuna deduzione dai campi legacy;
+- più ambienti sulla stessa PERSONA;
+- idempotenza;
+- idempotenza dopo chiusura;
+- chiusura selettiva;
+- intervalli temporali e rientro;
+- chiusura anticipata di una scadenza prevista;
+- Sale/città distinte;
+- copie in lettura;
+- roundtrip JSON;
+- tipo incoerente;
+- episodi sovrapposti e date non valide;
+- dati persistiti incoerenti rifiutati invece di “aggiustati”.
+
+### Confine del punto 7
+
+**Chiuso:** modello, schema, API, modulo caricato e test dedicati.
+
+**Non ancora integrato:** generatori di lavoro/Sala/Strada/carcere/Trasferte,
+registro centrale ambienti, geografia, scoperta UI, crime groups e migrazione.
+Questi collegamenti vanno effettuati nei punti successivi senza reinterpretare
+automaticamente i dati legacy.
+
