@@ -3004,7 +3004,7 @@ function stradaTentaEventoRete(roll,variantRoll){
   const cfg=mode==="bridge" ? STRADA_EVENTI_RETE.ponte : STRADA_EVENTI_RETE.nome;
   if(stradaReteRoll(roll)>=Number(cfg.chance||0)) return null;
 
-  const attivi=stradaContattiAttivi().slice().sort((a,b)=>
+  const attivi=stradaContattiAttivi().filter(p=>!stradaHeatPersonaCauta(p)).slice().sort((a,b)=>
     stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
     Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0)
   );
@@ -3055,8 +3055,9 @@ function stradaRisolviEventoRete(personId){
     const candidato=(p.candidateIds||[]).includes(personId)
       ? stradaPersonaDaId(personId)
       : null;
-    if(!stradaRelazioneDisponibile(requester) || !stradaRelazioneDisponibile(candidato))
-      return {ok:false,reason:"La rete è cambiata prima che riuscissi a fare il nome."};
+    stradaHeatSincronizzaPersone();
+    if(!stradaRelazioneOperativa(requester) || !stradaRelazioneOperativa(candidato))
+      return {ok:false,reason:"Con tutta questa attenzione, uno dei due non vuole esporsi adesso."};
 
     stradaModificaFiducia(requester,2,"rete-nome-dato");
     stradaModificaFiducia(candidato,2,"rete-presentato");
@@ -3083,8 +3084,9 @@ function stradaRisolviEventoRete(personId){
 
   if(p.mode==="bridge"){
     const a=stradaPersonaDaId(p.personAId), b=stradaPersonaDaId(p.personBId);
-    if(!stradaRelazioneDisponibile(a) || !stradaRelazioneDisponibile(b))
-      return {ok:false,reason:"Uno dei due contatti non è più raggiungibile."};
+    stradaHeatSincronizzaPersone();
+    if(!stradaRelazioneOperativa(a) || !stradaRelazioneOperativa(b))
+      return {ok:false,reason:"Con tutta questa attenzione, uno dei due non vuole farsi vedere adesso."};
 
     stradaModificaFiducia(a,3,"rete-ponte");
     stradaModificaFiducia(b,3,"rete-ponte");
