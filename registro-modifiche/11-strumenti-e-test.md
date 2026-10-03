@@ -6,6 +6,43 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:408dec7f -->
+## 03/10/26, 07:23 — feature/strada-punto19-heat-mondo → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `408dec7f`
+
+### Cosa è entrato
+
+- `76ab54d7` — Test: rischio ferro usa il profilo heat condiviso — **mycolbraga**
+- `b4ad4bed` — Test: contatti squadra rispettano cautela heat — **mycolbraga**
+- `0e7f674f` — Test: riallinea harness capacità al punto 19 — **mycolbraga**
+- `f2a94d13` — Cache: aggiorna Strada punto 19 — **mycolbraga**
+- `a172a1cd` — Audit: aggiungi gate Strada punto 19 — **mycolbraga**
+- `bb8b8902` — Test: heat cambia il mondo della Strada — **mycolbraga**
+- `bb31f7a8` — Strada punto 19: heat frena anche la rete sociale — **mycolbraga**
+- `69f08eb2` — Strada punto 19: mostra come l'heat cambia il giro — **mycolbraga**
+- `ab3f70d0` — Strada punto 19: fallimenti e controlli scalano con heat — **mycolbraga**
+- `546a9f71` — Strada punto 19: effetti heat su mondo, controlli e opportunità — **mycolbraga**
+- `abbddf3f` — Strada punto 19: heat frena contatti e opportunità — **mycolbraga**
+- `8f53a254` — Strada punto 19: fasce heat e cautela dei contatti — **mycolbraga**
+- `1f47b6c9` — Strada punto 19: stato persistente dell'heat nel mondo — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/state.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/strumenti/audit-regressioni.js`
+- **Aggiunto:** `frontend/test/unit/strada-heat-mondo.test.js`
+- **Modificato:** `frontend/test/unit/strada-ingresso.test.js`
+- **Modificato:** `frontend/test/unit/strada-peso-capacita.test.js`
+- **Modificato:** `frontend/test/unit/strada-relazioni.test.js`
+
+**File interessati in questa categoria:** 8
+
+---
+
 <!-- merge:dfe55047 -->
 ## 03/10/26, 07:04 — feature/strada-punto18-lifestyle-reddito → main
 
