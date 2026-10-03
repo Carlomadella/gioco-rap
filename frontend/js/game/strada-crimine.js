@@ -2609,6 +2609,14 @@ function stradaNpcCittaPersona(p){
       if(c!=null && String(c).trim()) return String(c).trim();
     }
   }catch(_){}
+  try{
+    const geo=typeof window!=="undefined" ? window.ADF_NPC_GEOGRAFIA : null;
+    if(geo && typeof geo.cittaAttuale==="function"){
+      const oggi=typeof stradaAbsDay==="function" ? stradaAbsDay() : 1;
+      const c=geo.cittaAttuale(p,oggi);
+      if(c) return c;
+    }
+  }catch(_){}
   const legacy=p.mondo&&p.mondo.cittaAttuale!=null
     ? p.mondo.cittaAttuale
     : p.cittaAttuale!=null ? p.cittaAttuale : p.citta;
