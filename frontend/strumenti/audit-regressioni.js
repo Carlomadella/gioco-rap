@@ -1694,7 +1694,21 @@ test("punto 21: il passato bussa attraverso persone e conti già esistenti",
   crime.includes('type:"past-knock"') &&
   crime.includes('kind=st.rivalita?"rival"') &&
   crime.includes('Number(cons.debiti||0)>0?"debt"') &&
-  crime.includes('p.origine==="carcere"'));
+  crime.includes('favori>0?"favor"') &&
+  crime.includes('stradaRelazioneForte(p) || p.origine==="carcere"'));
+test("punto 21: dopo l'uscita il lavoro non genera nuove dritte criminali",
+  lavoroEventi.includes('if(typeof stradaPartecipazioneAttiva==="function")') &&
+  lavoroEventi.includes("return !!stradaPartecipazioneAttiva()") &&
+  lavoroEventi.includes("if(!streetStarted()) return null;") &&
+  lavoroEventi.includes("function clearCrimeLeads(reason)") &&
+  lavoroEventi.includes("clearCrimeLeads,") &&
+  crime.includes('ADF_WORK_EVENTS.clearCrimeLeads("left-giro")'));
+test("punto 21: il costo di uscita è un costo reale, non può essere pagato con soldi inesistenti",
+  crime.includes("const disponibili=Math.max(0,Number(s.sporchi||0))+Math.max(0,Number(G.money||0))") &&
+  crime.includes("if(disponibili<costo)") &&
+  crime.includes('"Per mollare il giro ti servono "+fmt(costo)') &&
+  crime.includes('d:manca?"Ti mancano "+fmt(manca)+" €"') &&
+  crime.includes("if(stradaPartecipazioneAttiva()){ stToast(t); return; }"));
 test("punto 21: lifestyle smette di trattarti come criminale quando la memoria è scaduta",
   lifestyle.includes('typeof stradaRischioCriminaleAttivo==="function"') &&
   lifestyle.includes("!!stradaRischioCriminaleAttivo()"));
