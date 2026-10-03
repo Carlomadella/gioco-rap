@@ -219,18 +219,18 @@ function circoloBancone(id, pid){
 /* ==================== IL BACKSTAGE ====================
    Si apre con la serata (dalle 21:00 alle 03:00). Ci sono l'artista della
    serata — uno di fuori, che stasera suona qui e domani no — e la gente del
-   giro che conosci. L'artista non entra nella tua rete come una persona
-   della Sala: se lo convinci ti presenta qualcuno, o ci fai un pezzo. */
+   giro che conosci. Di base l'artista resta una comparsa: entra in G.gente
+   soltanto se un evento persistente lo promuove (punto NPC 15). */
 const CC_OSPITI = [
-  {n:"Raiz", r:"Headliner", d:"Rapper affermato, tournée nazionale.", tag:["Rap", "Tournée nazionale", "Label indipendente"], fama:82, fino:"00:30",
+  {tempId:"raiz", n:"Raiz", r:"Headliner", d:"Rapper affermato, tournée nazionale.", tag:["Rap", "Tournée nazionale", "Label indipendente"], fama:82, fino:"00:30",
    bio:"Punto di riferimento della scena. In tour per il suo nuovo album, sempre aperto a conoscere nuovi talenti."},
-  {n:"Nayra", r:"Artista emergente", d:"Pop-rap, sta crescendo rapidamente.", tag:["Pop-rap", "Uscite ogni mese"], fama:64, fino:"02:00",
+  {tempId:"nayra", n:"Nayra", r:"Artista emergente", d:"Pop-rap, sta crescendo rapidamente.", tag:["Pop-rap", "Uscite ogni mese"], fama:64, fino:"02:00",
    bio:"Due singoli in classifica quest’anno. Cerca voci nuove per il prossimo progetto."},
-  {n:"DJ Kento", r:"Producer / DJ", d:"Producer della scena locale.", tag:["Beat", "DJ set", "Club"], fama:58, fino:"01:30",
+  {tempId:"dj-kento", n:"DJ Kento", r:"Producer / DJ", d:"Producer della scena locale.", tag:["Beat", "DJ set", "Club"], fama:58, fino:"01:30",
    bio:"Suona nei club della regione e produce per tre artisti. Ascolta tutto, parla poco."},
-  {n:"Siria", r:"Manager", d:"Gestisce diversi artisti in Italia.", tag:["Management", "Booking"], fama:76, fino:"01:00",
+  {tempId:"siria", n:"Siria", r:"Manager", d:"Gestisce diversi artisti in Italia.", tag:["Management", "Booking"], fama:76, fino:"01:00",
    bio:"Segue artisti che fanno date in tutta Italia. È qui per vedere chi sale sul palco."},
-  {n:"Luca Framez", r:"Videomaker", d:"Realizza video e contenuti musicali.", tag:["Videoclip", "Contenuti"], fama:60, fino:"03:00",
+  {tempId:"luca-framez", n:"Luca Framez", r:"Videomaker", d:"Realizza video e contenuti musicali.", tag:["Videoclip", "Contenuti"], fama:60, fino:"03:00",
    bio:"Ha girato video per mezza scena del nord. Sta cercando il prossimo artista da filmare."}
 ];
 function circoloBackstageAperto(){
@@ -240,6 +240,44 @@ function circoloBackstageAperto(){
 function circoloOspite(){
   if(!circoloBackstageAperto()) return null;
   return CC_OSPITI[ccNumeroGiorno() % CC_OSPITI.length];
+}
+function circoloOspiteRif(o){
+  if(!o || typeof o.tempId!=="string" || !o.tempId.trim()) return null;
+  return {tipo:"circolo-ospite",id:o.tempId,n:o.n,fama:o.fama};
+}
+function circoloOspiteGiaPresentato(o){
+  const p=circoloStato().presentati || {};
+  return !!(o && (p[o.tempId] || p[o.n]));
+}
+function circoloRuoloOspite(o){
+  const r=String(o && o.r || "").toLowerCase();
+  if(r.includes("video")) return "videomaker";
+  if(r.includes("manager")) return "promoter";
+  if(r.includes("producer") || r.includes("dj")) return "beatmaker";
+  return "rapper";
+}
+function circoloPromuoviOspite(o,motivo,fonte){
+  const api=typeof window!=="undefined" ? window.ADF_NPC_PROMOZIONE : null;
+  const ref=circoloOspiteRif(o);
+  if(!api || typeof api.promuovi!=="function" || !ref) return null;
+  if(!Array.isArray(G.gente)) G.gente=[];
+  return api.promuovi(G.gente,ref,{
+    giorno:ccNumeroGiorno(),
+    motivo:motivo,
+    fonte:fonte,
+    crea:()=>{
+      const p=nuovaPersona(circoloRuoloOspite(o));
+      p.origine="circolo-ospite";
+      p.origineLuogo="circolo";
+      p.origineDettaglio="artista ospite del Circolo";
+      p.storia="Vi siete conosciuti nel backstage del Circolo.";
+      p.circoloSbloccato=false;
+      p.visto=true;
+      p.numero=false;
+      p.numDa=null;
+      return p;
+    }
+  });
 }
 /* chi del giro passa dal backstage: quelli che ti conoscono */
 function circoloBackstageGente(){
@@ -273,7 +311,7 @@ function circoloBackstageMosse(sel){
         stop || (st.networking ? "Stasera l’hai già fatto" : null) || tempo("networking"), CC_TEMPO.networking + " min"),
       voce("contatto", "Chiedi un contatto", "Potrebbe presentarti a qualcuno.",
         stop || (!st.notato ? "Prima deve averti notato" : null) ||
-          (st.contatto || (circoloStato().presentati || {})[o.n] ? "Te l’ha già dato" : null) || tempo("contatto"),
+          (st.contatto || circoloOspiteGiaPresentato(o) ? "Te l’ha già dato" : null) || tempo("contatto"),
         CC_TEMPO.contatto + " min"),
       voce("collab", "Proponi una collaborazione", "Valuta un progetto insieme.",
         stop || (!st.notato ? "Prima deve averti notato" : null) ||
@@ -336,7 +374,7 @@ function circoloBackstage(id, sel){
        (problemi-riscontrati, voce 85). */
     const c = circoloStato();
     if(!c.presentati) c.presentati = {};
-    c.presentati[o.n] = 1;
+    c.presentati[o.tempId] = 1;
     const pieno = typeof genteDellaSala === "function" && genteDellaSala().filter(x => !x.via).length >= POSTO_MAX;
     const giro = (G.gente || []).filter(x => !x.via && !circoloSconosciuto(x) && x.rel < 5);
     if(pieno && giro.length){
@@ -363,6 +401,7 @@ function circoloBackstage(id, sel){
       ccHypeLibero = false;
       G.fans += f;
       if(typeof gain === "function"){ gain("rete", 1); gain("flow", 0.4); }
+      circoloPromuoviOspite(o,"relazione","circolo:collab-ospite");
       ccDice(o.n + " ci sta: una strofa tua nel suo prossimo giro." + ccHypeTesto(dh) + " +" + f + " fan.", "bene");
       if(typeof pushLog === "function") pushLog("Collaborazione con <b>" + o.n + "</b>:" + ccHypeTesto(dh) + " +" + f + " fan.", "big");
     } else {
@@ -403,7 +442,7 @@ function circoloSblocchi(){
   const st = circoloOggi().ospite;
   return [
     {ic:"nota", n:o ? "Feat con " + o.n : "Feat con l’artista della serata", d:"Sblocca una collaborazione per un brano.", ok:!!st.notato},
-    {ic:"gente", n:"Un contatto nuovo", d:"L’artista ti presenta qualcuno del suo giro.", ok:!!st.notato && !st.contatto && !(o && (circoloStato().presentati || {})[o.n])},
+    {ic:"gente", n:"Un contatto nuovo", d:"L’artista ti presenta qualcuno del suo giro.", ok:!!st.notato && !st.contatto && !(o && circoloOspiteGiaPresentato(o))},
     {ic:"stella", n:"Showcase", d:"Solo su invito: ti ci chiama un promoter, più avanti nella carriera.", ok:false},
     {ic:"stella", n:"Opening Act", d:"Apri il concerto di qualcuno: serve un nome che la gente conosce già.", ok:false}
   ];
@@ -446,7 +485,7 @@ function circoloFan(){
     const [no, impara] = critiche[(g + i) % critiche.length];
     const si = suonato && i === 0 ? "stasera sul palco: ti ho sentito da sotto, eri vero."
       : "«" + top.t + "» la so a memoria" + (top.q >= 70 ? ", la mando a tutti." : ".");
-    out.push({id:"f" + i, n:nome, si:si, no:no, impara:impara, volto:CC_VOLTI_LUI.concat(CC_VOLTI_LEI)[(g + i * 3) % 8]});
+    out.push({id:"f" + i, tempId:"circolo-fan:" + circoloGiorno() + ":" + i, n:nome, si:si, no:no, impara:impara, volto:CC_VOLTI_LUI.concat(CC_VOLTI_LEI)[(g + i * 3) % 8]});
   }
   return out;
 }

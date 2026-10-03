@@ -3428,3 +3428,287 @@ simulazione autonoma quotidiana.
 Il prossimo punto riguarda la promozione di NPC temporanei/cameo a PERSONA
 persistenti.
 
+
+
+## Punto 15 — NPC temporanei e promozione a PERSONA persistente
+
+**Stato:** introdotto un bridge esplicito per trasformare una comparsa/cameo in
+una PERSONA canonica di `G.gente` quando il gameplay crea una conseguenza che
+deve sopravvivere alla scena.
+
+File introdotti:
+
+- `frontend/js/game/npc-promozione.js`;
+- `frontend/test/unit/npc-promozione.test.js`;
+- `frontend/test/unit/npc-promozione-integrazione.test.js`.
+
+Integrazione reale iniziale:
+
+- ospiti del backstage del Circolo;
+- fan del backstage come esempio di comparse che restano temporanee.
+
+### Temporaneo ≠ PERSONA
+
+Una comparsa può esistere per una scena senza occupare subito un record in
+`G.gente`.
+
+Questo vale per esempio per:
+
+- artista ospite di una serata;
+- fan incontrato una volta;
+- comparsa di evento;
+- futuro passante o cameo narrativo.
+
+Il fatto che un nome sia stato renderizzato o che il giocatore abbia scambiato
+una battuta con qualcuno **non basta** a renderlo persistente.
+
+La persistenza nasce soltanto quando un controller/evento esplicito decide che
+quella identità deve continuare a esistere.
+
+### Quando la promozione è ammessa
+
+`ADF_NPC_PROMOZIONE.promuovi(...)` richiede una causa esplicita fra:
+
+- `contatto`: nasce un canale personale che deve restare;
+- `relazione`: nasce un rapporto persistente o una collaborazione reale;
+- `ricorrenza`: la stessa comparsa deve poter tornare come la stessa persona;
+- `narrativa`: una storyline/evento rende quella comparsa parte stabile del
+  mondo.
+
+Queste sono **cause disponibili ai controller**, non soglie automatiche.
+
+Il modulo non conta quante volte una comparsa è stata vista e non promuove
+nessuno autonomamente.
+
+### Chiave temporanea stabile, mai deduplica per nome
+
+Ogni comparsa promuovibile deve possedere un riferimento composto da:
+
+- `tipo`;
+- `id` temporaneo stabile nel perimetro della sorgente.
+
+La chiave effettiva è `tipo:id`.
+
+Il nome visualizzato non è mai la chiave d'identità.
+
+Conseguenze:
+
+- due fan chiamati entrambi Giulia ma provenienti da due comparse diverse
+  restano due persone diverse;
+- lo stesso ospite del Circolo, se torna, può essere risolto sulla stessa
+  PERSONA dopo la promozione;
+- un alias o un cambio di nome visualizzato non obbliga a creare una seconda
+  persona;
+- non vengono fuse PERSONA esistenti solo perché hanno lo stesso `n`.
+
+Questo applica anche ai cameo l'invariante del punto 2: **una persona, un ID**.
+
+### Promozione idempotente
+
+La PERSONA promossa conserva:
+
+`p.promozioneTemporanea = {
+  versione: 1,
+  tipo,
+  id,
+  giorno,
+  motivo,
+  fonte
+}`
+
+`ADF_NPC_PROMOZIONE.risolvi(persone, temporaneo)` cerca la PERSONA già
+materializzata a partire dalla chiave temporanea.
+
+Se `promuovi()` viene richiamato sulla stessa comparsa:
+
+- non richiama di nuovo il factory;
+- non crea un altro ID;
+- non aggiunge un secondo record a `G.gente`;
+- restituisce la stessa PERSONA esistente.
+
+Se un save incoerente contiene due PERSONA con la stessa origine temporanea il
+modulo fallisce esplicitamente invece di sceglierne una a caso.
+
+### Conservazione dell'identità osservata
+
+Il factory del controller crea una PERSONA compatibile col sistema legacy
+corrente.
+
+Subito prima della persistenza il bridge preserva i dati della comparsa già
+realmente osservati quando presenti:
+
+- `n`;
+- `fama`;
+- `eta`;
+- `skin`;
+- `hair`;
+- `col`.
+
+Non vengono inventati cognome, provenienza, relazioni o appartenenze per
+completare lo schema.
+
+Se la comparsa non possedeva ancora età/aspetto, il factory corrente può
+assegnarli nel momento in cui diventa PERSONA: non esiste un valore precedente
+da sovrascrivere.
+
+L'ID PERSONA continua per ora a essere prodotto dal generatore del controller;
+il bridge rifiuta comunque un ID già presente. La centralizzazione del formato
+e dell'allocazione ID resta responsabilità del punto 16.
+
+### Nessun registro parallelo
+
+Non viene introdotto un secondo archivio persistente di tutte le comparse.
+
+Prima della promozione il cameo resta nei dati del sistema che lo genera.
+
+Dopo la promozione l'unica PERSONA canonica vive in:
+
+`G.gente`
+
+Il ponte alla sorgente temporanea è metadata della PERSONA, non una seconda
+copia dell'NPC.
+
+Questo evita di dover sincronizzare:
+
+- `G.gente`;
+- un ipotetico `G.npcTemporanei`;
+- registri di singole scene.
+
+### Integrazione Circolo — ospiti
+
+I cinque `CC_OSPITI` hanno ora `tempId` stabili:
+
+- `raiz`;
+- `nayra`;
+- `dj-kento`;
+- `siria`;
+- `luca-framez`.
+
+Il loro nome non viene più usato come nuova chiave nei dati persistenti del
+Circolo.
+
+Una **collaborazione riuscita** con l'ospite è il primo caso reale che promuove
+la comparsa:
+
+`motivo: "relazione"`
+
+`fonte: "circolo:collab-ospite"`
+
+La PERSONA risultante conserva nome e fama dell'ospite e riceve il ruolo legacy
+compatibile necessario ai consumer correnti.
+
+La promozione non rende automaticamente l'ospite una presenza casuale della
+Sala: `circoloSbloccato` resta falso. Le sue future ricomparse devono continuare
+a essere motivate dal contesto.
+
+### Compatibilità dei vecchi `presentati`
+
+Storicamente `G.circolo.presentati` usava il nome dell'ospite come chiave.
+
+Da questo punto le nuove scritture usano `tempId`.
+
+La lettura accetta però anche la vecchia chiave per nome.
+
+Quindi un save precedente che contiene, per esempio:
+
+`presentati.Raiz = 1`
+
+non permette di chiedere nuovamente lo stesso contatto dopo l'aggiornamento.
+
+Non viene eseguita una migrazione massiva al caricamento.
+
+### Integrazione Circolo — fan
+
+I fan restano volutamente **temporanei**.
+
+Ogni fan renderizzato riceve soltanto un `tempId` event-scoped:
+
+`circolo-fan:<giorno>:<slot>`
+
+Questo rende la comparsa promuovibile in futuro se una storyline la rende
+importante, ma:
+
+- una foto non crea automaticamente una PERSONA;
+- una critica non crea automaticamente una PERSONA;
+- il solo fatto che lo stesso nome ricompaia in un'altra serata non fonde due
+  fan;
+- nessun fan viene inserito in `G.gente` dal normale loop backstage.
+
+### Save compatibility
+
+Non viene aggiunto un nuovo campo top-level allo stato.
+
+I vecchi save continuano a funzionare perché:
+
+- le PERSONA storiche senza `promozioneTemporanea` restano valide;
+- i cameo non promossi non richiedono migrazione;
+- il metadata nasce solo quando avviene una nuova promozione;
+- la compatibilità del vecchio indice per nome del Circolo è gestita in lettura.
+
+La revisione generale dei salvataggi resta al punto 19.
+
+### Scala 300–800 NPC
+
+La promozione non introduce simulazioni periodiche.
+
+`risolvi()` scandisce `G.gente` soltanto quando un controller deve verificare
+o materializzare una comparsa.
+
+Con 800 PERSONA:
+
+- una comparsa non promossa costa zero record in `G.gente`;
+- una promozione aggiunge una sola PERSONA;
+- non esiste matrice PERSONA × cameo;
+- non esiste scansione giornaliera;
+- non esiste deduplica fuzzy per nomi.
+
+Il Population Manager del punto 16 potrà sostituire la scansione lineare con un
+indice senza cambiare il contratto del punto 15.
+
+### API runtime
+
+`window.ADF_NPC_PROMOZIONE` espone:
+
+- `motivi()`;
+- `chiave(temporaneo)`;
+- `risolvi(persone, temporaneo)`;
+- `promuovi(persone, temporaneo, meta)`.
+
+### Test
+
+`npc-promozione.test.js` copre:
+
+- comparsa che resta effimera senza evento;
+- promozione con identità osservata preservata;
+- idempotenza;
+- omonimi non fusi;
+- cause esplicite ammesse;
+- rifiuto di ID PERSONA duplicati;
+- rilevamento di origini temporanee duplicate;
+- roundtrip JSON;
+- scenario con 800 PERSONA.
+
+`npc-promozione-integrazione.test.js` verifica:
+
+- ordine di caricamento;
+- `tempId` stabili degli ospiti;
+- compatibilità vecchi `presentati` per nome;
+- promozione sulla collaborazione riuscita;
+- riuso della stessa PERSONA per lo stesso ospite;
+- fan con chiave event-scoped ma non promossi automaticamente.
+
+### Confine del punto 15
+
+**Chiuso:** contratto temporaneo → PERSONA, chiave temporanea stabile,
+promozione esplicita e idempotente, preservazione dell'identità osservata,
+rifiuto duplicati, compatibilità save di base e prima integrazione reale nel
+Circolo.
+
+**Non implementato qui:** promozione automatica per numero di incontri,
+deduplica fuzzy/per nome, registro persistente di tutte le comparse, migrazione
+euristica di vecchi NPC simili, trasformazione automatica di tutti gli ospiti o
+fan in PERSONA, UI dedicata, cataloghi generativi, indice centrale ID/origini o
+Population Manager.
+
+Queste esclusioni restano documentate per il reaudit; non sono requisiti
+dimenticati. Il prossimo punto centralizza la gestione della popolazione.
