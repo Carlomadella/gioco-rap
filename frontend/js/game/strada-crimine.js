@@ -1301,6 +1301,8 @@ function stradaPersonaMeta(p){
   if(!Array.isArray(p.strada.favoriEventi)) p.strada.favoriEventi=[];
   if(!Array.isArray(p.strada.streetStatusHistory)) p.strada.streetStatusHistory=[];
   if(!Array.isArray(p.strada.conseguenzeEventi)) p.strada.conseguenzeEventi=[];
+  if(!("firstLinkedCityId" in p.strada)) p.strada.firstLinkedCityId=null;
+  if(!("lastLinkedCityId" in p.strada)) p.strada.lastLinkedCityId=null;
   if(p.strada.firstLinkedCityId!=null)
     p.strada.firstLinkedCityId=String(p.strada.firstLinkedCityId);
   if(p.strada.lastLinkedCityId!=null)
@@ -2631,10 +2633,13 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
     variante.introducedByPersonId=causa&&causa.introducedBy?causa.introducedBy.id:null;
     variante.introducedByName=causa&&causa.introducedBy?causa.introducedBy.n:null;
     variante.networkCityId=stradaCittaContesto();
-    const introCtx=causa&&causa.introducedBy
-      ? stradaNpcContestoPersona(causa.introducedBy,variante.networkCityId)
+    const networkPerson=causa&&(causa.introducedBy||causa.person)
+      ? (causa.introducedBy||causa.person)
+      : null;
+    const networkCtx=networkPerson
+      ? stradaNpcContestoPersona(networkPerson,variante.networkCityId)
       : {groupIds:[]};
-    variante.networkGroupIds=introCtx.groupIds;
+    variante.networkGroupIds=networkCtx.groupIds;
 
     const storia=causa&&causa.introducedBy
       ?"Te l'ha presentato "+causa.introducedBy.n+": ha fatto il tuo nome nel giro."
