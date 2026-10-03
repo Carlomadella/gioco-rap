@@ -11,7 +11,7 @@ roadmap, nei commenti del codice) quel giro lo trova in `problemi-risolti.md`, c
 ## Cosa resta aperto al 29/09/2026
 
 I numeri sono quelli di sempre, e restano: altri documenti citano «la voce 65». La prossima
-voce nuova è la 95. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
+voce nuova è la 106. Le voci 7, 9 e 10 stanno anche in «Da fare adesso» di
 [`implementazioni/implementazioni.md`](../implementazioni/implementazioni.md) (la 7 con «Via la
 lucidità», la 9 fra «Le decisioni tue», la 10 fra quelle fuori dall'ordine); la 61 e la 65
 sono decisioni di bilanciamento e per ora stanno solo qui.
@@ -111,7 +111,9 @@ Le voci 92 e 93 (il Bancone del 02/10) sono chiuse lo stesso giorno, prima del p
 **103.** Dal giro del 02/10 sul recap di fine giornata (branch `task/recap-giornaliero`,
 dettaglio in fondo): le mosse fatte fuori dalle card non entrano nel conto delle mosse del
 recap, solo nel diario — è una decisione. La 101, la 102 e la 104 sono chiuse prima del push.
-La prossima voce nuova è la 105.
+La 105 (due controlli dell'audit che non potevano mai scattare, giro del 03/10 su
+`task/test-strada-crlf`, uscita su `main` col numero 101 che il recap aveva già preso) è chiusa
+lo stesso giorno, prima del push, e sta in `problemi-risolti.md`. La prossima voce nuova è la 106.
 
 ---
 

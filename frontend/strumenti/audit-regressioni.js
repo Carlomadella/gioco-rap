@@ -9,7 +9,9 @@ function test(n, cond, d){
   if(cond){ ok++; console.log("  ok   " + n); }
   else { no++; console.log("  NO   " + n + (d ? " — " + d : "")); }
 }
-const leggi = p => fs.readFileSync(path.join(ROOT,p),"utf8");
+/* Senza i \r: su Windows il checkout è CRLF, e un «non deve contenere» con un
+   \n dentro passerebbe sempre senza controllare niente. */
+const leggi = p => fs.readFileSync(path.join(ROOT,p),"utf8").replace(/\r\n/g,"\n");
 function elencaFile(dir){
   if(!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir, {withFileTypes:true}).flatMap(e => {
@@ -1223,7 +1225,7 @@ test("registro carcere contiene esattamente 20 sfondi ufficiali",
 
 test("sfondi carcere non dipendono più dal pool Attività criminali",
   crimeui.includes("window.JAIL_BACKGROUNDS_LOCAL||[]") &&
-  !crimeui.includes('const all=window.CRIME_BACKGROUNDS_LOCAL||[];\\n    const pool=all.filter(bg=>Array.isArray(bg.tags)&&bg.tags.includes("prison")') &&
+  !crimeui.includes('const all=window.CRIME_BACKGROUNDS_LOCAL||[];\n    const pool=all.filter(bg=>Array.isArray(bg.tags)&&bg.tags.includes("prison")') &&
   crimeui.includes('id="adf-jail-bg-a"') &&
   crimeui.includes('id="adf-jail-bg-b"') &&
   crimeui.includes('transition:opacity 1.8s ease,filter 1.5s ease') &&

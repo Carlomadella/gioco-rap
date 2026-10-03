@@ -6811,3 +6811,50 @@ ho letto il codice cambiato rispetto a `origin/main` e chi lo chiama. Guardato e
 - **quanto pesa** — da sistemare con calma.
 
 **RISOLTO (02/10/2026)** — branch `task/bancone-neon`: le card spente non hanno più il tasto tondo (`ccCartaBancone`), e «Cosa vuoi fare?» c'è solo a Circolo aperto e quando ci sei.
+
+## Giro del 03/10/2026 (segnala-problemi, fine task `task/test-strada-crlf`, commit `8f4c84ad`)
+
+Giro stretto, su richiesta: il commit tocca solo due test della Strada
+(`strada-relazioni.test.js` e `strada-uscita-passato.test.js`), che adesso leggono
+`strada-crimine.js` togliendo i `\r` di Windows prima di cercarci dentro testo con l'a capo.
+`npm run verifica` l'ha già fatta girare chi ha lanciato il giro (verde); io ho rifatto girare
+quei due test e `pizzeria-eventi.test.js` (28 passati) e ho passato a mano tutti i 47 file di
+`frontend/test/unit/`, gli aiuti in `frontend/test/helpers/` e `strumenti/audit-regressioni.js`
+cercando ogni ricerca di testo con dentro un a capo.
+
+Guardato e **a posto**:
+- **Negli altri test unitari non c'è lo stesso rischio.** Le uniche ricerche con l'a capo
+  fuori dai due test corretti sono in `pizzeria-eventi.test.js:78` e `:81`, e cercano
+  «a capo + due spazi + nome del ruolo»: su Windows davanti all'a capo c'è un `\r` in più, ma
+  il pezzo cercato c'è lo stesso, quindi lì il test funziona davvero, non per caso. Gli altri
+  `"\n"` dei test servono a incollare pezzi di codice da far girare, non a cercare. Nessun
+  test dice «qui **non** deve esserci» un testo con l'a capo (quelli sì passerebbero per caso
+  su Windows).
+- **La correzione non nasconde niente.** Nei due test il codice della Strada viene tagliato a
+  pezzi cercando dei segnaposto e poi fatto girare: tutto avviene sulla stessa copia senza
+  `\r`, quindi i tagli tornano. Togliere i `\r` non cambia quello che il codice fa, e il file
+  che sta nel repository è già così (senza `\r`): adesso Windows guarda lo stesso testo che
+  vede il server dei controlli. Gli altri file letti negli stessi test (`eventi-v2.js`,
+  `state.js`, `lifestyle.js`, `lavoro-eventi.js`) restano coi `\r`, ma nessuna loro ricerca ha
+  l'a capo dentro.
+
+Trovata invece una cosa nell'audit, che è la cugina di quella sistemata. E una svista
+nell'indice in cima: la frase «La prossima voce nuova è la 95» del primo paragrafo era rimasta
+indietro (più giù, dopo la 100, c'era già scritto «la 101»); sistemata con la chiusura di questa voce (su `main` uscita come 101, nel recap è la 105).
+
+### 105. Due controlli dell'audit che non possono mai scattare
+- **dove** — `frontend/strumenti/audit-regressioni.js:1006` e `:1226`
+- **cosa succede** — sono due controlli del tipo «questo pezzo vecchio **non** deve tornare».
+  Quello alla 1006 (in cabina l'oro non deve stare su «Un'altra take») cerca il pezzo vecchio
+  scritto su due righe; ma l'audit legge `studio.js` coi `\r` di Windows, e su un PC Windows un
+  testo con l'a capo semplice non lo trova mai: se il pezzo vecchio tornasse, sul tuo PC
+  l'audit direbbe lo stesso «a posto». Sul server dei controlli invece funziona. Quello alla
+  1226 (gli sfondi del carcere non devono venire dal pool delle attività criminali) è peggio:
+  è scritto con `\\n`, cioè cerca proprio le due lettere «barra» e «n» invece dell'a capo, e
+  non le trova da nessuna parte, né su Windows né sul server. Oggi il gioco è a posto su tutte
+  e due le cose (l'ho guardato), quindi non c'è niente di rotto: sono due guardie che dormono.
+- **come si vede** — non si vede giocando; si vede solo se qualcuno rimette il codice vecchio
+  e l'audit resta verde.
+- **quanto pesa** — da sistemare con calma.
+
+**RISOLTO (03/10/2026)** — branch `task/test-strada-crlf`: l'audit legge i file senza i `\r` (`leggi`), quindi il controllo su `studio.js` scatta anche su Windows, e quello sugli sfondi del carcere cerca un a capo vero invece di «barra n».

@@ -359,7 +359,7 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
   il TrapPhone è uno sblocco del giro e non c'è più in una carriera nuova, l'heat cambia contatti e
   controlli, il rischio lifestyle confronta le spese con le entrate giustificabili, le persone del
   carcere restano dopo, si può mollare il giro col passato che resta. Le due prove unitarie di quei
-  punti che cercano testo con `\n` cadono su Windows (file in CRLF), anche su `main` pulito;
+  punti che cercavano testo con `\n` cadevano su Windows (file in CRLF): leggono il file senza `\r`;
 - i dialoghi tanti e diversi, e gli scenari uguali nella forma e diversi nelle circostanze:
   tutti e due a metà.
 

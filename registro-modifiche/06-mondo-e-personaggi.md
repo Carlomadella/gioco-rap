@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:246eec98 -->
+## 03/10/26, 11:36 — task/test-strada-crlf → main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `246eec98`
+
+### Cosa è entrato
+
+- `a183aa95` — L'audit legge i file senza i \r: due «non deve tornare» che non scattavano mai — **Carlomadella**
+- `8f4c84ad` — Test della Strada: i toContain con l'a capo passano anche su Windows — **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/test/unit/strada-relazioni.test.js`
+- **Modificato:** `frontend/test/unit/strada-uscita-passato.test.js`
+
+**File interessati in questa categoria:** 5
+
+---
+
 <!-- merge:8cd436f6 -->
 ## 03/10/26, 07:38 — feature/strada-punto20-carcere-relazioni → main
 

@@ -6,6 +6,25 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:246eec98 -->
+## 03/10/26, 11:36 — task/test-strada-crlf → main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `246eec98`
+
+### Cosa è entrato
+
+- `a183aa95` — L'audit legge i file senza i \r: due «non deve tornare» che non scattavano mai — **Carlomadella**
+- `8f4c84ad` — Test della Strada: i toContain con l'a capo passano anche su Windows — **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+
+**File interessati in questa categoria:** 1
+
+---
+
 <!-- merge:dfe55047 -->
 ## 03/10/26, 07:04 — feature/strada-punto18-lifestyle-reddito → main
 
