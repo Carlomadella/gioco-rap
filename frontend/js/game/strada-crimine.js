@@ -3343,7 +3343,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
         fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne." + notaLead + notaPersone,
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
-    s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
+    const costoErrore=stradaHeatCostoErrore();
+    s.heat = clamp(s.heat + (rumore + rumoreLead) * costoErrore, 0, 100);
     if(reputazioneLead) stradaModificaReputazione(reputazioneLead,"crime-failure",{colpoId:colpo.id});
     const notaLeadFallita = leadUsato
       ? (leadUsato.source==="street-opportunity"
@@ -3360,20 +3361,21 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       const ingressoProtetto = !stradaAttivitaSbloccate();
       const primaVolta = s.precedenti === 0 && approccio.id !== "ferro" && colpo.difficolta <= .3;
       if(ingressoProtetto){
-        const multa = Math.max(40, Math.round(colpo.min * .45));
+        const multa = Math.max(40, Math.round(colpo.min * .45 * costoErrore));
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Saltato, ma sei fuori", testo:"<b>" + colpo.n + "</b> è saltato. " +
             "Perdi " + fmt(multa) + " € e attiri attenzione, ma in questa fase nessuno ha abbastanza per mandarti dentro." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
-      }else if(primaVolta && Math.random() < .6){
-        const multa = Math.round(colpo.min * .8);
+      }else if(primaVolta && Math.random() < stradaHeatChanceSoloDenuncia(.6)){
+        const multa = Math.round(colpo.min * .8 * costoErrore);
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
             fmt(multa) + " € di multa. Stavolta è andata." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
-          (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
+          (1 + s.precedenti * .35) * stradaHeatPenaMoltiplicatore() *
+          (stradaHaAvvocatoPrivato() ? .55 : 1)));
         s.precedenti++;
         if(approccio.id==="ferro" && s.ferro){
           const ferroSt=stradaFerroStato();
@@ -4304,15 +4306,17 @@ function stradaSettimana(){
   /* la reputazione si sgonfia un po' se non ti fai vedere */
   s.rep = clamp(s.rep - .6, 0, 100);
 
+  /* Punto 19: dopo il raffreddamento naturale, il valore rimasto modifica
+     persone, porte aperte e richieste del giro. */
+  stradaHeatMuoviMondo(Math.random(),false);
+
   /* Punto 18: il rischio lifestyle si chiude in advanceWeek(), dopo che
      tutte le fonti giustificabili della settimana sono state registrate. */
 
   /* Punto 5: possedere il ferro è già un rischio. Senza ferro i controlli
      seri restano legati a heat > 50; col ferro possono partire prima e la
      probabilità cresce con attenzione e precedenti. */
-  const rischioControllo=s.ferro
-    ? clamp(.03 + Math.max(0,Number(s.heat||0)-20)/100*.18 + Number(s.precedenti||0)*.02 - Number(s.prot||0)*.01,.03,.28)
-    : (s.heat>50?.15:0);
+  const rischioControllo=stradaHeatRischioControllo();
   if(rischioControllo>0 && Math.random()<rischioControllo){
     if(s.ferro){
       const ferroSt=stradaFerroStato();
@@ -4325,10 +4329,19 @@ function stradaSettimana(){
       });
       if(ferroSt.history.length>12) ferroSt.history.shift();
       ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
-      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
+      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) *
+        stradaHeatPenaMoltiplicatore() * (stradaHaAvvocatoPrivato() ? .55 : 1)));
       s.precedenti++; s.arresto = {settimane:settimane, colpo:"perquisizione"};
       pushLog("<b>Controllo alle sei del mattino.</b> Trovano il ferro: viene sequestrato e la situazione diventa penale.", "bad");
-    }else pushLog("Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.", "");
+    }else{
+      const hm=stradaHeatMondoStato(), prof=stradaHeatProfilo();
+      hm.history.push({type:"control",absoluteDay:stradaAbsDay(),heat:Number(s.heat||0),heatBand:prof.id,found:false});
+      if(hm.history.length>30) hm.history.shift();
+      pushLog(prof.id==="critico"
+        ? "<b>Controllo alle sei del mattino.</b> Non trovano niente, ma ormai basta il tuo nome per farli tornare."
+        : "Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.",
+        prof.id==="critico"?"bad":"");
+    }
   }
 
   /* Gli Opp criminali non possono nascere dal nulla su una carriera pulita. */
