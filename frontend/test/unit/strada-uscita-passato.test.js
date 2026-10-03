@@ -9,6 +9,7 @@ const ROOT=path.resolve(QUI,"../..");
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
 const state=fs.readFileSync(path.join(ROOT,"js/game/state.js"),"utf8");
 const lifestyle=fs.readFileSync(path.join(ROOT,"js/game/lifestyle.js"),"utf8");
+const lavoroEventi=fs.readFileSync(path.join(ROOT,"js/game/lavoro-eventi.js"),"utf8");
 
 const helpers=crime.slice(
   crime.indexOf("/* ==================== USCIRE DAL GIRO · PUNTO 21"),
@@ -34,6 +35,9 @@ function runtime(mollato=false){
     stradaFiduciaValore:p=>Number(p?.strada?.fiducia||0),
     stradaRivalitaAttiva:p=>!!p?.strada?.rivalita,
     stradaConseguenzePersona:p=>({debiti:Number(p?.strada?.debitiGiocatore||0)}),
+    stradaFavoriValore:p=>Math.max(0,Number(p?.strada?.favori||0)),
+    stradaRelazioneForte:p=>Number(p?.strada?.fiducia||0)>=50 ||
+      Number(p?.strada?.colpiInsieme||0)>=2 || Number(p?.strada?.favori||0)>0,
     stradaPersonaMeta:p=>p.strada,
     stradaRegistraConseguenzaPersona:()=>null,
     STRADA_FIDUCIA_SQUADRA:25,
@@ -119,9 +123,39 @@ describe("Strada · punto 21 uscita dal giro e memoria del passato",()=>{
     expect(crime).toContain('type:"past-knock"');
     expect(crime).toContain('kind=st.rivalita?"rival"');
     expect(crime).toContain('Number(cons.debiti||0)>0?"debt"');
-    expect(crime).toContain('p.origine==="carcere"');
+    expect(crime).toContain('favori>0?"favor"');
+    expect(crime).toContain('stradaRelazioneForte(p) || p.origine==="carcere"');
     expect(crime).toContain("if(!u.mollato || !stradaPassatoAttivo()) return null;");
     expect(crime).toContain("u.history.push(e)");
+  });
+
+  it("un favore rimasto aperto è davvero candidato alla memoria del passato",()=>{
+    const {ctx,G}=runtime(true);
+    G.gente=[{
+      id:"p-favore",n:"Rami",via:false,
+      strada:{known:true,fiducia:10,favori:1,debitiGiocatore:0,rivalita:false,colpiInsieme:0}
+    }];
+    expect(vm.runInContext('stradaPassatoCandidati().map(x=>x.kind).join(",")',ctx)).toBe("favor");
+  });
+
+  it("uscire blocca anche le nuove dritte criminali nate dal lavoro",()=>{
+    expect(lavoroEventi).toContain('if(typeof stradaPartecipazioneAttiva==="function")');
+    expect(lavoroEventi).toContain("return !!stradaPartecipazioneAttiva()");
+    expect(lavoroEventi).toContain("function clearCrimeLeads(reason)");
+    expect(lavoroEventi).toContain("if(!streetStarted()) return null;");
+    expect(lavoroEventi).toContain("clearCrimeLeads,");
+    expect(crime).toContain('ADF_WORK_EVENTS.clearCrimeLeads("left-giro")');
+  });
+
+  it("Molla richiede davvero i fondi dichiarati e non può azzerare il conto fingendo di aver pagato",()=>{
+    const i=crime.indexOf("function stMollaIlGiro()");
+    const j=crime.indexOf("/* ==================== CARCERE EVENTI",i);
+    const blocco=crime.slice(i,j);
+    expect(blocco).toContain("if(s.arresto) return");
+    expect(blocco).toContain("if(disponibili<costo)");
+    expect(blocco).toContain('"Per mollare il giro ti servono "');
+    expect(crime).toContain('d:manca?"Ti mancano "+fmt(manca)+" €"');
+    expect(crime).toContain("if(stradaPartecipazioneAttiva()){ stToast(t); return; }");
   });
 
   it("il lifestyle usa la memoria residua invece di considerarti criminale per sempre",()=>{
