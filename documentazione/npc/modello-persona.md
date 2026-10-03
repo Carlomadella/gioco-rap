@@ -678,3 +678,214 @@ combinate, scoperta, effetti sulle relazioni e ampliamento degli interessi.
 L'integrazione deve avvenire senza sommare il vecchio bonus `car` a nuovi
 bonus e senza scrivere direttamente nei sottosistemi proprietari.
 
+## Punto 5 — professione e funzione contestuale
+
+**Stato:** definizione riesaminata sulla repository corrente. Nessun campo
+runtime viene convertito in questo punto: il codice legacy usa ancora `ruolo`
+come contratto operativo misto e va migrato soltanto quando generatori,
+selettori e azioni avranno fonti più precise.
+
+### Cinque domande diverse
+
+Per evitare che un solo campo descriva cose incompatibili, il nuovo modello
+distingue:
+
+1. **Professione di base:** che mestiere fa la persona, quando è noto.
+2. **Impiego attuale:** dove e con quale mansione lavora adesso, quando è noto.
+3. **Funzione contestuale:** perché è rilevante in questo incontro o ambiente.
+4. **Competenza:** che cosa sa effettivamente fare.
+5. **Servizio disponibile:** che cosa può fare adesso per il protagonista,
+   tenendo conto di competenza, stato, relazione e gate dell'azione.
+
+Esempio coerente: la stessa persona può essere **magazziniere** come
+professione/impiego, **collega** durante il turno, **rapper** come competenza o
+attività musicale e **contatto della Strada** in un altro contesto. Nessuna di
+queste informazioni richiede una seconda PERSONA.
+
+### Dati previsti
+
+| Informazione | Collocazione | Regola |
+| --- | --- | --- |
+| Professione | `vita.professione` | opzionale; assente = sconosciuta |
+| Competenze | `vita.competenze` | codici espliciti soltanto quando il contenuto prova la capacità |
+| Impiego attuale | `stato.impiego` | punto 6; può cambiare senza cambiare identità |
+| Funzione nell'ambiente | derivata dai fatti del contesto | collega, cliente, socio, compagno di detenzione, contatto Strada ecc. |
+| Origine dell'incontro | storia/metadata esistenti | descrive dove/come ci si è conosciuti |
+| Servizio utilizzabile | vista derivata | competenza + stato + relazione + requisiti dell'azione |
+| Organizzazione collegata | riferimento separato quando necessario | una persona non diventa automaticamente il brand/club/agenzia che rappresenta |
+
+Non salviamo un generico array di “ruoli” per duplicare tutti questi fatti.
+La funzione contestuale deve essere ricavabile dal sottosistema che la possiede
+quando possibile.
+
+### `ruolo` legacy non è una professione canonica
+
+Il campo `p.ruolo` viene oggi usato per semantiche diverse:
+
+- **profili professionali/musicali:** `beatmaker`, `rapper`, `fonico`,
+  `videomaker`, `fotografo`, `stylist`, `promoter`, `manager`, `dj`,
+  `ar`, `avvocato`;
+- **funzioni contestuali:** `collega`, `cliente`, `fornitore`, `rider`,
+  `strada`;
+- **figura legata a un'attività:** `club` rappresenta nel testo un
+  proprietario di club;
+- **entità non necessariamente PERSONA:** `brand` contiene oggi nomi come
+  “Colle Studio”, “Nord Adv”, “Sedici Agency”, “Vetro Lab”, “Casa Rossa” e
+  “Piano B”.
+
+Quindi non è valida una migrazione generale `ruolo → vita.professione`.
+`ruolo` resta compatibile finché ogni consumer non viene convertito; i nuovi
+campi vengono valorizzati solo da una fonte semantica certa.
+
+### Ambiguità verificata 1 — lavoro del protagonista ≠ lavoro dell'NPC
+
+In `actions.js`, quando nasce un incontro lavorativo:
+
+- `workRoleId` riceve `corrente.id`;
+- `workRoleName` riceve `corrente.n`.
+
+`corrente` è il lavoro del **protagonista**. `postoNuovoContattoLavoro()`
+salva questi valori in `origineRuoloLavoro` e `origineRuoloNome` sulla
+persona incontrata.
+
+Questi campi sono quindi **metadati storici dell'incontro**, non prova della
+professione o mansione dell'NPC. Copiarli in `stato.impiego` trasformerebbe,
+per esempio, un cliente incontrato mentre il protagonista lavora in Pizzeria
+nello stesso mestiere del protagonista.
+
+Anche `origineLuogo`, `p.collega` o il fatto di essere incontrato al lavoro
+non bastano da soli a definire un mestiere preciso.
+
+### Ambiguità verificata 2 — socio/dipendente della Strada
+
+Le attività della Strada creano persone tramite un `roleHint` tecnico e poi
+salvano il fatto preciso in:
+
+`p.attivita = { id, ruolo }`
+
+dove `ruolo` è `socio` oppure `dipendente`.
+
+La funzione autorevole nell'attività è quindi `p.attivita.ruolo`, non il
+`p.ruolo` usato come fallback dal generatore. La futura normalizzazione deve
+leggere il fatto specifico senza trasformare “socio” in una professione
+universale o “fornitore” nel mestiere permanente della persona.
+
+### Ambiguità verificata 3 — Trasferte e organizzazioni
+
+`trasferte.js` contiene profili umani e non umani nello stesso catalogo.
+Il caso più netto è `brand`, che viene presentato come “Brand / agenzia” e
+usa nomi di organizzazioni.
+
+Il nuovo modello PERSONA **non deve inventare una biografia umana** per questi
+record storici. Le opzioni compatibili sono:
+
+- mantenere il contatto legacy nel suo formato finché esiste il relativo
+  consumer;
+- quando il contenuto richiede davvero una persona, creare un rappresentante
+  umano distinto e collegarlo all'organizzazione;
+- introdurre in futuro un modello ORGANIZZAZIONE separato se il gameplay lo
+  richiederà.
+
+Il punto 5 non introduce ora quel modello perché sarebbe fuori perimetro.
+
+### Ambiguità verificata 4 — profilo operativo ≠ servizio automatico
+
+Le Trasferte associano `reqKey` a un contatto: avere il numero di un A&R,
+manager, fotografo o altro profilo non significa poter usare subito il suo
+servizio. Allo stesso modo, Sala e Studio hanno già soglie, costi, cooldown e
+requisiti propri.
+
+Il nuovo modello deve quindi evitare flag persistenti tipo
+`puoFareFeat=true` o `puoMixare=true` derivati soltanto dal mestiere.
+
+Un servizio è disponibile se:
+
+1. la competenza pertinente è realmente definita;
+2. la persona è disponibile nel contesto/canale;
+3. il rapporto soddisfa i requisiti;
+4. i gate specifici dell'azione sono soddisfatti.
+
+Un interesse musicale non prova competenza. Una competenza musicale non prova
+che sia la professione principale. Una professione non garantisce disponibilità.
+
+### Professioni multiple e attività secondarie
+
+Non imponiamo una sola etichetta biografica quando la storia prova davvero più
+attività, ma **non generiamo due o tre professioni per ogni NPC per aumentare la
+varietà**.
+
+Regola:
+
+- `vita.professione` descrive il mestiere principale/base quando definito;
+- ulteriori capacità stanno in `vita.competenze`;
+- una seconda professione viene registrata solo se una storyline o un evento
+  ne ha bisogno come dato reale;
+- hobby/interesse non diventano professioni;
+- cambiare impiego non cancella competenze e rapporti già costruiti.
+
+Questa scelta è importante anche rispetto al dimensionamento 300–800: la
+varietà deve nascere dalla combinazione dell'intera PERSONA, non gonfiando ogni
+record con biografie artificialmente complesse.
+
+### Compatibilità per famiglie di `ruolo`
+
+| Legacy | Lettura compatibile | Non dedurre |
+| --- | --- | --- |
+| `beatmaker`, `rapper`, `fonico`, `videomaker`, `fotografo`, `stylist`, `promoter`, `manager`, `dj`, `ar` | profilo professionale/artistico plausibile e contratto operativo esistente | impiego esclusivo, reddito, disponibilità permanente |
+| `avvocato` | professione esplicitamente descritta | essere già assunto dal protagonista |
+| `collega` | funzione lavorativa rispetto al protagonista | mestiere preciso o stessa mansione |
+| `cliente` | funzione nell'ambiente commerciale | professione |
+| `fornitore` | funzione nella fornitura o fallback tecnico | mestiere specifico senza altro dato |
+| `rider` | attività descritta dal contenuto | datore, contratto o impiego attuale per i save legacy |
+| `strada` | funzione/provenienza dal giro | professione “criminale”, attività attuale o condanna |
+| `club` | persona descritta come proprietario/gestore | che il locale e la persona siano la stessa entità dati |
+| `brand` | contatto organizzativo legacy | PERSONA con professione inventata |
+
+### Casi d'accettazione per l'integrazione
+
+Il modello è sufficiente soltanto se i punti successivi possono gestire senza
+duplicazioni questi casi:
+
+1. magazziniere che rappa e diventa collaboratore musicale;
+2. collega che cambia lavoro ma mantiene chat e rapporto;
+3. cliente con professione sconosciuta;
+4. socio/dipendente letto da `p.attivita`, senza reinterpretare il fallback;
+5. persona conosciuta in carcere senza professione criminale forzata;
+6. avvocato conosciuto ma non ancora incaricato;
+7. rapper/beatmaker/fonico con requisiti di servizio ancora applicati;
+8. A&R o manager con numero ma `reqKey` non ancora soddisfatto;
+9. brand/agenzia legacy mantenuta senza inventare una PERSONA;
+10. stessa persona presente in Sala, lavoro e Strada con un unico ID.
+
+### Sufficienza rispetto alla simulazione
+
+La simulazione di dimensionamento misura persone distinte, non professioni
+distinte. Non c'è quindi alcun requisito di avere centinaia di mestieri.
+
+Per sostenere una popolazione nell'ordine 300–800 è invece importante che:
+
+- professione e competenze siano opzionali e leggere;
+- le funzioni contestuali non vengano duplicate in ogni PERSONA se possono
+  essere derivate dai sottosistemi;
+- cambiare contesto non crei nuove copie dello stesso individuo;
+- i generatori non assegnino professioni artificiali solo per “riempire” il
+  profilo;
+- le distribuzioni future siano valutate sui generatori reali, non sulle
+  etichette legacy.
+
+Il punto 5 non richiede quindi nuove strutture pesanti o simulazione economica
+degli NPC.
+
+### Confine del punto 5
+
+**Chiuso come definizione:** separazione fra professione, impiego, funzione,
+competenza, servizio e organizzazione; interpretazione conservativa di
+`ruolo`; quattro ambiguità concrete documentate; criteri d'accettazione.
+
+**Non implementato qui:** `vita.professione`, `vita.competenze`,
+`stato.impiego`, conversione dei consumer di `ruolo`, modello
+ORGANIZZAZIONE, migrazione legacy o selettori basati sui nuovi dati.
+
+Queste parti devono essere integrate nei punti successivi senza perdere i gate
+esistenti di Sala, Studio, Trasferte, lavoro, Strada e sistema legale.
+
