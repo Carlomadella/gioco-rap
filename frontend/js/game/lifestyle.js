@@ -110,32 +110,36 @@ function lifestyleOstentazione(){
   return Math.max(0,Math.min(10,media*7+Math.min(3,vestiti/700)));
 }
 
-function lifestyleSnapshotCorrente(){
+function lifestyleSnapshotCorrente(completa){
   const st=lifestyleRischioStato();
   const ricorrente=Math.max(0,Number(lifeCost())||0);
   const vestiti=lifestyleValoreVestitiVisibili();
-  /* Un outfit costoso è un segnale di ricchezza, non una spesa ripetuta ogni
-     settimana: gli attribuiamo solo un piccolo peso equivalente. */
-  const segnaleVestiti=vestiti*.05;
+  /* Durante la settimana il pannello mostra solo la quota già "maturata":
+     il lunedì non deve sembrare che hai già speso sette giorni di affitto,
+     auto e serate. La chiusura settimanale passa completa=true. */
+  const progresso=completa ? 1 : Math.max(1/7,Math.min(1,Number(G.day||1)/7));
+  const segnaleVestiti=vestiti*.05*progresso;
+  const ricorrenteMaturato=ricorrente*progresso;
   return {
     key:st.key,
     entrate:Math.max(0,Number(st.entrate)||0),
-    ricorrente,
+    ricorrente:ricorrenteMaturato,
+    ricorrentePieno:ricorrente,
     extra:Math.max(0,Number(st.speseExtra)||0),
     vestiti,
-    visibile:ricorrente+Math.max(0,Number(st.speseExtra)||0)+segnaleVestiti,
+    visibile:ricorrenteMaturato+Math.max(0,Number(st.speseExtra)||0)+segnaleVestiti,
     fonti:Object.assign({},st.fonti),
     speseFonti:Object.assign({},st.speseFonti)
   };
 }
 
-function lifestyleMediaRischio(includiCorrente){
+function lifestyleMediaRischio(includiCorrente,correnteCompleta){
   const st=lifestyleRischioStato();
   const righe=st.history.slice(-3).map(x=>({
     entrate:Number(x.entrate||0),
     visibile:Number(x.visibile||0)
   }));
-  if(includiCorrente!==false) righe.push(lifestyleSnapshotCorrente());
+  if(includiCorrente!==false) righe.push(lifestyleSnapshotCorrente(!!correnteCompleta));
   if(!righe.length) return {entrate:0,visibile:0,settimane:0};
   return {
     entrate:righe.reduce((n,x)=>n+x.entrate,0)/righe.length,
@@ -156,7 +160,7 @@ function lifestyleClassificaRischio(media){
 
 function lifestyleRiepilogoRischio(){
   const st=lifestyleRischioStato();
-  const media=lifestyleMediaRischio(true);
+  const media=lifestyleMediaRischio(true,false);
   const classe=lifestyleClassificaRischio(media);
   return {
     ...classe,
@@ -179,8 +183,8 @@ function lifestyleChiudiSettimanaRischio(){
   const st=lifestyleRischioStato();
   if(st.closedKey===st.key && st.last) return st.last;
 
-  const snap=lifestyleSnapshotCorrente();
-  const media=lifestyleMediaRischio(true);
+  const snap=lifestyleSnapshotCorrente(true);
+  const media=lifestyleMediaRischio(true,true);
   const classe=lifestyleClassificaRischio(media);
   const giro=(typeof stradaGiroAvviato==="function")
     ? !!stradaGiroAvviato()
