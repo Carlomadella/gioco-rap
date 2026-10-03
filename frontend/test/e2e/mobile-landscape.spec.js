@@ -126,6 +126,36 @@ test("landscape mobile: Inizia mostra tutte le voci senza blocco nero", async ({
   expect(misure.ultimoBottom).toBeLessThanOrEqual(misure.pannelloBottom + 1);
 });
 
+test("landscape mobile basso: Inizia usa tutto il viewport e resta scorrevole", async ({ page }) => {
+  await page.setViewportSize({ width: 780, height: 280 });
+  await page.goto("/pagine/landing.html");
+  await page.locator("#m-play").tap();
+
+  const pannello = page.locator(".land-avvio");
+  await expect(pannello).toBeVisible();
+  await expect(pannello).toHaveCSS("position", "fixed");
+  await expect(page.locator(".land-dock")).toBeHidden();
+
+  const misure = await pannello.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    return {
+      top: r.top,
+      bottom: r.bottom,
+      vh: innerHeight,
+      clientHeight: el.clientHeight,
+      scrollHeight: el.scrollHeight
+    };
+  });
+  expect(misure.top).toBeGreaterThanOrEqual(-1);
+  expect(misure.bottom).toBeLessThanOrEqual(misure.vh + 1);
+  expect(misure.clientHeight).toBeGreaterThanOrEqual(misure.vh - 1);
+  expect(misure.scrollHeight).toBeGreaterThan(misure.clientHeight);
+
+  const importa = pannello.getByText("Importa partita", { exact: true });
+  await importa.scrollIntoViewIfNeeded();
+  await expect(importa).toBeVisible();
+});
+
 test("landscape mobile: Inizia ha sempre un Chiudi che riporta alla landing", async ({ page }) => {
   await page.goto("/pagine/landing.html");
   await page.locator("#m-play").tap();
