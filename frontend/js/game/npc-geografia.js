@@ -179,7 +179,9 @@
     if(esistente) return Object.freeze({...esistente});
 
     const prima=posizione(p,Math.max(1,nuovo.dalGiorno-1));
-    if(prima && prima.cittaId===nuovo.cittaId)
+    /* Se la stessa città arriva solo da un campo legacy, questa chiamata è
+       comunque un fatto esplicito e va materializzata nella timeline. */
+    if(prima && prima.cittaId===nuovo.cittaId && prima.esplicita===true)
       return Object.freeze({
         cittaId:prima.cittaId,
         dalGiorno:prima.dalGiorno,
