@@ -106,12 +106,16 @@
     /* Il primo momento noto resta stabile. I vecchi record senza tipo vengono
        arricchiti soltanto quando un evento li tocca davvero. */
     rec.tipo=t;
-    if(per!=null) rec.percezione=per;
-    else if(Object.prototype.hasOwnProperty.call(opts,"percezione")) delete rec.percezione;
+    if(opts.hasPercezione===true){
+      if(per!=null) rec.percezione=per;
+      else delete rec.percezione;
+    }
 
-    if(opts.sottotipo!=null && String(opts.sottotipo).trim())
-      rec.sottotipo=String(opts.sottotipo).trim();
-    else if(Object.prototype.hasOwnProperty.call(opts,"sottotipo")) delete rec.sottotipo;
+    if(opts.hasSottotipo===true){
+      if(opts.sottotipo!=null && String(opts.sottotipo).trim())
+        rec.sottotipo=String(opts.sottotipo).trim();
+      else delete rec.sottotipo;
+    }
 
     if(opts.reason!=null && String(opts.reason).trim())
       rec.reason=String(opts.reason);
@@ -132,12 +136,23 @@
     const baseTipo=tipo(opts.tipo);
     const reciproco=opts.reciproco!==false;
 
+    const hasPerA=Object.prototype.hasOwnProperty.call(opts,"percezioneA") ||
+      Object.prototype.hasOwnProperty.call(opts,"percezione");
+    const hasPerB=Object.prototype.hasOwnProperty.call(opts,"percezioneB") ||
+      Object.prototype.hasOwnProperty.call(opts,"percezione");
+    const hasSubA=Object.prototype.hasOwnProperty.call(opts,"sottotipoA") ||
+      Object.prototype.hasOwnProperty.call(opts,"sottotipo");
+    const hasSubB=Object.prototype.hasOwnProperty.call(opts,"sottotipoB") ||
+      Object.prototype.hasOwnProperty.call(opts,"sottotipo");
+
     const va=upsert(a,b,{
       tipo:opts.tipoA||baseTipo,
       percezione:Object.prototype.hasOwnProperty.call(opts,"percezioneA")
         ? opts.percezioneA : opts.percezione,
+      hasPercezione:hasPerA,
       sottotipo:Object.prototype.hasOwnProperty.call(opts,"sottotipoA")
         ? opts.sottotipoA : opts.sottotipo,
+      hasSottotipo:hasSubA,
       reason:opts.reason,
       sinceWeek:opts.sinceWeek
     });
@@ -148,8 +163,10 @@
         tipo:opts.tipoB||baseTipo,
         percezione:Object.prototype.hasOwnProperty.call(opts,"percezioneB")
           ? opts.percezioneB : opts.percezione,
+        hasPercezione:hasPerB,
         sottotipo:Object.prototype.hasOwnProperty.call(opts,"sottotipoB")
           ? opts.sottotipoB : opts.sottotipo,
+        hasSottotipo:hasSubB,
         reason:opts.reason,
         sinceWeek:opts.sinceWeek
       });
