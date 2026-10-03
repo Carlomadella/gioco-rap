@@ -437,7 +437,7 @@ const DIALOGHI = {
    sociali normali: fanno crescere il rapporto personale, NON la futura
    fiducia criminale del punto 4. */
 function dialogoCarcereFuori(p){
-  const rapporto=Number(p&&p.carcere&&p.carcere.rapporto||0);
+  const rapporto=postoRapportoCarcere(p);
   if((p.strada&&p.strada.rivalita===true) || rapporto<=-4){
     return {
       jailOutside:"rival",
@@ -522,8 +522,34 @@ const DIALOGHI_VITA = Object.freeze([
 ]);
 
 /* ==================== LA GENTE ==================== */
-function relNome(p){ return REL_NOMI[clamp(p.rel, 0, 5)]; }
-function relSoglia(p){ return 3 + p.rel; }         /* più sali, più costa salire */
+function postoRelazioniApi(){
+  try{
+    const a=typeof window!=="undefined" ? window.ADF_NPC_RELAZIONI : null;
+    return a&&typeof a==="object" ? a : null;
+  }catch(_){ return null; }
+}
+function postoRelazioneSocialeLivello(p){
+  const a=postoRelazioniApi();
+  try{
+    if(a&&typeof a.sociale==="function"){
+      const s=a.sociale(p);
+      if(s) return Number(s.livello||0);
+    }
+  }catch(_){}
+  return clamp(Number(p&&p.rel||0),0,5);
+}
+function postoRapportoCarcere(p){
+  const a=postoRelazioniApi();
+  try{
+    if(a&&typeof a.carcere==="function"){
+      const s=a.carcere(p);
+      if(s&&s.rapporto!=null) return Number(s.rapporto);
+    }
+  }catch(_){}
+  return Number(p&&p.carcere&&p.carcere.rapporto||0);
+}
+function relNome(p){ return REL_NOMI[clamp(postoRelazioneSocialeLivello(p), 0, 5)]; }
+function relSoglia(p){ return 3 + postoRelazioneSocialeLivello(p); } /* più sali, più costa salire */
 
 function nuovaPersona(ruolo){
   /* i rapper pescano dagli stessi nomi dei rivali: un nome che sta gia' in
@@ -678,7 +704,7 @@ function postoRientroCarcereDisponibile(p){
   if(quando==null && m.linkedStreet!==true && m.outsideFollowupDone!==true){
     const uscita=postoGiornoAssolutoValido(m.releasedAbsoluteDay);
     if(uscita!=null){
-      const rapporto=Number(m.rapporto||0);
+      const rapporto=postoRapportoCarcere(p);
       const ritardo=rapporto>=2?42:rapporto>=1?56:rapporto===0?84:63;
       quando=uscita+ritardo;
       m.returnAfterAbsoluteDay=quando;
