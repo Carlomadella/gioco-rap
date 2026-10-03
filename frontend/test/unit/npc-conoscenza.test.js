@@ -112,6 +112,25 @@ describe("NPC · punto 12 discovery informazioni",()=>{
     expect(api.legamiConosciuti(x)).toEqual([{personId:"p2",tipo:"conoscenza"}]);
   });
 
+  it("può conoscere solo alcuni tipi di un legame multi-tipo",()=>{
+    const api=runtime();
+    const x=p({reteLegami:[{
+      personId:"p2",tipi:["amicizia","collaborazione"],percezione:"positiva"
+    }]});
+    api.scopriLegame(x,"p2",{tipo:"amicizia"},{fonte:"confidenza",giorno:6});
+    expect(api.legamiConosciuti(x)).toEqual([{personId:"p2",tipo:"amicizia"}]);
+
+    api.scopri(x,{tipo:"legame-tipo",id:"p2",valore:"collaborazione"},{
+      fonte:"progetto",giorno:8
+    });
+    expect(api.legamiConosciuti(x)).toEqual([{
+      personId:"p2",tipi:["amicizia","collaborazione"]
+    }]);
+    expect(api.sa(x,{
+      tipo:"legame-percezione",id:"p2",valore:"positiva"
+    })).toBe(false);
+  });
+
   it("un legame che cambia non rivela automaticamente il nuovo tipo",()=>{
     const api=runtime();
     const x=p({reteLegami:[{personId:"p2",tipo:"conoscenza"}]});
