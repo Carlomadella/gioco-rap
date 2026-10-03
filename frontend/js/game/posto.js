@@ -436,6 +436,29 @@ const DIALOGHI = {
    al Circolo, parlaCon() non aveva dialoghi per loro. Questi sono dialoghi
    sociali normali: fanno crescere il rapporto personale, NON la futura
    fiducia criminale del punto 4. */
+function dialogoCarcereFuori(p){
+  const rapporto=Number(p&&p.carcere&&p.carcere.rapporto||0);
+  if(rapporto>=1){
+    return {
+      jailOutside:"favore",
+      t:"Vi siete già visti dietro una porta che adesso non c'è più. "+p.n+
+        " ti ricorda una cosa fatta insieme dentro e ti chiede una mano per rimettere in ordine una faccenda fuori.",
+      o:[
+        ["Gli dai una mano",2,"pratico"],
+        ["Gli dici che il carcere è finito e vuoi tenerlo lì",0,"diffidente"]
+      ]
+    };
+  }
+  return {
+    jailOutside:"reincontro",
+    t:"Per un secondo vi riconoscete senza sapere bene se salutarvi. Dentro dividevate lo stesso spazio; fuori siete di nuovo due persone libere.",
+    o:[
+      ["Ti fermi e scambi due parole",1,"aperto"],
+      ["Fai un cenno e tieni le distanze",0,"diffidente"]
+    ]
+  };
+}
+
 const DIALOGHI_VITA = Object.freeze([
   Object.freeze({
     t:"Ti fa un cenno e resta appoggiato al bancone. «Com'è che gira, ultimamente?»",
@@ -614,7 +637,32 @@ function postoScambiaNumeroLavoro(p){
   return p;
 }
 
+function postoRientroCarcereDisponibile(p){
+  if(!p || p.via || p.origineLuogo!=="carcere" || p.circoloSbloccato || !p.carcere)
+    return false;
+  const m=p.carcere;
+  if(m.currentJailId) return false;
+  const quando=Number(m.returnAfterAbsoluteDay);
+  if(!Number.isFinite(quando)) return false;
+  const oggi=typeof stradaAbsDay==="function"
+    ? stradaAbsDay()
+    : (((Math.max(1,Number(G.year)||1)-1)*52+(Math.max(1,Number(G.week)||1)-1))*7+
+       (Math.max(1,Number(G.day)||1)-1)+1);
+  if(oggi<quando) return false;
+
+  /* Il carcere non genera un contatto gratis: sblocca soltanto la possibilità
+     di ritrovare FUORI la stessa persona. Il seguito dipenderà da cosa fai
+     quando la incontri davvero. */
+  p.circoloSbloccato=true;
+  m.returnAfterAbsoluteDay=null;
+  if(typeof pushLog==="function")
+    pushLog("<b>Una faccia del carcere è tornata fuori.</b> "+p.n+
+      " ha ricominciato a girare in provincia. Prima o poi potreste incrociarvi.","");
+  return true;
+}
+
 function postoSoloLavoro(p){
+  postoRientroCarcereDisponibile(p);
   return !!(p && p.origineLuogo && !p.circoloSbloccato);
 }
 
@@ -1000,7 +1048,11 @@ function parlaCon(id){
   G.energy -= PO_COSTO.parla;
   poTempoAvanza("parla");
   const pool = DIALOGHI[p.ruolo] || DIALOGHI_VITA;
-  POSTO_PARLA = {p:p, sit:pick(pool)};
+  const jailFollowup=(p.origine==="carcere" && p.carcere &&
+    p.carcere.releasedAbsoluteDay!=null && !p.carcere.outsideFollowupDone)
+      ? dialogoCarcereFuori(p)
+      : null;
+  POSTO_PARLA = {p:p, sit:jailFollowup||pick(pool)};
   SFX.tap(); save(); renderPosto();
   if(typeof renderHub === "function") renderHub();
 }
@@ -1041,6 +1093,40 @@ function poRispondi(i){
   p.pt += pt;
   gain("rete", pt > 0 ? 0.5 : 0.1);
   addLuc(1);
+
+  /* Punto Strada 20: il primo vero incontro DOPO il carcere chiude il filo
+     sospeso. Se il rapporto dentro era positivo, la persona può chiedere un
+     favore: ricambiarlo non regala una relazione, ma rende concreto il ponte
+     fra rapporto carcerario, rete sociale e fiducia della Strada. */
+  if(sit.jailOutside && p.carcere){
+    p.carcere.outsideFollowupDone=true;
+    if(sit.jailOutside==="favore"){
+      if(i===0){
+        if(typeof stradaSegnaPersona==="function")
+          stradaSegnaPersona(p,{
+            key:"carcere:"+p.id,
+            source:"carcere-reunion",
+            story:"Vi siete conosciuti dentro e vi siete ritrovati fuori."
+          });
+        if(typeof stradaModificaFiducia==="function")
+          stradaModificaFiducia(p,4,"carcere-favore-fuori");
+        if(typeof stradaAggiungiFavore==="function")
+          stradaAggiungiFavore(p,1,"carcere-favore-fuori");
+        if(typeof postoRegistraConseguenzaMondo==="function")
+          postoRegistraConseguenzaMondo(p,"jail-reunion-helped",1,{
+            source:"carcere",reason:"favore-ricambiato-fuori",context:"circolo"
+          });
+      }else if(typeof postoRegistraConseguenzaMondo==="function"){
+        postoRegistraConseguenzaMondo(p,"jail-reunion-declined",0,{
+          source:"carcere",reason:"favore-rifiutato-fuori",context:"circolo"
+        });
+      }
+    }else if(typeof postoRegistraConseguenzaMondo==="function"){
+      postoRegistraConseguenzaMondo(p,"jail-reunion",i===0?1:0,{
+        source:"carcere",reason:i===0?"reincontro-aperto":"reincontro-freddo",context:"circolo"
+      });
+    }
+  }
 
   /* si sale di un gradino alla volta */
   let salito = false;
