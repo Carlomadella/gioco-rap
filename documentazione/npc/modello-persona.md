@@ -2065,22 +2065,33 @@ Non deduciamo:
 I nuovi record possono contenere:
 
 - `personId`;
-- `tipo`;
+- `tipi[]`;
 - `percezione`;
 - `sottotipo`;
 - `reason`;
 - `sinceWeek`.
 
 `reason` continua a conservare **perché** il legame è nato.
-`tipo` descrive **che rapporto è**.
+`tipi[]` descrive **quali rapporti attuali coesistono**.
 
 I due campi non sono intercambiabili.
 
 Esempio:
 
-`tipo: "conoscenza", reason: "strada-referral"`
+`tipi:["conoscenza"], reason:"strada-referral"`
 
 è diverso da inventare un nuovo tipo `strada-referral`.
+
+Una coppia non deve perdere informazione quando due rapporti specifici
+coesistono. Per esempio:
+
+`tipi:["parentela","collaborazione"]`
+
+rappresenta due parenti che lavorano anche insieme senza creare due archi
+separati.
+
+La vista espone anche `tipo` come comodità **solo quando esiste un unico tipo
+non ambiguo**; con più tipi vale `null` e il consumer deve leggere `tipi[]`.
 
 ### Compatibilità legacy
 
@@ -2097,8 +2108,8 @@ viene letto come:
 
 La semplice lettura **non modifica il salvataggio**.
 
-Il record viene arricchito con `tipo` o altri campi soltanto quando un nuovo
-evento tocca realmente quel rapporto.
+Il record viene arricchito con `tipi[]` o altri campi soltanto quando un
+nuovo evento tocca realmente quel rapporto.
 
 Non viene eseguita una migrazione massiva al caricamento.
 
@@ -2175,15 +2186,28 @@ esempio:
 Non vengono creati decine di tipi principali solo per rappresentare ruoli
 complementari.
 
-### Evoluzione del rapporto
+### Evoluzione e coesistenza del rapporto
 
 Per una stessa direzione esiste un solo record per `personId`.
 
-Quindi:
+`conoscenza` è il fallback generico. Quando emerge un tipo specifico viene
+tolta perché ridondante:
 
 `conoscenza → collaborazione`
 
-aggiorna il legame esistente invece di crearne un secondo.
+resta quindi un solo arco con `tipi:["collaborazione"]`.
+
+I tipi specifici possono invece convivere:
+
+- `parentela + collaborazione`;
+- `amicizia + collaborazione`;
+- `parentela + rivalita`.
+
+Questo evita di perdere un fatto stabile soltanto perché ne emerge un altro.
+
+`rimuoviTipo()` consente a un evento futuro di chiudere una sola dimensione
+senza distruggere le altre. La rimozione è direzionale: la reciprocità non viene
+inventata.
 
 `sinceWeek` conserva il primo momento noto del rapporto; un aggiornamento
 successivo non riscrive la sua origine storica.
@@ -2202,13 +2226,14 @@ serve appartiene ai sistemi/event log che hanno prodotto il cambiamento.
 - `legami(p, opzioni)`;
 - `legame(p, personId)`;
 - `collega(a, b, opzioni)`;
+- `rimuoviTipo(da, aChi, tipo)`;
 - `tra(a, b)`;
 - `personeCollegate(p, persone, opzioni)`.
 
 `tra(a,b)` restituisce due concetti distinti:
 
 - `reciproco`: esistono entrambe le direzioni;
-- `simmetrico`: le due direzioni hanno stesso tipo, percezione e sottotipo.
+- `simmetrico`: le due direzioni hanno gli stessi tipi, percezione e sottotipo.
 
 Una relazione può quindi essere reciproca senza essere simmetrica.
 
@@ -2316,6 +2341,9 @@ e decidere se il Population Manager del punto 16 debba mantenere anche un indice
 - tipi/percezioni asimmetrici;
 - legame direzionale;
 - parentela con sottotipi complementari;
+- più tipi specifici contemporanei sulla stessa coppia;
+- conoscenza generica sostituita da un tipo specifico;
+- rimozione selettiva di un singolo tipo;
 - evoluzione senza duplicati;
 - conservazione di `sinceWeek`;
 - arricchimento lazy del legacy;
@@ -2337,8 +2365,8 @@ e decidere se il Population Manager del punto 16 debba mantenere anche un indice
 ### Confine del punto 11
 
 **Chiuso:** catalogo minimo dei legami, grafo sparso, compatibilità legacy,
-reciprocità, asimmetria, percezioni, parentela tipizzata, evoluzione senza
-duplicati, integrazione Circolo/Strada.
+reciprocità, asimmetria, percezioni, tipi specifici coesistenti, parentela
+tipizzata, evoluzione/rimozione senza duplicati e integrazione Circolo/Strada.
 
 **Non implementato qui:** discovery dei legami da parte del giocatore, UI della
 rete, generazione automatica di famiglie/amicizie/rivalità, cluster e gruppi,
