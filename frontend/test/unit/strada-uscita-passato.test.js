@@ -118,6 +118,14 @@ describe("Strada · punto 21 uscita dal giro e memoria del passato",()=>{
     expect(crime.slice(income,exit)).toContain('lifestyleRegistraEntrata(redditoAttivita,"attivita")');
   });
 
+  it("le attività possedute restano imprese normali senza offrire nuove funzioni criminali",()=>{
+    expect(crime).toContain('return "Hai mollato il giro: le attività che possiedi restano imprese normali');
+    expect(crime).toContain("if(partecipa&&!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)");
+    expect(crime).toContain("if(partecipa&&!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)");
+    expect(crime).toContain("'lato criminale chiuso · '");
+    expect(crime).toContain("(partecipa?'Rileva':'Fuori dal giro')");
+  });
+
   it("il passato può bussare tramite persone reali e poi smette dopo la scadenza",()=>{
     expect(crime).toContain("function stradaPassatoSettimana(roll,variantRoll)");
     expect(crime).toContain('type:"past-knock"');
