@@ -70,6 +70,35 @@ describe("NPC · punto 12 integrazione discovery",()=>{
     ]);
   });
 
+  it("un referral non svela tipi privati preesistenti sullo stesso legame",()=>{
+    const window=runtime();
+    const code=blocco(strada,"function stradaNpcTipoLegame(reason)","function stradaNpcGruppiPersona");
+    const api=new Function(
+      "window","stradaNpcAdapter","stradaAbsDay","postoCollegaPersone","Object","String","Array",
+      code+"\\nreturn stradaNpcCollega;"
+    )(
+      window,()=>null,()=>18,
+      (a,b,reason,cfg)=>{
+        window.ADF_NPC_LEGAMI.collega(a,b,{tipo:cfg.tipo,reason,sinceWeek:3});
+        return true;
+      },
+      Object,String,Array
+    );
+    const a={id:"a"},b={id:"b"};
+    window.ADF_NPC_LEGAMI.collega(a,b,{
+      tipo:"amicizia",percezioneA:"positiva",percezioneB:"positiva",
+      reason:"storia-privata",sinceWeek:1
+    });
+
+    api(a,b,"strada-referral");
+    expect(window.ADF_NPC_CONOSCENZA.legamiConosciuti(a)).toEqual([
+      {personId:"b"}
+    ]);
+    expect(window.ADF_NPC_CONOSCENZA.sa(a,{
+      tipo:"legame-tipo",id:"b",valore:"amicizia"
+    })).toBe(false);
+  });
+
   it("una collaborazione vissuta viene scoperta come collaborazione, non amicizia",()=>{
     const window=runtime();
     const code=blocco(strada,"function stradaNpcTipoLegame(reason)","function stradaNpcGruppiPersona");
