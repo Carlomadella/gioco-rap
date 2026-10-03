@@ -116,6 +116,7 @@ describe("Strada · punto 22 contratto crime verso sistema NPC",()=>{
     expect(block).not.toContain("creaGruppo");
     expect(block).not.toContain("professione");
     expect(block).not.toContain("tratti:");
-    expect(crime).toContain("variante.networkGroupIds=introCtx.groupIds");
+    expect(crime).toContain("variante.networkGroupIds=networkCtx.groupIds");
+    expect(crime).toContain("causa.introducedBy||causa.person");
   });
 });
