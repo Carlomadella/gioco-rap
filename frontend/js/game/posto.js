@@ -648,6 +648,20 @@ function postoScambiaNumeroLavoro(p){
   return p;
 }
 
+function postoGiornoAssolutoValido(v){
+  /* Le date persistite possono arrivare come numero o stringa numerica.
+     Null/false/stringa vuota non sono il giorno zero: significano dato assente. */
+  if(typeof v==="number")
+    return Number.isSafeInteger(v) && v>0 ? v : null;
+  if(typeof v==="string"){
+    const s=v.trim();
+    if(!/^\d+$/.test(s)) return null;
+    const n=Number(s);
+    return Number.isSafeInteger(n) && n>0 ? n : null;
+  }
+  return null;
+}
+
 function postoRientroCarcereDisponibile(p){
   if(!p || p.via || p.origineLuogo!=="carcere" || p.circoloSbloccato || !p.carcere)
     return false;
@@ -658,17 +672,19 @@ function postoRientroCarcereDisponibile(p){
     : (((Math.max(1,Number(G.year)||1)-1)*52+(Math.max(1,Number(G.week)||1)-1))*7+
        (Math.max(1,Number(G.day)||1)-1)+1);
 
-  let quando=Number(m.returnAfterAbsoluteDay);
+  let quando=postoGiornoAssolutoValido(m.returnAfterAbsoluteDay);
   /* Migrazione dei salvataggi creati dalla prima versione del punto 20:
      avevano releasedAbsoluteDay ma nessuna data di riemersione. */
-  if(!Number.isFinite(quando) && m.releasedAbsoluteDay!=null &&
-     m.linkedStreet!==true && m.outsideFollowupDone!==true){
-    const rapporto=Number(m.rapporto||0);
-    const ritardo=rapporto>=2?42:rapporto>=1?56:rapporto===0?84:63;
-    quando=Number(m.releasedAbsoluteDay)+ritardo;
-    m.returnAfterAbsoluteDay=quando;
+  if(quando==null && m.linkedStreet!==true && m.outsideFollowupDone!==true){
+    const uscita=postoGiornoAssolutoValido(m.releasedAbsoluteDay);
+    if(uscita!=null){
+      const rapporto=Number(m.rapporto||0);
+      const ritardo=rapporto>=2?42:rapporto>=1?56:rapporto===0?84:63;
+      quando=uscita+ritardo;
+      m.returnAfterAbsoluteDay=quando;
+    }
   }
-  if(!Number.isFinite(quando) || oggi<quando) return false;
+  if(quando==null || oggi<quando) return false;
 
   /* Il carcere non genera un contatto gratis: sblocca soltanto la possibilità
      di ritrovare FUORI la stessa persona. Il seguito dipenderà da cosa fai
