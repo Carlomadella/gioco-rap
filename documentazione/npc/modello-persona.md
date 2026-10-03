@@ -297,3 +297,203 @@ Il punto 2 è quindi chiuso come **definizione architetturale verificata**, con
 due requisiti aggiunti rispetto alla prima versione: unicità garantita degli ID
 e capacità nominale/visuale coerente con la scala 300–800.
 
+## Punto 3 — personalità combinatoria
+
+**Stato:** catalogo riesaminato sulla repository corrente e sul dimensionamento.
+Il punto chiude la struttura della personalità e il catalogo operativo di base;
+non introduce ancora effetti runtime.
+
+### Valutazione del catalogo
+
+I dodici tratti iniziali del checkpoint non coprivano abbastanza bene alcune
+situazioni già presenti nel gioco: critica e provocazione, memoria del torto e
+riparazione, revisione di un piano e continuità degli impegni. Il lavoro Work
+aveva quindi ampliato il catalogo a venti candidati.
+
+Il reaudit sulla repository corrente conferma quasi interamente quella scelta,
+ma distingue **catalogo operativo** e **candidati sospesi** invece di trattare
+tutti e venti come ugualmente pronti.
+
+### Catalogo operativo di base — 18 tratti
+
+| ID | Disposizione | Confine necessario |
+| --- | --- | --- |
+| `prudente` | valuta rischi e conseguenze prima di esporsi | non equivale a diffidenza verso le persone |
+| `diffidente` | cerca riscontri prima di affidarsi a qualcuno | non assegna fiducia bassa o ostilità |
+| `ambizioso` | cerca crescita, risultati e avanzamento | non implica competizione o tradimento |
+| `impulsivo` | tende a decidere/agire prima di valutare tutto | non implica aggressività o criminalità |
+| `leale` | dà peso ai legami e agli impegni verso persone reali | richiede un legame esistente; non crea amicizia |
+| `socievole` | sostiene lo scambio e cerca interazione | non implica confidenza o fiducia immediata |
+| `opportunista` | valuta il vantaggio personale di una situazione | non implica tradimento sistematico |
+| `generoso` | considera di condividere tempo, risorse o aiuto | non crea risorse né disponibilità |
+| `competitivo` | dà peso al confronto con gli altri | non crea una rivalità specifica |
+| `riservato` | limita l'accesso alla propria vita personale | non equivale a isolamento o diffidenza |
+| `pratico` | preferisce soluzioni concrete e attuabili | non descrive professione o assenza di ideali |
+| `idealista` | dà peso a principi e modo in cui si raggiunge un risultato | non implica ingenuità |
+| `permaloso` | tende a vivere critiche come svalutazione personale | non implica aggressività o memoria eterna del torto |
+| `irascibile` | reagisce con irritazione sotto provocazione/pressione | non implica violenza né impulsività generale |
+| `rancoroso` | mantiene peso persistente a un torto realmente avvenuto | non inventa torti o ostilità |
+| `conciliante` | cerca di ricomporre conflitti | non cancella conseguenze, debiti o tensione |
+| `flessibile` | considera una revisione del piano quando cambiano le condizioni | non equivale a opportunismo |
+| `ostinato` | tende a mantenere posizione o piano | non equivale ad ambizione o incapacità |
+
+### Candidati sospesi — 2 tratti
+
+- `disciplinato`: continuità, organizzazione e mantenimento degli impegni;
+- `incostante`: difficoltà nel mantenere continuità e impegni nel tempo.
+
+La repository corrente contiene dialoghi su promesse, puntualità e persone che
+mantengono la parola, ma questo è ancora **contenuto conversazionale**. Non
+esiste un contratto generale NPC che registri un impegno personale, ne attenda
+la scadenza e valuti in seguito se quella stessa persona lo ha mantenuto.
+
+Per questo i due tratti restano nel catalogo progettuale, ma **non entrano nella
+generazione generica finché esiste soltanto il dialogo iniziale**. Quando un
+sistema di impegni persistenti o un evento equivalente offrirà un trigger
+verificabile, potranno essere promossi nel catalogo operativo senza cambiare la
+struttura PERSONA.
+
+Questa scelta evita di aumentare artificialmente il catalogo con tratti che il
+giocatore non potrebbe distinguere durante la partita.
+
+### Perché non aggiungere un equivalente diretto di `gasato`
+
+Il carattere legacy `gasato` è oggi associato a risposte molto eterogenee:
+vantarsi, cercare confronto, reagire male a una critica, improvvisare, sostenere
+che il proprio lavoro sia migliore, negare un problema o spingere verso una
+scelta appariscente.
+
+Non è quindi una singola disposizione sufficientemente precisa da trasferire
+come nuovo tratto. I suoi casi utili sono meglio coperti da combinazioni di
+`competitivo`, `ambizioso`, `impulsivo`, `permaloso`, `irascibile` e,
+quando il vantaggio personale è il punto, `opportunista`.
+
+Non introduciamo ora `vanitoso`, `estroverso`, `aggressivo`,
+`affidabile`, `altruista`, `testardo` o `vendicativo`: non è stato
+identificato nel gameplay corrente un contratto distinto sufficiente rispetto
+ai tratti già presenti. Un nuovo tratto richiede prima un comportamento
+osservabile diverso, non soltanto un sinonimo o un aggettivo plausibile.
+
+### Struttura per persona
+
+Per i **nuovi NPC generici**:
+
+- due tratti principali distinti;
+- fonte autorevole futura: `personalita.tratti`, array di ID;
+- nessuna gerarchia implicita fra primo e secondo elemento;
+- nessun punteggio continuo, percentuale o intensità per ogni tratto;
+- terzo tratto soltanto per personaggi/eventi narrativamente definiti o per una
+  regola futura che ne motivi la necessità; niente probabilità casuale di
+  riceverne tre;
+- i tratti sono persistenti e non vengono ripescati cambiando luogo, città,
+  lavoro, appartenenza o relazione;
+- umore, heat, detenzione, fiducia e disponibilità non modificano il catalogo
+  personale: sono stato o relazione.
+
+I vecchi NPC possono continuare a esistere con il solo `car` legacy finché la
+migrazione non dispone di informazioni sufficienti. L'assenza dei nuovi tratti
+è un dato incompleto valido, non un motivo per inventarli al caricamento.
+
+### Combinazioni e conflitti
+
+La varietà non dipende dal rendere ogni NPC una combinazione unica. Anche con
+centinaia di persone è normale che più NPC condividano la stessa coppia di
+tratti: devono distinguersi attraverso identità, interessi, professione,
+storia, rete, appartenenze e stato.
+
+Perciò il riferimento 300–800 del dimensionamento **non richiede 300–800 profili
+di personalità unici**. Richiede invece che le coppie producano differenze
+percepibili e che gli altri assi del modello impediscano la sensazione di clone.
+
+Regole:
+
+- nessun mestiere o ambiente forza un tratto: rapper ≠ competitivo, Strada ≠
+  opportunista, collega ≠ pratico;
+- un contesto può pesare una distribuzione soltanto quando esiste una ragione
+  di gameplay documentata;
+- la coppia va interpretata insieme; non si sommano automaticamente due bonus;
+- l'ordine dell'array non modifica il risultato;
+- tensioni come `socievole + riservato`, `leale + opportunista` o
+  `rancoroso + conciliante` possono descrivere persone coerenti;
+- `flessibile + ostinato` non entra nella generazione generica finché il
+  modello non distingue domini nei quali le due disposizioni possono valere
+  separatamente;
+- `disciplinato + incostante` resta fuori finché entrambi sono sospesi;
+- altre esclusioni si aggiungono solo quando un contratto comportamentale
+  dimostra un conflitto reale, non per gusto tassonomico.
+
+### Copertura di gameplay verificata
+
+Il codice corrente offre già situazioni che giustificano gli assi principali:
+
+- rischio, urgenza e opportunità → prudente / impulsivo / ambizioso /
+  opportunista;
+- affidamento, confidenza e apertura → diffidente / socievole / riservato;
+- aiuto e legame reale → generoso / leale;
+- confronto e riconoscimento → competitivo, senza conservare `gasato` come
+  contenitore generico;
+- critica e provocazione → permaloso / irascibile;
+- torti persistenti, debiti, tensioni e reincontri → rancoroso / conciliante;
+- proposte di cambiare metodo o scelta → flessibile / ostinato;
+- concretezza contro principio → pratico / idealista.
+
+La copertura è sufficiente come **catalogo di base**. Non è una certificazione
+che tutti i diciotto tratti siano già giocabili: il punto 4 deve ancora dare a
+ciascuno un trigger semantico e una conseguenza osservabile.
+
+### Rapporto con fiducia e scoperta
+
+Fiducia, amicizia, tensione, rivalità, debiti e favori restano relazioni o
+storia. Un tratto può modificare una reazione a un fatto reale, ma non crea il
+fatto.
+
+Analogamente:
+
+- possedere un tratto ≠ averlo scoperto;
+- `scoperto` continua a significare scoperta del carattere legacy;
+- i nuovi tratti non diventano automaticamente visibili;
+- il punto 12 definirà quali informazioni il giocatore conosce.
+
+### Transizione dai quattro caratteri legacy
+
+| Legacy | Preservare | Non dedurre automaticamente |
+| --- | --- | --- |
+| `aperto` | dialoghi, bonus e scoperta correnti | `socievole`, `generoso`, `leale` o qualunque coppia |
+| `diffidente` | comportamento storico già salvato | nuovo `diffidente` + secondo tratto o fiducia numerica |
+| `gasato` | dialoghi e comportamento storico | un singolo equivalente nuovo; il vecchio tag copre più disposizioni |
+| `pratico` | comportamento storico già salvato | nuovo `pratico` + secondo tratto, professione o assenza di ideali |
+
+Non esiste una conversione automatica `car → personalita.tratti`. Durante la
+futura integrazione i consumer useranno i nuovi tratti quando presenti e il
+percorso legacy altrimenti. I nuovi NPC non devono ricevere contemporaneamente
+una coppia nuova e un `car` casuale indipendente che possa contraddirla.
+
+### Criteri di sufficienza da portare al punto 4 e al reaudit
+
+Il catalogo resta valido soltanto se:
+
+1. ogni tratto operativo ha almeno un trigger pertinente e una differenza
+   osservabile;
+2. due tratti vicini possono essere distinti nello stesso tipo di situazione;
+3. la coppia non produce bonus doppi o dipendenza dall'ordine;
+4. i prerequisiti di memoria/relazione impediscono a `leale`,
+   `rancoroso` e simili di inventare una storia;
+5. un tratto privo di percorso concreto viene sospeso invece di restare come
+   decorazione;
+6. nella verifica finale, NPC con coppie ripetute risultano comunque
+   distinguibili grazie agli altri assi della PERSONA;
+7. il playtest controlla ripetitività percepita su carriere lunghe: la
+   simulazione di dimensionamento misura quante persone possono essere
+   incontrate, non certifica la varietà dei comportamenti.
+
+### Confine del punto 3
+
+**Definito e chiuso:** modello a due tratti, terzo solo motivato, catalogo
+operativo di 18 disposizioni, due candidati sospesi, regole di composizione,
+compatibilità con `car` e criteri per eventuali aggiunte future.
+
+**Non implementato qui:** `personalita.tratti` nel runtime, assegnazione,
+effetti, dialoghi combinatori, scoperta e migrazione. Il punto 4 deve dimostrare
+che i tratti operativi producano differenze concrete prima che la generazione
+li utilizzi.
+
