@@ -1301,6 +1301,10 @@ function stradaPersonaMeta(p){
   if(!Array.isArray(p.strada.favoriEventi)) p.strada.favoriEventi=[];
   if(!Array.isArray(p.strada.streetStatusHistory)) p.strada.streetStatusHistory=[];
   if(!Array.isArray(p.strada.conseguenzeEventi)) p.strada.conseguenzeEventi=[];
+  if(p.strada.firstLinkedCityId!=null)
+    p.strada.firstLinkedCityId=String(p.strada.firstLinkedCityId);
+  if(p.strada.lastLinkedCityId!=null)
+    p.strada.lastLinkedCityId=String(p.strada.lastLinkedCityId);
   if(!Number.isFinite(Number(p.strada.debitiGiocatore))) p.strada.debitiGiocatore=0;
   p.strada.debitiGiocatore=Math.max(0,Math.min(3,Math.floor(Number(p.strada.debitiGiocatore)||0)));
   if(!Number.isFinite(Number(p.strada.tensione))) p.strada.tensione=0;
@@ -1618,9 +1622,10 @@ const STRADA_CAPACITA_RETE = Object.freeze({
   ponte:Object.freeze({rep:60,contatti:5,fidati:2})
 });
 
-function stradaContattiAttivi(){
+function stradaContattiAttivi(citta){
   stradaAggiornaRelazioniCriminali(true);
-  return (G.gente||[]).filter(stradaRelazioneDisponibile);
+  return stradaNpcPersone({cityId:stradaCittaContesto(citta)})
+    .filter(stradaRelazioneDisponibile);
 }
 
 function stradaCapacitaRete(){
@@ -2608,8 +2613,11 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
           label:"Contatto già attivo"
         }
       : stradaCausaOpportunita(variante,trigger);
-    const esistente=causa&&causa.person ? causa.person : (G.gente||[]).find(x=>x && !x.via &&
-      ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
+    const esistente=causa&&causa.person ? causa.person : stradaNpcTrovaPersona({
+      crimeKey:key,
+      name:variante.persona,
+      cityId:stradaCittaContesto()
+    });
     if(esistente && esistente.strada && esistente.strada.known){
       stradaHeatSincronizzaPersone();
       if(!stradaRelazioneOperativa(esistente)) return null;
