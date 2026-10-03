@@ -136,14 +136,12 @@
     const baseTipo=tipo(opts.tipo);
     const reciproco=opts.reciproco!==false;
 
-    const hasPerA=Object.prototype.hasOwnProperty.call(opts,"percezioneA") ||
-      Object.prototype.hasOwnProperty.call(opts,"percezione");
-    const hasPerB=Object.prototype.hasOwnProperty.call(opts,"percezioneB") ||
-      Object.prototype.hasOwnProperty.call(opts,"percezione");
-    const hasSubA=Object.prototype.hasOwnProperty.call(opts,"sottotipoA") ||
-      Object.prototype.hasOwnProperty.call(opts,"sottotipo");
-    const hasSubB=Object.prototype.hasOwnProperty.call(opts,"sottotipoB") ||
-      Object.prototype.hasOwnProperty.call(opts,"sottotipo");
+    const haValore=(obj,key)=>
+      Object.prototype.hasOwnProperty.call(obj,key) && obj[key]!==undefined;
+    const hasPerA=haValore(opts,"percezioneA") || haValore(opts,"percezione");
+    const hasPerB=haValore(opts,"percezioneB") || haValore(opts,"percezione");
+    const hasSubA=haValore(opts,"sottotipoA") || haValore(opts,"sottotipo");
+    const hasSubB=haValore(opts,"sottotipoB") || haValore(opts,"sottotipo");
 
     const va=upsert(a,b,{
       tipo:opts.tipoA||baseTipo,
