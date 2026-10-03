@@ -3651,7 +3651,8 @@ console.log("\nIl Circolo — la Sala e il Live Club, un posto solo");
     incontri.includes("if(!fan || oggi.fan[fid] || !circoloQui()) return false;") &&
     /const CC_TEMPO = Object\.freeze\(\{bevi:15,/.test(incontri));
   test("l'artista della serata ti presenta qualcuno una volta sola, e la gente della Sala resta sotto al tetto",
-    incontri.includes("c.presentati[o.n] = 1;") &&
+    incontri.includes("c.presentati[o.tempId] = 1;") &&
+    incontri.includes("p[o.tempId] || p[o.n]") &&
     incontri.includes("genteDellaSala().filter(x => !x.via).length >= POSTO_MAX"));
   test("nel backstage i fan dicono cosa gli è piaciuto e cosa no, dei pezzi veri",
     incontri.includes("function circoloFan(){") && incontri.includes("const critiche = [];") &&
