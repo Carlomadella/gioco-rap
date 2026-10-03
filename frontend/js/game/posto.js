@@ -704,7 +704,9 @@ function postoRientroCarcereDisponibile(p){
   if(quando==null && m.linkedStreet!==true && m.outsideFollowupDone!==true){
     const uscita=postoGiornoAssolutoValido(m.releasedAbsoluteDay);
     if(uscita!=null){
-      const rapporto=postoRapportoCarcere(p);
+      /* Recovery legacy autonomo: questo blocco viene testato anche isolato
+         dal runtime completo e non deve dipendere dal reader del punto 10. */
+      const rapporto=Number(m.rapporto||0);
       const ritardo=rapporto>=2?42:rapporto>=1?56:rapporto===0?84:63;
       quando=uscita+ritardo;
       m.returnAfterAbsoluteDay=quando;
