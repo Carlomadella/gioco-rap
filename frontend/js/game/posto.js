@@ -741,13 +741,17 @@ function popolazioneAssicura(){
   /* Sanificazione difensiva: un gruppo non deve poter duplicare membri o
      trattenere ID inesistenti dopo save vecchi/modificati. */
   const validi=new Set(G.gente.filter(p=>p&&p.id).map(p=>p.id));
+  let maxSeq=0;
   st.gruppi=st.gruppi.filter(g=>g&&typeof g==="object").map(g=>{
     if(!Array.isArray(g.membri)) g.membri=[];
     g.membri=[...new Set(g.membri.filter(id=>validi.has(id)))].slice(0,5);
     if(!g.stato) g.stato="attivo";
     if(typeof g.emergente!=="boolean") g.emergente=true;
+    const m=String(g.groupId||"").match(/^grp-(\d+)$/);
+    if(m) maxSeq=Math.max(maxSeq,Number(m[1])||0);
     return g;
   }).filter(g=>g.groupId&&g.membri.length>=3);
+  st.nextGroupSeq=Math.max(Number(st.nextGroupSeq)||1,maxSeq+1);
   return st;
 }
 
@@ -769,6 +773,16 @@ function popolazioneRegistraAmbiente(p,ambiente){
   return true;
 }
 
+function popolazioneRicalcolaCittaGruppo(gruppo){
+  if(!gruppo || !Array.isArray(gruppo.membri)) return null;
+  const citta=[...new Set(gruppo.membri
+    .map(id=>(G.gente||[]).find(p=>p&&p.id===id&&!p.via))
+    .filter(Boolean)
+    .map(p=>popolazioneCittaPersona(p)))];
+  gruppo.citta=citta.length===1?citta[0]:null;
+  return gruppo.citta;
+}
+
 function popolazioneSpostaPersona(p,citta,ambiente){
   if(!p || p.via) return false;
   const nuova=String(citta||"").trim();
@@ -781,6 +795,7 @@ function popolazioneSpostaPersona(p,citta,ambiente){
       absoluteDay:typeof stradaAbsDay==="function"?stradaAbsDay():null
     });
     if(m.spostamenti.length>12) m.spostamenti.shift();
+    popolazioneGruppiPersona(p).forEach(popolazioneRicalcolaCittaGruppo);
   }
   if(ambiente) popolazioneRegistraAmbiente(p,ambiente);
   return true;
