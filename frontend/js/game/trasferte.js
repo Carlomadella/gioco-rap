@@ -91,6 +91,12 @@ const CITTA = [
    ruoli:{fonico:1.2, promoter:1.1, videomaker:1.1}}
 ];
 const CITTA_BY_ID = CITTA.reduce((a, c) => { a[c.id] = c; return a; }, {});
+try{
+  if(window.ADF_NPC_GEOGRAFIA && typeof window.ADF_NPC_GEOGRAFIA.registraCatalogo==="function")
+    window.ADF_NPC_GEOGRAFIA.registraCatalogo(
+      [{id:"provincia",n:"Provincia"}].concat(CITTA.map(c=>({id:c.id,n:c.n})))
+    );
+}catch(e){ console.warn("[Trasferte] catalogo geografia non registrato", e); }
 
 /* ============================================================
    I RUOLI DI CHI INCONTRI
@@ -158,10 +164,10 @@ const REQUISITI = {
   hype60:     {t:"hype 60",                                   ok:() => (G.hype || 0) >= 60},
   pezzoBuono: {t:"un pezzo fuori sopra la sufficienza",        ok:() => (G.songs || []).some(s => s.released && (s.q || 0) >= 55)},
   tornarci:   {t:"tornare in quella città almeno un'altra volta",
-               ok:p => (cittaStato(p && p.citta).visite || 0) >= 2},
+               ok:p => (cittaStato(cittaPersona(p)).visite || 0) >= 2},
   affidabile: {t:"reputazione 45 nel giro",                   ok:() => reputazione() >= 45},
   duefacce:   {t:"conoscere già altre due persone di quella città",
-               ok:p => rete(p && p.citta).filter(x => x.id !== (p && p.id) && (x.rel || 0) >= 1).length >= 2}
+               ok:p => rete(cittaPersona(p)).filter(x => x.id !== (p && p.id) && (x.rel || 0) >= 1).length >= 2}
 };
 
 /* Più il mestiere sta in alto nella catena alimentare, più chiede prima di
@@ -201,6 +207,21 @@ function casaMia(){ return normalizza(artista().city); }
 
 function assoluto(){
   return (((G.year || 1) - 1) * 52 + ((G.week || 1) - 1)) * 7 + (G.day || 1);
+}
+function cittaPersona(p){
+  if(!p) return null;
+  try{
+    const geo=window.ADF_NPC_GEOGRAFIA;
+    if(geo && typeof geo.cittaAttuale==="function"){
+      const id=geo.cittaAttuale(p,assoluto());
+      if(id) return id;
+    }
+  }catch(_){}
+  return p.citta!=null && String(p.citta).trim() ? String(p.citta).trim().toLowerCase() : null;
+}
+function cittaPersonaInfo(p){
+  const id=cittaPersona(p);
+  return id ? (CITTA_BY_ID[id] || {id:id,n:id}) : null;
 }
 function quandoTesto(abs){
   const d = abs - assoluto();
@@ -253,7 +274,9 @@ function notifica(dati){
 
 /* ------------------ la rete fuori città ------------------ */
 function rete(cittaId){
-  return (G.gente || []).filter(p => p.fuori && !p.via && (!cittaId || p.citta === cittaId));
+  return (G.gente || []).filter(p =>
+    p.fuori && !p.via && (!cittaId || cittaPersona(p) === cittaId)
+  );
 }
 function conosciuti(cittaId){ return rete(cittaId).filter(p => (p.rel || 0) >= 1); }
 function personaPerId(id){ return (G.gente || []).find(p => p.id === id) || null; }
@@ -956,11 +979,10 @@ function ruoloDaIncontrare(){
 
 function nuovoContatto(ruolo, cittaId, daId){
   const c = CITTA_BY_ID[cittaId] || {n:"", scena:5};
-  const info = RUOLI[ruolo] || {};
   /* nemmeno i nomi della classifica: i rapper (e i DJ) pescano dallo stesso
      mazzo, e un omonimo di un rivale poi non si chiama in Cabina (v. posto.js) */
   const usati = (G.gente || []).map(p => p.n).concat((G.rivals || []).map(r => r.n));
-  let pool = info.nomi;
+  let pool = (RUOLI[ruolo] || {}).nomi;
   if(!pool || !pool.length) pool = (typeof RIV_NOMI !== "undefined") ? RIV_NOMI : ["Senza nome"];
   const liberi = pool.filter(n => usati.indexOf(n) < 0);
   const fascia = c.scena >= 8 ? 2 : c.scena >= 5 ? 1 : 0;
@@ -968,7 +990,7 @@ function nuovoContatto(ruolo, cittaId, daId){
   const generi = (typeof BEAT_IDS !== "undefined") ? BEAT_IDS : [""];
   const caratteri = (typeof CARATTERI !== "undefined") ? CARATTERI.map(x => x.id) : ["aperto"];
   const scala = REQ_RUOLO[ruolo] || ["aperto"];
-  return {
+  const p = {
     id:"f" + Math.floor(Math.random() * 1e9),
     ruolo:ruolo,
     n:liberi.length ? pick(liberi) : pick(pool) + " " + Math.floor(2 + Math.random() * 7),
@@ -980,15 +1002,27 @@ function nuovoContatto(ruolo, cittaId, daId){
     rel:0, pt:0, ult:-1, feat:-99,
     skin:pick(skin), hair:Math.floor(Math.random() * 4),
     col:pick(["#FF5A36", "#B026FF", "#FFC53D", "#3DC7FF", "#FF4D9D", "#57C98B", "#7A5CFF"]),
-    /* la parte nuova rispetto alla gente della Sala: chi è, dove sta, chi te
-       l'ha presentato e cosa serve per farci qualcosa davvero */
-    fuori:true,
-    citta:cittaId,
     daId:daId || null,
     reqKey:scala[Math.min(fascia, scala.length - 1)] || "aperto",
     conosciutoIl:assoluto(),
     contesto:(tipoAttivo() || {}).id || "incontro"
   };
+
+  /* Qui sappiamo soltanto DOVE si trova durante l'incontro. Non deduciamo
+     dove è nato. Registriamo prima la posizione canonica e manteniamo poi i
+     due campi legacy usati dall'app Trasferte. */
+  try{
+    const geo=window.ADF_NPC_GEOGRAFIA;
+    if(geo && typeof geo.sposta==="function")
+      geo.sposta(p,{
+        cittaId:cittaId,
+        dalGiorno:assoluto(),
+        fonte:"trasferta:incontro"
+      });
+  }catch(e){ console.warn("[Trasferte] posizione NPC non registrata", e); }
+  p.fuori=true;
+  p.citta=cittaId;
+  return p;
 }
 
 /* Dove e come lo incontri: è quello che rende l'incontro una scena e non una
@@ -1100,10 +1134,10 @@ function legaContatto(p, punti, numero){
   programmaCatena(p, punti);
 
   a.righe.push("Conosciuto " + p.n + ", " + info.n.toLowerCase() + " di " +
-    ((CITTA_BY_ID[p.citta] || {}).n || "") + ".");
+    ((CITTA_BY_ID[cittaPersona(p)] || {}).n || "") + ".");
   setTimeout(scenaIncontri, 0);
   return {t:"<b>" + esc(p.n) + "</b> è entrato nella tua rete: " + esc(info.n.toLowerCase()) +
-    " di " + esc((CITTA_BY_ID[p.citta] || {}).n || "") + ", " + esc(gradoNome(p)) + ".", c:"good"};
+    " di " + esc((CITTA_BY_ID[cittaPersona(p)] || {}).n || "") + ", " + esc(gradoNome(p)) + ".", c:"good"};
 }
 
 /* ============================================================
@@ -1317,9 +1351,9 @@ const OCCASIONI = {
         lifestyleRegistraEntrata(soldi,"data-fuori-citta");
       const f = Math.round(70 + (G.fans || 0) * .03);
       G.fans += f;
-      cittaStato(p.citta).rep = cl((cittaStato(p.citta).rep || 0) + 5, 0, 100);
+      cittaStato(cittaPersona(p)).rep = cl((cittaStato(cittaPersona(p)).rep || 0) + 5, 0, 100);
       return {t:"Data fatta: +" + eur(soldi) + " e +" + (typeof fmt === "function" ? fmt(f) : f) + " fan a " +
-        ((CITTA_BY_ID[p.citta] || {}).n || "") + ".", c:"good"};
+        ((CITTA_BY_ID[cittaPersona(p)] || {}).n || "") + ".", c:"good"};
     }},
   rotazione:{t:"Ti mette in scaletta", d:p => "«Stasera ti metto due volte. Se la gente si gira, ti metto sempre.»",
     run(p){
@@ -1339,13 +1373,13 @@ const OCCASIONI = {
 function eseguiCatena(cat){
   const p = personaPerId(cat.personaId);
   if(!p || p.via) return;
-  const c = CITTA_BY_ID[p.citta];
+  const c = CITTA_BY_ID[cittaPersona(p)];
   const info = ruoloInfo(p.ruolo);
 
   if(cat.tipo === "invito"){
     /* non ti richiama se non può ancora permetterselo o se sei già via */
     if(st().attiva) { cat.quando = assoluto() + ri(3, 8); return "rinviata"; }
-    const inv = creaInvito({citta:p.citta, tipo:cat.payload, daId:p.id});
+    const inv = creaInvito({citta:cittaPersona(p), tipo:cat.payload, daId:p.id});
     /* se in quel momento non c'era niente da proporti (soglie non ancora
        raggiunte) la chiamata non si perde: riprova fra qualche giorno */
     if(!inv){ cat.quando = assoluto() + ri(8, 20); return "rinviata"; }
@@ -1353,7 +1387,7 @@ function eseguiCatena(cat){
   }
 
   if(cat.tipo === "presenta"){
-    const nuovo = nuovoContatto(cat.payload, p.citta, p.id);
+    const nuovo = nuovoContatto(cat.payload, cittaPersona(p), p.id);
     nuovo.rel = 0; nuovo.pt = 0; nuovo.numero = true;
     if(!G.gente) G.gente = [];
     G.gente.push(nuovo);
@@ -1390,7 +1424,7 @@ function mostraOccasione(p, occ, tentativi){
     setTimeout(() => mostraOccasione(p, occ, tentativi - 1), 500);
     return;
   }
-  const info = ruoloInfo(p.ruolo), c = CITTA_BY_ID[p.citta];
+  const info = ruoloInfo(p.ruolo), c = CITTA_BY_ID[cittaPersona(p)];
   showEvent({
     k:"Ti ha scritto " + p.n.toUpperCase(),
     t:occ.t,
@@ -1603,7 +1637,7 @@ function contenutoApp(){
     html += '<div class="trasvuoto">Nessuno, per ora. Si conosce gente lavorando: nel backstage, sul set, in sala.</div>';
   } else {
     const perCitta = {};
-    for(const p of fuori){ (perCitta[p.citta] = perCitta[p.citta] || []).push(p); }
+    for(const p of fuori){ const cid=cittaPersona(p) || p.citta || "sconosciuta"; (perCitta[cid] = perCitta[cid] || []).push(p); }
     html += Object.keys(perCitta).map(cid =>
       '<div class="trasgruppo"><span>' + esc((CITTA_BY_ID[cid] || {}).n || cid) + '</span>' +
       perCitta[cid].map(schedaPersona).join("") + '</div>').join("");
@@ -1687,22 +1721,26 @@ function registraRuoli(){
       ci passa il martedì pomeriggio. Le due funzioni che decidono chi c'è
       lavorano su `G.gente` intero, quindi gliela passiamo senza quelli di fuori
       e gliela restituiamo subito dopo — la loro logica non la tocchiamo. */
-function senzaFuori(fn, ctx, args){
-  const fuori = (G.gente || []).filter(p => p.fuori);
-  if(!fuori.length) return fn.apply(ctx, args);
-  const dentro = G.gente.filter(p => !p.fuori);
-  G.gente = dentro;
+function personaInProvincia(p){
+  const c=cittaPersona(p);
+  if(c) return c==="provincia";
+  return !p.fuori;
+}
+function soloProvincia(fn, ctx, args){
+  const esclusi = (G.gente || []).filter(p => !personaInProvincia(p));
+  if(!esclusi.length) return fn.apply(ctx, args);
+  G.gente = G.gente.filter(personaInProvincia);
   try{ return fn.apply(ctx, args); }
-  finally{ G.gente = G.gente.concat(fuori); }
+  finally{ G.gente = G.gente.concat(esclusi); }
 }
 function innestaSala(){
   if(typeof sistemaGente === "function"){
     const orig = sistemaGente;
-    window.sistemaGente = function(){ return senzaFuori(orig, this, arguments); };
+    window.sistemaGente = function(){ return soloProvincia(orig, this, arguments); };
   }
   if(typeof presentiOggi === "function"){
     const orig = presentiOggi;
-    window.presentiOggi = function(){ return senzaFuori(orig, this, arguments); };
+    window.presentiOggi = function(){ return soloProvincia(orig, this, arguments); };
   }
 }
 
@@ -1814,7 +1852,7 @@ window.TRASFERTE = Object.freeze({
       cittaAperte:CITTA.filter(cittaAperta).map(c => c.n),
       tipiAperti:CITTA.filter(cittaAperta).length
         ? TIPI.filter(t => tipoAperto(t, CITTA.filter(cittaAperta)[0])).map(t => t.id) : [],
-      reteFuori:rete().map(p => p.n + " (" + p.ruolo + "@" + p.citta + ", " + gradoNome(p) + ")"),
+      reteFuori:rete().map(p => p.n + " (" + p.ruolo + "@" + (cittaPersona(p)||"?") + ", " + gradoNome(p) + ")"),
       rifiutiFila:s.rifiutiFila,
       trasferteFatte:s.storico.length
     };
