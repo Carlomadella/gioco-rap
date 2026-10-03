@@ -2717,21 +2717,33 @@ function stradaNpcSegnalaContesto(p,meta){
   }catch(_){}
 }
 
-function stradaNpcCollega(a,b,reason){
+function stradaNpcTipoLegame(reason){
+  /* Il motivo deve avere prova semantica sufficiente: lavorare nella stessa
+     attività è collaborazione; referral/ponti/incontri sono conoscenze. */
+  return reason==="attivita-lavoro" ? "collaborazione" : "conoscenza";
+}
+
+function stradaNpcCollega(a,b,reason,meta){
   if(!a || !b || !a.id || !b.id || a===b) return false;
+  const cfg=meta&&typeof meta==="object"?meta:{};
+  const relationshipType=cfg.tipo||stradaNpcTipoLegame(reason);
   const adapter=stradaNpcAdapter();
   try{
     if(adapter && typeof adapter.linkPeople==="function"){
       const out=adapter.linkPeople({
         aId:a.id,bId:b.id,
         reason:String(reason||"crime-link"),
+        relationshipType,
+        reciprocal:cfg.reciproco!==false,
+        perceptionA:cfg.percezioneA||cfg.percezione||null,
+        perceptionB:cfg.percezioneB||cfg.percezione||null,
         context:"crime"
       });
       if(out!==false) return true;
     }
   }catch(_){}
   return typeof postoCollegaPersone==="function"
-    ? !!postoCollegaPersone(a,b,reason)
+    ? !!postoCollegaPersone(a,b,reason,Object.assign({},cfg,{tipo:relationshipType}))
     : false;
 }
 
