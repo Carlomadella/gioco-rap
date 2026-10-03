@@ -1421,7 +1421,7 @@ test("punto 14: i colleghi Fabbrica sono esclusi dall'intro criminale generica",
   ev.includes('lavoroLuogo(G.job)==="fabbrica") return false'));
 test("punto 14: la Fabbrica non genera crimini, rivela il lato Strada di una persona reale",
   ev.includes("Non è la Fabbrica che ti sta offrendo un crimine") &&
-  ev.includes("non è un crimine della Fabbrica") &&
+  ev.includes("Non è un crimine della Fabbrica") &&
   crime.includes("if(!stradaFabbricaPersonaCandidata()) return null") &&
   crime.includes('source:"factory-opportunity"'));
 test("punto 14: l'anzianità di sede persiste oltre il cartellino mensile",
