@@ -99,6 +99,19 @@ describe("NPC · punto 12 discovery informazioni",()=>{
     });
   });
 
+  it("scopriLegame è atomico: un dettaglio falso non lascia discovery parziali",()=>{
+    const api=runtime();
+    const x=p({reteLegami:[{personId:"p2",tipo:"conoscenza"}]});
+    expect(()=>api.scopriLegame(
+      x,"p2",{tipo:"amicizia"},{fonte:"evento",giorno:5}
+    )).toThrow(/non presente/);
+    expect(api.legamiConosciuti(x)).toEqual([]);
+    expect(x).not.toHaveProperty("conoscenza");
+
+    api.scopriLegame(x,"p2",{tipo:"conoscenza"},{fonte:"evento",giorno:5});
+    expect(api.legamiConosciuti(x)).toEqual([{personId:"p2",tipo:"conoscenza"}]);
+  });
+
   it("un legame che cambia non rivela automaticamente il nuovo tipo",()=>{
     const api=runtime();
     const x=p({reteLegami:[{personId:"p2",tipo:"conoscenza"}]});
