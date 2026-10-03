@@ -131,7 +131,7 @@ describe("Strada · punto 10 relazioni criminali",()=>{
 
   it("i contatti inattivi restano persone del mondo ma non risorse del giro",()=>{
     expect(crime).toContain(".filter(p=>stradaRelazioneDisponibile(p) && stradaFavoriValore(p)>0)");
-    expect(crime).toContain(".filter(p=>stradaRelazioneDisponibile(p) &&\n      stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)");
+    expect(crime).toContain(".filter(p=>stradaRelazioneOperativa(p) &&\n      stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)");
     expect(crime).toContain(".filter(stradaRelazioneDisponibile)");
     expect(crime).toContain("dormienti=tuttiContatti.filter");
     expect(crime).not.toContain("p.via=true");
