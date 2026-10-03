@@ -6,7 +6,6 @@
   const esc=v=>String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
   const money=n=>Math.round(Number(n)||0).toLocaleString("it-IT");
   const clampN=(v,a,b)=>Math.max(a,Math.min(b,Number(v)||0));
-  const CRIME_DURATIONS={consegne:90,scotta:120,cassa:150,macchina:150};
   let activeBg=0,bgHistory=[],bgTimer=null,lastPhoneAt=0;
   let jailBgTimer=null,jailBgLast="",jailBgActive=0,jailTransitionBusy=false,jailLastPhrase="";
 
@@ -119,10 +118,10 @@
         <aside class="panel right">
           <div class="tabs"><button class="tab on" data-tab="cover" type="button">Chi ti copre</button><button class="tab" data-tab="business" type="button">Attività</button></div>
           <div class="tabpane on" id="tab-cover">
-            <div class="cover-row"><div class="t"><strong>Uomini <span id="menCount">(0/5)</span></strong><span>500 € all'ingresso · 140 €/sett.</span></div><button class="pill" id="addMan" type="button">+ Prendi</button></div>
-            <div class="cover-row"><div class="t"><strong>Protezione</strong><span>Riduce il rischio quando la zona si scalda.</span></div><button class="pill" id="prot" type="button">Nessuna</button></div>
-            <div class="cover-row"><div class="t"><strong>Il ferro</strong><span>Più riuscita. Se ti trovano, la pena pesa.</span></div><button class="pill danger" id="gun" type="button">900 €</button></div>
-            <div class="cover-row"><div class="t"><strong>Avvocato</strong><span>320 €/sett. · attenzione cala più in fretta.</span></div><button class="pill" id="lawyer" type="button">Prendilo</button></div>
+            <div class="cover-row"><div class="t"><strong>Persone del giro <span id="menCount">(0)</span></strong><span id="peopleSummary">La fiducia si costruisce: nessuno si compra da questa schermata.</span></div><button class="pill" id="addMan" type="button">Rapporti</button></div>
+            <div class="cover-row"><div class="t"><strong>Protezione</strong><span>Serve una persona reale disposta a garantire per te.</span></div><button class="pill" id="prot" type="button">Gestisci</button></div>
+            <div class="cover-row"><div class="t"><strong>Il ferro</strong><span>Arriva tramite un contatto molto fidato e una proposta reale.</span></div><button class="pill danger" id="gun" type="button">Via contatto</button></div>
+            <div class="cover-row"><div class="t"><strong>Avvocato</strong><span>Va conosciuto nel mondo e poi incaricato.</span></div><button class="pill" id="lawyer" type="button">Gestisci</button></div>
             <div class="cover-row"><div class="t"><strong>Costo copertura</strong><span>Spesa fissa attuale.</span></div><button class="pill on" id="weekly" type="button" disabled>0 €/sett.</button></div>
             <div class="traphone-dock" id="traphoneDock">
               <div class="traphone-dock-head"><div><span>LINEA SEPARATA</span><b>TRAPHONE 16</b></div><em id="trapDockStatus">OFFLINE</em></div>
@@ -144,16 +143,37 @@
   function gameState(){ return G; }
   function street(){ return G.strada; }
   function crimeVisualState(){
-    const s=street(), a=(typeof A!=="undefined"&&A)||{};
-    return {rep:+s.rep||0,heat:+s.heat||0,dirty:+s.sporchi||0,men:+s.uomini||0,protection:+s.prot||0,gun:!!s.ferro,lawyer:!!s.avvocato,precedents:+s.precedenti||0,arrest:!!s.arresto,arresto:s.arresto,owned:s.attivita||{},businessCount:Object.values(s.attivita||{}).filter(Boolean).length,hasTrapPhone:(typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned)),trapPhone:s.traphone||null,city:String(a.city||a.citta||"provincia").toLowerCase(),level:(typeof livello==="function"?livello().lvl:1),fame:+G.fans||0,hype:+G.hype||0,goat:(typeof livello==="function"?livello().lvl>=60:false)};
+    const s=street(), a=window.ARTIST||((typeof A!=="undefined"&&A)||{});
+    const fidati=typeof stradaPersoneSquadra==="function"?stradaPersoneSquadra():[];
+    const avvocato=typeof stradaHaAvvocatoPrivato==="function"?stradaHaAvvocatoPrivato():!!s.avvocato;
+    return {rep:+s.rep||0,heat:+s.heat||0,dirty:+s.sporchi||0,men:fidati.length,protection:+s.prot||0,gun:!!s.ferro,lawyer:!!avvocato,precedents:+s.precedenti||0,arrest:!!s.arresto,arresto:s.arresto,owned:s.attivita||{},businessCount:Object.values(s.attivita||{}).filter(Boolean).length,hasTrapPhone:(typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned)),trapPhone:s.traphone||null,city:String(a.city||a.citta||"provincia").toLowerCase(),level:(typeof livello==="function"?livello().lvl:1),fame:+G.fans||0,hype:+G.hype||0,goat:(typeof livello==="function"?livello().lvl>=60:false)};
   }
   window.crimeVisualState=crimeVisualState;
   function toast(t){const el=q("#crimeToast");if(!el)return;el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),1900)}
   function pressure(h){return h>=75?"Critici":h>=50?"Troppi":h>=25?"Presenti":"Bassi"}
-  function weeklyCost(){const s=street();return (s.uomini||0)*140 + ((typeof STRADA_PROT!=="undefined"&&STRADA_PROT[s.prot])?STRADA_PROT[s.prot].costo:0) + (s.avvocato?320:0)}
-  function durationFor(id){return CRIME_DURATIONS[id]||120}
+  function weeklyCost(){
+    if(typeof stCopertura==="function") return Number(stCopertura())||0;
+    const s=street();
+    const prot=(typeof STRADA_PROT!=="undefined"&&STRADA_PROT[s.prot])?Number(STRADA_PROT[s.prot].costo||0):0;
+    return prot+(s.avvocato?320:0);
+  }
+  function crimeDef(id){return typeof STRADA_COLPI!=="undefined"?STRADA_COLPI.find(c=>c&&c.id===id)||null:null}
+  function durationFor(id){const c=crimeDef(id);return c&&typeof stradaDurataColpo==="function"?stradaDurataColpo(c):120}
   function timeText(){try{return window.GAME_TIME?GAME_TIME.text():"08:00"}catch(_){return "08:00"}}
-  function canDoCrime(id){try{return !window.GAME_TIME || durationFor(id)<=GAME_TIME.remaining()}catch(_){return true}}
+  function crimeWindow(id){
+    const c=crimeDef(id);
+    return c&&typeof stradaFinestraColpoStato==="function"
+      ? stradaFinestraColpoStato(c)
+      : {ok:true,label:""};
+  }
+  function canDoCrime(id){
+    try{
+      if(typeof stradaPartecipazioneAttiva==="function"&&!stradaPartecipazioneAttiva())return false;
+      const finestra=crimeWindow(id);
+      if(finestra&&!finestra.ok)return false;
+      return !window.GAME_TIME || durationFor(id)<=GAME_TIME.remaining();
+    }catch(_){return true}
+  }
   function triggerPhone(level){const now=Date.now();if(now-lastPhoneAt<1500)return;lastPhoneAt=now;try{if(window.TRAPHONE16)TRAPHONE16.triggerTrapEvent(level||"low")}catch(_){}}
   function setVisual(tags,ms){try{if(window.setCrimeVisualEvent)window.setCrimeVisualEvent(tags,ms||60000)}catch(_){}}
 
@@ -422,24 +442,57 @@
   function unlocked(bg,s){const band=careerBand(s);if(bg.tier===0||bg.tier<=band)return true;if(bg.tier===1&&(s.men>=2||s.businessCount>=1||s.gun||s.lawyer||s.dirty>1500))return true;if(bg.tier===2&&(s.rep>=45&&(s.men>=2||s.protection>=2||s.businessCount>=2||s.dirty>4500)))return true;if(bg.tier===3&&((s.rep>=72&&s.protection>=2&&s.men>=3)||s.goat))return true;return false}
   function chooseBackground(immediate){const all=window.CRIME_BACKGROUNDS_LOCAL||[];if(!all.length)return;const s=crimeVisualState(),band=careerBand(s),mult=[1,band>=1?1.25:.45,band>=2?1.25:.28,band>=3?1.25:.18],pool=[];for(const bg of all){if(!unlocked(bg,s))continue;let w=tagBoost(bg,s)*mult[bg.tier];if(bgHistory.includes(bg.id))w*=.12;pool.push([bg,Math.max(.02,w)])}let total=pool.reduce((a,x)=>a+x[1],0),r=Math.random()*total,bg=pool[0]&&pool[0][0];for(const x of pool){r-=x[1];if(r<=0){bg=x[0];break}}if(!bg)return;const layers=[q("#bgA"),q("#bgB")],next=immediate?layers[0]:layers[1-activeBg];next.style.backgroundImage=`url("${bg.url}")`;next.style.backgroundPosition=bg.position||"center 48%";next.classList.add("on");if(!immediate){layers[activeBg].classList.remove("on");activeBg=1-activeBg}else activeBg=0;bgHistory.push(bg.id);if(bgHistory.length>6)bgHistory.shift();window.__CRIME_BG_TAGS=Array.isArray(bg.tags)?bg.tags.slice():[];try{if(window.refreshCrimeCaption)window.refreshCrimeCaption(!!immediate)}catch(_){}}
 
-  function renderCrimes(){const s=street();q("#crimes").innerHTML=STRADA_COLPI.map((c,i)=>{const ok=G.energy>=c.energia&&canDoCrime(c.id)&&!s.arresto;return `<button class="crime${ok?"":" disabled"}" data-crime="${esc(c.id)}" type="button" ${ok?"":"disabled"}><span class="num">0${i+1}</span><b>${esc(c.n)}</b><p>${esc(c.d)}</p><div class="chips"><span class="chip money">${money(c.min)}–${money(c.max)} €</span><span class="chip">${c.energia} energia</span><span class="chip">${window.GAME_TIME?GAME_TIME.formatDuration(durationFor(c.id)):""}</span></div><span class="go">→</span></button>`}).join("")}
-  function renderBusinesses(){const s=street();q("#businessList").innerHTML=STRADA_ATTIVITA.map(a=>{const own=!!s.attivita[a.id];return `<div class="activity ${own?"owned":""}"><div class="a-top"><strong>${esc(a.n)}</strong><span class="price">${own?"TUA":money(a.costo)+" €"}</span></div><p>${own?`Resa ${money(a.resa)} €/sett. · 45% pulito / 55% sporco · −${money(a.gestione)} € gestione`:`Resa ${money(a.resa)} €/sett. · aumenta la capacità di riciclaggio.`}</p>${own?"":`<button class="pill" data-buy="${esc(a.id)}" type="button" ${G.money<a.costo?"disabled":""}>Rileva</button>`}</div>`}).join("")}
-  function renderScene(){const modal=q("#crimeModal");if(!STRADA_SCENA){modal.classList.remove("on");return}q("#sceneK").textContent="DECISIONE";q("#mTitle").textContent=STRADA_SCENA.titolo||"—";q("#mDesc").innerHTML=STRADA_SCENA.testo||"";q("#crimeOptions").innerHTML=(STRADA_SCENA.opts||[]).map((o,i)=>`<button class="approach ${i===2?"hot":""}" data-scene-opt="${i}" type="button"><span class="a-num">0${i+1}</span><b>${esc(o.n)}</b><p>${esc(o.d||"")}</p></button>`).join("");modal.classList.add("on")}
-  function sync(){const s=street(),art=window.ARTIST||{},city=(String(art.city||art.citta||"").trim()||"Provincia");q("#crimeCity").textContent=city;q("#crimeWhere").textContent="IL GIRO // "+city.toUpperCase();q("#dirty").textContent=money(s.sporchi)+" €";q("#clean").textContent=money(G.money)+" €";q("#energy").textContent=Math.round(G.energy)+" / "+Math.round(G.maxEnergy||100);q("#repN").textContent=Math.round(s.rep);q("#repBar").style.width=clampN(s.rep,0,100)+"%";q("#heatN").textContent=Math.round(s.heat);q("#heatBar").style.width=clampN(s.heat,0,100)+"%";q("#precedents").textContent=Math.round(s.precedenti||0);q("#pressure").textContent=pressure(s.heat);q("#menCount").textContent=`(${s.uomini}/5)`;q("#addMan").disabled=s.uomini>=5||G.money<500;const launderCap=typeof stradaCapienza==="function"?stradaCapienza():400;const launderMin=window.GAME_TIME&&GAME_TIME.durationFor?GAME_TIME.durationFor("ricicla"):45;const launderTime=window.GAME_TIME&&GAME_TIME.formatDuration?GAME_TIME.formatDuration(launderMin):launderMin+" min";q("#launder").textContent=launderCap>0?"Ripulisci fino a "+money(launderCap)+" € · "+launderTime:"Limite settimanale raggiunto";q("#launder").disabled=s.sporchi<=0||launderCap<=0||!!s.arresto;q("#gun").textContent=s.ferro?"Ce l'hai":"900 €";q("#gun").classList.toggle("on",!!s.ferro);q("#gun").disabled=!!s.ferro||G.money<900;q("#lawyer").textContent=s.avvocato?"Ce l'hai":"Prendilo";q("#lawyer").classList.toggle("on",!!s.avvocato);q("#prot").textContent=(STRADA_PROT[s.prot]||STRADA_PROT[0]).n;q("#prot").classList.toggle("on",s.prot>0);q("#weekly").textContent=money(weeklyCost())+" €/sett.";q("#crimeWeek").textContent=String(G.week||1).padStart(2,"0");q("#crimeClock").textContent=timeText();const tc=q("#trapClock");if(tc)tc.textContent=timeText();const trapOwned=typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned);const trapDock=q("#traphoneDock");if(trapDock)trapDock.hidden=!trapOwned;const ar=!!s.arresto;q("#crimeCenter").classList.toggle("locked",ar);q("#crimeLock").style.display=ar?"flex":"";if(ar){q("#lockTitle").textContent="Sei dentro.";q("#lockReq").textContent=(s.arresto.settimane||0)+" settimane rimaste · "+(s.arresto.colpo||"arresto")};renderCrimes();renderBusinesses();renderScene();try{if(window.TRAPHONE16&&trapOwned){const snap=TRAPHONE16.snapshot();q("#trapDockStatus").textContent=(snap.unread||0)+" NON LETTI"}}catch(_){} }
+  function renderCrimes(){
+    const s=street();
+    const offerte=typeof stradaColpiDisponibili==="function"?stradaColpiDisponibili():STRADA_COLPI.slice(0,4);
+    q("#crimes").innerHTML=offerte.map((c,i)=>{
+      const finestra=crimeWindow(c.id);
+      const ok=G.energy>=c.energia&&canDoCrime(c.id)&&!s.arresto;
+      const categoria=typeof stradaCategoria==="function"?stradaCategoria(c).n:"";
+      const finestraTxt=finestra&&finestra.ok?(finestra.label||""):(finestra&&finestra.message||"Non disponibile ora");
+      return `<button class="crime${ok?"":" disabled"}" data-crime="${esc(c.id)}" type="button" ${ok?"":"disabled"}><span class="num">0${i+1}</span><b>${esc(c.n)}</b><p>${esc(c.d)}</p><div class="chips">${categoria?`<span class="chip">${esc(categoria)}</span>`:""}<span class="chip money">${money(c.min)}–${money(c.max)} €</span><span class="chip">${c.energia} energia</span><span class="chip">${window.GAME_TIME?GAME_TIME.formatDuration(durationFor(c.id)):""}</span>${finestraTxt?`<span class="chip">${esc(finestraTxt)}</span>`:""}</div><span class="go">→</span></button>`;
+    }).join("");
+  }
+  function renderBusinesses(){
+    const s=street(),partecipa=typeof stradaPartecipazioneAttiva!=="function"||stradaPartecipazioneAttiva();
+    q("#businessList").innerHTML=STRADA_ATTIVITA.map(a=>{
+      const own=!!s.attivita[a.id];
+      if(!own)return `<div class="activity"><div class="a-top"><strong>${esc(a.n)}</strong><span class="price">${money(a.costo)} €</span></div><p>Ricavi normali ${money(a.ricavoPulito||0)} €/sett. · gestione ${money(a.gestione||0)} €. Aumenta la capacità di riciclaggio.</p><button class="pill" data-buy="${esc(a.id)}" type="button" ${!partecipa||G.money<a.costo?"disabled":""}>${partecipa?"Rileva":"Fuori dal giro"}</button></div>`;
+      const st=typeof stradaAttivitaStato==="function"?stradaAttivitaStato(a.id,true):null;
+      const residuo=typeof stradaLavaggioResiduoCanale==="function"?stradaLavaggioResiduoCanale(a.id):0;
+      const operativa=typeof stradaAttivitaOperativa==="function"?stradaAttivitaOperativa(a.id):true;
+      return `<div class="activity owned"><div class="a-top"><strong>${esc(a.n)}</strong><span class="price">${operativa?(st&&st.issue?"PROBLEMA":"OPERATIVA"):"FERMA"}</span></div><p>Netto normale ${money(Math.max(0,Number(a.ricavoPulito||0)-Number(a.gestione||0)))} €/sett. · ${partecipa?"riciclaggio residuo "+money(residuo)+" €":"lato criminale chiuso"} · pressione ${Math.round(Number(st&&st.pressione||0))}/100.</p><button class="pill" data-business="${esc(a.id)}" type="button">Gestisci</button></div>`;
+    }).join("");
+  }
+  function renderScene(){
+    const modal=q("#crimeModal");
+    if(!STRADA_SCENA){modal.classList.remove("on");return}
+    q("#sceneK").textContent=STRADA_SCENA.k||"DECISIONE";
+    q("#mTitle").textContent=STRADA_SCENA.titolo||"—";
+    const stats=(STRADA_SCENA.stats||[]).map(x=>'<span class="chip '+esc(x.c||"")+'">'+esc(x.t||"")+'</span>').join("");
+    q("#mDesc").innerHTML=(STRADA_SCENA.testo||"")+(stats?'<div class="chips">'+stats+'</div>':"");
+    q("#crimeOptions").innerHTML=(STRADA_SCENA.opts||[]).map((o,i)=>{
+      const meta=[o.sx,o.dx].filter(Boolean).map(x=>'<span class="chip">'+esc(x)+'</span>').join("");
+      return `<button class="approach${o.hot?" hot":""}${o.no?" disabled":""}" data-scene-opt="${i}" type="button" ${o.no?"disabled":""}><span class="a-num">0${i+1}</span><b>${esc(o.n)}</b><p>${esc(o.d||"")}</p>${meta?'<div class="chips">'+meta+'</div>':""}</button>`;
+    }).join("");
+    modal.classList.add("on");
+  }
+  function sync(){const s=street(),art=window.ARTIST||{},city=(String(art.city||art.citta||"").trim()||"Provincia");q("#crimeCity").textContent=city;q("#crimeWhere").textContent="IL GIRO // "+city.toUpperCase();q("#dirty").textContent=money(s.sporchi)+" €";q("#clean").textContent=money(G.money)+" €";q("#energy").textContent=Math.round(G.energy)+" / "+Math.round(G.maxEnergy||100);q("#repN").textContent=Math.round(s.rep);q("#repBar").style.width=clampN(s.rep,0,100)+"%";q("#heatN").textContent=Math.round(s.heat);q("#heatBar").style.width=clampN(s.heat,0,100)+"%";q("#precedents").textContent=Math.round(s.precedenti||0);q("#pressure").textContent=pressure(s.heat);const fidati=typeof stradaPersoneSquadra==="function"?stradaPersoneSquadra():[],contatti=typeof stradaNpcPersone==="function"?stradaNpcPersone().filter(p=>p&&p.strada&&p.strada.known&&!p.via):[];q("#menCount").textContent=`(${contatti.length} attivi · ${fidati.length} fidati)`;q("#peopleSummary").textContent=fidati.length?(fidati.length+(fidati.length===1?" persona si fida":" persone si fidano")+" abbastanza da muoversi con te."):"Nessuno si fida ancora abbastanza da venire a un colpo con te.";q("#addMan").disabled=typeof stradaPartecipazioneAttiva==="function"&&!stradaPartecipazioneAttiva();const launderCap=typeof stradaCapienza==="function"?stradaCapienza():400;const launderMin=window.GAME_TIME&&GAME_TIME.durationFor?GAME_TIME.durationFor("ricicla"):45;const launderTime=window.GAME_TIME&&GAME_TIME.formatDuration?GAME_TIME.formatDuration(launderMin):launderMin+" min";q("#launder").textContent=launderCap>0?"Ripulisci fino a "+money(launderCap)+" € · "+launderTime:"Limite settimanale raggiunto";q("#launder").disabled=s.sporchi<=0||launderCap<=0||!!s.arresto;const ferroSt=typeof stradaFerroStato==="function"?stradaFerroStato():null,avvSt=typeof stradaAvvocatoStato==="function"?stradaAvvocatoStato():null,protSt=typeof stradaProtezioneStato==="function"?stradaProtezioneStato():null;q("#gun").textContent=s.ferro?"Ce l'hai":(ferroSt&&ferroSt.pending?"Proposta aperta":"Via contatto");q("#gun").classList.toggle("on",!!s.ferro);q("#gun").disabled=!!s.ferro;q("#lawyer").textContent=avvSt&&avvSt.retained?(avvSt.name||"Incaricato"):"Gestisci";q("#lawyer").classList.toggle("on",!!(avvSt&&avvSt.retained));q("#prot").textContent=s.prot>0?((protSt&&protSt.providerName?protSt.providerName+" · ":"")+(STRADA_PROT[s.prot]||STRADA_PROT[0]).n):"Gestisci";q("#prot").classList.toggle("on",s.prot>0);q("#weekly").textContent=money(weeklyCost())+" €/sett.";q("#crimeWeek").textContent=String(G.week||1).padStart(2,"0");q("#crimeClock").textContent=timeText();const tc=q("#trapClock");if(tc)tc.textContent=timeText();const trapOwned=typeof stradaHaTrapPhone==="function"?stradaHaTrapPhone():!!(s.traphone&&s.traphone.owned);const trapDock=q("#traphoneDock");if(trapDock)trapDock.hidden=!trapOwned;const ar=!!s.arresto;q("#crimeCenter").classList.toggle("locked",ar);q("#crimeLock").style.display=ar?"flex":"";if(ar){q("#lockTitle").textContent="Sei dentro.";q("#lockReq").textContent=(s.arresto.settimane||0)+" settimane rimaste · "+(s.arresto.colpo||"arresto")};renderCrimes();renderBusinesses();renderScene();try{if(window.TRAPHONE16&&trapOwned){const snap=TRAPHONE16.snapshot();q("#trapDockStatus").textContent=(snap.unread||0)+" NON LETTI"}}catch(_){} }
 
   function close(){root.classList.remove("on");try{window.dispatchEvent(new CustomEvent("crime-ui:closed"))}catch(_){} }
   function open(){if(street().arresto)return openJail();if(typeof hubTap==="function")hubTap();STRADA_SCENA=null;sync();root.classList.add("on");chooseBackground(!q("#bgA").style.backgroundImage);if(!bgTimer)bgTimer=setInterval(()=>{if(root.classList.contains("on"))chooseBackground(false)},15000); }
 
   root.addEventListener("click",ev=>{
-    const c=ev.target.closest("[data-crime]");if(c){if(!canDoCrime(c.dataset.crime)){toast("È troppo tardi per completare questo colpo oggi.");return}if(window.GAME_EVENTS&&GAME_EVENTS.blocked&&GAME_EVENTS.blocked()){toast("Prima devi risolvere l'evento in corso.");return}if(typeof hubTap==="function")hubTap();stAvviaColpo(c.dataset.crime);sync();return}
-    const so=ev.target.closest("[data-scene-opt]");if(so&&STRADA_SCENA){const o=STRADA_SCENA.opts[+so.dataset.sceneOpt];if(o&&typeof o.run==="function")o.run();try{save()}catch(_){}sync();try{renderGioco()}catch(_){}if(street().arresto&&!STRADA_SCENA){playArrestTransition()}return}
-    if(ev.target.closest("#launder")){const before=Number(street().sporchi)||0,msg=stradaRipulisci();if(msg)toast(msg);if((Number(street().sporchi)||0)<before){setVisual(["launder","cash","dirty"]);triggerPhone("low")}sync();return}
-    if(ev.target.closest("#addMan")){const before=Number(street().uomini)||0,msg=stAssumiUomo();if(msg)toast(msg);if((Number(street().uomini)||0)>before){setVisual(["crew","meeting","protection"]);triggerPhone("low")}sync();return}
-    if(ev.target.closest("#prot")){const before=Number(street().prot)||0,msg=stImpostaProtezione((before+1)%STRADA_PROT.length);if(msg)toast(msg);if((Number(street().prot)||0)!==before){setVisual(["protection","crew"]);triggerPhone("low")}sync();return}
-    if(ev.target.closest("#gun")){const before=!!street().ferro,msg=stCompraFerro();if(msg)toast(msg);if(!before&&street().ferro){setVisual(["gun","danger"]);triggerPhone("medium")}sync();return}
-    if(ev.target.closest("#lawyer")){const before=!!street().avvocato,msg=stToggleAvvocato();if(msg)toast(msg);if(!!street().avvocato!==before){setVisual(["lawyer","court"]);triggerPhone("low")}sync();return}
+    const c=ev.target.closest("[data-crime]");if(c){if(!canDoCrime(c.dataset.crime)){const f=crimeWindow(c.dataset.crime);toast(f&&!f.ok?f.message:"Non puoi completare questo colpo adesso.");return}if(window.GAME_EVENTS&&GAME_EVENTS.blocked&&GAME_EVENTS.blocked()){toast("Prima devi risolvere l'evento in corso.");return}if(typeof hubTap==="function")hubTap();stAvviaColpo(c.dataset.crime);sync();return}
+    const so=ev.target.closest("[data-scene-opt]");if(so&&STRADA_SCENA){const o=STRADA_SCENA.opts[+so.dataset.sceneOpt];if(o&&o.no)return;if(o&&typeof o.run==="function")o.run();try{save()}catch(_){}sync();try{renderGioco()}catch(_){}if(street().arresto&&!STRADA_SCENA){playArrestTransition()}return}
+    if(ev.target.closest("#launder")){if(typeof stScenaRiciclaggio==="function"){STRADA_SCENA=stScenaRiciclaggio();sync()}return}
+    if(ev.target.closest("#addMan")){toast("Le persone del giro entrano dai rapporti: non si comprano da qui.");return}
+    if(ev.target.closest("#prot")){if(typeof stScenaProtezione==="function"){STRADA_SCENA=stScenaProtezione();sync()}return}
+    if(ev.target.closest("#gun")){const msg=stCompraFerro();if(msg)toast(msg);sync();return}
+    if(ev.target.closest("#lawyer")){if(typeof stScenaAvvocato==="function"){STRADA_SCENA=stScenaAvvocato();sync()}return}
+    const manage=ev.target.closest("[data-business]");if(manage){if(typeof stScenaAttivita==="function"){STRADA_SCENA=stScenaAttivita(manage.dataset.business);sync()}return}
     const b=ev.target.closest("[data-buy]");if(b){const before=!!street().attivita[b.dataset.buy],msg=stCompraAttivita(b.dataset.buy);if(msg)toast(msg);if(!before&&street().attivita[b.dataset.buy]){setVisual(["business","launder"]);triggerPhone("medium")}sync();return}
-    if(ev.target.closest("#quit")){if(street().arresto){toast("Da dentro non si molla niente.");return}const costo=Math.max(1500,Math.round((Number(street().sporchi)||0)*.3));STRADA_SCENA={titolo:"Molla il giro",testo:"Ti costa "+money(costo)+" € — il 30% dei soldi sporchi, e mai meno di 1.500 € — e la reputazione di strada cala. In cambio ti torna la testa per la musica.",opts:[{n:"Mollo",d:"Chiudi i conti e sparisci dal giro",run(){stMollaIlGiro();STRADA_SCENA=null;setVisual(["street","danger"]);toast("Hai mollato il giro.")}},{n:"Lascia stare",d:"Resti dentro al giro",run(){STRADA_SCENA=null;}}]};sync();return}
+    if(ev.target.closest("#quit")){if(street().arresto){toast("Da dentro non si molla niente.");return}const costo=Math.max(1500,Math.round((Number(street().sporchi)||0)*.3)),disponibili=Math.max(0,Number(street().sporchi)||0)+Math.max(0,Number(G.money)||0),manca=Math.max(0,costo-disponibili);STRADA_SCENA={k:"Uscirne",titolo:"Molla il giro",testo:"Ti costa "+money(costo)+" € — il 30% dei soldi sporchi, e mai meno di 1.500 € — e la reputazione di strada cala. In cambio ti torna la testa per la musica.",opts:[{n:"Mollo",d:manca?"Ti mancano "+money(manca)+" €":"Chiudi i conti e sparisci dal giro",hot:true,no:manca>0,run(){const msg=stMollaIlGiro();if(typeof stradaPartecipazioneAttiva==="function"&&!stradaPartecipazioneAttiva()){STRADA_SCENA=null;setVisual(["street","danger"])}toast(msg)}},{n:"Lascia stare",d:"Resti dentro al giro",run(){STRADA_SCENA=null;}}]};sync();return}
     const tab=ev.target.closest("[data-tab]");if(tab){qa(".tab").forEach(x=>x.classList.toggle("on",x===tab));qa(".tabpane").forEach(x=>x.classList.remove("on"));q("#tab-"+tab.dataset.tab).classList.add("on");return}
     const city=ev.target.closest("[data-city]");if(city&&city.dataset.city!=="provincia"){toast(city.dataset.city==="milano"?"Milano si apre con la progressione prevista.":"Los Angeles si apre da GOAT.");return}
     if(ev.target.closest("#mapReturn")||ev.target.closest(".exit")){close();return}
@@ -448,9 +501,14 @@
   root.addEventListener("click",ev=>{if(ev.target===q("#crimeModal")){/* decisioni alte/no-cancel restano protette dalla logica core; qui le scene crime normali possono chiudersi */}},false);
 
   /* Innesto narrativo e temporale sui metodi REALI: nessuna formula economica viene duplicata. */
-  if(typeof stradaTenta==="function"&&!stradaTenta.__crimeUiWrapped){const old=stradaTenta;stradaTenta=function(colpoId,approccioId){const beforeArrest=!!street().arresto,beforeEnergy=Number(G.energy)||0,r=old.apply(this,arguments),started=(Number(G.energy)||0)<beforeEnergy;if(!started){sync();return r}const tags=["heist","street"];if(approccioId==="ferro")tags.push("gun");if(approccioId==="squadra")tags.push("crew");if(colpoId==="macchina")tags.push("car");if(colpoId==="scotta"||colpoId==="consegne")tags.push("deal","dirty");setVisual(tags,70000);const arrested=!beforeArrest&&!!street().arresto;triggerPhone(arrested?"high":"medium");try{if(window.GAME_TIME)GAME_TIME.advance(durationFor(colpoId),"crime:"+colpoId)}catch(_){}sync();return r};stradaTenta.__crimeUiWrapped=true}
+  if(typeof stradaTenta==="function"&&!stradaTenta.__crimeUiWrapped){const old=stradaTenta;stradaTenta=function(colpoId,approccioId){const beforeArrest=!!street().arresto,beforeEnergy=Number(G.energy)||0,r=old.apply(this,arguments),started=(Number(G.energy)||0)<beforeEnergy;if(!started){sync();return r}const tags=["heist","street"];if(approccioId==="ferro")tags.push("gun");if(approccioId==="squadra")tags.push("crew");if(colpoId==="macchina")tags.push("car");if(colpoId==="scotta"||colpoId==="consegne")tags.push("deal","dirty");setVisual(tags,70000);const arrested=!beforeArrest&&!!street().arresto;triggerPhone(arrested?"high":"medium");sync();return r};stradaTenta.__crimeUiWrapped=true}
 
   renderStrada=sync; window.renderStrada=sync;
+  /* Le scene del core (riciclaggio, attività, protezione, avvocato) chiamano
+     renderStScheda/stToast: quando la V2 sostituisce il DOM devono puntare
+     alla vista V2, non al markup legacy ormai rimosso. */
+  if(typeof renderStScheda==="function"){renderStScheda=renderScene;window.renderStScheda=renderScene}
+  if(typeof stToast==="function"){stToast=toast;window.stToast=toast}
   apriStrada=open; window.apriStrada=open;
   chiudiStrada=close; window.chiudiStrada=close;
   /* La main recente chiama uscitaStrada() da uscita.js. Il renderer legacy non può
