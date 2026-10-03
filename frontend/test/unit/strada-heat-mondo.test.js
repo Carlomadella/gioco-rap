@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
+const crimeUi=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8");
 const state=fs.readFileSync(path.join(ROOT,"js/game/state.js"),"utf8");
 
 const heatSlice=crime.slice(
@@ -148,10 +149,12 @@ describe("Strada · punto 19 heat cambia il mondo",()=>{
     expect(crime).toContain("stradaHeatChanceSoloDenuncia(.6)");
   });
 
-  it("la UI usa la stessa fascia del gameplay",()=>{
-    expect(crime).toContain("return stradaHeatProfilo().occhi");
-    expect(crime).toContain("<strong>Pressione sul giro</strong>");
-    expect(crime).toContain("heatMondo.mondo");
-    expect(crime).toContain("si tiene basso");
+  it("la UI V2 usa la stessa fascia del gameplay e mostra l'effetto sulla rete",()=>{
+    expect(crimeUi).toContain('typeof stradaHeatProfilo==="function"');
+    expect(crimeUi).toContain('q("#pressure").textContent=heatMondo.occhi');
+    expect(crimeUi).toContain('q("#pressureDetail").textContent=heatMondo.mondo');
+    expect(crimeUi).toContain('typeof stradaHeatPersonaCauta==="function"');
+    expect(crimeUi).toContain("contatti si tengono bassi");
+    expect(crimeUi).toContain('typeof stradaRivalitaAttiva==="function"');
   });
 });

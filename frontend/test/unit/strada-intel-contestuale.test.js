@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const crime=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine.js"),"utf8");
+const crimeUi=fs.readFileSync(path.join(ROOT,"js/game/strada-crimine-ui.js"),"utf8");
 
 const start=crime.indexOf("const STRADA_INTEL_TIPI");
 const end=crime.indexOf("/* Attività di provincia",start);
@@ -91,10 +92,13 @@ describe("Strada · punto 24 conoscenza, sotterfugio e informazione",()=>{
     expect(intel.sourceLabel).toBe("Dritta di Nina");
   });
 
-  it("la UI mostra informazione e stima solo dopo averla raccolta",()=>{
+  it("la UI V2 rende davvero visibili intel, stima e metadati delle scelte",()=>{
     expect(crime).toContain('...(intel?[{t:"Intel: "+(typeof stradaIntelDescrizione==="function"');
     expect(crime).toContain('"Stima "+stima+"% · "+(usaIntel?"sfrutta la dritta":baseDx)');
-    expect(crime).toContain('intel sul colpo · bonus pieno solo se la sfrutti');
+    expect(crimeUi).toContain("const stats=(STRADA_SCENA.stats||[])");
+    expect(crimeUi).toContain("const meta=[o.sx,o.dx].filter(Boolean)");
+    expect(crimeUi).toContain('typeof stradaOpportunitaAttiva==="function"');
+    expect(crimeUi).toContain('typeof ADF_WORK_EVENTS.crimeLeadActive==="function"');
   });
 
   it("l'informazione viene consumata quando il colpo viene tentato",()=>{

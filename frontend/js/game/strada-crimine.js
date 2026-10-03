@@ -1340,6 +1340,14 @@ function stradaColpiDisponibili(){
   return st.ids.map(id=>STRADA_COLPI.find(c=>c.id===id)).filter(Boolean);
 }
 
+/* Le quattro offerte restano stabili per l'intera giornata. La vista però
+   espone solo quelle narrativamente coerenti con l'ora corrente: non
+   sostituiamo un lavoro notturno con un altro solo per riempire lo schermo.
+   È normale che in una fascia non ci sia nulla da fare. */
+function stradaColpiDisponibiliAdesso(){
+  return stradaColpiDisponibili().filter(c=>stradaFinestraColpoStato(c).ok);
+}
+
 
 /* ==================== INGRESSO NELLA STRADA ====================
    Punto 1 della revisione 02/10/2026.
@@ -2477,6 +2485,8 @@ function stScenaProtezione(){
 
 function stIncaricaAvvocato(personId){
   const s=G.strada,st=stradaAvvocatoStato();
+  if(!stradaPartecipazioneAttiva())
+    return "Hai mollato il giro: non stai più affidando incarichi criminali a un legale privato.";
   if(st.retained) return "Hai già un avvocato privato.";
   const p=stradaNpcPersonaDaId(personId);
   if(!p || p.ruolo!=="avvocato" || Number(p.rel||0)<STRADA_AVVOCATO_REL_MIN)
@@ -2506,6 +2516,10 @@ function stRevocaAvvocato(){
 }
 
 function stScenaAvvocato(){
+  if(!stradaPartecipazioneAttiva())
+    return {k:"Legale",titolo:"Hai mollato il giro",
+      testo:"Il rapporto con gli avvocati che conosci resta nel mondo, ma non mantieni un incarico privato per la Strada.",
+      opts:[{n:"Chiudi",run(){STRADA_SCENA=null;}}]};
   const st=stradaAvvocatoStato();
   if(st.retained){
     return {k:"Legale",titolo:st.name||"Avvocato privato",
@@ -5754,12 +5768,18 @@ function renderStColpi(){
   }
 
   centro.classList.remove("locked");
-  const offerte = stradaColpiDisponibili();
+  const offerte = stradaColpiDisponibiliAdesso();
   const leadIncontro = stradaOpportunitaAttiva();
   const leadLavoro = window.ADF_WORK_EVENTS &&
     typeof ADF_WORK_EVENTS.crimeLeadActive === "function"
       ? ADF_WORK_EVENTS.crimeLeadActive()
       : null;
+  if(!offerte.length){
+    griglia.className="dentro";
+    griglia.innerHTML="<b>Nessun lavoro gira adesso</b><p>Le offerte del giorno restano le stesse, ma in questa fascia oraria nessuna è coerente con il contesto. Puoi tornare più tardi.</p>";
+    return;
+  }
+
   griglia.innerHTML = offerte.map((c, i) => {
     const finestra=stradaFinestraColpoStato(c);
     const senzaEnergia = G.energy < c.energia;
