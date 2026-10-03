@@ -4009,7 +4009,8 @@ function carcereHighObject(e){
 }
 function carcereResolveHigh(e,o){
   const ctx=carcereCtx(),c=ctx.state;
-  const r=(o&&o.run?o.run(ctx):null)||{t:e.n,c:""};
+  let r=(o&&o.run?o.run(ctx):null)||{t:e.n,c:""};
+  r=carcereApplicaRelazioneHigh(e,o,r)||r;
   c.pendingHigh=null;c.lastHighDay=ctx.day;carcereMark(e,ctx);
   carcereRegistra(e.id,e.n,r.t||e.n,"high");
   carcereModalLayer(false);carcereChanged();if(typeof save==="function")save();
@@ -4059,7 +4060,8 @@ function carcereGiorno(){
   c.lastEventDay=d;
   if(e.tier==="high")return carcereShowHigh(e);
 
-  const r=(e.run?e.run(ctx):null)||{t:e.n,c:""};
+  let r=(e.run?e.run(ctx):null)||{t:e.n,c:""};
+  r=carcereApplicaRelazioneEvento(e,r)||r;
   carcereMark(e,ctx);carcereRegistra(e.id,e.n,r.t||e.n,e.tier);
   carcereChanged();if(typeof save==="function")save();return true;
 }
@@ -4114,8 +4116,16 @@ function carcereAzione(id){
   if(id==="giro"){
     if(c.weekly.giro)return {ok:false,t:"Per questa settimana hai già mosso abbastanza il giro dentro."};
     const tempo=carcereTempo(45,id);if(!tempo.ok)return tempo;c.weekly.giro=true;
-    s.rep=clamp((s.rep||0)+.8,0,100);G.wellbeing=clamp(G.wellbeing-1,0,100);
-    const t="Due parole nel cortile, niente promesse. Reputazione +0,8, benessere -1.";carcereRegistra("azione_giro","Parla con il giro",t,"azione");
+    const presenti=carcerePersone();
+    let p=presenti.find(x=>Number(carcerePersonaMeta(x).rapporto||0)>=0)||null;
+    if(!p) p=carcerePersonaProfilo("giro",true);
+    if(p){
+      const profilo=carcerePersonaMeta(p).profilo||"giro";
+      carcereModificaRapporto(profilo,2,"azione-giro");
+    }
+    s.rep=clamp((s.rep||0)+.5,0,100);G.wellbeing=clamp(G.wellbeing-1,0,100);
+    const t=(p?p.n+" — ":"")+"Due parole nel cortile. Il nome gira un po', ma soprattutto il rapporto resta. Reputazione +0,5, benessere -1.";
+    carcereRegistra("azione_giro","Parla con il giro",t,"azione");
     carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:""};
   }
   if(id==="avvocato"){
@@ -4142,8 +4152,17 @@ function carcereAzione(id){
   return {ok:false,t:"Azione carcere sconosciuta."};
 }
 function carcereVista(){
-  const c=carcereStato();if(!c)return {detenuto:false,azioni:[],eventi:[],pendingHigh:null};
-  return {detenuto:true,azioni:carcereAzioni(),eventi:c.eventi.slice(0,10),pendingHigh:c.pendingHigh||null};
+  const c=carcereStato();if(!c)return {detenuto:false,azioni:[],eventi:[],persone:[],pendingHigh:null};
+  return {
+    detenuto:true,
+    azioni:carcereAzioni(),
+    eventi:c.eventi.slice(0,10),
+    persone:carcerePersone().map(p=>({
+      id:p.id,n:p.n,rapporto:Number(carcerePersonaMeta(p).rapporto||0),
+      stato:carcereRelazioneEtichetta(p)
+    })),
+    pendingHigh:c.pendingHigh||null
+  };
 }
 window.addEventListener("jail-ui:opened",()=>setTimeout(carcereRestoreHigh,100));
 window.ADF_JAIL=Object.freeze({
