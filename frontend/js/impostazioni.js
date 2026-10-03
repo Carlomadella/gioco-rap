@@ -20,7 +20,7 @@ const SET_DEF = () => ({
   audio: {on:true, musicMenuOn:true, master:80, music:70, sfx:80, beat:85, ui:80, ambient:70, suoni:"morbido", click:true}, /* ADF_AUDIO_SETTINGS_V2 */
   look:  {tema:"notte", accento:"artista", col:"#FF5A36", grana:55, alone:52,
           scala:100, anim:true, compatto:false},
-  gioco: {difficolta:"anni-di-fame", preset:"normale", energia:0, spese:1, fan:1, rivali:1, conferme:true}
+  gioco: {difficolta:"anni-di-fame", preset:"normale", energia:0, spese:1, fan:1, rivali:1, conferme:true, recap:true}
 });
 
 let SET = SET_DEF();

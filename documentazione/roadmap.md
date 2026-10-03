@@ -197,6 +197,14 @@ fatica solo sul carico lungo, il conflitto fra turno e musica leggibile, e la re
 separata per ruolo (`frontend/js/game/lavoro-eventi.js`, `actions.js`, `posto.js`).
 Con la pull request #43 (stesso giorno, segnata dal push degli altri) gli eventi per ruolo sono
 di più, quelli di linea non capitano più ai ruoli alti e anche gli straordinari seguono il ruolo.
+Con la #62 anche la Pizzeria ha la sua faccia: è il lavoro part-time, con la rete dei contatti
+che cresce per ruolo (segnata dal push degli altri).
+**FATTO (02/10/2026)** — **il recap di fine giornata**: chiusa la giornata, una finestra coi
+numeri del giorno (soldi, fan, hype, benessere, energia spesa), le mosse e gli highlights
+del diario scelti per peso; non il settimo giorno (c'è il rapporto della settimana), né sui
+salti lunghi. Si spegne dalle Impostazioni. «Il recap di fine giornata» in
+`05-carriera-e-tempo.md`. Il 03/10, con la Strada dentro: i colpi sono mosse e righe del
+diario, e i soldi sporchi si vedono.
 **FATTO (02/10/2026)** — le **ferie in Fabbrica** (pull request #39, segnate dal push degli
 altri): due giorni ogni ciclo di quattro settimane, chiesti almeno il giorno prima; il giorno
 di ferie non è un turno e non è un'assenza, copre la quota del contratto senza malus e non si
@@ -342,12 +350,16 @@ gradino in meno); il feat con un rapper si propone solo la sera, col palco acces
   hanno abilità, fama e carattere»*;
 - i rapporti coi beatmaker che non vanno mai in negativo: li puoi offendere quanto vuoi e
   il rapporto resta uguale (foglio dei punti nuovi, Alessio);
-- la vita simulata, e la criminalità che oggi è troppo facile: risposta scritta, codice no.
-  Il simulatore di bilanciamento (29/09) aggiunge che non rende: con un colpo al giorno
-  l'anno finisce in carcere e in rosso (voce 65 di `problemi-riscontrati.md`);
-  **FATTO in parte (02/10/2026)** — le opportunità criminali hanno un pool generale, un dialogo con la
-  decisione e conseguenze vere, e arrivano anche fuori dalla Fabbrica (pull request #30 di Carletto,
-  segnata dal push degli altri; `frontend/js/game/strada-crimine.js`). Il bilanciamento resta da fare;
+- la vita simulata e il bilanciamento della criminalità restano da misurare sul sistema
+  corrente. **AGGIORNATO (03/10/2026)** — la Provincia non è più il sottosistema del 29/09:
+  oggi ha 30 colpi in 5 categorie, rete persistente, heat, lifestyle, attività di copertura,
+  carcere relazionale, uscita dal giro, fallout progressivo e intel contestuale. Per questo
+  i numeri del vecchio simulatore («un colpo al giorno», 300 giorni su 364 in carcere,
+  carriera in rosso) restano uno **snapshot storico**, non una diagnosi del runtime attuale.
+  La voce 65 di `problemi-riscontrati.md` resta aperta solo finché il simulatore non viene
+  rilanciato sul codice corrente. Il gap gameplay noto emerso dal reaudit è diverso:
+  i colpi consumano tempo reale ma non hanno ancora vere finestre
+  mattina/pomeriggio/notte/weekend;
   **FATTO in parte (03/10/2026)** — la Strada di Mycol, punti 9–24 (segnata dal push degli altri):
   il TrapPhone è uno sblocco del giro e non c'è più in una carriera nuova, l'heat cambia contatti e
   controlli, il rischio lifestyle confronta le spese con le entrate giustificabili, le persone del
@@ -378,6 +390,9 @@ testi leggibili senza zoom. Il giro mobile di gameplay copre 844×390; in portra
 **FATTO (02/10/2026)** — il layout orizzontale ha un foglio suo, `css/mobile-landscape.css`,
 con le prove su scala e viewport (pull request #41), e le Impostazioni in orizzontale si
 impilano e restano leggibili (#42): segnati dal push degli altri.
+Sempre il 02/10, dal push degli altri: sul telefono in orizzontale il pannello «Inizia» della
+landing sta al suo posto e mostra tutte le voci (#57); e la Pizzeria apre alle 17, come dice
+il suo cartello (#58).
 Dal 02/10/2026 l'agente `prova-sul-telefono` e il suo promemoria non ci sono più (Carlo): il
 giro sul telefono lo coprono le e2e in orizzontale, e quello su un telefono vero si fa a mano.
 

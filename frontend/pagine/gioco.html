@@ -32,6 +32,8 @@
 <link rel="stylesheet" href="css/seguiti.css?v=1">
 <link rel="stylesheet" href="css/overlays.css?v=15">
 <link rel="stylesheet" href="css/effects.css?v=14">
+<!-- dopo effects.css: il recap di fine giornata usa la finestra del rapporto della settimana -->
+<link rel="stylesheet" href="css/recap-giornata.css?v=1">
 <link rel="stylesheet" href="css/transizioni-video.css?v=1">
 <link rel="stylesheet" href="css/hud.css?v=12">
 <link rel="stylesheet" href="css/forms.css?v=12">
@@ -620,6 +622,10 @@
   <button class="solid" id="r-go" style="width:100%">Avanti</button>
 </div></div>
 
+<!-- Il recap di fine giornata: i numeri, le mosse e gli highlights del
+     giorno. Contenuto scritto da js/game/recap-giornata.js. -->
+<div class="report recap" id="recap"><div class="rcard" id="recap-card"></div></div>
+
 <!-- Punto 50: la mossa che prima finiva in un toast adesso apre una pagina
      vera, con l'illustrazione che già c'era sulla card (scene-art.js) più
      grande, non un popup. Contenuto scritto da js/game/ui.js. -->
@@ -661,7 +667,7 @@
 
 <!-- Impostazioni: audio, aspetto, difficoltà, slot e lingua. Devono esistere
      prima di tutto il resto, perché stato e simulazione leggono da qui. -->
-<script src="js/impostazioni.js?v=13"></script>
+<script src="js/impostazioni.js?v=14"></script>
 <!-- ADF_AUDIO_GAME_V1: backend astratto, transport, formato beat e musica -->
 <script src="js/audio/engine.js?v=3"></script>
 <script src="js/audio/transport.js?v=1"></script>
@@ -710,6 +716,7 @@
 <script src="js/game/studio-automatico.js?v=1"></script><!-- il resto in automatico, coi malus: dopo la Cabina Mix e Uscita li chiude il gioco -->
 <script src="js/game/seguiti.js?v=1"></script><!-- remastered e parti 2: si decidono dalla Discografia, si fanno in Studio -->
 <script src="js/game/progetti.js?v=1"></script><!-- mixtape e album: i pezzi in fila, nella linguetta Disco dello Studio -->
+<script src="js/game/recap-giornata.js?v=2"></script><!-- il recap di fine giornata: numeri, mosse e highlights -->
 <!-- e dopo lo Studio le pagine degli altri posti, che ne riusano i pannelli:
      Casa, Palestra, Fabbrica, Pizzeria, il Circolo, stacca la spina, e la foto sotto alla Piazza -->
 <script src="js/game/luoghi-foto.js?v=25"></script>
@@ -719,10 +726,10 @@
 <script src="js/game/circolo-stanze.js?v=4"></script><!-- le quattro stanze, sui riferimenti bancone/sala/open_mic/backstage -->
 <script src="js/game/abilita.js?v=1"></script>
 <script src="js/game/strada.js?v=13"></script>
-<script src="js/game/strada-crimine.js?v=44"></script>
+<script src="js/game/strada-crimine.js?v=45"></script>
 <script src="js/game/negozio.js?v=18"></script>
 <script src="js/game/negozio-offerte.js?v=1"></script><!-- «Le offerte della settimana»: l'offerta del lunedì e il banco dell'usato -->
-<script src="js/game/uscita.js?v=12"></script>
+<script src="js/game/uscita.js?v=13"></script>
 <!-- le transizioni video: prima di hub.js, che le chiama dai cartelli della mappa -->
 <script src="js/game/transizioni-video.js?v=2"></script>
 <script src="js/game/hub.js?v=34"></script>
@@ -740,7 +747,7 @@
 <script src="js/game/spostamenti.js?v=12"></script>
 <script src="js/game/interruzioni.js?v=8"></script>
 <!-- Eventi V2 prima di eventi-tempo: proprietario di skip e Notifiche. -->
-<script src="js/game/eventi-v2.js?v=1243"></script>
+<script src="js/game/eventi-v2.js?v=1245"></script>
 <!-- Eventi a minuti: azioni/spostamenti; nessuna seconda app Notifiche. -->
 <script src="js/game/eventi-tempo.js?v=13"></script>
 <script src="js/game/trasferte.js?v=5"></script>
@@ -757,14 +764,14 @@
 <!-- Meteo globale: previsione coerente e persistente, senza effetti gameplay. -->
 <script src="js/game/meteo.js?v=2"></script>
 <!-- Widget unico tempo/meteo + controlli globali. -->
-<script src="js/game/tempo-controlli.js?v=20"></script>
+<script src="js/game/tempo-controlli.js?v=21"></script>
 <!-- Luce della città: crossfade dei tre render sul clock di gioco. -->
 <script src="js/game/mappa-luce.js?v=1"></script>
 <script src="js/game/mappa-scorre.js?v=1"></script>
 
 <!-- Il pannello delle impostazioni: per ultimo, tocca roba definita ovunque. -->
-<script src="js/impostazioni-ui.js?v=16"></script>
-<script src="js/menu-sistema.js?v=12"></script>
+<script src="js/impostazioni-ui.js?v=17"></script>
+<script src="js/menu-sistema.js?v=13"></script>
 
 <!-- L'ingresso in partita, per ultimo di tutti: legge dall'indirizzo come si è
      arrivati qui dalla landing (riprendi, nuova, creatore, profilo) e apre la

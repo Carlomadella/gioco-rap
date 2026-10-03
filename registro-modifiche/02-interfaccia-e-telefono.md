@@ -6,6 +6,57 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:8e222dd6 -->
+## 03/10/26, 12:21 — task/recap-giornaliero → main
+
+**Merge effettuato da:** Carlomadella (madella871@gmail.com)  
+**Merge commit:** `8e222dd6`
+
+### Cosa è entrato
+
+- `7d30fe0d` — Il recap di fine giornata: i colpi in Strada e la notte andata in errore (voci 106 e 107) — **Carlomadella**
+- `972bbeee` — Merge main in task/recap-giornaliero: i test della Strada e l'audit passano su Windows — **Carlomadella**
+- `6183db83` — Merge main in task/recap-giornaliero: il bridge crime verso le persone NPC (#122) — **Carlomadella**
+- `4847a106` — La roadmap si aggiorna al push di chiunque: la Strada di Mycol (punti 9–24) e il TrapPhone come sblocco — **Carlomadella**
+- `66d13126` — Merge main in task/recap-giornaliero: la Strada di Mycol (punti 9–24) e il TrapPhone come sblocco — **Carlomadella**
+- `d4bda568` — La roadmap si aggiorna al push di chiunque: la Pizzeria part-time (#62) — **Carlomadella**
+- `afeb008a` — Merge remote-tracking branch 'origin/main' into task/recap-giornaliero — **Carlomadella**
+- `4babdc15` — docs(implementazioni): il punto sull'uscita del pezzo non solo di venerdì (Carlo) — **Carlomadella**
+- `edf9c962` — Il recap di fine giornata: la e2e confronta i soldi con la differenza vera — **Carlomadella**
+- `d7720b35` — La roadmap si aggiorna al push di chiunque: il pannello Inizia sul telefono (#57) e l'orario della Pizzeria (#58) — **Carlomadella**
+- `f45d625e` — Merge remote-tracking branch 'origin/main' into task/recap-giornaliero — **Carlomadella**
+- `a8d1e598` — Il recap di fine giornata: le voci 101, 102 e 104 del giro di fine task — **Carlomadella**
+- `cea8628b` — Merge remote-tracking branch 'origin/main' into task/recap-giornaliero — **Carlomadella**
+- `9e026938` — Il recap di fine giornata: «mettere un recap giornaliero con in aggiunta gli highlights» — **Carlomadella**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/problemi-riscontrati.md`
+- **Modificato:** `documentazione/problemi-risolti.md`
+- **Modificato:** `documentazione/roadmap.md`
+- **Aggiunto:** `frontend/css/recap-giornata.css`
+- **Modificato:** `frontend/js/game/eventi-v2.js`
+- **Aggiunto:** `frontend/js/game/recap-giornata.js`
+- **Modificato:** `frontend/js/game/sim.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/js/game/tempo-controlli.js`
+- **Modificato:** `frontend/js/game/trasferte.js`
+- **Modificato:** `frontend/js/game/ui.js`
+- **Modificato:** `frontend/js/game/uscita.js`
+- **Modificato:** `frontend/js/impostazioni-ui.js`
+- **Modificato:** `frontend/js/impostazioni.js`
+- **Modificato:** `frontend/js/menu-sistema.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Modificato:** `frontend/pagine/landing.html`
+- **Modificato:** `frontend/test/e2e/diario-fine-giornata.spec.js`
+- **Aggiunto:** `frontend/test/e2e/recap-giornata.spec.js`
+- **Modificato:** `frontend/test/e2e/salvataggio-vecchio.spec.js`
+- **Aggiunto:** `frontend/test/unit/recap-giornata.test.js`
+
+**File interessati in questa categoria:** 21
+
+---
+
 <!-- merge:8cd436f6 -->
 ## 03/10/26, 07:38 — feature/strada-punto20-carcere-relazioni → main
 
