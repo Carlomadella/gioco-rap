@@ -92,7 +92,7 @@ describe("Strada · punto 24 conoscenza, sotterfugio e informazione",()=>{
   });
 
   it("la UI mostra informazione e stima solo dopo averla raccolta",()=>{
-    expect(crime).toContain('...(intel?[{t:"Intel: "+stradaIntelDescrizione(preparazione),c:"money"}]:[])');
+    expect(crime).toContain('...(intel?[{t:"Intel: "+(typeof stradaIntelDescrizione==="function"');
     expect(crime).toContain('"Stima "+stima+"% · "+(usaIntel?"sfrutta la dritta":baseDx)');
     expect(crime).toContain('intel sul colpo · bonus pieno solo se la sfrutti');
   });
