@@ -1243,6 +1243,115 @@ function stradaRelazioneOperativa(p){
   return stradaRelazioneDisponibile(p) && !stradaHeatPersonaCauta(p);
 }
 
+function stradaHeatCostoErrore(){
+  return Number(stradaHeatProfilo().errore||1);
+}
+
+function stradaHeatPenaMoltiplicatore(){
+  return Number(stradaHeatProfilo().pena||1);
+}
+
+function stradaHeatChanceSoloDenuncia(base){
+  const p=stradaHeatProfilo();
+  return clamp(Number(base==null?.6:base)*(1-Number(p.escalation||0)),.12,.9);
+}
+
+function stradaHeatRischioControllo(){
+  const s=G.strada||{};
+  const p=stradaHeatProfilo();
+  let rischio=s.ferro
+    ? Math.max(Number(p.controlloFerro||0),.03+Math.max(0,Number(s.heat||0)-20)/100*.18)
+    : Number(p.controllo||0);
+  rischio+=Number(s.precedenti||0)*.02;
+  rischio-=Number(s.prot||0)*.01;
+  return clamp(rischio,0,.42);
+}
+
+function stradaHeatBruciaOpportunita(roll,silent){
+  const p=stradaHeatProfilo();
+  if(Number(p.bruciaOpportunita||0)<=0) return null;
+  const st=stradaOpportunitaStato();
+  stradaAggiornaOpportunita(true);
+  const tutte=[];
+  if(st.active) tutte.push(st.active);
+  if(st.pending) tutte.push(st.pending);
+  if(Array.isArray(st.pendingChoices)) tutte.push(...st.pendingChoices);
+  if(!tutte.length) return null;
+
+  const r=Number.isFinite(Number(roll))
+    ? Math.max(0,Math.min(.999999,Number(roll)))
+    : Math.random();
+  if(r>=Number(p.bruciaOpportunita||0)) return null;
+
+  const oggi=stradaAbsDay();
+  const viste=new Set();
+  for(const lead of tutte){
+    if(!lead || viste.has(lead.id)) continue;
+    viste.add(lead.id);
+    const persona=lead.personId?stradaPersonaDaId(lead.personId):null;
+    st.history.push({
+      type:"burned-by-heat",absoluteDay:oggi,opportunityId:lead.id,
+      personId:lead.personId||null,heat:Number(G.strada.heat||0),heatBand:p.id
+    });
+    if(persona) stradaRegistraConseguenzaPersona(persona,"heat-opportunity-burned",{
+      heat:Number(G.strada.heat||0),opportunityId:lead.id
+    });
+  }
+  while(st.history.length>30) st.history.shift();
+  st.active=null;
+  st.pending=null;
+  st.pendingChoices=[];
+  st.nextOfferAbsoluteDay=Math.max(
+    Number(st.nextOfferAbsoluteDay||0),
+    oggi+(p.id==="critico"?10:7)
+  );
+
+  const hm=stradaHeatMondoStato();
+  hm.history.push({type:"opportunity-burned",absoluteDay:oggi,heat:Number(G.strada.heat||0),count:viste.size});
+  if(hm.history.length>30) hm.history.shift();
+  if(!silent && typeof pushLog==="function"){
+    const nomi=[...viste].length;
+    pushLog("<b>Una porta si è chiusa perché il giro è troppo caldo.</b> "+
+      (nomi>1?"Le proposte aperte sono saltate.":"La proposta aperta è saltata.")+
+      " Nessuno vuole restare esposto adesso.","bad");
+  }
+  return {count:viste.size,heatBand:p.id};
+}
+
+function stradaHeatRichiestaFermati(silent){
+  const p=stradaHeatProfilo();
+  if(!Number(p.stopCooldown||0)) return null;
+  const hm=stradaHeatMondoStato();
+  const oggi=stradaAbsDay();
+  const last=Number(hm.lastStopRequestAbsoluteDay);
+  if(Number.isFinite(last)&&oggi-last<Number(p.stopCooldown)) return null;
+
+  stradaHeatSincronizzaPersone();
+  const candidati=(G.gente||[]).filter(x=>
+    x&&!x.via&&x.strada&&x.strada.known&&stradaRelazioneDisponibile(x)&&!stradaRivalitaAttiva(x)
+  ).sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const persona=candidati[0]||null;
+  if(!persona) return null;
+
+  hm.lastStopRequestAbsoluteDay=oggi;
+  hm.history.push({
+    type:"stop-request",absoluteDay:oggi,heat:Number(G.strada.heat||0),
+    heatBand:p.id,personId:persona.id,personName:persona.n
+  });
+  if(hm.history.length>30) hm.history.shift();
+  stradaRegistraConseguenzaPersona(persona,"heat-stop-request",{heat:Number(G.strada.heat||0)});
+  if(!silent&&typeof pushLog==="function")
+    pushLog("<b>"+persona.n+" ti ha chiesto di abbassare il profilo.</b> «Per un po' non farti vedere ovunque. C'è troppa attenzione addosso.»","bad");
+  return persona;
+}
+
+function stradaHeatMuoviMondo(rollBrucia,silent){
+  const prudenti=stradaHeatSincronizzaPersone();
+  const bruciata=stradaHeatBruciaOpportunita(rollBrucia,silent);
+  const fermati=stradaHeatRichiestaFermati(silent);
+  return {profilo:stradaHeatProfilo(),prudenti,bruciata,fermatoDa:fermati};
+}
+
 function stradaRelazioneForte(p){
   const st=stradaPersonaMeta(p);
   if(!st) return false;
