@@ -1532,7 +1532,7 @@ test("punto 22: città e gruppi NPC entrano solo come contesto della rete crimin
   crime.includes("function stradaNpcGruppiPersona(p)") &&
   crime.includes("function stradaNpcContestoPersona(p,cityId)") &&
   crime.includes("function stradaContattiAttivi(citta)") &&
-  crime.includes("stradaNpcPersone({cityId:stradaCittaContesto(citta)})") &&
+  crime.includes("stradaNpcPersone({cityId})") &&
   crime.includes("variante.networkCityId=stradaCittaContesto()") &&
   crime.includes("variante.networkGroupIds=networkCtx.groupIds") &&
   crime.includes("firstLinkedCityId:null") &&
