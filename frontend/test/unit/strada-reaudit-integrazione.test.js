@@ -98,5 +98,8 @@ describe("Reaudit crime · integrazione UI/core",()=>{
     expect(r.stradaFinestraColpoStato(by("ufficio-vuoto"),10*60,1).reason).toBe("day");
     expect(r.stradaFinestraColpoStato(by("ufficio-vuoto"),10*60,6).ok).toBe(true);
     expect(r.stradaFinestraColpoStato(by("deposito-weekend"),19*60,6).ok).toBe(true);
+
+    expect(core).toContain("const finestraDopo=stradaFinestraColpoStato(colpo,GAME_TIME.now()+minuti)");
+    expect(core).toContain("if(!finestraDopo.ok) return {ok:false,reason:finestraDopo.message}");
   });
 });
