@@ -1203,3 +1203,222 @@ registro centrale ambienti, geografia, scoperta UI, crime groups e migrazione.
 Questi collegamenti vanno effettuati nei punti successivi senza reinterpretare
 automaticamente i dati legacy.
 
+## Punto 8 — ricomparsa e selezione
+
+**Stato:** selettore generale ricostruito e collegato al Circolo; gli altri
+sistemi restano volutamente da integrare nel manager comune del punto 16.
+
+File introdotti:
+
+- `frontend/js/game/npc-selezione.js`;
+- `frontend/test/unit/npc-selezione.test.js`.
+
+### Ordine delle decisioni
+
+La ricomparsa segue questo ordine:
+
+1. risolvere PERSONA canoniche già esistenti;
+2. applicare vincoli fisici/contestuali;
+3. verificare l'appartenenza esplicita, quando presente;
+4. usare il percorso legacy soltanto per NPC senza lista esplicita;
+5. ordinare i soli candidati ammessi;
+6. usare legami reali come suggerimento secondario, mai come bypass;
+7. applicare il budget dell'incontro.
+
+Punteggio, relazione e legami non possono rendere eleggibile una persona che
+fallisce un vincolo.
+
+### Contratto del selettore
+
+`window.ADF_NPC_SELEZIONE.seleziona(persone, richiesta)` non accede a `G`,
+non genera NPC, non salva e non assegna ricompense.
+
+La richiesta contiene:
+
+| Campo | Regola |
+| --- | --- |
+| `ambienteId` | ambiente concreto, obbligatorio |
+| `giorno` | giorno assoluto positivo |
+| `periodo` | chiave stabile della rotazione |
+| `quanti` | budget intero non negativo |
+| `verifica` | callback obbligatoria dei vincoli hard |
+| `legacy` | callback usata solo se `p.appartenenze` è assente |
+| `punteggio` | peso finito dei soli candidati ammessi |
+| `legami` | persone/ID realmente collegati, ricontrollati nel pool ammesso |
+| `memoria` | snapshot opzionale `{ambienteId, periodo, ids}` |
+
+Il risultato contiene:
+
+- `persone`: riferimenti canonici agli oggetti PERSONA;
+- `memoria`: ordine completo del pool ammesso per quell'ambiente/periodo.
+
+### Appartenenze esplicite e fallback legacy
+
+Se `p.appartenenze` esiste, anche come array vuoto, il selettore richiede una
+appartenenza attiva per l'`ambienteId` esatto. Un episodio scaduto o riferito a
+`sala:milano` non viene ammesso in `sala:provincia`.
+
+Solo quando la lista non esiste viene chiamato `legacy(p)`.
+
+Questo è importante per la migrazione graduale: i nuovi fatti espliciti non
+vengono contraddetti da flag storici, mentre i vecchi save continuano a
+funzionare finché non vengono convertiti.
+
+### Stabilità e memoria
+
+Il selettore usa un tie-break deterministico basato su:
+
+- ID completo della PERSONA;
+- `ambienteId`;
+- `periodo`.
+
+Non dipende dall'ordine di `G.gente`.
+
+Quando riceve una memoria valida dello stesso ambiente/periodo:
+
+- conserva l'ordine delle persone ancora ammesse;
+- rimuove chi non supera più i vincoli;
+- aggiunge nuovi candidati in coda;
+- non permette a un cambiamento di punteggio causato dal render di rimescolare
+  la lista già scelta.
+
+Aumentare `quanti` conserva quindi il prefisso della lista corta.
+
+### Legami
+
+`legami(p)` può suggerire una seconda PERSONA accanto alla prima. Il
+suggerimento viene accettato soltanto se quella persona:
+
+- è già fra i candidati forniti;
+- supera gli stessi vincoli hard;
+- supera appartenenza/fallback;
+- non è già stata inserita.
+
+Un contatto comune non crea una PERSONA, una presenza, un gruppo o
+un'appartenenza.
+
+ID duplicati nei candidati vengono rifiutati invece di fondere automaticamente
+persone che il chiamante dovrebbe già aver normalizzato.
+
+### Integrazione Circolo
+
+`presentiOggi()` usa il nuovo selettore quando disponibile e conserva il
+vecchio algoritmo come fallback per test/runtime parziali.
+
+Ambiente corrente:
+
+`sala:provincia`
+
+Periodo:
+
+rotazione settimanale.
+
+Snapshot persistito nello stato:
+
+`G.npcPresenzeSala`
+
+Il ramo nuovo conserva il punteggio storico del Circolo:
+
+- relazione;
+- relazione Strada nota;
+- precedenti presenze;
+- conseguenze recenti;
+- contatti comuni;
+- componente deterministica settimanale.
+
+Ma il punteggio viene applicato **dopo** i vincoli.
+
+### Vincoli fisici attuali del Circolo
+
+Prima del punteggio vengono esclusi:
+
+- `p.via`;
+- `p.carcere.currentJailId` esplicito;
+- contatti delle Trasferte con `p.fuori === true`;
+- città corrente esplicitamente diversa da `provincia`, leggendo in ordine
+  `p.mondo.cittaAttuale`, `p.cittaAttuale`, `p.citta`.
+
+Non viene usato `ST_CITTA`: appartiene al pannello crime e non certifica la
+posizione fisica del protagonista.
+
+Per NPC senza appartenenze esplicite, `postoSoloLavoro(p)` resta il filtro
+legacy. Un NPC con una vera appartenenza `sala:provincia`, invece, non viene
+respinto soltanto perché conserva una vecchia origine lavorativa.
+
+La geografia definitiva resta il punto 9.
+
+### Bug di stabilità corretto
+
+Il vecchio punteggio includeva `circoloPresenze`, ma `presentiOggi()`
+incrementava lo stesso contatore dopo la scelta.
+
+Senza memoria:
+
+1. primo render sceglie una lista;
+2. il render modifica `circoloPresenze`;
+3. secondo render ricalcola i punteggi;
+4. la lista può cambiare pur essendo lo stesso periodo.
+
+Con `G.npcPresenzeSala` l'ordine settimanale viene fissato prima
+dell'incremento. Lo stesso giorno ogni persona incrementa
+`circoloPresenze` al massimo una volta tramite `circoloUltimoVistoKey`.
+Il campo `visto` non viene modificato: vedere una faccia non equivale a
+conoscerla.
+
+### Test ricostruiti
+
+La suite del selettore copre:
+
+- vincoli prima di punteggio/legami;
+- fallback legacy soltanto senza appartenenze esplicite;
+- appartenenze scadute e array vuoti;
+- distinzione fra Sale di città diverse;
+- ordine indipendente dall'anagrafe;
+- budget zero;
+- memoria stabile dopo cambi di punteggio;
+- rimozione dalla memoria di persone divenute incompatibili;
+- nuovi candidati aggiunti in coda;
+- prefisso stabile aumentando il budget;
+- legami ammessi solo se entrambi eleggibili;
+- memoria di periodo/ambiente diverso ignorata;
+- ID duplicati rifiutati;
+- punteggi non finiti rifiutati.
+
+Un test aggiuntivo esegue il ramo reale di `presentiOggi()` con entrambi i
+moduli e verifica insieme:
+
+- Milano esclusa;
+- detenzione esclusa;
+- `fuori` escluso;
+- appartenenza esplicita Sala capace di superare il solo filtro legacy lavoro;
+- ricomparsa con contatto comune;
+- snapshot settimanale;
+- prefisso pomeriggio → sera;
+- contatore presenza una sola volta al giorno;
+- nessuna modifica di `visto`.
+
+### Sufficienza rispetto alla simulazione
+
+Il selettore è adatto a una popolazione nell'ordine 300–800 perché valuta il
+pool del contesto e salva soltanto un array di ID come memoria, non copie degli
+NPC.
+
+Resta però una verifica quantitativa da fare al punto 18:
+
+- dimensione degli snapshot quando il pool ammesso cresce;
+- costo dei sort con centinaia di candidati;
+- frequenza di riuso delle stesse persone;
+- capacità di far emergere nuove conoscenze senza cancellare la continuità.
+
+La simulazione misura il numero di persone incontrate, non dimostra che i pesi
+del Circolo producano una varietà piacevole. Questo richiede playtest.
+
+### Confine del punto 8
+
+**Chiuso:** motore generale di selezione, memoria stabile, legami controllati,
+vincoli prima dei pesi, integrazione concreta del Circolo e test.
+
+**Non integrato qui:** lavoro, Strada, carcere, attività e Trasferte. Devono
+adottare lo stesso contratto nel punto 16 con i rispettivi gate, senza
+sostituire i loro sistemi specifici.
+
