@@ -2141,6 +2141,13 @@ function stradaModificaReputazione(delta,motivo,meta){
 }
 
 function stradaFiduciaValore(p){
+  try{
+    const api=typeof window!=="undefined" ? window.ADF_NPC_RELAZIONI : null;
+    if(api&&typeof api.strada==="function"){
+      const r=api.strada(p);
+      if(r&&r.fiducia!=null) return Number(r.fiducia);
+    }
+  }catch(_){}
   const st=stradaPersonaMeta(p);
   return st?Number(st.fiducia||0):0;
 }
@@ -4544,8 +4551,20 @@ function carcerePersone(){
     .sort((a,b)=>Number(carcerePersonaMeta(b).rapporto||0)-Number(carcerePersonaMeta(a).rapporto||0));
 }
 
+function carcereRapportoValore(p){
+  try{
+    const api=typeof window!=="undefined" ? window.ADF_NPC_RELAZIONI : null;
+    if(api&&typeof api.carcere==="function"){
+      const r=api.carcere(p);
+      if(r&&r.rapporto!=null) return Number(r.rapporto);
+    }
+  }catch(_){}
+  const m=carcerePersonaMeta(p);
+  return m?Number(m.rapporto||0):0;
+}
+
 function carcereRelazioneEtichetta(p){
-  const v=Number(carcerePersonaMeta(p)?.rapporto||0);
+  const v=carcereRapportoValore(p);
   return v>=7?"legame forte":v>=4?"si fida di te":v>=1?"rapporto buono":v<=-5?"conto aperto":v<=-2?"tensione":"vi conoscete";
 }
 
@@ -4555,7 +4574,7 @@ function carcereScarcerazioneRelazioni(c){
   for(const id of Object.values(c.persone)){
     const p=stradaNpcPersonaDaId(id);
     if(!p) continue;
-    const m=carcerePersonaMeta(p),rapporto=Number(m.rapporto||0);
+    const m=carcerePersonaMeta(p),rapporto=carcereRapportoValore(p);
     m.currentJailId=null;
     m.releasedAbsoluteDay=stradaAbsDay();
 
