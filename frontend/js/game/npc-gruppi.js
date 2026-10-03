@@ -154,6 +154,8 @@
     meta=meta&&typeof meta==="object"?meta:{};
     const d=giorno(meta.giorno);
     const fonte=testo(meta.fonte,"fonte");
+    if(d<Number(g.creatoGiorno))
+      throw new RangeError("ingresso precedente alla creazione del gruppo");
 
     const corrente=(g.membri||[]).find(m=>m&&m.personId===p.id&&m.uscitoGiorno==null);
     if(corrente) return corrente;
@@ -220,6 +222,8 @@
     meta=meta&&typeof meta==="object"?meta:{};
     const d=giorno(meta.giorno);
     const fonte=testo(meta.fonte,"fonte");
+    if(d<Number(g.creatoGiorno))
+      throw new RangeError("spostamento precedente alla creazione del gruppo");
     if(meta.cittaId==null && meta.ambienteId==null)
       throw new TypeError("cittaId o ambienteId obbligatorio");
 
@@ -257,11 +261,13 @@
   function gruppiPerPersona(reg,personId,opts){
     const id=testo(personId,"personId");
     const includeSciolti=!!(opts&&opts.includeSciolti);
-    return Object.freeze(registro(reg).filter(g=>
-      g&&
-      (includeSciolti||g.stato!=="sciolto")&&
-      (g.membri||[]).some(m=>m&&m.personId===id&&m.uscitoGiorno==null)
-    ));
+    return Object.freeze(registro(reg).filter(g=>{
+      if(!g || (!includeSciolti&&g.stato==="sciolto")) return false;
+      const membri=Array.isArray(g.membri)?g.membri:[];
+      return includeSciolti
+        ? membri.some(m=>m&&m.personId===id)
+        : membri.some(m=>m&&m.personId===id&&m.uscitoGiorno==null);
+    }));
   }
 
   function coesione(g,persone){
