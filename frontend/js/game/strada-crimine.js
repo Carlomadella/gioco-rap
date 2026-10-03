@@ -3614,6 +3614,186 @@ function stMollaIlGiro(){
    interna e contatti esterni plausibili (posta, colloqui, legale).
    I cinque HIGH sono obbligatori, persistono al refresh e bloccano il tempo. */
 
+/* Punto Strada 20: il carcere è una seconda fonte di relazioni.
+   Le persone conosciute dentro entrano in G.gente e restano le stesse dopo
+   la scarcerazione. Il rapporto costruito qui è separato dalla fiducia della
+   Strada: solo un legame davvero forte apre un contatto criminale fuori. */
+const CARCERE_RELAZIONI_PROFILI = Object.freeze({
+  compagno:Object.freeze({ruolo:"strada",dettaglio:"compagno di detenzione"}),
+  veterano:Object.freeze({ruolo:"strada",dettaglio:"detenuto più anziano del braccio"}),
+  cortile:Object.freeze({ruolo:"strada",dettaglio:"conoscenza del cortile"}),
+  giro:Object.freeze({ruolo:"strada",dettaglio:"faccia del giro conosciuta dentro"}),
+  conto:Object.freeze({ruolo:"strada",dettaglio:"conto nato o riemerso in carcere"})
+});
+
+const CARCERE_EVENTO_RELAZIONE = Object.freeze({
+  jail_compagno_parla:Object.freeze({profilo:"compagno",delta:1}),
+  jail_vecchio_consiglio:Object.freeze({profilo:"veterano",delta:2}),
+  jail_tavolo_cortile:Object.freeze({profilo:"cortile",delta:1}),
+  jail_riconosciuto_dentro:Object.freeze({profilo:"compagno",delta:2}),
+  jail_favore_piccolo:Object.freeze({profilo:"cortile",delta:2}),
+  jail_chiamano_nome:Object.freeze({profilo:"cortile",delta:1}),
+  jail_aria_pesante:Object.freeze({profilo:"cortile",delta:-1}),
+  jail_barre_quaderno:Object.freeze({profilo:"compagno",delta:2}),
+  jail_voce_giro:Object.freeze({profilo:"giro",delta:1}),
+  jail_messaggio_piegato:Object.freeze({profilo:"giro",delta:1}),
+  jail_nome_pesa:Object.freeze({profilo:"giro",delta:1}),
+  jail_faccia_giro:Object.freeze({profilo:"giro",delta:3}),
+  jail_conto_vecchio:Object.freeze({profilo:"conto",delta:-2})
+});
+
+function carcerePersonaMeta(p){
+  if(!p) return null;
+  if(!p.carcere || typeof p.carcere!=="object"){
+    p.carcere={
+      conosciuto:true,rapporto:0,interazioni:[],jailIds:[],
+      currentJailId:null,profilo:null,firstMetAbsoluteDay:null,lastMetAbsoluteDay:null,
+      linkedStreet:false,releasedAbsoluteDay:null
+    };
+  }
+  if(!Array.isArray(p.carcere.interazioni)) p.carcere.interazioni=[];
+  if(!Array.isArray(p.carcere.jailIds)) p.carcere.jailIds=[];
+  if(!Number.isFinite(Number(p.carcere.rapporto))) p.carcere.rapporto=0;
+  return p.carcere;
+}
+
+function carcerePersonaNuova(profilo){
+  const def=CARCERE_RELAZIONI_PROFILI[profilo]||CARCERE_RELAZIONI_PROFILI.cortile;
+  G.gente=Array.isArray(G.gente)?G.gente:[];
+  let p=null;
+  if(typeof nuovaPersona==="function") p=nuovaPersona(def.ruolo||"strada");
+  if(!p){
+    const usati=new Set(G.gente.map(x=>x&&x.n).filter(Boolean));
+    const basi={compagno:"Dani",veterano:"Bruno",cortile:"Rami",giro:"Nox",conto:"Moro"};
+    let n=basi[profilo]||"Rami",s=2;
+    while(usati.has(n)) n=(basi[profilo]||"Rami")+" "+s++;
+    p={id:"p"+Math.floor(Math.random()*1e9),ruolo:"strada",n,rel:0,pt:0,ult:-1,feat:-99,via:false};
+  }
+  p.origine="carcere";
+  p.origineLuogo="carcere";
+  p.origineDettaglio=def.dettaglio;
+  p.storia="Vi siete conosciuti durante una detenzione. Quello che è successo dentro non sparisce quando si apre il cancello.";
+  p.circoloSbloccato=false;
+  p.numero=false;
+  p.visto=true;
+  const meta=carcerePersonaMeta(p);
+  meta.profilo=profilo;
+  meta.firstMetAbsoluteDay=stradaAbsDay();
+  meta.lastMetAbsoluteDay=stradaAbsDay();
+  G.gente.push(p);
+  return p;
+}
+
+function carcerePersonaProfilo(profilo,crea){
+  const c=carcereStato();
+  if(!c) return null;
+  if(!c.persone || typeof c.persone!=="object") c.persone={};
+  const id=c.persone[profilo];
+  let p=id?(G.gente||[]).find(x=>x&&x.id===id&&!x.via):null;
+  if(!p && crea!==false){
+    p=carcerePersonaNuova(profilo);
+    c.persone[profilo]=p.id;
+  }
+  if(p){
+    const m=carcerePersonaMeta(p);
+    if(!m.jailIds.includes(c.jailId)) m.jailIds.push(c.jailId);
+    m.currentJailId=c.jailId;
+    m.lastMetAbsoluteDay=stradaAbsDay();
+  }
+  return p;
+}
+
+function carcereModificaRapporto(profilo,delta,motivo){
+  const p=carcerePersonaProfilo(profilo,true);
+  if(!p) return null;
+  const m=carcerePersonaMeta(p);
+  const prima=Number(m.rapporto||0);
+  m.rapporto=clamp(prima+Number(delta||0),-10,10);
+  m.lastMetAbsoluteDay=stradaAbsDay();
+  m.interazioni.push({
+    absoluteDay:stradaAbsDay(),delta:Number(delta||0),
+    reason:String(motivo||"carcere")
+  });
+  if(m.interazioni.length>20)m.interazioni.shift();
+  if(typeof postoRegistraConseguenzaMondo==="function" && delta)
+    postoRegistraConseguenzaMondo(p,delta>0?"jail-bond-positive":"jail-bond-negative",delta>0?1:-1,{
+      source:"carcere",reason:String(motivo||"carcere"),context:"carcere"
+    });
+  return p;
+}
+
+function carcereApplicaRelazioneEvento(e,r){
+  const cfg=e&&CARCERE_EVENTO_RELAZIONE[e.id];
+  if(!cfg) return r;
+  const p=carcereModificaRapporto(cfg.profilo,cfg.delta,e.id);
+  if(p&&r&&r.t) r.t=p.n+" — "+r.t;
+  return r;
+}
+
+function carcereApplicaRelazioneHigh(e,o,r){
+  if(!e) return r;
+  let profilo=null,delta=0;
+  if(e.id==="jail_high_schieramento"){
+    profilo="cortile";delta=r&&r.c==="good"?2:r&&r.c==="bad"?-2:1;
+  }else if(e.id==="jail_high_telefono"){
+    profilo="giro";delta=o&&o.n==="Lo rifiuti"?-1:1;
+  }else if(e.id==="jail_high_vecchio_opp"){
+    profilo="conto";delta=r&&r.c==="good"?1:r&&r.c==="bad"?-3:-1;
+  }else if(e.id==="jail_high_quando_esci"){
+    profilo="giro";delta=o&&o.n==="Dici sì"?3:o&&o.n==="Dici no"?-2:1;
+  }
+  if(!profilo) return r;
+  const p=carcereModificaRapporto(profilo,delta,e.id+":"+(o&&o.n||"scelta"));
+  if(p&&r&&r.t) r.t=p.n+" — "+r.t;
+  return r;
+}
+
+function carcerePersone(){
+  const c=carcereStato();
+  if(!c||!c.persone) return [];
+  return Object.values(c.persone).map(id=>(G.gente||[]).find(p=>p&&p.id===id&&!p.via))
+    .filter(Boolean)
+    .sort((a,b)=>Number(carcerePersonaMeta(b).rapporto||0)-Number(carcerePersonaMeta(a).rapporto||0));
+}
+
+function carcereRelazioneEtichetta(p){
+  const v=Number(carcerePersonaMeta(p)?.rapporto||0);
+  return v>=7?"legame forte":v>=4?"si fida di te":v>=1?"rapporto buono":v<=-5?"conto aperto":v<=-2?"tensione":"vi conoscete";
+}
+
+function carcereScarcerazioneRelazioni(c){
+  if(!c||!c.persone) return {contatti:[],rivali:[]};
+  const contatti=[],rivali=[];
+  for(const id of Object.values(c.persone)){
+    const p=(G.gente||[]).find(x=>x&&x.id===id&&!x.via);
+    if(!p) continue;
+    const m=carcerePersonaMeta(p),rapporto=Number(m.rapporto||0);
+    m.currentJailId=null;
+    m.releasedAbsoluteDay=stradaAbsDay();
+
+    if(rapporto>=4){
+      stradaSegnaPersona(p,{
+        key:"carcere:"+p.id,
+        source:"carcere",
+        story:"Vi siete conosciuti dentro e il rapporto ha retto fino all'uscita."
+      });
+      const st=stradaPersonaMeta(p);
+      st.fiducia=Math.max(Number(st.fiducia||0),Math.min(35,5+rapporto*3));
+      st.lastPlayerStreetInteractionAbsoluteDay=stradaAbsDay();
+      m.linkedStreet=true;
+      contatti.push(p);
+      stradaRegistraConseguenzaPersona(p,"jail-contact-released",{jailId:c.jailId,rapporto});
+    }else if(rapporto<=-4){
+      stradaSegnaPersona(p,{key:"carcere:"+p.id,source:"carcere",story:"Un conto nato dentro è uscito insieme a voi."});
+      const st=stradaPersonaMeta(p);
+      st.fiducia=Math.min(Number(st.fiducia||5),10);
+      stradaModificaTensionePersona(p,2,"carcere-conto-uscita");
+      rivali.push(p);
+    }
+  }
+  return {contatti,rivali};
+}
+
 const CARCERE_EVENTI = [
   /* ---------- ROUTINE · 10 ---------- */
   {id:"jail_conta_22",n:"Conta delle ventidue",cat:"routine",tier:"low",weight:1.8,
@@ -3756,7 +3936,7 @@ function carcereStato(){
   if(!s.carcere||typeof s.carcere!=="object"||s.carcere.jailId!==a.jailId){
     s.carcere={jailId:a.jailId,eventi:[],recenti:[],seen:{},lastEventDay:d,lastHighDay:d-30,startedDay:d,
       daily:{key:d},weekly:{key:carcereSerialeSettimana()},ricorsoUsato:false,pendingHigh:null,airBlockedUntil:0,
-      releaseRepBonus:0,releaseHeatBonus:0};
+      releaseRepBonus:0,releaseHeatBonus:0,persone:{}};
   }
   const c=s.carcere;
   if(!Array.isArray(c.eventi))c.eventi=[];
@@ -3767,6 +3947,7 @@ function carcereStato(){
   if(!Number.isFinite(c.airBlockedUntil))c.airBlockedUntil=0;
   if(!Number.isFinite(c.releaseRepBonus))c.releaseRepBonus=0;
   if(!Number.isFinite(c.releaseHeatBonus))c.releaseHeatBonus=0;
+  if(!c.persone||typeof c.persone!=="object")c.persone={};
   const dk=carcereSerialeGiorno();if(!c.daily||c.daily.key!==dk)c.daily={key:dk};
   const wk=carcereSerialeSettimana();if(!c.weekly||c.weekly.key!==wk)c.weekly={key:wk};
   return c;
@@ -3828,7 +4009,8 @@ function carcereHighObject(e){
 }
 function carcereResolveHigh(e,o){
   const ctx=carcereCtx(),c=ctx.state;
-  const r=(o&&o.run?o.run(ctx):null)||{t:e.n,c:""};
+  let r=(o&&o.run?o.run(ctx):null)||{t:e.n,c:""};
+  r=carcereApplicaRelazioneHigh(e,o,r)||r;
   c.pendingHigh=null;c.lastHighDay=ctx.day;carcereMark(e,ctx);
   carcereRegistra(e.id,e.n,r.t||e.n,"high");
   carcereModalLayer(false);carcereChanged();if(typeof save==="function")save();
@@ -3878,7 +4060,8 @@ function carcereGiorno(){
   c.lastEventDay=d;
   if(e.tier==="high")return carcereShowHigh(e);
 
-  const r=(e.run?e.run(ctx):null)||{t:e.n,c:""};
+  let r=(e.run?e.run(ctx):null)||{t:e.n,c:""};
+  r=carcereApplicaRelazioneEvento(e,r)||r;
   carcereMark(e,ctx);carcereRegistra(e.id,e.n,r.t||e.n,e.tier);
   carcereChanged();if(typeof save==="function")save();return true;
 }
@@ -3933,8 +4116,16 @@ function carcereAzione(id){
   if(id==="giro"){
     if(c.weekly.giro)return {ok:false,t:"Per questa settimana hai già mosso abbastanza il giro dentro."};
     const tempo=carcereTempo(45,id);if(!tempo.ok)return tempo;c.weekly.giro=true;
-    s.rep=clamp((s.rep||0)+.8,0,100);G.wellbeing=clamp(G.wellbeing-1,0,100);
-    const t="Due parole nel cortile, niente promesse. Reputazione +0,8, benessere -1.";carcereRegistra("azione_giro","Parla con il giro",t,"azione");
+    const presenti=carcerePersone();
+    let p=presenti.find(x=>Number(carcerePersonaMeta(x).rapporto||0)>=0)||null;
+    if(!p) p=carcerePersonaProfilo("giro",true);
+    if(p){
+      const profilo=carcerePersonaMeta(p).profilo||"giro";
+      carcereModificaRapporto(profilo,2,"azione-giro");
+    }
+    s.rep=clamp((s.rep||0)+.5,0,100);G.wellbeing=clamp(G.wellbeing-1,0,100);
+    const t=(p?p.n+" — ":"")+"Due parole nel cortile. Il nome gira un po', ma soprattutto il rapporto resta. Reputazione +0,5, benessere -1.";
+    carcereRegistra("azione_giro","Parla con il giro",t,"azione");
     carcereChanged();if(typeof save==="function")save();return {ok:true,t:t,c:""};
   }
   if(id==="avvocato"){
@@ -3961,8 +4152,17 @@ function carcereAzione(id){
   return {ok:false,t:"Azione carcere sconosciuta."};
 }
 function carcereVista(){
-  const c=carcereStato();if(!c)return {detenuto:false,azioni:[],eventi:[],pendingHigh:null};
-  return {detenuto:true,azioni:carcereAzioni(),eventi:c.eventi.slice(0,10),pendingHigh:c.pendingHigh||null};
+  const c=carcereStato();if(!c)return {detenuto:false,azioni:[],eventi:[],persone:[],pendingHigh:null};
+  return {
+    detenuto:true,
+    azioni:carcereAzioni(),
+    eventi:c.eventi.slice(0,10),
+    persone:carcerePersone().map(p=>({
+      id:p.id,n:p.n,rapporto:Number(carcerePersonaMeta(p).rapporto||0),
+      stato:carcereRelazioneEtichetta(p)
+    })),
+    pendingHigh:c.pendingHigh||null
+  };
 }
 window.addEventListener("jail-ui:opened",()=>setTimeout(carcereRestoreHigh,100));
 window.ADF_JAIL=Object.freeze({
@@ -4221,12 +4421,21 @@ function stradaSettimana(){
     if(s.arresto.settimane <= 0){
       const colpoFatto = s.arresto.colpo;
       const jailFx = s.carcere || {};
+      const relazioniUscita=carcereScarcerazioneRelazioni(jailFx);
       s.arresto = null;
       s.rep = clamp(s.rep + 12 + (Number(jailFx.releaseRepBonus)||0), 0, 100);
       s.heat = clamp(s.heat + (Number(jailFx.releaseHeatBonus)||0), 0, 100);
       if(jailFx.releaseRepBonus || jailFx.releaseHeatBonus)
         pushLog("<b>Quello che hai deciso dentro ti aspetta fuori.</b> Il giro e l'attenzione ripartono da dove li avevi lasciati.", "");
-      showEvent({k:"Sei uscito", t:"Fuori", d:"La storia di «" + colpoFatto + "» ti ha seguito fin qui.",
+      if(relazioniUscita.contatti.length)
+        pushLog("<b>Non sei uscito da solo.</b> "+relazioniUscita.contatti.map(p=>p.n).join(", ")+
+          (relazioniUscita.contatti.length===1?" resta un contatto costruito dentro.":" restano contatti costruiti dentro."),"good");
+      if(relazioniUscita.rivali.length)
+        pushLog("<b>Un conto ha passato il cancello con te.</b> "+relazioniUscita.rivali.map(p=>p.n).join(", ")+
+          (relazioniUscita.rivali.length===1?" non ha dimenticato.":" non hanno dimenticato."),"bad");
+      showEvent({k:"Sei uscito", t:"Fuori", d:"La storia di «" + colpoFatto + "» ti ha seguito fin qui."+
+        (relazioniUscita.contatti.length?" Anche "+relazioniUscita.contatti.map(p=>p.n).join(", ")+" fa parte di quello che ti porti fuori.":"")+
+        (relazioniUscita.rivali.length?" C'è però un conto aperto con "+relazioniUscita.rivali.map(p=>p.n).join(", ")+".":""),
         annulla(){},
         opts:[
           {n:"Raccontala", d:"+lucidità, +hype: la trasformi in un pezzo",

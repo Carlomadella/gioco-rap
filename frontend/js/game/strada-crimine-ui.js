@@ -194,6 +194,10 @@
       .adf-jail-act b{display:block;font-size:12px}.adf-jail-act span{display:block;margin-top:3px;color:#aeb3bd;font-size:10px;line-height:1.3}
       .adf-jail-act:disabled{opacity:.42;cursor:not-allowed}@media (hover:hover){.adf-jail-act:not(:disabled):hover{border-color:#ff315b;background:rgba(255,49,91,.09)}}
       .adf-jail-result{min-height:18px;margin-top:8px;color:#d9dde4;font-size:11px;line-height:1.35}
+      .adf-jail-people{margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
+      .adf-jail-people>small{display:block;margin-bottom:8px;color:#9aa0aa;font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+      .adf-jail-person{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.07)}
+      .adf-jail-person:first-of-type{border-top:0}.adf-jail-person b{font-size:11px}.adf-jail-person span{color:#9fa5af;font-size:10px;text-align:right}
       .adf-jail-feed{margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,.10)}
       .adf-jail-event{padding:7px 0;border-top:1px solid rgba(255,255,255,.07)}.adf-jail-event:first-of-type{border-top:0}
       .adf-jail-event b{display:block;font-size:11px}.adf-jail-event span{display:block;margin-top:2px;color:#9fa5af;font-size:10px;line-height:1.35}
@@ -258,6 +262,10 @@
             <small>Cosa puoi fare qui dentro</small>
             <div class="adf-jail-actions" id="adf-jail-actions"></div>
             <div class="adf-jail-result" id="adf-jail-result"></div>
+          </div>
+          <div class="adf-jail-people">
+            <small>Persone qui dentro</small>
+            <div id="adf-jail-people"></div>
           </div>
           <div class="adf-jail-feed">
             <small>Dentro succede</small>
@@ -334,7 +342,8 @@
     },24000);
   }
   function renderJailLoop(el){
-    const box=el.querySelector("#adf-jail-actions"), feed=el.querySelector("#adf-jail-events");
+    const box=el.querySelector("#adf-jail-actions"), feed=el.querySelector("#adf-jail-events"),
+      people=el.querySelector("#adf-jail-people");
     if(!window.ADF_JAIL || typeof ADF_JAIL.view!=="function"){
       if(box) box.innerHTML='<div class="adf-jail-empty">Meccaniche carcere non disponibili.</div>';
       return;
@@ -344,6 +353,11 @@
       '<button class="adf-jail-act" type="button" data-jail-action="'+esc(a.id)+'" '+(a.disabled?"disabled":"")+'>'+
         '<b>'+esc(a.n)+'</b><span>'+esc(a.reason||a.d||"")+'</span></button>'
     ).join("");
+    if(people){
+      people.innerHTML=(v.persone&&v.persone.length)
+        ? v.persone.map(p=>'<div class="adf-jail-person"><b>'+esc(p.n)+'</b><span>'+esc(p.stato)+'</span></div>').join("")
+        : '<div class="adf-jail-empty">Non hai ancora costruito un rapporto vero con nessuno qui dentro.</div>';
+    }
     if(feed){
       feed.innerHTML=(v.eventi&&v.eventi.length)
         ? v.eventi.map(e=>'<div class="adf-jail-event"><b>'+esc(e.t)+'</b><span>'+esc(e.txt)+'</span></div>').join("")

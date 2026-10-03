@@ -1598,6 +1598,44 @@ test("punto 19: la Strada spiega al giocatore come il giro reagisce all'heat",
   crime.includes("si tiene basso") &&
   crime.includes("stradaHeatMuoviMondo(Math.random(),false)"));
 
+test("punto 20: il carcere crea persone persistenti dentro G.gente",
+  crime.includes("const CARCERE_RELAZIONI_PROFILI") &&
+  crime.includes('p.origine="carcere"') &&
+  crime.includes('p.origineLuogo="carcere"') &&
+  crime.includes("G.gente.push(p)") &&
+  crime.includes("function carcerePersonaProfilo(profilo,crea)"));
+test("punto 20: il rapporto carcere resta separato dalla fiducia criminale",
+  crime.includes("function carcerePersonaMeta(p)") &&
+  crime.includes("rapporto:0") &&
+  crime.includes("function carcereModificaRapporto(profilo,delta,motivo)") &&
+  crime.includes("m.rapporto=clamp") &&
+  crime.includes("linkedStreet:false"));
+test("punto 20: eventi e scelte high muovono relazioni con persone concrete",
+  crime.includes("const CARCERE_EVENTO_RELAZIONE") &&
+  crime.includes("carcereApplicaRelazioneEvento(e,r)") &&
+  crime.includes("carcereApplicaRelazioneHigh(e,o,r)") &&
+  crime.includes('jail_faccia_giro:Object.freeze({profilo:"giro",delta:3})') &&
+  crime.includes('jail_conto_vecchio:Object.freeze({profilo:"conto",delta:-2})'));
+test("punto 20: parlare con il giro costruisce un rapporto e non solo reputazione",
+  crime.includes('carcerePersonaProfilo("giro",true)') &&
+  crime.includes('carcereModificaRapporto(profilo,2,"azione-giro")') &&
+  crime.includes("ma soprattutto il rapporto resta"));
+test("punto 20: solo legami forti escono come contatti e i conti gravi come rivalità",
+  crime.includes("function carcereScarcerazioneRelazioni(c)") &&
+  crime.includes("if(rapporto>=4)") &&
+  crime.includes('source:"carcere"') &&
+  crime.includes("else if(rapporto<=-4)") &&
+  crime.includes('stradaModificaTensionePersona(p,2,"carcere-conto-uscita")'));
+test("punto 20: il gate relazioni viene applicato prima della scarcerazione",
+  crime.indexOf("const relazioniUscita=carcereScarcerazioneRelazioni(jailFx);") <
+  crime.indexOf("s.arresto = null;",crime.indexOf("const relazioniUscita=carcereScarcerazioneRelazioni(jailFx);")));
+test("punto 20: la UI carcere mostra facce e stato del rapporto",
+  crime.includes("persone:carcerePersone().map") &&
+  crime.includes("carcereRelazioneEtichetta(p)") &&
+  crimeui.includes("Persone qui dentro") &&
+  crimeui.includes('id="adf-jail-people"') &&
+  crimeui.includes("v.persone&&v.persone.length"));
+
 test("punto 13 esteso: gli esiti Strada entrano nella relazione sociale della stessa persona",
   posto.includes("function postoConseguenzeMondo(p)") &&
   posto.includes("function postoRegistraConseguenzaMondo(p,tipo,punti,meta)") &&
