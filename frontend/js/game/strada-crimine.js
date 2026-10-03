@@ -423,11 +423,17 @@ function stradaOpportunitaTriggerConfig(trigger){
     cooldown=Math.max(6,cooldown-1);
   }
 
+  const heat=stradaHeatProfilo();
+  chance*=Number(heat.opportunita||1);
+  if(heat.id==="alto") cooldown+=2;
+  else if(heat.id==="critico") cooldown+=4;
+
   return {
     chance:Math.min(.16,chance),
     cooldownGiorni:cooldown,
     durataGiorni:Number(base.durataGiorni||7),
-    trigger
+    trigger,
+    heatBand:heat.id
   };
 }
 
@@ -1081,6 +1087,52 @@ const STRADA_RELAZIONI = Object.freeze({
   coldTrustLoss:15
 });
 
+/* Punto Strada 19: l'heat cambia il mondo, non soltanto il dado del colpo.
+   Le quattro fasce sono una fonte unica di verità per opportunità, persone,
+   controlli e costo degli errori. Nessun "livello criminale" viene salvato:
+   la fascia deriva sempre dall'heat attuale. */
+const STRADA_HEAT_FASCE = Object.freeze([
+  Object.freeze({
+    id:"basso",min:0,label:"Basso",occhi:"Nessuno",
+    opportunita:1,cautela:.00,controllo:.00,controlloFerro:.03,
+    errore:1,pena:1,escalation:0,bruciaOpportunita:0,stopCooldown:0,
+    mondo:"Il giro scorre normalmente. Nessuno sta cambiando abitudini per colpa tua."
+  }),
+  Object.freeze({
+    id:"medio",min:25,label:"Medio",occhi:"Gente prudente",
+    opportunita:.82,cautela:.25,controllo:.04,controlloFerro:.07,
+    errore:1.12,pena:1.05,escalation:.08,bruciaOpportunita:.08,stopCooldown:0,
+    mondo:"Le persone meno legate a te iniziano a tenersi basse e le porte si aprono più lentamente."
+  }),
+  Object.freeze({
+    id:"alto",min:50,label:"Alto",occhi:"Giro caldo",
+    opportunita:.55,cautela:.45,controllo:.13,controlloFerro:.14,
+    errore:1.35,pena:1.15,escalation:.22,bruciaOpportunita:.28,stopCooldown:21,
+    mondo:"Qualcuno evita di farsi vedere con te, le occasioni possono saltare e i controlli diventano concreti."
+  }),
+  Object.freeze({
+    id:"critico",min:75,label:"Molto alto",occhi:"Ti stanno addosso",
+    opportunita:.30,cautela:.70,controllo:.22,controlloFerro:.22,
+    errore:1.65,pena:1.35,escalation:.42,bruciaOpportunita:.52,stopCooldown:14,
+    mondo:"Il giro si restringe. Anche un errore piccolo può trascinare conseguenze molto più pesanti."
+  })
+]);
+
+function stradaHeatProfilo(valore){
+  const h=clamp(Number(valore==null?(G.strada&&G.strada.heat):valore)||0,0,100);
+  for(let i=STRADA_HEAT_FASCE.length-1;i>=0;i--)
+    if(h>=STRADA_HEAT_FASCE[i].min) return STRADA_HEAT_FASCE[i];
+  return STRADA_HEAT_FASCE[0];
+}
+
+function stradaHeatMondoStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.heatMondo || typeof s.heatMondo!=="object")
+    s.heatMondo={lastStopRequestAbsoluteDay:null,history:[]};
+  if(!Array.isArray(s.heatMondo.history)) s.heatMondo.history=[];
+  return s.heatMondo;
+}
+
 function stradaPersonaMeta(p){
   if(!p) return null;
   if(!p.strada || typeof p.strada!=="object"){
@@ -1109,7 +1161,10 @@ function stradaPersonaMeta(p){
       tensione:0,
       rivalita:false,
       lastReferralAbsoluteDay:null,
-      conseguenzeEventi:[]
+      conseguenzeEventi:[],
+      heatCaution:false,
+      heatCautionBand:null,
+      heatCautionSinceAbsoluteDay:null
     };
   }
   if(!Array.isArray(p.strada.sources)) p.strada.sources=[];
@@ -1123,6 +1178,8 @@ function stradaPersonaMeta(p){
   if(!Number.isFinite(Number(p.strada.tensione))) p.strada.tensione=0;
   p.strada.tensione=Math.max(0,Math.min(3,Math.floor(Number(p.strada.tensione)||0)));
   p.strada.rivalita=!!p.strada.rivalita;
+  p.strada.heatCaution=!!p.strada.heatCaution;
+  if(p.strada.heatCautionBand!=null) p.strada.heatCautionBand=String(p.strada.heatCautionBand);
   if(!Number.isFinite(Number(p.strada.favori))) p.strada.favori=0;
   p.strada.favori=Math.max(0,Math.min(3,Math.floor(Number(p.strada.favori)||0)));
   if(!Number.isFinite(Number(p.strada.colpiInsieme))) p.strada.colpiInsieme=0;
@@ -1143,6 +1200,156 @@ function stradaPersonaMeta(p){
     p.strada.fiducia=clamp(base,0,40);
   }else p.strada.fiducia=clamp(Number(p.strada.fiducia)||0,0,100);
   return p.strada;
+}
+
+function stradaHeatSincronizzaPersone(){
+  const prof=stradaHeatProfilo();
+  const oggi=stradaAbsDay();
+  const pool=(G.gente||[]).filter(p=>{
+    if(!p || p.via || !p.strada || !p.strada.known) return false;
+    const st=stradaPersonaMeta(p);
+    return (st.streetStatus==="active" || st.streetStatus==="cold") && !st.rivalita;
+  }).sort((a,b)=>{
+    const fa=stradaFiduciaValore(a), fb=stradaFiduciaValore(b);
+    if(fa!==fb) return fa-fb; /* si tirano indietro prima i legami più deboli */
+    const la=Number(stradaPersonaMeta(a).lastPlayerStreetInteractionAbsoluteDay||0);
+    const lb=Number(stradaPersonaMeta(b).lastPlayerStreetInteractionAbsoluteDay||0);
+    return la-lb;
+  });
+
+  const quanti=prof.cautela>0 && pool.length
+    ? Math.min(pool.length,Math.max(1,Math.ceil(pool.length*prof.cautela)))
+    : 0;
+  const prudenti=new Set(pool.slice(0,quanti).map(p=>p.id));
+
+  for(const p of pool){
+    const st=stradaPersonaMeta(p);
+    const prima=st.heatCaution===true;
+    const dopo=prudenti.has(p.id);
+    st.heatCaution=dopo;
+    st.heatCautionBand=dopo?prof.id:null;
+    if(dopo&&!prima) st.heatCautionSinceAbsoluteDay=oggi;
+    if(!dopo) st.heatCautionSinceAbsoluteDay=null;
+  }
+  return pool.filter(p=>prudenti.has(p.id));
+}
+
+function stradaHeatPersonaCauta(p){
+  const st=stradaPersonaMeta(p);
+  return !!(st&&st.heatCaution);
+}
+
+function stradaRelazioneOperativa(p){
+  return stradaRelazioneDisponibile(p) && !stradaHeatPersonaCauta(p);
+}
+
+function stradaHeatCostoErrore(){
+  return Number(stradaHeatProfilo().errore||1);
+}
+
+function stradaHeatPenaMoltiplicatore(){
+  return Number(stradaHeatProfilo().pena||1);
+}
+
+function stradaHeatChanceSoloDenuncia(base){
+  const p=stradaHeatProfilo();
+  return clamp(Number(base==null?.6:base)*(1-Number(p.escalation||0)),.12,.9);
+}
+
+function stradaHeatRischioControllo(){
+  const s=G.strada||{};
+  const p=stradaHeatProfilo();
+  let rischio=s.ferro
+    ? Math.max(Number(p.controlloFerro||0),.03+Math.max(0,Number(s.heat||0)-20)/100*.18)
+    : Number(p.controllo||0);
+  rischio+=Number(s.precedenti||0)*.02;
+  rischio-=Number(s.prot||0)*.01;
+  return clamp(rischio,0,.42);
+}
+
+function stradaHeatBruciaOpportunita(roll,silent){
+  const p=stradaHeatProfilo();
+  if(Number(p.bruciaOpportunita||0)<=0) return null;
+  const st=stradaOpportunitaStato();
+  stradaAggiornaOpportunita(true);
+  const tutte=[];
+  if(st.active) tutte.push(st.active);
+  if(st.pending) tutte.push(st.pending);
+  if(Array.isArray(st.pendingChoices)) tutte.push(...st.pendingChoices);
+  if(!tutte.length) return null;
+
+  const r=Number.isFinite(Number(roll))
+    ? Math.max(0,Math.min(.999999,Number(roll)))
+    : Math.random();
+  if(r>=Number(p.bruciaOpportunita||0)) return null;
+
+  const oggi=stradaAbsDay();
+  const viste=new Set();
+  for(const lead of tutte){
+    if(!lead || viste.has(lead.id)) continue;
+    viste.add(lead.id);
+    const persona=lead.personId?stradaPersonaDaId(lead.personId):null;
+    st.history.push({
+      type:"burned-by-heat",absoluteDay:oggi,opportunityId:lead.id,
+      personId:lead.personId||null,heat:Number(G.strada.heat||0),heatBand:p.id
+    });
+    if(persona) stradaRegistraConseguenzaPersona(persona,"heat-opportunity-burned",{
+      heat:Number(G.strada.heat||0),opportunityId:lead.id
+    });
+  }
+  while(st.history.length>30) st.history.shift();
+  st.active=null;
+  st.pending=null;
+  st.pendingChoices=[];
+  st.nextOfferAbsoluteDay=Math.max(
+    Number(st.nextOfferAbsoluteDay||0),
+    oggi+(p.id==="critico"?10:7)
+  );
+
+  const hm=stradaHeatMondoStato();
+  hm.history.push({type:"opportunity-burned",absoluteDay:oggi,heat:Number(G.strada.heat||0),count:viste.size});
+  if(hm.history.length>30) hm.history.shift();
+  if(!silent && typeof pushLog==="function"){
+    const nomi=[...viste].length;
+    pushLog("<b>Una porta si è chiusa perché il giro è troppo caldo.</b> "+
+      (nomi>1?"Le proposte aperte sono saltate.":"La proposta aperta è saltata.")+
+      " Nessuno vuole restare esposto adesso.","bad");
+  }
+  return {count:viste.size,heatBand:p.id};
+}
+
+function stradaHeatRichiestaFermati(silent){
+  const p=stradaHeatProfilo();
+  if(!Number(p.stopCooldown||0)) return null;
+  const hm=stradaHeatMondoStato();
+  const oggi=stradaAbsDay();
+  const last=Number(hm.lastStopRequestAbsoluteDay);
+  if(Number.isFinite(last)&&oggi-last<Number(p.stopCooldown)) return null;
+
+  stradaHeatSincronizzaPersone();
+  const candidati=(G.gente||[]).filter(x=>
+    x&&!x.via&&x.strada&&x.strada.known&&stradaRelazioneDisponibile(x)&&!stradaRivalitaAttiva(x)
+  ).sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const persona=candidati[0]||null;
+  if(!persona) return null;
+
+  hm.lastStopRequestAbsoluteDay=oggi;
+  hm.history.push({
+    type:"stop-request",absoluteDay:oggi,heat:Number(G.strada.heat||0),
+    heatBand:p.id,personId:persona.id,personName:persona.n
+  });
+  if(hm.history.length>30) hm.history.shift();
+  stradaRegistraConseguenzaPersona(persona,"heat-stop-request",{heat:Number(G.strada.heat||0)});
+  if(!silent&&typeof pushLog==="function")
+    pushLog("<b>"+persona.n+" ti ha chiesto di abbassare il profilo.</b> «Per un po' non farti vedere ovunque. C'è troppa attenzione addosso.»","bad");
+  return persona;
+}
+
+function stradaHeatMuoviMondo(rollBrucia,silent){
+  const prudenti=stradaHeatSincronizzaPersone();
+  const bruciata=stradaHeatBruciaOpportunita(rollBrucia,silent);
+  const fermati=stradaHeatRichiestaFermati(silent);
+  return {profilo:stradaHeatProfilo(),prudenti,bruciata,fermatoDa:fermati};
 }
 
 function stradaRelazioneForte(p){
@@ -1411,6 +1618,7 @@ function stradaAggiornaRelazioniCriminali(silent){
         pushLog("<b>"+c.p.n+" è ricomparso.</b> La storia comune pesa ancora, ma il rapporto è molto più freddo.", "");
     }
   }
+  stradaHeatSincronizzaPersone();
   return cambi;
 }
 
@@ -1512,7 +1720,7 @@ function stradaPersoneConFavore(){
 function stradaPersoneSquadra(){
   stradaAggiornaRelazioniCriminali(true);
   return (G.gente||[])
-    .filter(p=>stradaRelazioneDisponibile(p) &&
+    .filter(p=>stradaRelazioneOperativa(p) &&
       stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a) || Number(b.rel||0)-Number(a.rel||0));
 }
@@ -2073,8 +2281,10 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
       : stradaCausaOpportunita(variante,trigger);
     const esistente=causa&&causa.person ? causa.person : (G.gente||[]).find(x=>x && !x.via &&
       ((x.strada&&x.strada.key===key) || (variante.persona&&x.n===variante.persona))) || null;
-    if(esistente && esistente.strada && esistente.strada.known &&
-       !stradaRelazioneDisponibile(esistente)) return null;
+    if(esistente && esistente.strada && esistente.strada.known){
+      stradaHeatSincronizzaPersone();
+      if(!stradaRelazioneOperativa(esistente)) return null;
+    }
 
     variante.networkCause=causa?causa.type:null;
     variante.networkCauseText=causa?causa.text:null;
@@ -2093,13 +2303,16 @@ function stradaRisolviContattoOpportunita(variante,trigger,legacy){
     });
     if(p && causa&&causa.introducedBy && typeof postoCollegaPersone==="function")
       postoCollegaPersone(causa.introducedBy,p,"strada-introduzione");
-    return p && stradaRelazioneDisponibile(p) ? p : null;
+    stradaHeatSincronizzaPersone();
+    return p && stradaRelazioneOperativa(p) ? p : null;
   }
 
   /* La Fabbrica non inventa una faccia del giro fuori dal nulla. Serve un
      collega già incontrato e abbastanza vita condivisa in stabilimento. */
   const p=stradaFabbricaPersonaCandidata();
   if(!p) return null;
+  stradaHeatSincronizzaPersone();
+  if(stradaHeatPersonaCauta(p)) return null;
   variante.factoryStory=true;
   variante.factoryPersonId=p.id;
   variante.factoryWasKnown=!!(p.strada&&p.strada.known);
@@ -2791,7 +3004,7 @@ function stradaTentaEventoRete(roll,variantRoll){
   const cfg=mode==="bridge" ? STRADA_EVENTI_RETE.ponte : STRADA_EVENTI_RETE.nome;
   if(stradaReteRoll(roll)>=Number(cfg.chance||0)) return null;
 
-  const attivi=stradaContattiAttivi().slice().sort((a,b)=>
+  const attivi=stradaContattiAttivi().filter(p=>!stradaHeatPersonaCauta(p)).slice().sort((a,b)=>
     stradaFiduciaValore(b)-stradaFiduciaValore(a) ||
     Number((b.strada&&b.strada.colpiInsieme)||0)-Number((a.strada&&a.strada.colpiInsieme)||0)
   );
@@ -2842,8 +3055,9 @@ function stradaRisolviEventoRete(personId){
     const candidato=(p.candidateIds||[]).includes(personId)
       ? stradaPersonaDaId(personId)
       : null;
-    if(!stradaRelazioneDisponibile(requester) || !stradaRelazioneDisponibile(candidato))
-      return {ok:false,reason:"La rete è cambiata prima che riuscissi a fare il nome."};
+    stradaHeatSincronizzaPersone();
+    if(!stradaRelazioneOperativa(requester) || !stradaRelazioneOperativa(candidato))
+      return {ok:false,reason:"Con tutta questa attenzione, uno dei due non vuole esporsi adesso."};
 
     stradaModificaFiducia(requester,2,"rete-nome-dato");
     stradaModificaFiducia(candidato,2,"rete-presentato");
@@ -2870,8 +3084,9 @@ function stradaRisolviEventoRete(personId){
 
   if(p.mode==="bridge"){
     const a=stradaPersonaDaId(p.personAId), b=stradaPersonaDaId(p.personBId);
-    if(!stradaRelazioneDisponibile(a) || !stradaRelazioneDisponibile(b))
-      return {ok:false,reason:"Uno dei due contatti non è più raggiungibile."};
+    stradaHeatSincronizzaPersone();
+    if(!stradaRelazioneOperativa(a) || !stradaRelazioneOperativa(b))
+      return {ok:false,reason:"Con tutta questa attenzione, uno dei due non vuole farsi vedere adesso."};
 
     stradaModificaFiducia(a,3,"rete-ponte");
     stradaModificaFiducia(b,3,"rete-ponte");
@@ -3130,7 +3345,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
         fmt(sporco) + " € sporchi da ripulire. In giro si comincia a parlarne." + notaLead + notaPersone,
       opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
   }else{
-    s.heat = clamp(s.heat + rumore + rumoreLead, 0, 100);
+    const costoErrore=stradaHeatCostoErrore();
+    s.heat = clamp(s.heat + (rumore + rumoreLead) * costoErrore, 0, 100);
     if(reputazioneLead) stradaModificaReputazione(reputazioneLead,"crime-failure",{colpoId:colpo.id});
     const notaLeadFallita = leadUsato
       ? (leadUsato.source==="street-opportunity"
@@ -3147,20 +3363,21 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       const ingressoProtetto = !stradaAttivitaSbloccate();
       const primaVolta = s.precedenti === 0 && approccio.id !== "ferro" && colpo.difficolta <= .3;
       if(ingressoProtetto){
-        const multa = Math.max(40, Math.round(colpo.min * .45));
+        const multa = Math.max(40, Math.round(colpo.min * .45 * costoErrore));
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Saltato, ma sei fuori", testo:"<b>" + colpo.n + "</b> è saltato. " +
             "Perdi " + fmt(multa) + " € e attiri attenzione, ma in questa fase nessuno ha abbastanza per mandarti dentro." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
-      }else if(primaVolta && Math.random() < .6){
-        const multa = Math.round(colpo.min * .8);
+      }else if(primaVolta && Math.random() < stradaHeatChanceSoloDenuncia(.6)){
+        const multa = Math.round(colpo.min * .8 * costoErrore);
         G.money = Math.max(0, G.money - multa);
         STRADA_SCENA = {k:"Com'è andata", titolo:"Denuncia", testo:"<b>" + colpo.n + "</b> è saltato, ma te la cavi con una denuncia e " +
             fmt(multa) + " € di multa. Stavolta è andata." + notaLeadFallita + notaPersone,
           opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
       }else{
         const settimane = Math.max(1, Math.round(colpo.pena * approccio.pena *
-          (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
+          (1 + s.precedenti * .35) * stradaHeatPenaMoltiplicatore() *
+          (stradaHaAvvocatoPrivato() ? .55 : 1)));
         s.precedenti++;
         if(approccio.id==="ferro" && s.ferro){
           const ferroSt=stradaFerroStato();
@@ -3879,7 +4096,7 @@ function stradaAttivitaContattoIncontro(id){
   if(typeof stradaContattiAttivi!=="function") return null;
   const persone=stradaAttivitaPersone(id);
   const esclusi=new Set([persone.partner&&persone.partner.id,persone.employee&&persone.employee.id].filter(Boolean));
-  return stradaContattiAttivi().filter(p=>p&&!esclusi.has(p.id))
+  return stradaContattiAttivi().filter(p=>p&&!esclusi.has(p.id)&&!stradaHeatPersonaCauta(p))
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a))[0]||null;
 }
 
@@ -3887,7 +4104,12 @@ function stradaAttivitaIncontro(id){
   const st=stradaAttivitaStato(id,true),persone=stradaAttivitaPersone(id);
   const contatto=stradaAttivitaContattoIncontro(id);
   const week=stradaAttivitaWeekIndex();
-  if(!st||!contatto) return "Non hai ancora un contatto con cui abbia senso fissare qui un incontro.";
+  if(!st||!contatto){
+    const prudenti=stradaContattiAttivi().filter(stradaHeatPersonaCauta);
+    if(prudenti.length)
+      return "Con l'attenzione così alta, i contatti che potresti portare qui non vogliono farsi vedere con te.";
+    return "Non hai ancora un contatto con cui abbia senso fissare qui un incontro.";
+  }
   if(Number(st.lastMeetingWeek)===week) return "Questa settimana hai già usato l'attività come punto d'incontro.";
   if(!stradaAttivitaOperativa(id)) return "L'attività è ferma: non è il momento di portarci gente.";
   if(typeof GAME_TIME!=="undefined"&&typeof GAME_TIME.spend==="function"){
@@ -4091,15 +4313,17 @@ function stradaSettimana(){
   /* la reputazione si sgonfia un po' se non ti fai vedere */
   s.rep = clamp(s.rep - .6, 0, 100);
 
+  /* Punto 19: dopo il raffreddamento naturale, il valore rimasto modifica
+     persone, porte aperte e richieste del giro. */
+  stradaHeatMuoviMondo(Math.random(),false);
+
   /* Punto 18: il rischio lifestyle si chiude in advanceWeek(), dopo che
      tutte le fonti giustificabili della settimana sono state registrate. */
 
   /* Punto 5: possedere il ferro è già un rischio. Senza ferro i controlli
      seri restano legati a heat > 50; col ferro possono partire prima e la
      probabilità cresce con attenzione e precedenti. */
-  const rischioControllo=s.ferro
-    ? clamp(.03 + Math.max(0,Number(s.heat||0)-20)/100*.18 + Number(s.precedenti||0)*.02 - Number(s.prot||0)*.01,.03,.28)
-    : (s.heat>50?.15:0);
+  const rischioControllo=stradaHeatRischioControllo();
   if(rischioControllo>0 && Math.random()<rischioControllo){
     if(s.ferro){
       const ferroSt=stradaFerroStato();
@@ -4112,10 +4336,19 @@ function stradaSettimana(){
       });
       if(ferroSt.history.length>12) ferroSt.history.shift();
       ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
-      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) * (stradaHaAvvocatoPrivato() ? .55 : 1)));
+      const settimane = Math.max(1, Math.round(2 * (1 + s.precedenti * .35) *
+        stradaHeatPenaMoltiplicatore() * (stradaHaAvvocatoPrivato() ? .55 : 1)));
       s.precedenti++; s.arresto = {settimane:settimane, colpo:"perquisizione"};
       pushLog("<b>Controllo alle sei del mattino.</b> Trovano il ferro: viene sequestrato e la situazione diventa penale.", "bad");
-    }else pushLog("Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.", "");
+    }else{
+      const hm=stradaHeatMondoStato(), prof=stradaHeatProfilo();
+      hm.history.push({type:"control",absoluteDay:stradaAbsDay(),heat:Number(s.heat||0),heatBand:prof.id,found:false});
+      if(hm.history.length>30) hm.history.shift();
+      pushLog(prof.id==="critico"
+        ? "<b>Controllo alle sei del mattino.</b> Non trovano niente, ma ormai basta il tuo nome per farli tornare."
+        : "Controllo alle sei del mattino. Non hanno trovato niente, ma l'hanno fatto girare in paese.",
+        prof.id==="critico"?"bad":"");
+    }
   }
 
   /* Gli Opp criminali non possono nascere dal nulla su una carriera pulita. */
@@ -4292,8 +4525,7 @@ function stClasseRischio(colpo){
   return r <= .2 ? "risk-low" : r <= .45 ? "risk-mid" : "risk-high";
 }
 function stOcchiAddosso(){
-  const h = G.strada.heat;
-  return h < 20 ? "Nessuno" : h < 45 ? "Qualcuno" : h < 70 ? "Troppi" : "Ti stanno addosso";
+  return stradaHeatProfilo().occhi;
 }
 function stCopertura(){
   const s = G.strada;
@@ -4332,7 +4564,7 @@ function renderStBarre(){
   $("st-precedenti").textContent = s.precedenti;
   const occhi = $("st-occhi");
   occhi.textContent = stOcchiAddosso();
-  occhi.classList.toggle("hot", s.heat >= 45);
+  occhi.classList.toggle("hot", s.heat >= 50);
 }
 
 /* ---- il centro: i colpi, o il tempo che passa ---- */
@@ -4409,10 +4641,14 @@ function renderStCopre(){
   const avvSt=stradaAvvocatoStato();
   const tuttiContatti=(G.gente||[]).filter(p=>p&&p.strada&&p.strada.known&&!p.via);
   const rivali=tuttiContatti.filter(stradaRivalitaAttiva);
+  stradaHeatSincronizzaPersone();
   const contatti=tuttiContatti.filter(stradaRelazioneDisponibile)
     .sort((a,b)=>stradaFiduciaValore(b)-stradaFiduciaValore(a));
+  const prudenti=contatti.filter(stradaHeatPersonaCauta);
+  const operativi=contatti.filter(p=>!stradaHeatPersonaCauta(p));
   const dormienti=tuttiContatti.filter(p=>!stradaRelazioneDisponibile(p) && !stradaRivalitaAttiva(p));
-  const fidati=contatti.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const fidati=operativi.filter(p=>stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA);
+  const heatMondo=stradaHeatProfilo();
   const avvConosciuti=stradaAvvocatiConosciuti();
   const tenore=typeof lifestyleRiepilogoRischio==="function"
     ? lifestyleRiepilogoRischio()
@@ -4423,6 +4659,8 @@ function renderStCopre(){
       '<span>' + (fidati.length
         ? fidati.length + ' ' + (fidati.length===1?'si fida':'si fidano') + ' abbastanza da muoversi con te.'
         : 'Conosci gente, ma nessuno attivo si fida ancora abbastanza da venire a un colpo con te.') +
+        (prudenti.length ? ' · ' + prudenti.length + ' ' +
+          (prudenti.length===1?'contatto si tiene basso per l\'attenzione':'contatti si tengono bassi per l\'attenzione') + '.' : '') +
         (dormienti.length ? ' · ' + dormienti.length + ' ' +
           (dormienti.length===1?'contatto è fuori dal giro per ora':'contatti sono fuori dal giro per ora') + '.' : '') +
         (rivali.length ? ' · ' + rivali.length + ' ' +
@@ -4430,14 +4668,20 @@ function renderStCopre(){
       '</span></div>' +
       '<div class="pills">' +
         (contatti.slice(0,3).map(p=>'<span class="pill' +
-          (stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
+          (stradaHeatPersonaCauta(p)?' no':stradaFiduciaValore(p)>=STRADA_FIDUCIA_SQUADRA?' on':'') + '">' +
           p.n + ' · Fiducia: ' + stradaFiduciaEtichetta(p) +
+          (stradaHeatPersonaCauta(p)?' · si tiene basso':'') +
           (stradaConseguenzePersona(p).debiti ? ' · Gli devi '+stradaConseguenzePersona(p).debiti+' favore/i' : '') +
           '</span>').join('') ||
           '<span class="pill no">Nessun contatto attivo</span>') +
         (dormienti.length ? '<span class="pill no">' + dormienti.length + ' non raggiungibili</span>' : '') +
         (rivali.slice(0,2).map(p=>'<span class="pill danger">'+p.n+' · Rivalità</span>').join('')) +
       '</div></div>' +
+
+    '<div class="cover-row"><div class="t"><strong>Pressione sul giro</strong>' +
+      '<span>'+heatMondo.mondo+'</span></div>' +
+      '<div class="pills"><span class="pill'+(heatMondo.id==="basso"?' on':heatMondo.id==="medio"?'':' danger')+'">'+
+        heatMondo.label+'</span></div></div>' +
 
     '<div class="cover-row"><div class="t"><strong>Protezione</strong>' +
       '<span>' + (s.prot>0

@@ -314,7 +314,8 @@ describe("Strada · ingresso nascosto",()=>{
     expect(strada).toContain("Non è merce da scaffale");
     expect(strada).toContain("function stradaTentaPropostaFerro");
     expect(strada).toContain("STRADA_FERRO_FIDUCIA_MIN = 50");
-    expect(strada).toContain("const rischioControllo=s.ferro");
+    expect(strada).toContain("function stradaHeatRischioControllo()");
+    expect(strada).toContain("const rischioControllo=stradaHeatRischioControllo();");
     expect(strada).toContain('status:"seized"');
     expect(strada).toContain('status:"seized-on-crime"');
     expect(strada).toContain("ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30");
