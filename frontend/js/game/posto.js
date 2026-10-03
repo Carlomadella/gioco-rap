@@ -733,17 +733,17 @@ function postoSoloLavoro(p){
 
 /* Punto 11 PERSONA: rete NPC↔NPC sparsa. I record legacy restano validi
    e vengono letti come conoscenze finché un evento non li arricchisce. */
+function postoReteLegami(p){
+  if(!p || p.via) return [];
+  if(!Array.isArray(p.reteLegami)) p.reteLegami=[];
+  return p.reteLegami;
+}
+
 function postoLegamiApi(){
   try{
     const a=typeof window!=="undefined" ? window.ADF_NPC_LEGAMI : null;
     return a&&typeof a==="object" ? a : null;
   }catch(_){ return null; }
-}
-
-function postoReteLegami(p){
-  if(!p || p.via) return [];
-  if(!Array.isArray(p.reteLegami)) p.reteLegami=[];
-  return p.reteLegami;
 }
 
 function postoTipoLegameDaMotivo(motivo){
