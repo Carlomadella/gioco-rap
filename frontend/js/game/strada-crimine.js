@@ -3940,8 +3940,12 @@ function carcereScarcerazioneRelazioni(c){
       const st=stradaPersonaMeta(p);
       st.fiducia=Math.min(Number(st.fiducia||5),10);
       stradaModificaTensionePersona(p,2,"carcere-conto-uscita");
-      m.returnAfterAbsoluteDay=null;
-      m.outsideFollowupDone=true;
+      /* La rivalità esiste subito nella Strada, ma la faccia non deve apparire
+         al Circolo nello stesso istante con un dialogo neutro. Il reincontro
+         fisico arriva dopo, e mantiene il conto aperto. */
+      p.circoloSbloccato=false;
+      m.returnAfterAbsoluteDay=stradaAbsDay()+28;
+      m.outsideFollowupDone=false;
       rivali.push(p);
     }else{
       /* Un rapporto non abbastanza forte da diventare subito contatto non
