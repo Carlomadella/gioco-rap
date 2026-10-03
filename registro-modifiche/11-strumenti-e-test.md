@@ -6,6 +6,41 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:1c30983b -->
+## 03/10/26, 20:08 — fix/crime-reaudit-7-punti → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `1c30983b`
+
+### Cosa è entrato
+
+- `0b7eba85` — docs: documenta accesso crime 24/7 e finestre colpi — **mycolbraga**
+- `e04ba796` — docs: chiudi gap temporale del crime — **mycolbraga**
+- `7ed4e11f` — test: stabilizza setup E2E crime — **mycolbraga**
+- `d4e04a0f` — test: copri preparazione entro la finestra — **mycolbraga**
+- `f57ec3b7` — fix: non sprecare preparazione fuori finestra — **mycolbraga**
+- `798fc9b7` — chore: aggiorna cache bust UI crime — **mycolbraga**
+- `447e4d11` — test: aggiungi smoke E2E del reaudit crime — **mycolbraga**
+- `3e17e4af` — test: copri i sette rilievi del reaudit crime — **mycolbraga**
+- `b91e323a` — fix: aggiorna copy crime per accesso 24/7 — **mycolbraga**
+- `97c79697` — fix: lascia Attività criminali accessibile 24/7 — **mycolbraga**
+- `953df456` — fix: riallinea UI crime al core corrente — **mycolbraga**
+- `c6d51040` — fix: aggiungi finestre temporali ai singoli colpi — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `documentazione/roadmap.md`
+- **Modificato:** `frontend/js/game/orari.js`
+- **Modificato:** `frontend/js/game/strada-crimine-ui.js`
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/e2e/crime-reaudit.spec.js`
+- **Aggiunto:** `frontend/test/unit/strada-reaudit-integrazione.test.js`
+
+**File interessati in questa categoria:** 7
+
+---
+
 <!-- merge:8e222dd6 -->
 ## 03/10/26, 12:21 — task/recap-giornaliero → main
 
