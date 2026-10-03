@@ -1538,6 +1538,29 @@ test("punto 22: città e gruppi NPC entrano solo come contesto della rete crimin
   crime.includes("firstLinkedCityId:null") &&
   crime.includes("lastLinkedCityId:null"));
 
+test("punto 23: la caduta cresce col peso del colpo senza introdurre un rango criminale",
+  crime.includes("const STRADA_CADUTA_FASCE=Object.freeze([") &&
+  crime.includes("function stradaCadutaPunteggio(colpo,heat,precedenti)") &&
+  crime.includes("Number(colpo.difficolta||0)*45") &&
+  crime.includes("Number(colpo.minRep||0)*.55") &&
+  crime.includes("Number(colpo.pena||0)*2.2") &&
+  !crime.includes("falloutRank"));
+test("punto 23: i colpi pesanti possono propagare perdite economiche, relazionali e sulle attività",
+  crime.includes("function stradaApplicaFalloutFallimento(colpo,ctx)") &&
+  crime.includes("function stradaFalloutPerditaTarget(colpo,score,arrested,shielded,costoErrore)") &&
+  crime.includes('stradaRelazioneTransizione(persona,stato,"major-crime-fallout"') &&
+  crime.includes('candidata.st.issue={id:"controllo"') &&
+  crime.includes('type:"crime-fallout"'));
+test("punto 23: il carcere lega il rischio contratto alla gravità della caduta",
+  crime.includes("function stradaRischioContrattoCarcere(arresto)") &&
+  crime.includes("settimaneIniziali:settimane") &&
+  crime.includes("s.arresto.falloutScore=fallout.score") &&
+  crime.includes("Math.random() < stradaRischioContrattoCarcere(s.arresto)"));
+test("punto 23: il giocatore vede separati rischio di fallire e costo della caduta",
+  crime.includes("Rischio ' + stRischio(c).toLowerCase()") &&
+  crime.includes("Caduta ' + stradaCadutaProfilo(c).label") &&
+  crime.includes("stradaCadutaClasse(c)"));
+
 
 test("punto 18: il rischio lifestyle ha un registro settimanale e una media mobile",
   state.includes("rischioLifestyle:{key:null,entrate:0,fonti:{}") &&

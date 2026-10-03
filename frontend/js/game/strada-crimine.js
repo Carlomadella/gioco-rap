@@ -1408,6 +1408,194 @@ function stradaHeatRischioControllo(){
   return clamp(rischio,0,.42);
 }
 
+/* Punto 23: i soldi devono restare facili rispetto alla musica, ma la caduta
+   non può restare uguale quando la posta cresce. Questo indice NON è un rango
+   criminale persistente: viene calcolato dal singolo colpo + heat + precedenti. */
+const STRADA_CADUTA_FASCE=Object.freeze([
+  Object.freeze({id:"contenuta",min:0,label:"contenuta"}),
+  Object.freeze({id:"seria",min:35,label:"seria"}),
+  Object.freeze({id:"pesante",min:55,label:"pesante"}),
+  Object.freeze({id:"devastante",min:75,label:"devastante"})
+]);
+
+function stradaCadutaPunteggio(colpo,heat,precedenti){
+  if(!colpo) return 0;
+  const h=Number.isFinite(Number(heat))
+    ? Number(heat) : Number(G.strada&&G.strada.heat||0);
+  const p=Number.isFinite(Number(precedenti))
+    ? Number(precedenti) : Number(G.strada&&G.strada.precedenti||0);
+  const score=
+    Number(colpo.difficolta||0)*45+
+    Number(colpo.minRep||0)*.55+
+    Number(colpo.pena||0)*2.2+
+    Math.max(0,Math.min(100,h))*.22+
+    Math.max(0,Math.min(5,p))*5;
+  return Math.max(0,Math.min(100,Math.round(score)));
+}
+
+function stradaCadutaProfiloDaPunteggio(score){
+  const s=Math.max(0,Math.min(100,Number(score)||0));
+  for(let i=STRADA_CADUTA_FASCE.length-1;i>=0;i--)
+    if(s>=STRADA_CADUTA_FASCE[i].min)
+      return Object.assign({score:s},STRADA_CADUTA_FASCE[i]);
+  return Object.assign({score:s},STRADA_CADUTA_FASCE[0]);
+}
+
+function stradaCadutaProfilo(colpo,heat,precedenti){
+  return stradaCadutaProfiloDaPunteggio(
+    stradaCadutaPunteggio(colpo,heat,precedenti)
+  );
+}
+
+function stradaCadutaClasse(colpo){
+  const id=stradaCadutaProfilo(colpo).id;
+  return id==="contenuta"?"risk-low":id==="seria"?"risk-mid":"risk-high";
+}
+
+function stradaFalloutStato(){
+  const s=G.strada||(G.strada={});
+  if(!s.falloutStato || typeof s.falloutStato!=="object")
+    s.falloutStato={history:[]};
+  if(!Array.isArray(s.falloutStato.history)) s.falloutStato.history=[];
+  return s.falloutStato;
+}
+
+function stradaFalloutPerditaTarget(colpo,score,arrested,shielded,costoErrore){
+  if(!colpo || Number(score)<55) return 0;
+  const crescita=Math.max(0,Math.min(1,(Number(score)-55)/45));
+  const fattore=.55+crescita*1.05;
+  const arresto=arrested===true?1:.68;
+  const coperto=shielded===true?.55:1;
+  const heat=Math.max(1,Number(costoErrore)||1);
+  return Math.max(0,Math.round(
+    Number(colpo.max||colpo.min||0)*fattore*arresto*coperto*heat
+  ));
+}
+
+function stradaFalloutPerdiDenaro(target){
+  const s=G.strada||(G.strada={}),voluto=Math.max(0,Math.round(Number(target)||0));
+  if(!voluto) return {totale:0,sporchi:0,puliti:0};
+  const sporchi=Math.min(Math.max(0,Number(s.sporchi||0)),voluto);
+  s.sporchi=Math.max(0,Number(s.sporchi||0)-sporchi);
+  const residuo=Math.max(0,voluto-sporchi);
+  const puliti=Math.min(Math.max(0,Number(G.money||0)),residuo);
+  G.money=Math.max(0,Number(G.money||0)-puliti);
+  return {totale:sporchi+puliti,sporchi,puliti};
+}
+
+function stradaFalloutAttivitaCandidata(){
+  return STRADA_ATTIVITA
+    .filter(a=>G.strada&&G.strada.attivita&&G.strada.attivita[a.id])
+    .map(a=>({a,st:stradaAttivitaStato(a.id,true)}))
+    .filter(x=>x.st)
+    .sort((x,y)=>
+      Number(y.st.pressione||0)-Number(x.st.pressione||0) ||
+      Number(y.a.rischio||0)-Number(x.a.rischio||0)
+    )[0] || null;
+}
+
+function stradaRischioContrattoCarcere(arresto){
+  if(!arresto || !Number.isFinite(Number(arresto.falloutScore))) return .20;
+  const score=Math.max(0,Math.min(100,Number(arresto.falloutScore)||0));
+  const settimane=Math.max(1,Number(arresto.settimaneIniziali||arresto.settimane||1));
+  return Math.max(.06,Math.min(.24,
+    .06+score*.0018+Math.max(0,settimane-3)*.004
+  ));
+}
+
+function stradaApplicaFalloutFallimento(colpo,ctx){
+  ctx=ctx&&typeof ctx==="object"?ctx:{};
+  if(!colpo) return {score:0,profilo:stradaCadutaProfiloDaPunteggio(0),text:""};
+
+  const base=stradaCadutaPunteggio(colpo);
+  const score=Math.max(0,base-(ctx.shielded===true?12:0));
+  const profilo=stradaCadutaProfiloDaPunteggio(score);
+  const st=stradaFalloutStato();
+  const effetti=[];
+  const dettagli={
+    denaro:null,persona:null,attivita:null
+  };
+
+  if(score>=55){
+    const target=stradaFalloutPerditaTarget(
+      colpo,score,ctx.arrested===true,ctx.shielded===true,stradaHeatCostoErrore()
+    );
+    const perso=stradaFalloutPerdiDenaro(target);
+    if(perso.totale>0){
+      dettagli.denaro=perso;
+      effetti.push("tra soldi sequestrati, spese e roba bruciata perdi <b>"+fmt(perso.totale)+" €</b>");
+    }
+
+    const persona=ctx.personaLead || ctx.personaSquadra || null;
+    if(persona && !persona.via){
+      const chancePersona=Math.min(.68,.18+Math.max(0,score-55)*.012);
+      const rollPersona=Number.isFinite(Number(ctx.rollPersona))
+        ? Number(ctx.rollPersona) : Math.random();
+      if(rollPersona<chancePersona){
+        const perditaFiducia=Math.round(8+Math.max(0,score-55)*.18);
+        stradaModificaFiducia(persona,-perditaFiducia,"fallout-colpo");
+        stradaModificaTensionePersona(persona,1,"fallout-colpo");
+        const stato=score>=82?"unreachable":"inactive";
+        stradaRelazioneTransizione(persona,stato,"major-crime-fallout",stradaAbsDay());
+        stradaRegistraConseguenzaPersona(persona,"major-crime-fallout",{
+          colpoId:colpo.id,score,status:stato
+        });
+        stradaEcoMondo(persona,"major-crime-fallout",-2,{
+          reason:"caduta-"+colpo.id,context:"fallout",noHearsay:true
+        });
+        dettagli.persona={personId:persona.id,personName:persona.n,status:stato};
+        effetti.push("<b>"+persona.n+"</b> si tira fuori"+(stato==="unreachable"?" e diventa irraggiungibile":" dal giro con te"));
+      }
+    }
+
+    if(score>=65){
+      const candidata=stradaFalloutAttivitaCandidata();
+      const chanceAttivita=Math.min(.58,.16+Math.max(0,score-65)*.016);
+      const rollAttivita=Number.isFinite(Number(ctx.rollAttivita))
+        ? Number(ctx.rollAttivita) : Math.random();
+      if(candidata && rollAttivita<chanceAttivita){
+        const giorni=score>=82?14:7;
+        candidata.st.blockedUntilAbsoluteDay=Math.max(
+          Number(candidata.st.blockedUntilAbsoluteDay||0),
+          stradaAbsDay()+giorni
+        );
+        candidata.st.pressione=Math.min(100,Number(candidata.st.pressione||0)+(score>=82?42:28));
+        if(!candidata.st.issue)
+          candidata.st.issue={id:"controllo",openedWeek:stradaAttivitaWeekIndex()};
+        candidata.st.history.push({
+          type:"crime-fallout",absoluteDay:stradaAbsDay(),colpoId:colpo.id,
+          score,blockedDays:giorni
+        });
+        if(candidata.st.history.length>24)candidata.st.history.shift();
+        dettagli.attivita={id:candidata.a.id,name:candidata.a.n,blockedDays:giorni};
+        effetti.push("<b>"+candidata.a.n+"</b> finisce sotto pressione e si ferma per "+giorni+" giorni");
+      }
+    }
+  }
+
+  const evento={
+    type:"crime-failure-fallout",
+    absoluteDay:stradaAbsDay(),
+    colpoId:colpo.id,
+    score,
+    band:profilo.id,
+    arrested:ctx.arrested===true,
+    shielded:ctx.shielded===true,
+    moneyLost:dettagli.denaro?dettagli.denaro.totale:0,
+    personId:dettagli.persona?dettagli.persona.personId:null,
+    businessId:dettagli.attivita?dettagli.attivita.id:null
+  };
+  st.history.push(evento);
+  if(st.history.length>30)st.history.shift();
+
+  return {
+    score,profilo,evento,dettagli,
+    text:effetti.length
+      ? " <b>La caduta si allarga:</b> "+effetti.join("; ")+"."
+      : ""
+  };
+}
+
 function stradaHeatBruciaOpportunita(roll,silent){
   const p=stradaHeatProfilo();
   if(Number(p.bruciaOpportunita||0)<=0) return null;
@@ -3728,8 +3916,12 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
           : " La dritta arrivata dal lavoro è bruciata.")
       : "";
     if(squadraCopre){
+      const fallout=stradaApplicaFalloutFallimento(colpo,{
+        arrested:false,shielded:true,personaLead,personaSquadra
+      });
       STRADA_SCENA = {k:"Com'è andata", titolo:"È andata male", testo:"<b>" + colpo.n + "</b> è saltato. <b>" +
-          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." + notaLeadFallita + notaPersone,
+          personaSquadra.n + "</b> si prende la parte peggiore del casino e tu riesci a rientrare. La fiducia fra voi ne risente." +
+          notaLeadFallita + notaPersone + fallout.text,
         opts:[{n:"Continua", d:"Torni alla strada", run(){ STRADA_SCENA = null; }}]};
     }else{
       const ingressoProtetto = !stradaAttivitaSbloccate();
@@ -3763,7 +3955,19 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
           if(ferroSt.history.length>12) ferroSt.history.shift();
           ferroSt.nextOfferAbsoluteDay=stradaAbsDay()+30;
         }
-        s.arresto = {settimane:settimane, colpo:colpo.n};
+        s.arresto = {
+          settimane:settimane,
+          settimaneIniziali:settimane,
+          colpo:colpo.n,
+          colpoId:colpo.id,
+          falloutScore:null,
+          falloutBand:null
+        };
+        const fallout=stradaApplicaFalloutFallimento(colpo,{
+          arrested:true,shielded:false,personaLead,personaSquadra
+        });
+        s.arresto.falloutScore=fallout.score;
+        s.arresto.falloutBand=fallout.profilo.id;
         if(personaLead) stradaEcoMondo(personaLead,"street-arrest",0,{
           reason:"arresto-dopo-colpo",context:"carcere"
         });
@@ -3773,7 +3977,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
           });
         STRADA_SCENA = {k:"Com'è andata", titolo:"Arrestato", testo:"<b>" + colpo.n + "</b> è saltato, e stavolta non te la cavi: " +
             settimane + (settimane === 1 ? " settimana dentro" : " settimane dentro") +
-            ". Niente musica, niente strada: solo il tempo che passa." + notaLeadFallita + notaPersone,
+            ". Niente musica, niente strada: solo il tempo che passa." +
+            notaLeadFallita + notaPersone + fallout.text,
           opts:[{n:"Continua", d:"", run(){ STRADA_SCENA = null; }}]};
       }
     }
@@ -4848,8 +5053,8 @@ function stradaSettimana(){
     const dentro = Math.round(weeklyCosts() * .6);
     G.money -= dentro;
     pushLog("Da dentro costa: <b>−" + fmt(dentro) + " €</b> fra pacchi, telefonate e spese extra, oltre alle spese di fuori.", "bad");
-    if(G.contract && Math.random() < .20){
-      pushLog("<b>L'etichetta ha rescisso.</b> I giornali ci sono andati pesante.", "bad");
+    if(G.contract && Math.random() < stradaRischioContrattoCarcere(s.arresto)){
+      pushLog("<b>L'etichetta ha rescisso.</b> Più pesa la caduta, più settimane passano e più diventa difficile tenere in piedi anche la carriera pulita.", "bad");
       G.contract = null;
       /* senza contratto la consegna non esiste più: lasciata lì, alla
          scadenza advanceWeek() cercava la penale su un contratto che non c'è
@@ -5301,6 +5506,7 @@ function renderStColpi(){
         '<span class="stchip">' + c.energia + ' energia</span>' +
         '<span class="stchip">' + stradaDurataColpoLabel(c) + '</span>' +
         '<span class="stchip ' + stClasseRischio(c) + '">Rischio ' + stRischio(c).toLowerCase() + '</span>' +
+        '<span class="stchip ' + stradaCadutaClasse(c) + '">Caduta ' + stradaCadutaProfilo(c).label + '</span>' +
         (lead
           ? '<span class="stchip money">' + fonteLead + ' ' +
             (Number(lead.bonusPct||0)>=0?'+':'') + Number(lead.bonusPct||0) + '% · ' +
