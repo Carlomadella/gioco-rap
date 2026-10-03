@@ -876,7 +876,8 @@ function sistemaGente(){
 function presentiOggi(quanti){
   sistemaGente();
   const sett = typeof totalWeeks === "function" ? totalWeeks() : G.week;
-  const vivi = G.gente.filter(p => !p.via && !postoSoloLavoro(p));
+  const richiesti=quanti==null ? 3 : Number(quanti);
+  const limite=Number.isFinite(richiesti) ? Math.max(0,Math.floor(richiesti)) : 3;
 
   const punteggio=p=>{
     const k=(p.id.charCodeAt(1)*31+sett*17)%97;
@@ -896,33 +897,98 @@ function presentiOggi(quanti){
     return k+Number(p.rel||0)*12+strada+ritorno+rete+conseguenza;
   };
 
-  const ord=vivi.slice().sort((a,b)=>punteggio(b)-punteggio(a));
-  const limite=Math.max(0,Number(quanti||3));
-  const scelti=[];
-  const presi=new Set();
+  const selettore=(()=>{
+    try{
+      return typeof window!=="undefined" &&
+        window.ADF_NPC_SELEZIONE &&
+        typeof window.ADF_NPC_SELEZIONE.seleziona==="function"
+        ? window.ADF_NPC_SELEZIONE : null;
+    }catch(_){ return null; }
+  })();
 
-  for(const p of ord){
-    if(scelti.length>=limite) break;
-    if(presi.has(p.id)) continue;
-    scelti.push(p); presi.add(p.id);
+  let scelti=null;
 
-    /* Se una persona è già davvero nella tua rete, un suo legame può
-       comparire insieme a lei. Questo trasforma "un contatto comune" in una
-       relazione del mondo, non in un nuovo tiro casuale scollegato. */
-    if(scelti.length<limite &&
-       (Number(p.rel||0)>0 || (p.strada&&p.strada.known))){
-      const legato=postoLegamiAttivi(p)
-        .filter(x=>!presi.has(x.id) && vivi.includes(x))
-        .sort((a,b)=>punteggio(b)-punteggio(a))[0] || null;
-      if(legato){
-        scelti.push(legato);
-        presi.add(legato.id);
+  if(selettore){
+    const oggi=((Math.max(1,Number(G.year)||1)-1)*52+
+      (Math.max(1,Number(G.week)||1)-1))*7+
+      Math.max(1,Number(G.day)||1);
+
+    const cittaEsplicita=p=>{
+      const raw=p&&p.mondo&&p.mondo.cittaAttuale!=null
+        ? p.mondo.cittaAttuale
+        : p&&p.cittaAttuale!=null ? p.cittaAttuale : p&&p.citta;
+      return raw!=null && String(raw).trim()
+        ? String(raw).trim().toLowerCase()
+        : null;
+    };
+
+    const verifica=p=>{
+      if(!p || p.via) return false;
+      /* Detenzione fisica esplicita: una faccia ancora dentro non può essere
+         materializzata in Sala da un peso sociale o da un contatto comune. */
+      if(p.carcere && p.carcere.currentJailId) return false;
+      /* Le Trasferte marcano le persone fuori città. Finché il punto 9 non
+         centralizza la geografia, questo resta un vincolo fisico legacy. */
+      if(p.fuori===true) return false;
+      const citta=cittaEsplicita(p);
+      if(citta && citta!=="provincia") return false;
+      return true;
+    };
+
+    const legacy=p=>!postoSoloLavoro(p);
+    const legami=p=>
+      (Number(p.rel||0)>0 || (p.strada&&p.strada.known))
+        ? postoLegamiAttivi(p)
+        : [];
+
+    const out=selettore.seleziona(G.gente||[],{
+      ambienteId:"sala:provincia",
+      giorno:oggi,
+      periodo:"settimana:"+String(sett),
+      quanti:limite,
+      verifica,
+      legacy,
+      punteggio,
+      legami,
+      memoria:G.npcPresenzeSala
+    });
+
+    G.npcPresenzeSala=out.memoria;
+    scelti=out.persone;
+  }
+
+  /* Fallback storico: test vecchi, caricamenti parziali e pagine che non
+     includono ancora npc-selezione.js conservano il comportamento precedente. */
+  if(!scelti){
+    const vivi = G.gente.filter(p => !p.via && !postoSoloLavoro(p));
+    const ord=vivi.slice().sort((a,b)=>punteggio(b)-punteggio(a));
+    scelti=[];
+    const presi=new Set();
+
+    for(const p of ord){
+      if(scelti.length>=limite) break;
+      if(presi.has(p.id)) continue;
+      scelti.push(p); presi.add(p.id);
+
+      /* Se una persona è già davvero nella tua rete, un suo legame può
+         comparire insieme a lei. Questo trasforma "un contatto comune" in una
+         relazione del mondo, non in un nuovo tiro casuale scollegato. */
+      if(scelti.length<limite &&
+         (Number(p.rel||0)>0 || (p.strada&&p.strada.known))){
+        const legato=postoLegamiAttivi(p)
+          .filter(x=>!presi.has(x.id) && vivi.includes(x))
+          .sort((a,b)=>punteggio(b)-punteggio(a))[0] || null;
+        if(legato){
+          scelti.push(legato);
+          presi.add(legato.id);
+        }
       }
     }
   }
 
   /* Ricordiamo solo che la faccia è passata dal Circolo, non il suo nome:
-     "visto" resta riservato a quando il giocatore ci parla davvero. */
+     "visto" resta riservato a quando il giocatore ci parla davvero. Lo snapshot
+     settimanale impedisce che questo contatore rimescoli la stessa lista. */
   const giorno=[Number(G.year||1),Number(G.week||1),Number(G.day||1)].join(":");
   scelti.forEach(p=>{
     if(p.circoloUltimoVistoKey!==giorno){
