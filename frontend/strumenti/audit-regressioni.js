@@ -1405,6 +1405,29 @@ test("punto 13: la UI mostra debiti e rivalità senza cancellare le persone",
   crime.includes("Gli devi '+stradaConseguenzePersona(p).debiti+' favore/i") &&
   crime.includes("p.n+' · Rivalità") &&
   crime.includes("const rivali=tuttiContatti.filter(stradaRivalitaAttiva)"));
+test("punto 14: la Fabbrica ha un percorso criminale dedicato dopo almeno 10 turni reali",
+  crime.includes("const STRADA_FABBRICA_STORY_MIN_TURNI = 10") &&
+  crime.includes("function stradaFabbricaTurniLavorati") &&
+  crime.includes("function stradaFabbricaPersonaCandidata") &&
+  crime.includes('lavoroTurniTotaliSede("fabbrica")'));
+test("punto 14: serve un collega Fabbrica realmente incontrato",
+  crime.includes("function stradaFabbricaPersonaConosciuta") &&
+  crime.includes("p.workEncountered || p.numero || Number(p.rel)>0 || Number(p.pt)>0") &&
+  crime.includes("stradaFabbricaPersonaMatura(p)"));
+test("punto 14: i colleghi Fabbrica sono esclusi dall'intro criminale generica",
+  crime.includes('if(p.origineLuogo==="fabbrica") return false') &&
+  ev.includes("function adfFactoryStreetIntroAfterShift()") &&
+  ev.includes('claimAutoEvent("factory-street-intro")') &&
+  ev.includes('lavoroLuogo(G.job)==="fabbrica") return false'));
+test("punto 14: la Fabbrica non genera crimini, rivela il lato Strada di una persona reale",
+  ev.includes("Non è la Fabbrica che ti sta offrendo un crimine") &&
+  ev.includes("non è un crimine della Fabbrica") &&
+  crime.includes("if(!stradaFabbricaPersonaCandidata()) return null") &&
+  crime.includes('source:"factory-opportunity"'));
+test("punto 14: l'anzianità di sede persiste oltre il cartellino mensile",
+  actions.includes("function lavoroTurniTotaliSede(luogo)") &&
+  actions.includes("sede.totalShiftsWorked=totaliPrima+1") &&
+  actions.includes("totaliSede:sede.totalShiftsWorked"));
 
 test("gli uomini legacy non sono più una crew comprabile né un costo invisibile",
   crime.includes("Gli uomini numerici sono solo compatibilità legacy") &&
