@@ -4473,17 +4473,31 @@ function renderStAttivita(){
   const s = G.strada;
   $("st-tab-attivita").innerHTML =
     STRADA_ATTIVITA.map(a => {
-      const tua = !!s.attivita[a.id];
-      return '<div class="activity' + (tua ? " owned" : "") + '">' +
-        '<div class="a-top"><strong>' + a.n + '</strong><span class="price">' +
-          (tua ? "TUA" : fmt(a.costo) + " €") + '</span></div>' +
-        '<p>' + (tua
-          ? "Resa " + fmt(a.resa) + " €/sett. · 45% pulito / 55% sporco · −" + fmt(a.gestione) + " € di gestione"
-          : "Resa " + fmt(a.resa) + " €/sett. · alza di altrettanto quanto puoi ripulire.") + '</p>' +
-        (tua ? "" : '<button class="pill' + (G.money < a.costo ? " no" : "") + '" data-stattivita="' + a.id + '">Rileva</button>') +
+      const tua=!!s.attivita[a.id];
+      if(!tua){
+        const rischio=a.rischio<.07?"basso":a.rischio<.1?"medio":"alto";
+        return '<div class="activity">' +
+          '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+fmt(a.costo)+' €</span></div>' +
+          '<p>Ricavi normali '+fmt(a.ricavoPulito)+' €/sett. · −'+fmt(a.gestione)+' € gestione · '+
+            'capienza '+fmt(a.capienza)+' € · rischio '+rischio+'.</p>' +
+          '<button class="pill'+(G.money<a.costo?" no":"")+'" data-stattivita="'+a.id+'">Rileva</button>' +
+          '</div>';
+      }
+
+      const st=stradaAttivitaStato(a.id,true),persone=stradaAttivitaPersone(a.id);
+      const fermata=!stradaAttivitaOperativa(a.id);
+      const stato=fermata?"FERMA":st.issue?"PROBLEMA":"OPERATIVA";
+      const residuo=stradaLavaggioResiduoCanale(a.id);
+      return '<div class="activity owned">' +
+        '<div class="a-top"><strong>'+a.n+'</strong><span class="price">'+stato+'</span></div>' +
+        '<p>'+(persone.partner?persone.partner.n+' · ':'')+
+          'netto normale '+fmt(Math.max(0,a.ricavoPulito-a.gestione))+' €/sett. · '+
+          'riciclaggio residuo '+fmt(residuo)+' € · pressione '+Math.round(Number(st.pressione||0))+'/100'+
+          (st.issue?' · <b>'+(stradaAttivitaProblemaDef(st.issue.id)||{}).n+'</b>':'')+'.</p>' +
+        '<button class="pill'+(st.issue?" danger":"")+'" data-stgestione="'+a.id+'">Gestisci</button>' +
         '</div>';
     }).join("") +
-    '<div class="business-foot">Le attività rendono ogni settimana e allargano quanto denaro sporco riesci a far sparire.</div>';
+    '<div class="business-foot">Sono imprese vere: producono reddito pulito, hanno persone e problemi. Il denaro sporco passa solo quando decidi tu quanto esporle.</div>';
 }
 
 /* ---- in basso: le tre città ---- */
@@ -4550,7 +4564,10 @@ $("st-modal").addEventListener("click", ev => {
 $("st-ripulisci").onclick = () => {
   hubTap();
   if(G.strada.arresto){ stToast("Sei in carcere: non puoi ripulire i soldi finché non esci."); return; }
-  stToast(stradaRipulisci());
+  if(Number(G.strada.sporchi||0)<=0){ stToast("Non hai soldi sporchi da ripulire."); return; }
+  if(stradaCapienza()<=0){ stToast("Hai già usato tutta la capacità di questa settimana."); return; }
+  STRADA_SCENA=stScenaRiciclaggio();
+  renderStScheda();
 };
 
 $("st-tab-copre").addEventListener("click", ev => {
@@ -4566,9 +4583,16 @@ $("st-tab-copre").addEventListener("click", ev => {
 });
 
 $("st-tab-attivita").addEventListener("click", ev => {
-  const a = ev.target.closest("[data-stattivita]");
+  const gestisci=ev.target.closest("[data-stgestione]");
+  if(gestisci){
+    hubTap();
+    STRADA_SCENA=stScenaAttivita(gestisci.dataset.stgestione);
+    renderStScheda();
+    return;
+  }
+  const a=ev.target.closest("[data-stattivita]");
   if(!a) return;
-  hubTap(); stToast(stCompraAttivita(a.dataset.stattivita));
+  hubTap();stToast(stCompraAttivita(a.dataset.stattivita));
 });
 
 $("st-citta-lista").addEventListener("click", ev => {
