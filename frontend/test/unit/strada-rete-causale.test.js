@@ -147,10 +147,10 @@ describe("Strada · punto 16 rete causale",()=>{
   });
 
   it("i ponti della rete diventano legami persistenti e le offerte mostrano la causa",()=>{
-    expect(strada).toContain('postoCollegaPersone(requester,candidato,"strada-nome")');
-    expect(strada).toContain('postoCollegaPersone(a,b,"strada-ponte")');
-    expect(strada).toContain('postoCollegaPersone(persona,nuovo,"strada-referral")');
-    expect(strada).toContain('postoCollegaPersone(causa.introducedBy,p,"strada-introduzione")');
+    expect(strada).toContain('stradaNpcCollega(requester,candidato,"strada-nome")');
+    expect(strada).toContain('stradaNpcCollega(a,b,"strada-ponte")');
+    expect(strada).toContain('stradaNpcCollega(persona,nuovo,"strada-referral")');
+    expect(strada).toContain('stradaNpcCollega(causa.introducedBy,p,"strada-introduzione")');
     expect(strada).toContain('type:"legacy"');
     expect(strada).toContain("prima che il gioco iniziasse a tracciare il passaparola");
     expect(eventi).toContain("Come ci sei arrivato:");
