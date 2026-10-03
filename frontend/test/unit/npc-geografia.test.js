@@ -138,7 +138,7 @@ describe("NPC · punto 9 geografia e mobilita",()=>{
     const x=p();
     api.sposta(x,{cittaId:"roma",dalGiorno:10,fonte:"evento:a"});
     const list=api.posizioni(x);
-    list[0].cittaId="milano";
+    expect(()=>{ list[0].cittaId="milano"; }).toThrow(TypeError);
     list.push({cittaId:"torino",dalGiorno:20,fonte:"falso"});
     expect(api.posizioni(x)).toEqual([
       {cittaId:"roma",dalGiorno:10,fonte:"evento:a"}
