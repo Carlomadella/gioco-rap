@@ -106,6 +106,8 @@ describe("Strada · punto 20 carcere come fonte di relazioni",()=>{
     expect(posto).toContain('p.origineLuogo!=="carcere"');
     expect(posto).toContain("p.circoloSbloccato=true");
     expect(posto).toContain("dialogoCarcereFuori(p)");
+    expect(posto).toContain("m.releasedAbsoluteDay!=null");
+    expect(posto).toContain("m.returnAfterAbsoluteDay=quando");
   });
 
   it("il primo reincontro può trasformare un favore in continuità reale",()=>{
