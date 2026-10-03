@@ -127,13 +127,13 @@ describe("Strada · punto 11 peso e capacità senza ranghi",()=>{
     const trust=[],fav=[];
     const api=new Function(
       "stradaEventoReteStato","stradaPersonaDaId","stradaRelazioneDisponibile",
-      "stradaModificaFiducia","stradaAggiungiFavore","stradaAbsDay",
+      "stradaModificaFiducia","stradaAggiungiFavore","stradaAbsDay","stradaEcoMondo",
       code+"\nreturn stradaRisolviEventoRete;"
     )(
       ()=>state,id=>people[id]||null,p=>!!p.available,
       (p,d,r)=>trust.push({id:p.id,d,r}),
       (p,d,r)=>fav.push({id:p.id,d,r}),
-      ()=>200
+      ()=>200,()=>null
     );
 
     const out=api("cand");
@@ -157,13 +157,13 @@ describe("Strada · punto 11 peso e capacità senza ranghi",()=>{
     const trust=[],fav=[];
     const api=new Function(
       "stradaEventoReteStato","stradaPersonaDaId","stradaRelazioneDisponibile",
-      "stradaModificaFiducia","stradaAggiungiFavore","stradaAbsDay",
+      "stradaModificaFiducia","stradaAggiungiFavore","stradaAbsDay","stradaEcoMondo",
       code+"\nreturn stradaRisolviEventoRete;"
     )(
       ()=>state,id=>people[id]||null,p=>!!p.available,
       (p,d,r)=>trust.push({id:p.id,d,r}),
       (p,d,r)=>fav.push({id:p.id,d,r}),
-      ()=>300
+      ()=>300,()=>null
     );
 
     const out=api();
