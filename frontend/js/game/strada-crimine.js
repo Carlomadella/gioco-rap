@@ -2965,8 +2965,23 @@ function stradaChance(colpo, approccio, personaSquadra, preparazione){
 
 function stradaLavaggioStato(){
   const s=G.strada, key=(G.year||1)+":"+(G.week||1);
-  if(!s.lavaggio || typeof s.lavaggio!=="object" || s.lavaggio.key!==key) s.lavaggio={key:key,used:0};
+  if(!s.lavaggio || typeof s.lavaggio!=="object" || s.lavaggio.key!==key)
+    s.lavaggio={key:key,used:0,canali:{}};
   if(typeof s.lavaggio.used!=="number") s.lavaggio.used=0;
+  if(!s.lavaggio.canali || typeof s.lavaggio.canali!=="object") s.lavaggio.canali={};
+
+  if(!s.lavaggio.canaliMigrati){
+    let residuo=Math.max(0,Number(s.lavaggio.used)||0);
+    s.lavaggio.canali.base=Math.min(400,residuo);
+    residuo=Math.max(0,residuo-s.lavaggio.canali.base);
+    for(const a of STRADA_ATTIVITA){
+      if(!s.attivita || !s.attivita[a.id]) continue;
+      const preso=Math.min(Number(a.capienza||a.resa||0),residuo);
+      s.lavaggio.canali[a.id]=preso;
+      residuo=Math.max(0,residuo-preso);
+    }
+    s.lavaggio.canaliMigrati=true;
+  }
   return s.lavaggio;
 }
 
