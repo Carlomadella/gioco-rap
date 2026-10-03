@@ -8,6 +8,14 @@ const QUI=path.dirname(fileURLToPath(import.meta.url));
 const ROOT=path.resolve(QUI,"../..");
 const appartenenze=fs.readFileSync(path.join(ROOT,"js/game/npc-appartenenze.js"),"utf8");
 const selezione=fs.readFileSync(path.join(ROOT,"js/game/npc-selezione.js"),"utf8");
+const posto=fs.readFileSync(path.join(ROOT,"js/game/posto.js"),"utf8");
+
+function blocco(source,start,end){
+  const a=source.indexOf(start);
+  const b=source.indexOf(end,a);
+  if(a<0 || b<0) throw new Error("blocco non trovato: "+start);
+  return source.slice(a,b);
+}
 
 function runtime(){
   const window={};
@@ -166,5 +174,59 @@ describe("NPC · punto 8 selezione e ricomparsa",()=>{
     const w=runtime();
     expect(()=>w.ADF_NPC_SELEZIONE.seleziona([p("x")],req({punteggio:()=>Infinity})))
       .toThrow(/finito/);
+  });
+
+  it("integra il Circolo: snapshot stabile, vincoli fisici, legami e prefisso",()=>{
+    const w=runtime();
+    const a=p("p9",{rel:5});
+    const b=p("p1",{rel:0});
+    const e=p("p3",{rel:1,origineLuogo:"fabbrica",circoloSbloccato:false});
+    const milano=p("p7",{rel:99,citta:"milano"});
+    const detenuto=p("p8",{rel:99,carcere:{currentJailId:"J:3"}});
+    const trasferta=p("p6",{rel:99,fuori:true});
+
+    w.ADF_NPC_APPARTENENZE.registra(e,{
+      ambienteId:"sala:provincia",tipo:"musica",fonte:"invito-sala",dalGiorno:1
+    });
+
+    const G={year:1,week:1,day:2,gente:[milano,detenuto,trasferta,e,b,a]};
+    const fn=new Function(
+      "window","G","sistemaGente","postoSoloLavoro","postoLegamiAttivi","postoUltimaConseguenzaMondo",
+      blocco(posto,"function presentiOggi(quanti)","/* ==================== DOVE SI INCONTRA")+
+        "\nreturn presentiOggi;"
+    )(
+      w,
+      G,
+      ()=>{},
+      x=>!!(x&&x.origineLuogo&&!x.circoloSbloccato),
+      x=>x===a?[b]:[],
+      ()=>null
+    );
+
+    const pomeriggio=fn(2);
+    expect(pomeriggio).toEqual([a,b]);
+    expect(G.npcPresenzeSala.ambienteId).toBe("sala:provincia");
+    expect(G.npcPresenzeSala.ids).not.toContain("p7");
+    expect(G.npcPresenzeSala.ids).not.toContain("p8");
+    expect(G.npcPresenzeSala.ids).not.toContain("p6");
+    expect(G.npcPresenzeSala.ids).toContain("p3");
+    expect(a.circoloPresenze).toBe(1);
+    expect(b.circoloPresenze).toBe(1);
+    expect(a.visto).toBeUndefined();
+
+    e.rel=100;
+    const ripetuto=fn(2);
+    expect(ripetuto).toEqual(pomeriggio);
+    expect(a.circoloPresenze).toBe(1);
+
+    const sera=fn(3);
+    expect(sera.slice(0,2)).toEqual(pomeriggio);
+    expect(sera).toContain(e);
+    expect(e.circoloPresenze).toBe(1);
+
+    G.day=3;
+    fn(2);
+    expect(a.circoloPresenze).toBe(2);
+    expect(b.circoloPresenze).toBe(2);
   });
 });
