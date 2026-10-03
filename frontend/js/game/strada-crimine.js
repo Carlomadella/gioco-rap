@@ -3830,7 +3830,7 @@ function stradaAttivitaRisolviProblema(id,scelta){
       });
     st.history.push({type:"issue-resolved",issueId:def.id,choice:"sistema",week:settimana});
   }else if(scelta==="pausa"){
-    st.blockedUntilWeek=settimana+2;
+    st.blockedUntilWeek=settimana+1;
     st.pressione=Math.max(0,Number(st.pressione||0)-32);
     if(persona&&typeof postoRegistraConseguenzaMondo==="function")
       postoRegistraConseguenzaMondo(persona,"business-paused-cleanup",1,{
