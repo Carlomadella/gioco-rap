@@ -2375,3 +2375,340 @@ propagazione sociale o simulazione giornaliera della rete.
 La scoperta delle informazioni è il punto 12; cluster e gruppi arrivano ai
 punti 13–14.
 
+## Punto 12 — scoperta delle informazioni
+
+**Stato:** introdotto un layer persistente di discovery separato dai fatti reali
+della PERSONA. Il sistema è collegato al vecchio carattere della Sala e ai
+legami Strada esplicitamente vissuti dal giocatore.
+
+File introdotti:
+
+- `frontend/js/game/npc-conoscenza.js`;
+- `frontend/test/unit/npc-conoscenza.test.js`;
+- `frontend/test/unit/npc-conoscenza-integrazione.test.js`.
+
+### Mondo reale ≠ ciò che sa il giocatore
+
+I punti precedenti descrivono fatti reali della simulazione:
+
+- tratti;
+- interessi;
+- appartenenze;
+- provenienza;
+- legami NPC↔NPC.
+
+Il punto 12 aggiunge una dimensione diversa:
+
+> quali di quei fatti il protagonista ha effettivamente scoperto.
+
+Una informazione non diventa nota solo perché esiste nel save.
+
+Esempi:
+
+- un NPC può avere `personalita.tratti=["prudente"]` senza che il giocatore lo
+  sappia;
+- può frequentare `sala:provincia` senza che il protagonista conosca quella
+  abitudine;
+- può essere fratello di un altro NPC senza che il legame sia ancora emerso;
+- può avere una provenienza definita senza averla mai raccontata.
+
+### Stato persistente
+
+La discovery usa, solo quando serve:
+
+`p.conoscenza = { versione:1, fatti:{} }`
+
+La struttura è sparsa: un NPC senza informazioni scoperte non riceve
+`p.conoscenza`.
+
+Ogni fatto scoperto salva soltanto:
+
+- una chiave semantica;
+- la fonte della scoperta;
+- il giorno del primo apprendimento, quando disponibile.
+
+Non viene duplicato l'intero profilo NPC.
+
+Esempio:
+
+`tratto:prudente → { fonte:"dialogo:7", giorno:12 }`
+
+Il valore reale resta in `p.personalita.tratti`.
+
+### Tipi di informazione supportati
+
+Il contratto operativo copre:
+
+- `carattere-legacy`;
+- `tratto`;
+- `interesse`;
+- `appartenenza`;
+- `provenienza`;
+- esistenza di un legame;
+- tipo di un legame;
+- percezione di un legame;
+- sottotipo di parentela/legame.
+
+Il sistema rifiuta la scoperta di un fatto che non esiste nella PERSONA.
+
+Non è quindi possibile scrivere, per errore:
+
+“il giocatore ha scoperto che Luca è ambizioso”
+
+se `ambizioso` non è realmente uno dei suoi tratti.
+
+### Discovery dei legami a più livelli
+
+Conoscere una relazione non significa conoscerne ogni dettaglio.
+
+Per A → B possono essere scoperti separatamente:
+
+1. **esistenza:** “A conosce B”;
+2. **tipo:** “sono amici / collaboratori / rivali / parenti”;
+3. **percezione:** “A vede B positivamente / negativamente / in modo
+   ambivalente”;
+4. **sottotipo:** per esempio `fratello`.
+
+Quindi una presentazione può rendere noto soltanto che due persone si
+conoscono, senza rivelare ciò che una pensa davvero dell'altra.
+
+### I valori mutevoli non trapelano
+
+Per `legame-tipo`, `legame-percezione` e `legame-sottotipo` la prova di
+conoscenza è legata anche al **valore osservato**.
+
+Esempio:
+
+- il giocatore scopre `A → B = conoscenza`;
+- il rapporto reale evolve in `rivalita`;
+- il nuovo tipo **non appare automaticamente**;
+- finché un evento non rivela la rivalità, la vista pubblica mostra soltanto
+  l'esistenza del collegamento.
+
+Questo evita che una UI basata sul punto 12 diventi una finestra onnisciente
+sullo stato interno del grafo.
+
+### Prima prova, non log infinito
+
+Riscoprire lo stesso fatto non aggiunge duplicati e non riscrive la prima
+fonte.
+
+Il sistema conserva quindi:
+
+- quando il protagonista l'ha saputo per la prima volta;
+- da quale esperienza è emerso.
+
+Non costruisce un log completo di ogni volta che quella informazione è stata
+ripetuta.
+
+Gli eventi storici completi restano responsabilità dei sottosistemi che li
+producono.
+
+### Correzioni del mondo
+
+La discovery non rende eterno un valore che non esiste più nel mondo corrente.
+
+Per tratti/interessi, la vista pubblica interseca:
+
+- fatti realmente presenti adesso;
+- fatti già scoperti.
+
+Se un dato viene corretto/rimosso dal modello PERSONA, non continua a essere
+presentato come fatto attuale soltanto perché esiste una vecchia prova di
+discovery.
+
+La prova storica può rimanere nel save per migrazione/debug, ma non viene
+esposta dal profilo corrente.
+
+### Compatibilità con `p.scoperto`
+
+Il gioco possiede già:
+
+`p.car`
+
+e:
+
+`p.scoperto`
+
+Il significato corrente è preciso: durante un dialogo della Sala, se il
+giocatore sceglie una risposta compatibile col carattere dell'NPC, ha “capito
+che tipo è”.
+
+Il punto 12 non elimina questo sistema.
+
+Un vecchio save con:
+
+`p.scoperto === true`
+
+continua a considerare noto il solo `p.car` legacy anche senza
+`p.conoscenza`.
+
+Da questo punto in avanti, quando lo stesso evento avviene, viene registrata
+anche la discovery:
+
+`carattere-legacy:<car>`
+
+con fonte:
+
+`circolo:dialogo-carattere`.
+
+Quindi vecchi e nuovi save restano coerenti.
+
+### `visto`, numero e discovery non sono sinonimi
+
+I campi legacy già esistenti mantengono il proprio significato.
+
+- `p.visto`: la persona è stata realmente incontrata/riconosciuta nei
+  percorsi che lo usano;
+- `p.scoperto`: il vecchio carattere `car` è stato capito;
+- `p.numero`: possiedi il numero personale;
+- `p.strada.known`: conosci quella persona nel contesto Strada.
+
+Nessuno di questi significa:
+
+“conosco automaticamente tratti, interessi, appartenenze e rete sociale”.
+
+Il punto 12 non crea quindi un generico `known=true` globale.
+
+### API runtime
+
+`window.ADF_NPC_CONOSCENZA` espone:
+
+- `chiave(fatto)`;
+- `esiste(p, fatto)`;
+- `sa(p, fatto)`;
+- `scopri(p, fatto, meta)`;
+- `prove(p)`;
+- `trattiConosciuti(p)`;
+- `interessiConosciuti(p)`;
+- `appartenenzeConosciute(p)`;
+- `legamiConosciuti(p)`;
+- `scopriLegame(p, personId, dettagli, meta)`;
+- `profilo(p)`.
+
+`scopriLegame()` è atomica: valida prima tutti i dettagli richiesti e scrive
+soltanto se sono tutti fatti reali. Una richiesta incoerente non lascia metà
+discovery nel save.
+
+### Provenienza
+
+La provenienza è scopribile soltanto se esiste davvero in
+`p.identita.provenienza`.
+
+La città corrente, `p.citta`, una Trasferta o `origineLuogo` non bastano.
+
+Questo mantiene la separazione del punto 9:
+
+- dove viene una persona;
+- dove si trova;
+- dove l'hai conosciuta.
+
+### Appartenenze
+
+Una appartenenza può essere scoperta anche dopo la fine dell'episodio, perché
+`p.appartenenze` conserva la storia.
+
+Il punto 12 registra che il giocatore sa del legame con quell'ambiente; non
+trasforma automaticamente questa informazione in “la persona è lì oggi”.
+
+La presenza corrente resta responsabilità dei punti 7–8.
+
+### Integrazione Strada
+
+Quando la Strada crea un legame che il giocatore ha appena vissuto
+direttamente — referral, introduzione, nome dato, ponte o collaborazione in una
+attività — il sistema locale registra discovery di:
+
+- esistenza del legame;
+- tipo del legame.
+
+Non vengono rivelati automaticamente:
+
+- percezione interna;
+- sottotipo;
+- altri legami della persona.
+
+Se un futuro `ADF_CRIME_NPC` esterno gestisce il grafo senza materializzarlo
+nel record locale, la Strada **non inventa** una discovery che non può
+verificare. Il Population Manager dovrà esporre il proprio contratto di
+discovery quando verrà introdotto.
+
+### UI
+
+Il punto 12 non ridisegna ancora le schede NPC.
+
+La nuova API fornisce però una vista sicura per future UI:
+
+`ADF_NPC_CONOSCENZA.profilo(p)`
+
+che restituisce soltanto le informazioni realmente scoperte.
+
+Le UI future non dovranno quindi leggere direttamente:
+
+- `p.personalita`;
+- `p.appartenenze`;
+- `p.reteLegami`;
+- `p.identita.provenienza`;
+
+quando vogliono rappresentare **ciò che sa il giocatore**.
+
+### Sufficienza rispetto alla simulazione 300–800 NPC
+
+Il modello è adatto alla scala perché la discovery è sparsa.
+
+Con 800 NPC:
+
+- nessuna conoscenza → zero `p.conoscenza`;
+- vengono salvati soltanto i fatti effettivamente scoperti;
+- non viene creata una tabella giocatore × NPC × attributo;
+- nessun aggiornamento giornaliero globale.
+
+Il costo cresce quindi con il numero reale di informazioni apprese durante la
+partita, non con tutte le informazioni possibili del mondo.
+
+Al punto 18 andrà misurata la crescita del save in carriere molto lunghe, ma il
+contratto non richiede pruning adesso.
+
+### Test
+
+`npc-conoscenza.test.js` copre:
+
+- fatti reali che restano nascosti;
+- discovery di tratti/interessi;
+- rifiuto di fatti inventati;
+- appartenenze nascoste/scoperte;
+- esistenza del legame separata dal tipo;
+- tipo/percezione/sottotipo separati;
+- evoluzione del legame senza leak del nuovo valore;
+- provenienza distinta dalla città corrente;
+- compatibilità `p.scoperto`;
+- idempotenza e prima fonte;
+- assenza di copie complete del profilo;
+- correzione/rimozione di fatti del mondo;
+- 800 NPC con discovery sparsa;
+- roundtrip JSON;
+- atomicità di `scopriLegame()`.
+
+`npc-conoscenza-integrazione.test.js` verifica:
+
+- presenza del bridge nel dialogo Sala;
+- referral Strada che scopre esistenza + tipo in entrambe le direzioni;
+- collaborazione di attività scoperta come `collaborazione`, non amicizia;
+- percezioni private non rivelate;
+- adapter esterno privo di grafo locale che non produce discovery inventata.
+
+### Confine del punto 12
+
+**Chiuso:** storage sparso della conoscenza, validazione contro la PERSONA,
+discovery progressiva di tratti/interessi/appartenenze/provenienza/legami,
+compatibilità col vecchio `scoperto`, integrazione Sala e Strada, API sicura
+per UI future.
+
+**Non implementato qui:** UI completa delle informazioni conosciute, dialoghi
+nuovi per scoprire i tratti moderni del punto 3, discovery automatica degli
+interessi, gossip/hearsay, falsi ricordi, affidabilità delle fonti o propagazione
+sociale della conoscenza.
+
+I cluster sociali del mondo sono il punto 13; non devono essere confusi con
+quello che il giocatore sa della rete.
+
