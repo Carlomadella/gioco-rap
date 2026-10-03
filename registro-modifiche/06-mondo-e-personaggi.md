@@ -6,6 +6,29 @@ Non contiene idee, TODO o implementazioni future.
 
 ---
 
+<!-- merge:0dedecc2 -->
+## 03/10/26, 00:11 — feature/strada-punto13-conseguenze-persone-v2 → main
+
+**Merge effettuato da:** GitHub (noreply@github.com)  
+**Merge commit:** `0dedecc2`
+
+### Cosa è entrato
+
+- `ca8785d7` — chore(frontend): bump cache Strada preservando fix MakeHuman — **mycolbraga**
+- `65a8809d` — test(strada): ripristina test punto 13 su main aggiornato — **mycolbraga**
+- `c3d7bc20` — test(audit): riallinea verifiche punto 13 su main aggiornato — **mycolbraga**
+- `7c8d2a75` — feat(strada): riallinea punto 13 su main aggiornato — **mycolbraga**
+
+### File di questa categoria
+
+- **Modificato:** `frontend/js/game/strada-crimine.js`
+- **Modificato:** `frontend/pagine/gioco.html`
+- **Aggiunto:** `frontend/test/unit/strada-conseguenze-persone.test.js`
+
+**File interessati in questa categoria:** 3
+
+---
+
 <!-- merge:b7d67809 -->
 ## 02/10/26, 23:52 — feature/strada-punto12-reputazione-separata → main
 
