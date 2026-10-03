@@ -1688,6 +1688,12 @@ test("punto 21: le attività normali continuano anche dopo l'uscita",
   crime.indexOf("redditoAttivita+=Number(esito.income||0)") <
   crime.indexOf("if(!stradaPartecipazioneAttiva()){",crime.indexOf("redditoAttivita+=Number(esito.income||0)")) &&
   crime.includes('lifestyleRegistraEntrata(redditoAttivita,"attivita")'));
+test("punto 21: le attività possedute restano imprese, ma il lato criminale non viene più proposto",
+  crime.includes('return "Hai mollato il giro: le attività che possiedi restano imprese normali') &&
+  crime.includes("if(partecipa&&!fermata&&Number(G.strada.sporchi||0)>0&&residuo>0)") &&
+  crime.includes("if(partecipa&&!fermata&&contatto&&Number(st.lastMeetingWeek)!==week)") &&
+  crime.includes("'lato criminale chiuso · '") &&
+  crime.includes("(partecipa?'Rileva':'Fuori dal giro')"));
 test("punto 21: il passato bussa attraverso persone e conti già esistenti",
   crime.includes("function stradaPassatoCandidati()") &&
   crime.includes("function stradaPassatoSettimana(roll,variantRoll)") &&
