@@ -1680,3 +1680,293 @@ di trasferimento, viaggi autonomi, UI della provenienza e migrazione massiva
 dei vecchi save. Questi aspetti appartengono ai punti 12, 16, 17, 18 e 19 o a
 future espansioni del mondo.
 
+## Punto 10 — relazioni col giocatore
+
+**Stato:** le dimensioni relazionali esistenti sono state riesaminate, mantenute
+separate e raccolte in una vista runtime comune senza introdurre un nuovo
+punteggio aggregato.
+
+File introdotti:
+
+- `frontend/js/game/npc-relazioni.js`;
+- `frontend/test/unit/npc-relazioni.test.js`;
+- `frontend/test/unit/npc-relazioni-integrazione.test.js`.
+
+### Tre assi già presenti nel gioco
+
+La repository corrente possiede già tre sistemi diversi, con scale e
+responsabilità differenti.
+
+| Dimensione | Dati autorevoli | Scala/forma | Uso corrente |
+| --- | --- | --- | --- |
+| rapporto sociale generale | `p.rel`, `p.pt`, `numero`, `numDa` | `rel` 0–5 + progresso `pt` | Sala, lavoro, chat, Trasferte, costi/azioni sociali |
+| rapporto Strada | `p.strada.fiducia` e stato `p.strada` | fiducia 0–100 + status/favori/tensione/debiti | squadra, protezione, favori, conseguenze e accesso nel giro |
+| rapporto carcerario | `p.carcere.rapporto` e storia `p.carcere` | rapporto -10…10 + episodi/stato carcere | legami/tensioni dentro, scarcerazione e possibili seguiti fuori |
+
+Non sono tre copie della stessa fiducia.
+
+Una PERSONA può quindi, nello stesso momento:
+
+- essere `rel=4` socialmente;
+- avere `fiducia=12` nella Strada e rapporto criminale inattivo;
+- avere `rapporto=-4` per una storia carceraria negativa.
+
+Questa divergenza è valida e non viene “corretta”.
+
+### Rapporto sociale generale
+
+`p.rel` resta il livello relazionale generale usato dal mondo sociale.
+
+Il codice corrente usa:
+
+- `relNome(p)` per l'etichetta;
+- `relSoglia(p) = 3 + rel` per la progressione;
+- `p.pt` come progresso dentro il gradino;
+- `numero/numDa` per il contatto telefonico.
+
+Questo rapporto viene modificato da dialoghi, lavoro, Trasferte e da
+conseguenze di mondo esplicite.
+
+Non misura:
+
+- affidabilità nel giro criminale;
+- debiti/favori della Strada;
+- storia in carcere;
+- appartenenza a gruppi;
+- disponibilità fisica.
+
+### Fiducia della Strada
+
+`p.strada.fiducia` resta l'unica fiducia criminale personale.
+
+La repository corrente la usa, fra l'altro, per:
+
+- accesso alla squadra (`STRADA_FIDUCIA_SQUADRA = 25`);
+- classificare relazioni forti;
+- protezione;
+- bonus e selezione di persone affidabili nel giro;
+- reazioni a inattività, heat, favori e storia comune.
+
+Lo stato criminale conserva inoltre informazioni autonome:
+
+- `streetStatus`;
+- `favori`;
+- `colpiInsieme`;
+- `debitiGiocatore`;
+- `tensione`;
+- `rivalita`;
+- `heatCaution`.
+
+Nessuno di questi valori viene derivato automaticamente da `p.rel`.
+
+Avere `rel=5` non rende quindi automaticamente una persona disponibile per
+un colpo, così come `fiducia=80` non la rende automaticamente un “partner”
+sociale nella Sala.
+
+### Rapporto carcerario
+
+`p.carcere.rapporto` conserva ciò che è successo durante la detenzione.
+
+La scala corrente va da -10 a +10 e la UI deriva etichette come:
+
+- rapporto buono;
+- si fida di te;
+- legame forte;
+- tensione;
+- conto aperto.
+
+Sono informazioni sulla storia carceraria, non una seconda `p.rel`.
+
+Anche dopo la scarcerazione il dato può restare importante per:
+
+- reincontri;
+- rivalità;
+- tempi di riemersione;
+- collegamento successivo alla Strada.
+
+### Ponti fra sistemi: eventi, non sincronizzazione
+
+Separare le dimensioni non significa impedire a un evento di avere conseguenze
+su più sistemi.
+
+La repository contiene già due esempi corretti:
+
+1. `carcereModificaRapporto()` può registrare anche una
+   `postoRegistraConseguenzaMondo()`, facendo maturare il rapporto sociale
+   generale come conseguenza di un fatto realmente accaduto;
+2. alla scarcerazione, un rapporto carcerario forte può creare una relazione
+   Strada e assegnare una fiducia iniziale coerente con quell'evento.
+
+Questi sono **ponti causali espliciti**.
+
+Non sono sincronizzazioni del tipo:
+
+- `rel × 20 = fiducia`;
+- `rapporto carcere = rel`;
+- “il valore più alto vince”;
+- media delle tre dimensioni.
+
+Dopo il ponte, ogni sistema continua ad evolvere autonomamente.
+
+### API runtime
+
+`window.ADF_NPC_RELAZIONI` espone:
+
+- `sociale(p)`;
+- `strada(p)`;
+- `carcere(p)`;
+- `dimensione(p, id)`;
+- `vista(p)`;
+- `fatti(p)`.
+
+L'API è **read-only**.
+
+Non:
+
+- crea `p.relazioni`;
+- modifica i valori autorevoli;
+- chiama `save()`;
+- assegna premi;
+- inizializza fiducia;
+- migra i vecchi salvataggi;
+- calcola un relationship score globale.
+
+Le viste restituite sono copie congelate.
+
+### Assenza di dati
+
+Il lettore non inventa dimensioni mancanti.
+
+Se una persona non possiede dati Strada:
+
+`strada(p) === null`
+
+Se non possiede dati carcere:
+
+`carcere(p) === null`
+
+Se non possiede nessun campo del rapporto sociale:
+
+`sociale(p) === null`
+
+Numeri legacy serializzati come stringhe vengono letti in modo compatibile ma
+non riscritti.
+
+Valori fuori scala vengono limitati **solo nella vista derivata**, senza
+modificare il save: la migrazione/correzione persistente resta responsabilità
+del punto 19 o del sottosistema autorevole.
+
+### Integrazione reale
+
+`posto.js` usa ora il contratto per leggere:
+
+- livello sociale;
+- soglia sociale;
+- rapporto carcere nei reincontri.
+
+`strada-crimine.js` usa il contratto per leggere:
+
+- fiducia Strada;
+- rapporto carcere nelle etichette e nella scarcerazione.
+
+I mutatori restano dove erano:
+
+- Posto modifica `rel/pt`;
+- Strada modifica `p.strada`;
+- carcere modifica `p.carcere`.
+
+Questa separazione impedisce al modulo comune di diventare un secondo proprietario
+del dato.
+
+### Tratti e personalità
+
+Il principio approvato resta:
+
+> i tratti modificano la curva della relazione; non sostituiscono la relazione.
+
+Il prototipo comportamentale del punto 4 non è ancora caricato nel gioco e non
+viene usato dal punto 10 per assegnare bonus o malus numerici.
+
+`ADF_NPC_RELAZIONI.fatti(p)` espone invece fatti distinti e verificabili, ad
+esempio:
+
+- rapporto sociale avviato;
+- Strada conosciuta;
+- fiducia Strada;
+- tensione/rivalità Strada;
+- rapporto carcere;
+- tensione carceraria.
+
+Quando i contratti dei tratti entreranno nel runtime, potranno usare questi fatti
+come **contesto** per modificare la reazione o il delta di un evento.
+
+Non dovranno mai salvare una nuova `fiduciaTratto`, `amiciziaTratto` o copia
+parallela della relazione.
+
+### Nessun punteggio aggregato
+
+Il modulo rifiuta dimensioni generiche come:
+
+- `fiducia`;
+- `relazione`.
+
+Il chiamante deve chiedere esplicitamente:
+
+- `sociale`;
+- `strada`;
+- `carcere`.
+
+`vista(p)` non espone `score`, `totale` o `fiducia` a livello root.
+
+Questo è intenzionale: un singolo numero distruggerebbe informazione utile e
+renderebbe impossibile rappresentare rapporti contraddittori ma credibili.
+
+### Sufficienza rispetto a 300–800 NPC
+
+Il punto 10 non introduce nuovo stato persistente per persona.
+
+La vista viene calcolata in O(1) leggendo campi già presenti. Non viene costruita
+una matrice giocatore × NPC separata da `G.gente`, né viene eseguito un update
+giornaliero della popolazione.
+
+La scala 300–800 non richiede quindi ottimizzazioni aggiuntive qui.
+
+Il costo futuro dipenderà dagli eventi che modificano relazioni, non dalla vista.
+
+### Test
+
+`npc-relazioni.test.js` verifica:
+
+- nessuna dimensione inventata;
+- rapporto sociale letto separatamente;
+- indipendenza delle tre dimensioni;
+- fiducia Strada alta con relazione sociale bassa;
+- rapporto carcere negativo con relazione sociale positiva;
+- assenza di score aggregato;
+- fatti distinti per i futuri tratti;
+- compatibilità con numeri legacy serializzati;
+- lettura conservativa senza mutare il save;
+- rifiuto di dimensioni generiche;
+- viste immutabili;
+- roundtrip JSON senza nuovi campi persistiti.
+
+`npc-relazioni-integrazione.test.js` verifica:
+
+- Posto usa soltanto il rapporto sociale per nomi/soglie;
+- il lettore Strada usa soltanto `p.strada.fiducia`;
+- il lettore carcere usa soltanto `p.carcere.rapporto`;
+- la stessa PERSONA può avere contemporaneamente tre stati relazionali
+  divergenti;
+- i consumer integrati non richiedono un `relationshipScore`.
+
+### Confine del punto 10
+
+**Chiuso:** significato e convivenza delle tre dimensioni, API comune di lettura,
+assenza di score aggregato, integrazione nei consumer principali e test.
+
+**Non implementato qui:** bilanciamento dei delta attraverso i nuovi tratti,
+nuove UI che mostrino tutte le dimensioni, migrazione strutturale di
+`rel/pt`, nuove forme di relazione romantica/familiare o legami NPC↔NPC.
+
+I legami fra NPC sono il punto 11.
+
