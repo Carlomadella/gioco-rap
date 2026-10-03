@@ -97,7 +97,7 @@ describe("Strada · punto 18 lifestyle e reddito dichiarabile",()=>{
   it("il valore dei vestiti realmente indossati entra come segnale, senza contarlo ogni settimana per intero",()=>{
     const ctx=contesto({stileAddosso:()=>[{p:500},{p:300}]});
     expect(vm.runInContext("lifestyleValoreVestitiVisibili()",ctx)).toBe(800);
-    const snap=vm.runInContext("lifestyleSnapshotCorrente()",ctx);
+    const snap=vm.runInContext("lifestyleSnapshotCorrente(true)",ctx);
     expect(snap.vestiti).toBe(800);
     expect(snap.visibile).toBe(40);
   });
