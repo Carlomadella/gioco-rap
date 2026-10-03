@@ -2723,7 +2723,7 @@ function stradaNpcTipoLegame(reason){
   return reason==="attivita-lavoro" ? "collaborazione" : "conoscenza";
 }
 
-function stradaNpcScopriLegameLocale(a,b,reason){
+function stradaNpcScopriLegameLocale(a,b,reason,relationshipType){
   try{
     const api=typeof window!=="undefined" ? window.ADF_NPC_CONOSCENZA : null;
     if(!api || typeof api.scopriLegame!=="function") return;
@@ -2735,10 +2735,16 @@ function stradaNpcScopriLegameLocale(a,b,reason){
         ? da.reteLegami.find(x=>x&&String(x.personId)===String(aChi.id))
         : null;
       if(!r) return;
+      const tipi=[];
+      if(Array.isArray(r.tipi)) r.tipi.forEach(t=>{
+        if(typeof t==="string"&&!tipi.includes(t)) tipi.push(t);
+      });
+      if(typeof r.tipo==="string"&&!tipi.includes(r.tipo)) tipi.push(r.tipo);
       const dettagli={};
-      if(typeof r.tipo==="string"&&r.tipo) dettagli.tipo=r.tipo;
-      /* Percezioni e sottotipi restano privati finché un evento dedicato non
-         li rende espliciti al giocatore. */
+      if(relationshipType && tipi.includes(relationshipType))
+        dettagli.tipo=relationshipType;
+      /* L'evento rende noto soltanto il tipo che ha appena dimostrato.
+         Percezioni, sottotipi e altri tipi preesistenti restano privati. */
       api.scopriLegame(da,aChi.id,dettagli,meta);
     };
 
@@ -2764,7 +2770,7 @@ function stradaNpcCollega(a,b,reason,meta){
         context:"crime"
       });
       if(out!==false){
-        stradaNpcScopriLegameLocale(a,b,reason);
+        stradaNpcScopriLegameLocale(a,b,reason,relationshipType);
         return true;
       }
     }
@@ -2772,7 +2778,7 @@ function stradaNpcCollega(a,b,reason,meta){
   const ok=typeof postoCollegaPersone==="function"
     ? !!postoCollegaPersone(a,b,reason,Object.assign({},cfg,{tipo:relationshipType}))
     : false;
-  if(ok) stradaNpcScopriLegameLocale(a,b,reason);
+  if(ok) stradaNpcScopriLegameLocale(a,b,reason,relationshipType);
   return ok;
 }
 
