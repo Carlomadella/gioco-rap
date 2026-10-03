@@ -78,6 +78,40 @@ Principio del modello:
 
 L'evoluzione dell'età richiede una regola esplicita del calendario: il solo campo `eta` non autorizza a inventare date di nascita o incrementi al caricamento.
 
+
+## Vincolo di scala acquisito dalla simulazione
+
+Il riferimento quantitativo è `documentazione/npc/dimensionamento-npc.md`. Il recap
+riporta, senza rieseguire il simulatore, 104,4 persone distinte in media nello
+scenario equilibrato a un anno, 305,3 nello scenario equilibrato a tre anni e
+538,2 nello scenario esplorativo a tre anni, con massimo osservato 620.
+
+Per l'architettura del modello PERSONA questo non significa precaricare centinaia
+di NPC né fissare un tetto rigido. Significa però progettare da subito per una
+**capacità nell'ordine di centinaia di identità persistenti**, con riferimento
+prudenziale alla fascia 300–800 indicata dalla simulazione per i punti 17–18.
+
+Conseguenze architetturali del punto 1:
+
+- i dati obbligatori per persona devono restare pochi e motivati dal gameplay;
+- i dati opzionali devono poter restare assenti senza rompere selettori o UI;
+- le relazioni NPC↔NPC devono essere una rete sparsa, non una matrice completa
+  persona × persona;
+- non è accettabile un aggiornamento giornaliero globale di tutti gli NPC solo
+  per mantenere lo stato "vivo": gli stati evolvono per eventi e letture
+  pertinenti;
+- appartenenze, disponibilità e presenza devono essere selezionate per contesto,
+  non materializzate per ogni persona × ambiente;
+- la capacità 300–800 riguarda la generazione e la persistenza possibili, non
+  il numero di NPC creati all'avvio né una soglia oltre cui cancellare persone;
+- crescita del salvataggio, costo dei selettori, varietà dei cataloghi e tasso
+  di riuso vanno misurati esplicitamente nei punti 17–18 e nel reaudit finale.
+
+La simulazione non dimostra che tratti, interessi o dialoghi siano sufficienti
+e non misura hub futuri completi o carriere oltre tre anni. I suoi numeri sono
+quindi un vincolo di scala da rispettare, non una certificazione del modello.
+
+
 ## Confine del punto 1
 
 **Definito in questo punto:** i sette macro-gruppi, la separazione Persona/Stato/Relazione, la fonte comune dell'identità, le responsabilità dei dati e i vincoli di compatibilità col sistema corrente.
