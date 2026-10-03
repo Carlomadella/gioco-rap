@@ -759,7 +759,9 @@ function stradaPreparazioneContesto(ctx){
 function stradaPreparazioneEffetti(ctx,approccio){
   const c=stradaPreparazioneContesto(ctx);
   const prep=stradaPreparazioneDaId(c.id);
-  const intel=stradaIntelDaContesto(c);
+  const intel=typeof stradaIntelDaContesto==="function"
+    ? stradaIntelDaContesto(c)
+    : null;
   const usa=!!(intel&&approccio&&intel.approachId===approccio.id);
   const baseChance=Number(prep.chance||0);
   const baseHeat=Number(prep.heat||1);
@@ -801,7 +803,9 @@ function stradaApplicaPreparazione(colpo,prepId,personId){
     if(!stradaConsumaFavore(p,"preparazione:"+String(colpo&&colpo.id||"colpo")))
       return {ok:false,reason:"Quel favore non è più disponibile."};
     if(typeof save==="function") save();
-    const intel=stradaIntelCrea(colpo,"contatto",p);
+    const intel=typeof stradaIntelCrea==="function"
+      ? stradaIntelCrea(colpo,"contatto",p)
+      : null;
     return {
       ok:true,
       context:{
@@ -834,7 +838,9 @@ function stradaApplicaPreparazione(colpo,prepId,personId){
       return {ok:false,reason:"Prima devi chiudere la decisione o l'azione in corso."};
   }
 
-  const intel=prep.id==="subito"?null:stradaIntelCrea(colpo,prep.id,null);
+  const intel=prep.id==="subito" || typeof stradaIntelCrea!=="function"
+    ? null
+    : stradaIntelCrea(colpo,prep.id,null);
   return {
     ok:true,
     context:{
@@ -948,7 +954,9 @@ function stScenaApproccio(colpo,preparazione){
   const s = G.strada;
   preparazione=stradaPreparazioneContesto(preparazione);
   const personeSquadra=stradaPersoneSquadra();
-  const intel=stradaIntelDaContesto(preparazione);
+  const intel=typeof stradaIntelDaContesto==="function"
+    ? stradaIntelDaContesto(preparazione)
+    : null;
   const lead=typeof stradaOpportunitaAttiva==="function"?stradaOpportunitaAttiva(colpo.id):null;
   const miglioreSquadra=personeSquadra.slice().sort((a,b)=>
     stradaBonusFiduciaSquadra(b)-stradaBonusFiduciaSquadra(a)
@@ -961,7 +969,9 @@ function stScenaApproccio(colpo,preparazione){
       {t:"Rischio " + stRischio(colpo).toLowerCase(), c:stClasseRischio(colpo)},
       {t:stradaCategoriaLabel(colpo)},
       {t:"Preparazione: "+stradaPreparazioneEtichetta(preparazione)},
-      ...(intel?[{t:"Intel: "+stradaIntelDescrizione(preparazione),c:"money"}]:[])
+      ...(intel?[{t:"Intel: "+(typeof stradaIntelDescrizione==="function"
+        ? stradaIntelDescrizione(preparazione)
+        : intel.text),c:"money"}]:[])
     ],
     opts:STRADA_APPROCCI.map(a => {
       const riga = stRigaApproccio(a);
@@ -4130,7 +4140,8 @@ function stradaTenta(colpoId, approccioId, personaSquadraId, preparazione){
       }
     }
   }
-  stradaIntelConsuma(colpo.id);
+  if(typeof stradaIntelConsuma==="function")
+    stradaIntelConsuma(colpo.id);
   save(); renderStrada(); renderGioco();
 }
 
