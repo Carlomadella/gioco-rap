@@ -1,3 +1,4 @@
+import { crimeNpcBridge } from "../helpers/crime-npc-bridge.js";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -77,7 +78,7 @@ describe("Strada · punto 16 rete causale",()=>{
     const causa=new Function(
       "G","stradaContattoKey","stradaContattiAttivi","stradaFiduciaValore",
       "stradaFavoriValore","stradaPersonaDaId","stradaAbsDay",
-      blocco(strada,"function stradaCausaOpportunita","function stradaRisolviContattoOpportunita")+
+      crimeNpcBridge(strada)+blocco(strada,"function stradaCausaOpportunita","function stradaRisolviContattoOpportunita")+
         "\nreturn stradaCausaOpportunita;"
     )(
       G,
@@ -102,7 +103,7 @@ describe("Strada · punto 16 rete causale",()=>{
     const causa=new Function(
       "G","stradaContattoKey","stradaContattiAttivi","stradaFiduciaValore",
       "stradaFavoriValore","stradaPersonaDaId","stradaAbsDay",
-      blocco(strada,"function stradaCausaOpportunita","function stradaRisolviContattoOpportunita")+
+      crimeNpcBridge(strada)+blocco(strada,"function stradaCausaOpportunita","function stradaRisolviContattoOpportunita")+
         "\nreturn stradaCausaOpportunita;"
     )(
       G,
@@ -126,7 +127,7 @@ describe("Strada · punto 16 rete causale",()=>{
     const causa=new Function(
       "G","stradaContattoKey","stradaContattiAttivi","stradaFiduciaValore",
       "stradaFavoriValore","stradaPersonaDaId","stradaAbsDay",
-      blocco(strada,"function stradaCausaOpportunita","function stradaRisolviContattoOpportunita")+
+      crimeNpcBridge(strada)+blocco(strada,"function stradaCausaOpportunita","function stradaRisolviContattoOpportunita")+
         "\nreturn stradaCausaOpportunita;"
     )(
       G,

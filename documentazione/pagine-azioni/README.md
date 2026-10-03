@@ -117,12 +117,11 @@ il giro preciso dal seme. «Ascolta il beat prima di comprarlo» costa quasi zer
 
 ## I contro, coi numeri
 
-**Una pagina costa cento volte una scena.** Aggiungere una mossa a `SCENA_PIENA` è una
-riga. Le pagine vere pesano: `posto.js` 973 righe, `strada-crimine.js` 1.209 più
-`strada-crimine-ui.js` 462, `studio.js` 424, `writer.js` 374, `piazza.js` 349. E i fogli
-di stile: `strada-crimine-v2.css` da solo è **2.412 righe**, un terzo di tutto il CSS del
-gioco. Tredici pagine così non sono tredici volte il lavoro di una: sono tredici volte
-anche la **manutenzione**, per sempre.
+**Una pagina costa molto più di una scena.** Aggiungere una mossa a `SCENA_PIENA` può
+essere una modifica locale; una pagina completa coinvolge JS, CSS, navigazione, tempo,
+responsive, modali e test. I numeri di righe cambiano troppo rapidamente per essere una
+metrica affidabile: il punto operativo è che pagine come Sala, Studio e Attività criminali
+sono sistemi estesi e hanno un costo di manutenzione permanente.
 
 **Ogni pagina si rompe da sola quando cambi qualcos'altro.** Non è teoria: la pagina delle
 Attività criminali tagliava «Molla il giro» e metà del TRAPHONE a **tutte** le
@@ -753,10 +752,12 @@ persone, i caratteri, i gradini di confidenza, le rivalità che nascono. **Video
 che manca è a valle, non qui: chi conosci alla Sala deve **servire** nello Studio (il beat,
 il fonico: c'è già) e al Live Club (chi viene a vederti: da fare).
 
-**LE ATTIVITÀ CRIMINALI** (`strada-crimine.js`, 1.209 + 462 righe) — **c'è già.** Appena
-sistemata perché tagliava i contenuti. Restano il bilanciamento (la reputazione sale di
-quasi 4 a colpo contro i 2 di progetto) e le trenta immagini di fondo che arrivano ancora
-da un CDN.
+**LE ATTIVITÀ CRIMINALI** (`strada-crimine.js` + `strada-crimine-ui.js`) — **c'è già.**
+La pagina oggi comprende rete di persone, attività di copertura, carcere, heat, uscita dal
+giro, fallout e intel. I fondali crime sono locali in
+`frontend/media/photo/attivita-criminali/`. Lo stato e i gap correnti sono documentati
+nel punto 21 di `implementazioni/06-mondo-e-personaggi.md`, non in conteggi di righe o
+note di bilanciamento hardcoded qui.
 
 **LO SHOP** (`negozio.js`, dentro a `apriPannello`) — **c'è già**, ma come **pannello**,
 cioè una lista: attrezzatura, beat, vestiti. **Video 09.** È l'unico posto dove una lista è
@@ -765,9 +766,9 @@ due cose che ci metterei: **provarsi i vestiti addosso** (il ritratto c'è,
 `ARTIST_PORTRAIT()`) e **sentire i beat prima di comprarli** — di nuovo `beatplay.js`. Poi
 c'è il punto 2 di ALE: lo shop aperto già in provincia, con meno roba.
 
-**IL CARCERE** (dentro a `strada-crimine-ui.js`) — **c'è già**, ed è l'esempio giusto di
-una pagina che non deve essere divertente: dentro non c'è niente da fare, e quello è il
-punto.
+**IL CARCERE** (dentro a `strada-crimine-ui.js`) — **c'è già** ed è intenzionalmente
+più ristretto della vita fuori, ma non è più vuoto: ha persone persistenti, rapporti,
+eventi, azioni limitate e conseguenze che possono riemergere dopo la scarcerazione.
 
 ---
 
@@ -789,7 +790,7 @@ punto.
 | 12 | Pesi | scena | **resta scena** + video 06 + la striscia | 10 min | subito, gratis |
 | 13 | Cardio leggero | scena | **resta scena** + video 06 | 10 min | subito, gratis |
 | — | La Sala | **pagina** | c'è già · + video 02 | — | — |
-| — | Attività criminali | **pagina** | c'è già · bilanciamento e foto locali | — | — |
+| — | Attività criminali | **pagina** | c'è già · sistema integrato; evoluzione gameplay tracciata nel punto 21 | — | — |
 | — | Lo Shop | pannello | resta lista · + provarsi addosso, + sentire i beat | ~200 righe | dopo |
 | — | Il carcere | **pagina** | c'è già | — | — |
 | — | *il telaio* | — | **il registro unico + lo scheletro comune** | ~2 giorni | **prima di tutto** |

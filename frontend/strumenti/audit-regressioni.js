@@ -1517,10 +1517,11 @@ test("punto 22: il crime espone un contratto NPC opzionale senza possedere il si
   crime.includes('adapterGlobal:"ADF_CRIME_NPC"') &&
   crime.includes('"personById","findPerson","createPerson","people"') &&
   crime.includes('"linkPeople","cityOf","groupsForPerson","markContext"'));
-test("punto 22: senza il nuovo manager la Strada continua a usare G.gente e nuovaPersona",
-  crime.includes("return (G.gente||[]).find(p=>p&&p.id===id&&!p.via) || null") &&
-  crime.includes('if(typeof nuovaPersona!=="function") return {person:null,managed:false}') &&
-  crime.includes('const p=nuovaPersona(request.roleHint||"strada")'));
+test("punto 22: il fallback legacy è centralizzato nel bridge NPC",
+  crime.includes("return stradaNpcPersone().find(p=>p.id===id) || null") &&
+  crime.includes('let p=typeof nuovaPersona==="function" ? nuovaPersona(role) : null') &&
+  crime.includes('if(!G.gente.some(x=>x&&x.id===p.id)) G.gente.push(p)'));
+
 test("punto 22: col nuovo manager ricerca, creazione e legami passano dal bridge crime",
   crime.includes('typeof a.findPerson==="function"') &&
   crime.includes('typeof a.createPerson==="function"') &&

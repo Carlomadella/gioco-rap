@@ -1,3 +1,4 @@
+import { crimeNpcBridge } from "../helpers/crime-npc-bridge.js";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,7 +19,7 @@ function creaRuntime(dayRef, gente){
   const stradaAbsDay=()=>dayRef.value;
   const pushLog=()=>{};
   return new Function("G","clamp","stradaAbsDay","pushLog",
-    code+"\nreturn {STRADA_RELAZIONI,stradaPersonaMeta,stradaRelazioneDisponibile,"+
+    crimeNpcBridge(crime)+code+"\nreturn {STRADA_RELAZIONI,stradaPersonaMeta,stradaRelazioneDisponibile,"+
     "stradaIgnoraContatto,stradaRegistraInterazione,stradaAggiornaRelazioniCriminali};"
   )(G,clamp,stradaAbsDay,pushLog);
 }

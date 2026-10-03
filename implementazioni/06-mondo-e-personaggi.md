@@ -23,6 +23,19 @@ _I punti di questo argomento. L'indice di tutti sta in_ [`README.md`](README.md)
 
 21. implementa un nuovo modo di fare soldi, poi nel caso anche la fama, ovvero la professione del criminale
 
+> **STATO ATTUALE — 03/10/2026.** Le note datate qui sotto restano come cronologia
+> dell'implementazione e descrivono correttamente ciò che esisteva in quei momenti,
+> ma **non sono più una fotografia del runtime corrente**. Oggi la Provincia ha un
+> pool di 30 colpi in 5 categorie con 4 offerte giornaliere; contatti, fiducia,
+> favori/debiti, rivalità, attività di copertura e relazioni nate in carcere sono
+> persistenti; la detenzione blocca le azioni esterne tramite i gate globali;
+> si può mollare il giro conservando il passato; heat, lifestyle, fallout e intel
+> sono integrati nel gameplay. Milano e Los Angeles restano non giocabili lato crime.
+> Il bridge `ADF_CRIME_NPC` è ora usato come interfaccia standard per lookup e
+> creazioni crime, mantenendo `G.gente` / `nuovaPersona()` come fallback legacy.
+> Il gap ancora aperto emerso dal reaudit è temporale: i colpi consumano tempo reale
+> ma non hanno ancora finestre mattina/pomeriggio/notte/weekend.
+
 **57 · «Non è più giocabile, che è successo?» — controllato, non era una regressione.**
 Cercato in tutta la cronologia (`git log --all --grep`, tutti i branch) qualcosa che avesse mai reso
 «Attività criminali» o «Colpo rapido» giocabili: **non c'era mai stato un commit che l'avesse
