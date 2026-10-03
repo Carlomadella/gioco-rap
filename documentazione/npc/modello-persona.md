@@ -3050,3 +3050,381 @@ altri gruppi con identità propria; regole di nascita, scioglimento,
 leadership, nome, scopo o appartenenza formale. Queste sono responsabilità del
 **punto 14 — gruppi emergenti**.
 
+## Punto 14 — gruppi emergenti
+
+**Stato:** introdotto un registro persistente di gruppi NPC che permette a una
+cerchia reale del punto 13 di essere promossa, tramite evento esplicito, a
+entità autonoma e riutilizzabile dal gameplay.
+
+File introdotti:
+
+- `frontend/js/game/npc-gruppi.js`;
+- `frontend/test/unit/npc-gruppi.test.js`;
+- `frontend/test/unit/npc-gruppi-integrazione.test.js`.
+
+Stato globale introdotto:
+
+`G.npcGruppi = []`
+
+### Cerchia candidata ≠ gruppo
+
+Il sistema mantiene la distinzione del punto 13.
+
+`ADF_NPC_GRUPPI.candidati(registro, persone)` può individuare cerchie che
+potrebbero essere promosse, ma:
+
+- non crea nulla;
+- non modifica le PERSONA;
+- non assegna nomi;
+- non sceglie tipo/scopo;
+- non decide che “serve una crew”;
+- non punta a un numero minimo di gruppi per partita.
+
+La promozione avviene soltanto con:
+
+`promuoviCerchia(registro, persone, cerchiaKey, meta)`
+
+e richiede un evento che fornisca almeno:
+
+- `groupId`;
+- `tipo`;
+- `giorno`;
+- `fonte`.
+
+Quindi un triangolo di amici può restare per tutta la carriera una semplice
+cerchia sociale.
+
+### Registro separato dalle PERSONA
+
+I gruppi vivono nel registro globale:
+
+`G.npcGruppi`
+
+e non vengono copiati dentro ogni NPC.
+
+Una PERSONA non riceve:
+
+- `groupId`;
+- `groupIds`;
+- `gruppi`;
+- `cerchie`.
+
+Questo evita duplicazioni, problemi di sincronizzazione e crescita inutile del
+save.
+
+La membership è conservata nel record del gruppo.
+
+### Struttura persistente
+
+Un gruppo promosso contiene il minimo necessario:
+
+- `groupId` stabile;
+- `nome` opzionale;
+- `tipo`;
+- `contesto` opzionale;
+- `stato` (`attivo` / `sciolto`);
+- giorno e fonte di creazione;
+- `origineCerchiaKey`;
+- storia dei membri;
+- timeline leggera dei luoghi.
+
+La chiave della cerchia originaria è **provenienza del gruppo**, non la sua
+identità permanente.
+
+Dopo la fondazione il gruppo non dipende più dalla chiave della cerchia.
+
+### ID stabile
+
+`groupId` viene fornito dall'evento/controller che promuove il gruppo.
+
+Il modulo non genera ID casuali.
+
+Un `groupId` già usato non può essere riciclato nemmeno dopo lo scioglimento,
+perché identificherebbe due entità storiche diverse con la stessa chiave.
+
+### Membri autonomi
+
+Ogni membro resta una PERSONA canonica autonoma.
+
+La membership salva episodi:
+
+- `personId`;
+- `entratoGiorno`;
+- `fonte`;
+- `uscitoGiorno`;
+- `uscitaFonte`.
+
+Una persona può:
+
+- uscire;
+- rientrare più avanti;
+- entrare dopo la fondazione;
+- appartenere contemporaneamente a più gruppi.
+
+L'uscita dal gruppo non:
+
+- elimina la PERSONA;
+- cancella i legami NPC↔NPC;
+- modifica automaticamente la relazione col protagonista;
+- rimuove chat, storia o appartenenze.
+
+### Il gruppo sopravvive alla cerchia originaria
+
+Questo è il confine fondamentale col punto 13.
+
+Una cerchia è derivata dalla topologia corrente.
+
+Un gruppo, una volta fondato, è una **entità storica persistente**.
+
+Quindi se dopo la fondazione:
+
+- due membri litigano;
+- alcuni legami si indeboliscono;
+- la topologia non forma più una componente biconnessa;
+
+il gruppo non scompare automaticamente.
+
+Può continuare a esistere per interesse comune, convenienza, lavoro,
+storyline o semplice inerzia.
+
+Per scioglierlo serve un evento esplicito:
+
+`ADF_NPC_GRUPPI.sciogli(...)`.
+
+### Coesione derivata
+
+Il gruppo non salva un secondo “punteggio fiducia”.
+
+`coesione(gruppo, persone)` viene calcolata sulla rete attuale dei membri
+attivi:
+
+- considera gli archi sociali reciproci adatti alla co-presenza;
+- misura la quota di coppie interne realmente collegate;
+- restituisce un valore 0–1.
+
+La coesione può quindi cambiare quando cambiano i legami senza dover
+sincronizzare un campo persistito.
+
+Questo evita un nuovo valore magico da aggiornare a mano.
+
+La coesione non scioglie automaticamente il gruppo.
+
+### Tipo e contesto
+
+`tipo` è obbligatorio ma non è un enum rigido.
+
+Il sistema può quindi rappresentare in futuro, senza cambiare schema:
+
+- crew musicale;
+- collettivo;
+- gruppo lavorativo;
+- rete della Strada;
+- gruppo criminale;
+- gang rivale;
+- rete di contatti;
+- futura fazione narrativa.
+
+`contesto` è opzionale e può specificare il dominio quando serve.
+
+Il modulo non deduce il tipo dai membri o dai loro ruoli.
+
+### Nessuna relazione globale col giocatore inventata
+
+L'audit storico prevedeva la possibilità futura di una relazione globale col
+gruppo.
+
+Il punto 14 **non la inizializza automaticamente**.
+
+Non viene creato un nuovo:
+
+- trust di gruppo;
+- `rel` di gruppo;
+- rapporto criminale aggregato;
+- media delle relazioni dei membri.
+
+Questo mantiene valido il punto 10: le relazioni reali col giocatore restano
+dove sono finché un futuro gameplay di gruppo non avrà bisogno di un proprio
+contratto.
+
+### Luogo e città del gruppo
+
+Il gruppo può avere una timeline leggera:
+
+`luoghi[]`
+
+Ogni transizione contiene:
+
+- `dalGiorno`;
+- `cittaId` opzionale;
+- `ambienteId` opzionale;
+- `fonte`.
+
+Questo consente a un gruppo nato in Provincia di:
+
+- cambiare ambiente;
+- trasferirsi;
+- ricomparire più avanti a Milano o in una città futura;
+
+senza cambiare `groupId`.
+
+Non viene eseguita alcuna simulazione giornaliera.
+
+### Guardrail temporali
+
+Il modulo impedisce:
+
+- fondazioni con una cerchia inesistente;
+- doppia promozione della stessa cerchia attiva;
+- duplicazione dello stesso `groupId`;
+- ingresso di un membro prima della fondazione;
+- uscita prima del suo ingresso;
+- spostamento del gruppo prima della fondazione;
+- due luoghi differenti nello stesso giorno.
+
+Questi controlli evitano timeline impossibili senza imporre storyline.
+
+### Scioglimento
+
+`sciogli()`:
+
+- mantiene il record del gruppo;
+- imposta lo stato `sciolto`;
+- registra giorno e fonte;
+- chiude le membership ancora attive.
+
+Il record non viene cancellato.
+
+Un sistema futuro può quindi sapere che una PERSONA **faceva parte** di un
+gruppo ormai sciolto.
+
+`gruppiPerPersona(..., {includeSciolti:true})` permette questa lettura
+storica.
+
+### Save compatibility
+
+`START()` include ora:
+
+`npcGruppi: []`
+
+Il sistema corrente di `partitaDaSalvataggio()` completa i campi top-level
+mancanti partendo da `START()`.
+
+Un vecchio save senza `npcGruppi` riceve quindi un registro vuoto senza
+conversioni euristiche e senza creare gruppi retroattivi.
+
+La migrazione generale resta comunque da riesaminare al punto 19.
+
+### Integrazione Strada
+
+`stradaNpcGruppiPersona(p)` mantiene questo ordine:
+
+1. `ADF_CRIME_NPC.groupsForPerson()`, se un Population Manager esterno lo
+   implementa;
+2. registro locale `ADF_NPC_GRUPPI + G.npcGruppi`;
+3. array vuoto.
+
+Quindi un vero gruppo persistente può già produrre `groupIds` nel contesto
+crime.
+
+Una semplice cerchia del punto 13 continua invece a produrre:
+
+`groupIds: []`.
+
+Il bridge esterno mantiene priorità, quindi il punto 14 non rende impossibile
+il Population Manager centralizzato del punto 16.
+
+### Riutilizzo narrativo
+
+Una volta promosso, il gruppo possiede un'identità stabile indipendente dalla
+scena che lo ha fatto emergere.
+
+Può quindi essere riutilizzato in futuro per:
+
+- eventi;
+- referral;
+- rivalità;
+- attività;
+- storyline;
+- cambi città;
+- ricomparse a distanza di tempo.
+
+Il punto 14 prepara questa possibilità ma **non genera autonomamente eventi o
+storyline**.
+
+### Sufficienza rispetto alla simulazione 300–800 NPC
+
+Il modello è leggero perché:
+
+- non esiste una membership per tutte le PERSONA;
+- vengono salvati soltanto i gruppi realmente creati;
+- ogni gruppo salva soltanto i propri membri;
+- la coesione è calcolata quando serve;
+- non esiste scansione giornaliera globale;
+- le posizioni del gruppo sono transizioni, non snapshot giornalieri.
+
+Un test con 800 PERSONA verifica che promuovere una cerchia di tre persone
+salvi esattamente tre membership e non aggiunga campi agli altri 797 NPC.
+
+Questo è coerente anche con l'obiettivo storico: non servono decine di gruppi
+artificiali, basta che il sistema possa sostenere pochi gruppi credibili che
+continuino a esistere indipendentemente dal giocatore.
+
+### API runtime
+
+`window.ADF_NPC_GRUPPI` espone:
+
+- `candidati(registro, persone)`;
+- `promuoviCerchia(...)`;
+- `aggiungiMembro(...)`;
+- `rimuoviMembro(...)`;
+- `sciogli(...)`;
+- `sposta(...)`;
+- `luogo(...)`;
+- `trova(...)`;
+- `membriAttivi(...)`;
+- `gruppiPerPersona(...)`;
+- `coesione(...)`;
+- `vista(...)`.
+
+### Test
+
+`npc-gruppi.test.js` copre:
+
+- cerchia candidata senza promozione automatica;
+- promozione di una cerchia reale;
+- rifiuto di cerchie inventate;
+- doppia promozione;
+- stabilità/unicità di `groupId`;
+- ingresso, uscita e rientro dei membri;
+- gruppo persistente dopo la perdita della cerchia originaria;
+- coesione derivata;
+- timeline città/ambiente;
+- appartenenza di una PERSONA a più gruppi;
+- scioglimento con storia preservata;
+- guardrail temporali;
+- vista read-only;
+- scenario con 800 PERSONA.
+
+`npc-gruppi-integrazione.test.js` verifica:
+
+- ordine di caricamento runtime;
+- presenza di `npcGruppi:[]` nello stato iniziale;
+- cerchia semplice non trattata come gruppo Strada;
+- gruppo persistente locale disponibile alla Strada;
+- priorità dell'adapter esterno;
+- `groupIds` derivati soltanto da gruppi reali.
+
+### Confine del punto 14
+
+**Chiuso:** promozione esplicita cerchia → gruppo, registro persistente,
+membership storica, scioglimento, spostamento fra città/ambienti, coesione
+derivata, integrazione col bridge crime e compatibilità save di base.
+
+**Non implementato qui:** generazione automatica di nomi, probabilità casuali
+di fondazione, leadership, economia del gruppo, relazione globale col
+protagonista, conflitti fra gruppi, UI dedicata, storyline automatiche o
+simulazione autonoma quotidiana.
+
+Il prossimo punto riguarda la promozione di NPC temporanei/cameo a PERSONA
+persistenti.
+
